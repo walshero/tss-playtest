@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dad Energy: A Father's Day Game</title><style>
+  :root{
+    --paper:#0c0f14;            /* deep slate page (matches cut-paper night) */
+    --panel:#16202c;            /* card surface — slate */
+    --ink:#e8d9bc;             /* warm cream text */
+    --ink-soft:#8aa0b4;        /* muted slate-blue */
+    --tape:#243140;
+    --marker:#e0a857;          /* warm amber accent */
+    --marker-deep:#f4d089;     /* bright amber */
+    --warn:#d98a5a;            /* terracotta accent */
+    --line:#2a3a4a;            /* hairline borders — slate */
+    --focus:#f4d089;
+    /* TOKEN-ROLE split: decoration-only aliases (same hex as their ink twins) */
+    --ink-line:var(--ink);
+    --marker-line:var(--marker);
+    --marker-deep-line:var(--marker-deep);
+  }
+  /* ---- STUDIO EYES · LIGHT: DUSK (warm slate, still dark) ---- */
+  html[data-light="dusk"]{
+    --paper:#100c12;
+    --panel:#1d1922;
+    --ink:#efdcc0;
+    --ink-soft:#a99fb0;
+    --tape:#2a2434;
+    --marker:#e6b06a;
+    --marker-deep:#f6d590;
+    --warn:#e09a6a;
+    --line:#332b3a;
+    --focus:#f6d590;
+  }
+  /* ---- STUDIO EYES · LIGHT: WARM-DARK / night (warm charcoal, never pure black) ---- */
+  html[data-light="night"]{
+    --paper:#17130d;
+    --panel:#241d14;
+    --ink:#f4e6c4;
+    --ink-soft:#c2ad88;
+    --tape:#33291a;
+    --marker:#eab866;
+    --marker-deep:#f8d98e;
+    --warn:#e6a066;
+    --line:#3a2f1e;
+    --focus:#f8d98e;
+  }
+  /* ---- STUDIO EYES · toggles ---- */
+  html.se-contrast{ --ink:#fdfcf8; --ink-soft:#e6dcc8; --marker:#f6c877; --marker-deep:#ffe0a0; --line:#5a4a2a; }
+  html.se-a1 body{ font-size:clamp(20px,2.7vw,24px); }
+  html.se-a2 body{ font-size:clamp(22px,3vw,27px); }
+  html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+  html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:"Source Serif 4",Georgia,serif;
+    font-size:clamp(18px,2.4vw,22px);line-height:1.55;min-height:100vh;
+    display:flex;flex-direction:column;transition:background .18s ease,color .18s ease;}
+  .page-main{flex:1 1 auto;display:flex;align-items:flex-start;justify-content:center;
+    padding:clamp(16px,4vw,48px);width:100%;}
+  .card{background:var(--panel);border:2px solid #1d3328;border-radius:14px;
+    box-shadow:0 0 0 1px rgba(224,168,87,.08), inset 0 0 70px rgba(224,168,87,.05), 0 18px 50px rgba(0,0,0,.5);
+    max-width:700px;width:100%;padding:clamp(24px,5vw,48px);position:relative;overflow:hidden;}
+  .card::after{ /* CRT scanlines over everything */
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:5;border-radius:12px;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.04) 3px,rgba(0,0,0,0) 4px);}
+  .eyebrow{font-family:"Caveat",cursive;font-size:clamp(26px,4vw,34px);color:var(--marker);margin:0 0 2px;line-height:1;position:relative;z-index:6;text-shadow:0 0 8px rgba(224,168,87,.45);}
+  h1{font-weight:700;font-size:clamp(28px,5vw,40px);margin:0 0 18px;letter-spacing:-.01em;position:relative;z-index:6;color:var(--marker-deep);text-shadow:0 0 6px rgba(224,168,87,.4),3px 3px 0 rgba(255,200,87,.25);}
+  .art-block{margin:6px 0 22px;position:relative;z-index:6;}
+  .art{width:100%;border:1px solid var(--line);border-radius:10px 10px 0 0;background:#0d130e;display:block;border-bottom:none;box-shadow:inset 0 0 40px rgba(224,168,87,.06);}
+  .art svg{display:block;width:100%;height:auto;max-height:46vh;}
+  .art-caption{font-family:"Caveat",cursive;font-size:clamp(22px,4.5vw,30px);line-height:1.15;color:var(--marker);text-align:center;
+    background:#0d130e;border:1px solid var(--line);border-top:1px dashed var(--line);border-radius:0 0 10px 10px;padding:8px 14px 12px;margin:0;text-shadow:0 0 8px rgba(224,168,87,.4);}
+  .art-caption.warn{color:var(--warn);text-shadow:0 0 8px rgba(255,200,87,.4);}
+  .meter-wrap{margin:18px 0 26px;position:relative;z-index:6;}
+  .meter-label{display:flex;justify-content:space-between;align-items:baseline;font-size:.8em;color:var(--ink-soft);margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase;}
+  .meter-label b{color:var(--marker-deep);font-family:"Caveat",cursive;font-size:1.5em;text-transform:none;letter-spacing:0;text-shadow:0 0 8px rgba(224,168,87,.5);}
+  .meter{height:16px;background:#0a120c;border-radius:99px;overflow:hidden;border:1px solid var(--line);}
+  .meter-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--marker-line),var(--marker-deep-line));border-radius:99px;transition:width .55s ease;box-shadow:0 0 12px rgba(224,168,87,.6);}
+  .meter-fill.climb{transition:width 1.15s cubic-bezier(.34,1.56,.64,1);}
+  @media (prefers-reduced-motion: reduce){.meter-fill,.meter-fill.climb{transition:none;}}
+  .scene{font-size:1.05em;position:relative;z-index:6;color:#e8d9bc;}
+  .scene p{margin:0 0 1em;}
+  .narrator{color:var(--warn);font-style:italic;text-shadow:0 0 6px rgba(255,200,87,.25);}
+  .options{display:flex;flex-direction:column;gap:14px;margin-top:26px;position:relative;z-index:6;}
+  button.choice{font-family:"Source Serif 4",serif;font-size:1em;text-align:left;background:transparent;color:#e8d9bc;
+    border:2px solid var(--ink-line);border-radius:10px;padding:16px 18px;cursor:pointer;line-height:1.4;transition:transform .08s ease, background .15s ease, box-shadow .15s ease;}
+  button.choice:hover{background:rgba(224,168,87,.10);transform:translateY(-1px);box-shadow:0 0 16px rgba(224,168,87,.2);}
+  button.choice:active{transform:translateY(0);}
+  button.choice:focus-visible,button.next:focus-visible,button.restart:focus-visible{outline:4px solid var(--focus);outline-offset:2px;}
+  .feedback{margin-top:8px;padding:16px 18px;border-left:5px solid var(--marker-line);background:rgba(224,168,87,.07);border-radius:0 10px 10px 0;font-size:1em;position:relative;z-index:6;color:#e8d9bc;}
+  .feedback.zing{border-left-color:var(--warn);background:rgba(255,200,87,.08);}
+  .feedback .tag{display:block;font-family:"Caveat",cursive;font-size:1.5em;line-height:1;color:var(--marker-deep);margin-bottom:2px;text-shadow:0 0 8px rgba(224,168,87,.4);}
+  .feedback.zing .tag{color:var(--warn);text-shadow:0 0 8px rgba(255,200,87,.4);}
+  .next-row{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:6;}
+  button.next{font-family:"Source Serif 4",serif;font-weight:700;font-size:1em;letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--marker);
+    border:2px solid var(--marker-line);border-radius:10px;padding:14px 26px;cursor:pointer;transition:background .15s ease;text-shadow:0 0 8px rgba(224,168,87,.4);box-shadow:0 0 14px rgba(224,168,87,.15);}
+  button.next:hover{background:rgba(224,168,87,.14);}
+  .step-count{font-size:.78em;color:var(--ink-soft);margin-top:24px;position:relative;z-index:6;letter-spacing:.08em;text-transform:uppercase;}
+  .ending h1{margin-bottom:6px;}
+  .rank{font-family:"Caveat",cursive;font-size:clamp(34px,6vw,52px);color:var(--marker-deep);line-height:1;margin:4px 0 14px;text-shadow:0 0 12px rgba(224,168,87,.5);}
+  button.restart{font-family:"Source Serif 4",serif;font-weight:700;font-size:1em;letter-spacing:.06em;text-transform:uppercase;background:transparent;color:var(--marker);
+    border:2px solid var(--marker-line);border-radius:10px;padding:14px 24px;cursor:pointer;margin-top:10px;text-shadow:0 0 8px rgba(224,168,87,.4);}
+  button.restart:hover{background:rgba(224,168,87,.14);}
+  .hint{font-size:.8em;color:var(--ink-soft);margin-top:30px;border-top:1px dashed var(--line);padding-top:14px;position:relative;z-index:6;}
+  .brand{margin-top:18px;text-align:center;font-size:.82em;color:var(--ink-soft);position:relative;z-index:6;}
+  .brand .studio{font-family:"Caveat",cursive;font-size:1.6em;color:var(--marker);display:block;line-height:1;text-shadow:0 0 8px rgba(224,168,87,.4);}
+  .brand a{color:var(--marker-deep);text-decoration:none;border-bottom:1px solid var(--line);}
+  .brand a:focus-visible{outline:4px solid var(--focus);outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
+
+  /* ---- between-scene castle build interstitial ---- */
+  .build-wrap{position:relative;z-index:6;text-align:center;}
+  .build-cap{font-family:"Caveat",cursive;font-size:clamp(24px,5vw,34px);color:var(--marker);
+    text-shadow:0 0 8px rgba(224,168,87,.4);margin:0 0 4px;line-height:1.1;}
+  .build-sub{color:var(--ink-soft);font-size:.82em;letter-spacing:.08em;text-transform:uppercase;margin:0 0 14px;}
+  .build-art{border:1px solid var(--line);border-radius:10px;background:#0d130e;box-shadow:inset 0 0 40px rgba(224,168,87,.06);}
+  .build-art svg{display:block;width:100%;height:auto;max-height:46vh;}
+  /* newest piece draws itself in via stroke-dash; older pieces are already solid */
+  .bnew path,.bnew g{stroke-dasharray:600;stroke-dashoffset:600;animation:draw 1.1s ease forwards;}
+  .bnew .bfill{opacity:0;animation:fadein .5s ease .9s forwards;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  @keyframes fadein{to{opacity:1;}}
+  @media (prefers-reduced-motion: reduce){
+    .bnew path,.bnew g{stroke-dashoffset:0;animation:none;}
+    .bnew .bfill{opacity:1;animation:none;}
+  }
+  .build-row{margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:6;}
+  button.replaybtn{font-family:"Source Serif 4",serif;font-weight:700;font-size:.92em;letter-spacing:.06em;text-transform:uppercase;
+    background:transparent;color:var(--ink-soft);border:2px solid var(--line);border-radius:10px;padding:12px 20px;cursor:pointer;}
+  button.replaybtn:hover{background:rgba(224,168,87,.08);color:var(--marker);}
+  button.replaybtn:focus-visible{outline:4px solid var(--focus);outline-offset:2px;}
+
+  /* ---- retro arcade title screen (intro only) ---- */
+  .arcade{
+    background:#16202c;
+    border-radius:12px;
+    margin:-2px 0 0;
+    padding:clamp(28px,7vw,56px) clamp(20px,5vw,40px);
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    border:2px solid #2a3a4a;
+    box-shadow:inset 0 0 60px rgba(224,168,87,.08);
+  }
+  .arcade::after{ /* CRT scanlines */
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.04) 3px,rgba(0,0,0,0) 4px);
+    border-radius:12px;
+  }
+  .arcade-tag{
+    font-family:"Caveat",cursive;font-size:clamp(16px,3.4vw,22px);
+    color:#e0a857;letter-spacing:.12em;text-transform:uppercase;margin:0 0 10px;
+    text-shadow:0 0 8px rgba(224,168,87,.5);
+  }
+  .arcade-title{
+    font-family:"Source Serif 4",serif;font-weight:700;
+    font-size:clamp(40px,11vw,84px);line-height:.92;margin:0;
+    color:#f4d089;letter-spacing:-.02em;
+    text-shadow:0 0 4px rgba(224,168,87,.6),0 0 22px rgba(224,168,87,.35),4px 4px 0 #B4582A;
+  }
+  .arcade-sub{
+    font-family:"Caveat",cursive;font-size:clamp(24px,5.5vw,38px);
+    color:#FFC857;margin:6px 0 0;line-height:1;
+    text-shadow:0 0 10px rgba(255,200,87,.4);
+  }
+  .arcade-pitch{
+    color:#e8d9bc;font-size:clamp(15px,3.4vw,18px);line-height:1.5;
+    max-width:30em;margin:22px auto 0;position:relative;z-index:1;
+  }
+  .arcade-pitch .dare{color:#FFC857;font-style:italic;}
+  .arcade-start{
+    margin-top:26px;position:relative;z-index:1;
+    font-family:"Source Serif 4",serif;font-weight:700;font-size:clamp(16px,3.6vw,20px);
+    letter-spacing:.16em;text-transform:uppercase;
+    background:transparent;color:#f4d089;border:2px solid #e0a857;border-radius:8px;
+    padding:14px 28px;cursor:pointer;
+    text-shadow:0 0 8px rgba(224,168,87,.5);box-shadow:0 0 16px rgba(224,168,87,.18);
+    animation:presspulse 1.4s ease-in-out infinite;
+  }
+  .arcade-start:hover{background:rgba(224,168,87,.12);}
+  .arcade-start:focus-visible{outline:4px solid #FFC857;outline-offset:3px;}
+  @keyframes presspulse{0%,100%{opacity:1}50%{opacity:.55}}
+  @media (prefers-reduced-motion: reduce){.arcade-start{animation:none;}}
+  .arcade-foot{
+    margin-top:20px;position:relative;z-index:1;
+    font-family:"Caveat",cursive;font-size:clamp(15px,3.2vw,19px);color:#6B9C82;
+  }
+
+  /* ═══ STUDIO EYES — reserved chrome header (v2 standard, page palette) ═══ */
+  .se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--panel);border-bottom:2px solid var(--line);
+    position:sticky;top:0;z-index:100;box-shadow:0 4px 14px rgba(0,0,0,.45);}
+  .se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:44px;
+    padding:8px 14px;border:1.5px solid var(--ink);border-radius:8px;background:transparent;
+    color:var(--ink);font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:14px;
+    letter-spacing:.02em;text-decoration:none;line-height:1;}
+  .se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;}
+  .se-brand svg{width:34px;height:20px;color:var(--marker);flex:0 0 auto;}
+  .se-brand .wm{font-family:"Caveat",cursive;font-size:22px;letter-spacing:.01em;white-space:nowrap;
+    color:var(--marker);text-shadow:0 0 8px rgba(224,168,87,.35);}
+  .se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:44px;
+    padding:8px 15px;border:2px solid transparent;border-radius:8px;background:var(--marker);
+    color:var(--paper);font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:14px;
+    cursor:pointer;line-height:1;}
+  .se-home:hover{background:rgba(224,168,87,.14);}
+  .se-eyes:hover{filter:brightness(1.06);}
+  .se-home:focus-visible,.se-eyes:focus-visible{outline:4px solid var(--focus);outline-offset:2px;}
+  @media (max-width:560px){.se-brand .wm{display:none;}}
+
+  /* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+  .se-panel{position:fixed;right:12px;top:64px;z-index:101;
+    width:min(320px,calc(100vw - 24px));background:var(--panel);color:var(--ink);
+    border:2px solid var(--marker);border-radius:12px;padding:15px;
+    box-shadow:0 12px 40px rgba(0,0,0,.55);display:none;}
+  .se-panel[data-open="1"]{display:block;}
+  .se-panel h2{font-family:"Source Serif 4",Georgia,serif;font-size:11px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px;}
+  .se-row{display:flex;gap:6px;margin-bottom:14px;}
+  .se-btn{flex:1;min-height:44px;padding:8px 4px;border:1.5px solid var(--line);border-radius:8px;
+    background:transparent;color:var(--ink);font-family:"Source Serif 4",Georgia,serif;font-weight:700;
+    font-size:14px;cursor:pointer;}
+  .se-btn[aria-pressed="true"]{background:var(--marker);color:var(--paper);border-color:var(--marker);}
+  .se-btn:focus-visible{outline:4px solid var(--focus);outline-offset:2px;}
+  .se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    min-height:44px;padding:8px 12px;margin-bottom:6px;border:1.5px solid var(--line);border-radius:8px;
+    background:transparent;color:var(--ink);font-family:"Source Serif 4",Georgia,serif;font-weight:600;
+    font-size:15px;cursor:pointer;text-align:left;}
+  .se-tog[aria-pressed="true"]{border-color:var(--marker);}
+  .se-tog .st{font-family:"Source Serif 4",Georgia,serif;font-size:12px;color:var(--ink-soft);}
+  .se-tog[aria-pressed="true"] .st{color:var(--marker);font-weight:700;}
+  .se-tog:focus-visible{outline:4px solid var(--focus);outline-offset:2px;}
+  .se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{display:flex;gap:10px;justify-content:center;align-items:center;padding:18px;
+    border-top:2px solid var(--line);background:var(--panel);}
+  .se-rail a,.se-rail button{min-height:44px;padding:10px 20px;border:1.5px solid var(--ink);
+    border-radius:8px;background:transparent;color:var(--ink);font-family:"Source Serif 4",Georgia,serif;
+    font-weight:700;font-size:14px;letter-spacing:.02em;text-decoration:none;cursor:pointer;line-height:1;
+    display:inline-flex;align-items:center;}
+  .se-rail a:hover,.se-rail button:hover{background:rgba(224,168,87,.14);}
+  .se-rail a:focus-visible,.se-rail button:focus-visible{outline:4px solid var(--focus);outline-offset:2px;}
+  .se-updated{text-align:center;font-family:"Source Serif 4",Georgia,serif;font-size:13px;
+    color:var(--ink-soft);margin:0;padding:12px 16px 22px;background:var(--paper);letter-spacing:.02em;}
+  </style>
+<style>
+/* LAB STATUS BAND - founder ruling 2026-08-27, "put in lab not as done game."
+   New builds carry a .tsp-lab chip inside the h1, beside the version chip. This is
+   a RETROFIT across 19 shipped games whose heading structures have nothing in
+   common: some carry four h1 elements, one builds its title from a JS template, and
+   three have no h1 at all. Rewriting the title markup of nineteen shipped games to
+   add a label is a large blast radius for a label, so the status mounts as its own
+   band instead. Colours are fixed rather than tokenised, because these files do not
+   share a palette and a status that inherits an unknown token can arrive invisible.
+   #f6efe0 on #241a11 is 13.4:1, which clears the studio floor of 7:1 with room. */
+.tsp-labband{
+  display:block; box-sizing:border-box; width:100%;
+  background:#241a11; color:#f6efe0;
+  border-bottom:3px solid #b98c39;
+  padding:9px 16px; margin:0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:18px; line-height:1.35; font-weight:700; letter-spacing:.02em;
+}
+.tsp-labband b{
+  display:inline-block; color:#f3c675;
+  border:2px dashed #f3c675; border-radius:3px;
+  padding:.06em .38em; margin-right:.5em; letter-spacing:.09em;
+}
+@media print{ .tsp-labband{background:#fff; color:#000; border-bottom:2px solid #000;} }
+</style>
+</head>
+<body>
+<p class="tsp-labband"><b>LAB</b>An experiment on the bench, not a finished game.</p>
+
+  <!-- RESERVED CHROME -->
+  <header class="se-chrome">
+    <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+    <span class="se-brand">
+      <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+      <span class="wm">Tight Spiral</span>
+    </span>
+  </header>
+<p class="se-stamp" style="margin:.45rem .9rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><p class="se-updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v15 <span style="opacity:.75">246aeaf</span></span> </span> </span> </span>  </p>
+
+
+<!-- ART-ASK REGISTER  =  art-department compositor sweep, 2026-08-01 =========
+CHARTER LAW: scene art comes from two lanes only (MJ / legal photo). The hand-
+drawn SVGs below this comment are scaffolding awaiting plates; each site is
+tagged "ART-ASK" in a code comment. art-gate HALTs on these sites are known
+and intentional until the founder supplies the plates.
+
+PERIOD PIN (whole file): 1993 American middle-class suburb. The Scene 2 minivan
+is the dating object; nothing in frame may postdate it. FORBIDDEN everywhere:
+granite, stainless appliances, K-cups, LED bulbs/string lights, flat screens,
+cordless lithium tools, digital clocks with legible digits.
+
+EXISTING PLATES: none mounted. art/cyl/plates/room.household.nixon69.jpg was
+considered for the kitchen and REJECTED - its range and fridge are ~1959, an
+anachronism against the on-screen 1993 minivan. Zero shots in this sweep carry
+an existing-plate lane.
+
+DEAD CODE CLEARED: art.s1 (Greg reveal), art.s1r (orphan), art.s2r (castle
+spec), art.s3r (mid-build), art.s4r (duplicate of s4) were reveal drawings for
+scenes 1-4 that never rendered (choose() draws s.reveal only on the final
+scene). Deleted this sweep; restore prompts are held below in case the founder
+revives per-scene reveals.
+
+GENERATION ORDER: generate the s5r hero plate FIRST and chain every castle-
+shaped shot to it via the sref flag pointing at the chosen hero plate.
+NOTE ON FLAGS: every Midjourney flag in this register is written with a
+spaced double-dash (" - -ar", " - -style", " - -sref") because a literal
+double-hyphen is illegal inside an HTML comment. When pasting into
+Midjourney, close each flag up to a real double-dash with no space.
+
+ASK 1 - art.intro (Scene 1 setup, kitchen). MJ:
+  early 1990s American middle-class kitchen at 7 a.m., golden oak cabinets,
+  almond refrigerator with a child's crayon drawing held by fruit magnets,
+  white Mr. Coffee drip machine mid-brew, wall-mounted push-button phone with
+  long coiled cord, Formica counter, kitchen table in soft window light with
+  one white plate holding a single lumpy thumb-shaped pancake, quiet house
+  before anyone wakes, shot on Kodak Gold 400 35mm, warm morning light, faded
+  4x6 print grain, matte, no people, no text - -ar 21:9 - -style raw
+
+ASK 2 - RESTORE-ONLY (art.s1, Greg the pancake, deleted dead code). MJ:
+  close-up of a single lumpy thumb-shaped pancake on a plain white plate, two
+  blueberries for eyes and a thin syrup smile, melting pat of butter, fork
+  askew, 1990s Formica kitchen table, morning window light, shot on Kodak
+  Gold 400 35mm, shallow depth of field, faded snapshot grain, no people,
+  no text - -ar 21:9 - -style raw
+
+ASK 3 - art.s2 (Scene 2 setup, THE MINIVAN - the game's dating object).
+  LEGAL-PHOTO lane, Period Librarian brief - Wikimedia Commons first:
+  search "Dodge Grand Caravan 1991", "Plymouth Voyager 1993", "Chrysler AS
+  platform", category Dodge Caravan (second generation). Must be an AS-body
+  1991-1995 Dodge Grand Caravan or Plymouth Voyager: woodgrain vinyl side
+  panel preferred, single MANUAL sliding door (power sliding door does not
+  exist until 1996 - audit point), mast antenna, blue or maroon paint,
+  suburban street or driveway, clean 3/4 front view, daylight.
+  FORBIDDEN: 1996+ rounded NS body, dual sliding doors, modern alloy wheels.
+  LICENSE: public domain or CC-BY preferred; CC-BY-SA acceptable with
+  attribution + full license string recorded in the mount per charter. Verify
+  license ON THE FILE'S OWN PAGE, not the search result; record source URL.
+  License plate must be illegible or cropped.
+  MJ fallback if no clean plate survives verification:
+  a 1993 Plymouth Voyager minivan with woodgrain side panels parked on a
+  tree-lined American suburban street, late morning sun, shot on Kodak Gold
+  400 35mm, faded snapshot, no people, no text - -ar 21:9 - -style raw
+
+ASK 4 - RESTORE-ONLY (art.s2r, kid's castle spec, deleted dead code). MJ:
+  a six-year-old's crayon drawing of a castle with a wide moat and a blue
+  flag, bold waxy crayola strokes on slightly curled white paper,
+  photographed flat on a 1990s Formica kitchen table, warm afternoon light,
+  shot on Kodak Gold 400 35mm, no letters, no numbers, no people, no text
+  - -ar 21:9 - -style raw
+
+ASK 5 - art.s3 (Scene 3 setup, garage build-panic still life). MJ:
+  early 1990s suburban garage interior, workbench under a pegboard of
+  red-handled hand tools, corded hot glue gun and roll of silver duct tape on
+  the bench, huge flattened refrigerator cardboard box leaning against the
+  wall, caged incandescent trouble light hanging from a rafter, corded
+  circular saw, green metal cooler, single bare bulb, sawdust on the floor,
+  shot on Kodak Gold 400 35mm with flash, faded snapshot grain, no people,
+  no text, no legible logos - -ar 21:9 - -style raw
+
+ASK 6 - RESTORE-ONLY (art.s3r, castle mid-build, deleted dead code). MJ:
+  a half-built cardboard castle inside a 1990s suburban garage,
+  refrigerator-box base walls taped with silver duct tape, one corner tower
+  standing, a cut drawbridge flap hanging open on twine, hot glue gun and
+  utility knife on the concrete floor, pencil marks and crooked seams, caged
+  trouble light glow, shot on Kodak Gold 400 35mm with flash, no people,
+  no text - -ar 21:9 - -style raw
+
+ASK 7 - art.s4 (Scene 4 setup, bedtime stall). CONTINUITY FAILURE: current
+  SVG is an exterior night street - wrong room for an interior stalling
+  scene - and the same drawing was pasted three times (s4, the deleted s4r,
+  and s5). MJ:
+  a child's bedroom at night in 1993, warm incandescent bedside lamp with
+  pleated shade, open paperback picture book face-down on a homemade
+  patchwork quilt, plastic cup of water and wind-up analog alarm clock on
+  the nightstand, glow-in-the-dark star stickers dim on the ceiling, door
+  ajar with hallway light, shot on Kodak Gold 400 35mm, warm low light,
+  heavy snapshot grain, no people, no text - -ar 21:9 - -style raw
+
+ASK 8 - art.s5 (Scene 5 setup, the held breath; currently a duplicate of
+  s4's drawing). Castle stays silhouette - the payoff belongs to the next
+  screen. MJ:
+  American suburban backyard at dusk seen from the back porch, strings of
+  multicolor C9 incandescent christmas lights glowing warm over the lawn,
+  the dark unlit silhouette of a homemade cardboard castle at the edge of
+  the light, green garden hose coiled in the grass, wooden stockade fence,
+  warm light spilling from an aluminum storm door, June evening, shot on
+  Kodak Gold 400 35mm, dusk grain, no people, no text - -ar 21:9 - -style raw
+
+ASK 9 - art.s5r (Scene 5 reveal, "Open them." - THE image of the game;
+  generate FIRST, then sref-chain everything castle-shaped to it). MJ:
+  a homemade cardboard castle standing in a suburban backyard at night, two
+  corner towers made of taped refrigerator boxes, hand-cut crenellations, a
+  working cardboard drawbridge lowered on twine, a coiled green garden hose
+  ringing it like a moat, small cut windows glowing warm from a flashlight
+  inside, multicolor C9 incandescent string lights strung overhead, silver
+  duct tape seams visible, proud and slightly crooked, 1993 family snapshot
+  shot on Kodak Gold 400 35mm with flash at dusk, no people, no text
+  - -ar 21:9 - -style raw
+
+ASK 10 - art.endL (Ending LOW, the promise kept smaller - scale variant of
+  the hero plate: same yard, same night, same film stock). MJ:
+  a single small homemade cardboard tower standing in a dark suburban
+  backyard, one string of multicolor incandescent christmas lights sagging
+  over it, a green garden hose coiled hopefully around its base, duct tape
+  seams, humble and warm, 1993 Kodak Gold 400 flash snapshot at night,
+  no people, no text - -ar 21:9 - -style raw - -sref [chosen s5r hero plate]
+
+ASK 11 - art.endM (Ending MID, the words made true - same castle as hero,
+  calmer framing, slightly wider, yard settled). MJ:
+  the same homemade cardboard castle at night seen slightly wider, every
+  hand-cut window glowing warm from flashlights inside, full strings of
+  multicolor C9 incandescent lights lit above, garden hose moat, drawbridge
+  closed, quiet settled backyard, 1993 Kodak Gold 400 night snapshot,
+  no people, no text - -ar 21:9 - -style raw - -sref [chosen s5r hero plate]
+
+ASK 12 - art.endH (Ending HIGH, grandest). FOUNDER CONTINUITY RULING NEEDED:
+  she demanded a BLUE flag in Scene 2 ("Blue flag. Deep moat. Noted." - a
+  scripted on-screen promise) but the current SVG flies RED. Recommend BLUE
+  to honor the spec. MJ:
+  the same homemade cardboard castle at night at its grandest, low camera
+  angle so the taped refrigerator-box towers loom, working cardboard
+  drawbridge lowered on twine, small blue paper flag flying from the tallest
+  tower, garden hose moat ringing the walls, every window glowing, all
+  strings of multicolor incandescent lights blazing overhead, triumphant and
+  slightly crooked, 1993 Kodak Gold 400 flash snapshot, no people, no text
+  - -ar 21:9 - -style raw - -sref [chosen s5r hero plate]
+
+ASK 13 - castleLayers interstitials (GATE-BLIND: their svg wrapper is
+  assembled at runtime in choose() and drawBuild(), so art-gate's static
+  scan never sees them, yet they render on every choice screen). FOUNDER
+  DECISION, two honest paths:
+  (a) INSTRUMENT RULING - they render game state (the promise compounding,
+      four data-driven stages, closer to a progress schematic than scene
+      art); if ruled instrument, add data-art-class="instrument" inside the
+      runtime-assembled svg tag at BOTH wrapper-assembly points (marked
+      ART-ASK 13 in choose() and drawBuild()) and record the ruling in
+      art-doctrine.md.
+  (b) MJ LANE - four progressive build plates of the SAME castle as the s5r
+      hero, sref-chained, each stage photographed at its scene's hour:
+      Stage 1: flattened refrigerator boxes taped into a rectangular base on
+        a garage floor, silver duct tape, pencil marks, morning, Kodak Gold
+        400 flash, no people, no text
+      Stage 2: cardboard walls standing waist-high, seams taped, garage
+        light, midday
+      Stage 3: two corner towers up with hand-cut crenellations, glue gun on
+        floor, afternoon
+      Stage 4: finished castle with lowered twine drawbridge and small blue
+        paper flag, dusk, first string lights on
+      (all four end: - -ar 21:9 - -style raw - -sref [chosen s5r hero plate])
+  Do NOT leave them unmarked - the gate will catch them the day the string
+  assembly is refactored into static markup.
+============================================================================ -->
+  <div class="page-main">
+    <main class="card" id="card" role="application" aria-label="Dad Energy, a Father's Day game"></main>
+  </div>
+<script>
+(function(){
+  "use strict";
+  var ink="#e0a857";
+  var _fid=0;
+  // style → [baseFrequency, octaves, displacement scale]; A loosest, B tightest
+  var roughCfg={A:[0.022,2,4.3],B:[0.012,1,1.6],C:[0.015,2,2.6],D:[0.020,2,3.0]};
+  function frame(style,inner){
+    var cfg=roughCfg[style]||roughCfg.B; _fid++; var id="rgh"+_fid;
+    var f='<filter id="'+id+'" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency="'+cfg[0]+'" numOctaves="'+cfg[1]+'" seed="'+((_fid*7)%37)+'" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="'+cfg[2]+'" xChannelSelector="R" yChannelSelector="G"/></filter>';
+    return '<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs>'+f+'</defs><g filter="url(#'+id+')">'+inner+'</g></svg>';
+  }
+  var art={
+    // ART-ASK 1: replace with MJ kitchen plate (1993 period pin) - see register above
+    intro:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="intro_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="intro_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="intro_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="intro_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="intro_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="176" fill="#dfe4e2" filter="url(#intro_paper)"/><rect x="408" y="0" width="192" height="176" fill="#cdd6d6" filter="url(#intro_paper)"/><rect x="405" y="0" width="3" height="176" fill="#b3bcbc"/><rect x="52" y="28" width="160" height="126" fill="#9a8f7a" filter="url(#intro_liftbig)"/><rect x="62" y="38" width="140" height="106" fill="#a9d2e8" filter="url(#intro_paper)"/><circle cx="132" cy="92" r="20" fill="#ffd66a" filter="url(#intro_lift)"/><path d="M62 144 L62 108 L96 92 L128 110 L160 90 L202 116 L202 144 Z" fill="#8fb98a" filter="url(#intro_lift)"/><path d="M62 144 L62 122 L92 110 L132 124 L176 106 L202 124 L202 144 Z" fill="#6fa06d" filter="url(#intro_lift)"/><rect x="52" y="28" width="160" height="12" fill="#eef0ea" filter="url(#intro_lift)"/><rect x="52" y="142" width="160" height="14" fill="#d8dcd4" filter="url(#intro_lift)"/><rect x="52" y="28" width="12" height="128" fill="#eef0ea" filter="url(#intro_lift)"/><rect x="200" y="28" width="12" height="128" fill="#cdd2ca" filter="url(#intro_lift)"/><rect x="62" y="88" width="140" height="7" fill="#eef0ea" filter="url(#intro_lift)"/><rect x="128" y="40" width="7" height="104" fill="#eef0ea" filter="url(#intro_lift)"/><rect x="0" y="158" width="600" height="6" fill="#e8cf9a"/><rect x="0" y="164" width="600" height="18" fill="#caa26a" filter="url(#intro_paper)"/><rect x="0" y="182" width="600" height="48" fill="#b6c2b0" filter="url(#intro_paper)"/><ellipse cx="330" cy="150" rx="46" ry="11" fill="#cfd8e0" filter="url(#intro_liftbig)"/><path d="M300 132 q44 -4 88 0 q4 22 -2 24 q-2 4 -40 4 q-38 0 -40 -4 q-6 -2 -2 -24z" fill="#8fb2c8" filter="url(#intro_lift)"/><ellipse cx="338" cy="132" rx="34" ry="6" fill="#6e4a2c"/><g fill="none" stroke="#cfd8e0" stroke-width="2.4" opacity=".5" stroke-linecap="round"><path d="M324 122 q-8 -12 2 -22"/><path d="M350 122 q8 -12 -2 -22"/></g></svg>',
+    // ART-ASK 3: replace with LEGAL-PHOTO 1991-1995 AS-body minivan plate - see register
+    s2:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="s2_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="s2_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="s2_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="s2_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="s2_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="176" fill="#a9d2e8" filter="url(#s2_paper)"/><path d="M-6 150 Q150 122 320 144 Q460 160 606 138 L606 182 L-6 182 Z" fill="#8fb98a" filter="url(#s2_lift)"/><rect x="0" y="176" width="600" height="54" fill="#7d8794" filter="url(#s2_paper)"/><g fill="#e8e0c8" opacity=".8"><rect x="40" y="200" width="70" height="5" rx="2"/><rect x="200" y="200" width="70" height="5" rx="2"/><rect x="360" y="200" width="70" height="5" rx="2"/><rect x="520" y="200" width="60" height="5" rx="2"/></g><g fill="#fff" opacity=".8"><ellipse cx="120" cy="46" rx="34" ry="12"/><ellipse cx="156" cy="42" rx="24" ry="10"/><ellipse cx="470" cy="58" rx="36" ry="12"/></g><path d="M104 178 L110 150 Q120 136 150 134 L156 116 Q170 100 250 100 Q330 100 352 120 L420 130 Q452 136 470 152 L474 178 Z" fill="#c8543e" filter="url(#s2_liftbig)"/><path d="M168 116 Q182 96 250 96 Q318 96 344 120 L344 132 L168 132 Z" fill="#d96a52" filter="url(#s2_lift)"/><rect x="174" y="104" width="160" height="26" fill="#bcdcef" filter="url(#s2_lift)"/><circle cx="468" cy="160" r="8" fill="#FFE39A"/><g filter="url(#s2_liftbig)"><circle cx="150" cy="178" r="26" fill="#2e353c"/><circle cx="408" cy="178" r="26" fill="#2e353c"/></g><circle cx="150" cy="178" r="11" fill="#aab2ba"/><circle cx="408" cy="178" r="11" fill="#aab2ba"/></svg>',
+    // ART-ASK 5: replace with MJ 1993 garage still-life plate - see register
+    s3:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="s3_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="s3_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="s3_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="s3_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="s3_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="176" fill="#5a6b76" filter="url(#s3_paper)"/><rect x="48" y="30" width="180" height="96" fill="#c9b78f" filter="url(#s3_liftbig)"/><g fill="#9a8a64" opacity=".55"><circle cx="70" cy="50" r="2.5"/><circle cx="110" cy="50" r="2.5"/><circle cx="150" cy="50" r="2.5"/><circle cx="190" cy="50" r="2.5"/><circle cx="70" cy="90" r="2.5"/><circle cx="190" cy="90" r="2.5"/></g><g filter="url(#s3_lift)"><path d="M62 64 L120 64 L120 76 Q90 80 64 76 Z" fill="#cfd6da"/><rect x="58" y="62" width="10" height="16" rx="2" fill="#8a5a3a"/></g><g filter="url(#s3_lift)"><rect x="150" y="60" width="8" height="44" rx="2" fill="#8a5a2a"/><path d="M140 60 q18 -6 36 0 l0 10 q-18 5 -36 0z" fill="#6a7076"/></g><g filter="url(#s3_lift)" transform="translate(96 92)"><path d="M0 0 L26 14 M0 12 L26 -2" stroke="#9aa2a8" stroke-width="3.4" stroke-linecap="round"/><circle cx="-2" cy="0" r="5" fill="none" stroke="#c05a4a" stroke-width="2.6"/><circle cx="-2" cy="12" r="5" fill="none" stroke="#c05a4a" stroke-width="2.6"/></g><rect x="392" y="58" width="170" height="8" fill="#8a6a4a" filter="url(#s3_lift)"/><g filter="url(#s3_lift)"><rect x="410" y="34" width="26" height="24" rx="2" fill="#bcd0d6" opacity=".9"/><rect x="452" y="38" width="22" height="20" rx="2" fill="#cdbfa0" opacity=".9"/></g><g fill="#c05a4a"><circle cx="418" cy="50" r="2.4"/><circle cx="426" cy="52" r="2.4"/></g><path d="M300 0 L300 16 L408 28" stroke="#3a4650" stroke-width="3" fill="none"/><g filter="url(#s3_lift)"><path d="M392 20 Q424 20 432 46 L386 46 Q386 28 392 20z" fill="#3a4650"/></g><circle cx="409" cy="44" r="7" fill="#FFE6A8"/><path d="M409 48 L300 200 L540 200 Z" fill="url(#s3_glow)"/><rect x="0" y="150" width="600" height="6" fill="#e0c084"/><rect x="0" y="156" width="600" height="20" fill="#c49a5e" filter="url(#s3_paper)"/><g filter="url(#s3_liftbig)"><path d="M256 150 L254 96 L272 92 L272 80 L288 80 L288 92 L304 90 L304 150 Z" fill="#c39256"/><path d="M304 150 L304 100 L356 100 L356 150 Z" fill="#a87844"/></g><g filter="url(#s3_lift)" transform="translate(356 96) rotate(18)"><path d="M0 0 L22 12 M0 10 L22 -2" stroke="#9aa2a8" stroke-width="3" stroke-linecap="round"/><circle cx="-1" cy="0" r="4" fill="none" stroke="#c05a4a" stroke-width="2.2"/><circle cx="-1" cy="10" r="4" fill="none" stroke="#c05a4a" stroke-width="2.2"/></g><rect x="0" y="194" width="600" height="36" fill="#3f4850" filter="url(#s3_paper)"/><g fill="none" stroke="#c8a36a" stroke-width="2" opacity=".8" stroke-linecap="round"><path d="M150 212 q8 -7 15 0 q-7 5 -2 11"/><path d="M450 208 q9 -6 16 2 q-7 4 -3 10"/></g></svg>',
+    // ART-ASK 7: CONTINUITY FAILURE (exterior street for an interior scene; same drawing
+    // as s5). Replace with MJ 1993 child's-bedroom plate - see register
+    s4:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="s4_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="s4_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="s4_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="s4_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="s4_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="200" fill="#3a4660" filter="url(#s4_paper)"/><g fill="#cdd8ee" opacity=".8"><circle cx="120" cy="40" r="1.6"/><circle cx="470" cy="30" r="1.8"/><circle cx="520" cy="70" r="1.4"/><circle cx="80" cy="80" r="1.3"/></g><path d="M500 48 a13 13 0 1 0 6 20 a16 16 0 1 1 -6 -20z" fill="#e8ecff" opacity=".85" filter="url(#s4_lift)"/><rect x="0" y="186" width="600" height="44" fill="#2e4636" filter="url(#s4_paper)"/><path d="M104 188 L104 120 L168 70 L232 120 L232 188 Z" fill="#2a3344" filter="url(#s4_liftbig)"/><path d="M360 188 L360 108 L426 60 L492 108 L492 188 Z" fill="#2a3344" filter="url(#s4_liftbig)"/><rect x="146" y="140" width="26" height="36" fill="#1f2632" filter="url(#s4_lift)"/><rect x="404" y="128" width="26" height="40" fill="#1f2632" filter="url(#s4_lift)"/></svg>',
+    // ART-ASK 8: duplicate of s4's drawing. Replace with MJ dusk-backyard silhouette plate
+    // (castle withheld) - see register
+    s5:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="s5_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="s5_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="s5_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="s5_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="s5_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="200" fill="#3a4660" filter="url(#s5_paper)"/><g fill="#cdd8ee" opacity=".8"><circle cx="120" cy="40" r="1.6"/><circle cx="470" cy="30" r="1.8"/><circle cx="520" cy="70" r="1.4"/><circle cx="80" cy="80" r="1.3"/></g><path d="M500 48 a13 13 0 1 0 6 20 a16 16 0 1 1 -6 -20z" fill="#e8ecff" opacity=".85" filter="url(#s5_lift)"/><rect x="0" y="186" width="600" height="44" fill="#2e4636" filter="url(#s5_paper)"/><path d="M104 188 L104 120 L168 70 L232 120 L232 188 Z" fill="#2a3344" filter="url(#s5_liftbig)"/><path d="M360 188 L360 108 L426 60 L492 108 L492 188 Z" fill="#2a3344" filter="url(#s5_liftbig)"/><rect x="146" y="140" width="26" height="36" fill="#1f2632" filter="url(#s5_lift)"/><rect x="404" y="128" width="26" height="40" fill="#1f2632" filter="url(#s5_lift)"/></svg>',
+    // ART-ASK 9: THE image of the game. Generate this MJ hero plate FIRST; sref-chain all
+    // castle shots to it - see register
+    s5r:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="s5r_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="s5r_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="s5r_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="s5r_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="s5r_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="230" fill="#3a4660" filter="url(#s5r_paper)"/><g fill="#cdd8ee" opacity=".7"><circle cx="120" cy="40" r="1.6"/><circle cx="470" cy="32" r="1.8"/><circle cx="520" cy="64" r="1.3"/></g><rect x="0" y="178" width="600" height="52" fill="#3a5a44" filter="url(#s5r_paper)"/><g transform="translate(300,200) scale(1.05) translate(-300,-200)"><path d="M150 196 L150 92 L172 92 L172 76 L196 76 L196 92 L220 92 L220 196 Z" fill="#a06a32" filter="url(#s5r_liftbig)"/><path d="M380 196 L380 76 L404 76 L404 92 L428 92 L428 76 L452 76 L452 196 Z" fill="#a06a32" filter="url(#s5r_liftbig)"/><path d="M214 196 L214 116 L300 108 L386 116 L386 196 Z" fill="#c39256" filter="url(#s5r_liftbig)"/><path d="M168 198 L168 150 L300 144 L434 150 L434 198 Z" fill="#d99a4a" filter="url(#s5r_lift)"/><g><rect x="152" y="112" width="16" height="22" fill="#FFD37A" filter="url(#s5r_lift)"/><rect x="434" y="112" width="16" height="22" fill="#FFD37A" filter="url(#s5r_lift)"/><rect x="266" y="124" width="14" height="18" fill="#FFD37A" filter="url(#s5r_lift)"/><rect x="320" y="124" width="14" height="18" fill="#FFD37A" filter="url(#s5r_lift)"/></g><path d="M276 198 L276 164 Q300 142 324 164 L324 198 Z" fill="#FFD37A" filter="url(#s5r_lift)"/><path d="M300 108 L300 64" stroke="#7a4e22" stroke-width="3" fill="none"/><path class="flag" d="M300 66 L334 76 L300 86 Z" fill="#d6453a" filter="url(#s5r_lift)"/></g><path d="M120 60 Q255 30 300 42 Q345 30 480 58" fill="none" stroke="#2a3344" stroke-width="2"/><g class="bulb"><circle cx="120" cy="60" r="9" fill="url(#s5r_warmpool)"/><circle cx="120" cy="60" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="210" cy="46" r="9" fill="url(#s5r_warmpool)"/><circle cx="210" cy="46" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="300" cy="42" r="9" fill="url(#s5r_warmpool)"/><circle cx="300" cy="42" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="390" cy="46" r="9" fill="url(#s5r_warmpool)"/><circle cx="390" cy="46" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="480" cy="58" r="9" fill="url(#s5r_warmpool)"/><circle cx="480" cy="58" r="4" fill="#FFE39A"/></g></svg>',
+    // ART-ASK 10: scale variant of the s5r hero plate (sref-chained) - see register
+    endL:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="endL_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="endL_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="endL_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="endL_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="endL_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="230" fill="#3a4660" filter="url(#endL_paper)"/><g fill="#cdd8ee" opacity=".7"><circle cx="120" cy="40" r="1.6"/><circle cx="470" cy="32" r="1.8"/><circle cx="520" cy="64" r="1.3"/></g><rect x="0" y="178" width="600" height="52" fill="#3a5a44" filter="url(#endL_paper)"/><g transform="translate(300,200) scale(0.82) translate(-300,-200)"><path d="M150 196 L150 92 L172 92 L172 76 L196 76 L196 92 L220 92 L220 196 Z" fill="#a06a32" filter="url(#endL_liftbig)"/><path d="M380 196 L380 76 L404 76 L404 92 L428 92 L428 76 L452 76 L452 196 Z" fill="#a06a32" filter="url(#endL_liftbig)"/><path d="M214 196 L214 116 L300 108 L386 116 L386 196 Z" fill="#c39256" filter="url(#endL_liftbig)"/><path d="M168 198 L168 150 L300 144 L434 150 L434 198 Z" fill="#d99a4a" filter="url(#endL_lift)"/><g><rect x="266" y="124" width="14" height="18" fill="#e8b85a" filter="url(#endL_lift)"/></g><rect x="152" y="112" width="16" height="22" fill="#7a4e22" filter="url(#endL_lift)"/><rect x="434" y="112" width="16" height="22" fill="#7a4e22" filter="url(#endL_lift)"/><path d="M276 198 L276 164 Q300 142 324 164 L324 198 Z" fill="#7a4e22" filter="url(#endL_lift)"/><path d="M300 108 L300 64" stroke="#7a4e22" stroke-width="3" fill="none"/><path class="flag" d="M300 66 L334 76 L300 86 Z" fill="#d6453a" filter="url(#endL_lift)"/><circle cx="468" cy="150" r="9" fill="#caa46a" filter="url(#endL_lift)"/><path d="M468 159 q-2 20 0 34 M458 168 l20 0" stroke="#caa46a" stroke-width="3.4" fill="none" stroke-linecap="round"/></g></svg>',
+    // ART-ASK 11: same castle as s5r hero, wider and at rest (sref-chained) - see register
+    endM:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="endM_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="endM_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="endM_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="endM_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="endM_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="230" fill="#3a4660" filter="url(#endM_paper)"/><g fill="#cdd8ee" opacity=".7"><circle cx="120" cy="40" r="1.6"/><circle cx="470" cy="32" r="1.8"/><circle cx="520" cy="64" r="1.3"/></g><rect x="0" y="178" width="600" height="52" fill="#3a5a44" filter="url(#endM_paper)"/><g transform="translate(300,200) scale(0.95) translate(-300,-200)"><path d="M150 196 L150 92 L172 92 L172 76 L196 76 L196 92 L220 92 L220 196 Z" fill="#a06a32" filter="url(#endM_liftbig)"/><path d="M380 196 L380 76 L404 76 L404 92 L428 92 L428 76 L452 76 L452 196 Z" fill="#a06a32" filter="url(#endM_liftbig)"/><path d="M214 196 L214 116 L300 108 L386 116 L386 196 Z" fill="#c39256" filter="url(#endM_liftbig)"/><path d="M168 198 L168 150 L300 144 L434 150 L434 198 Z" fill="#d99a4a" filter="url(#endM_lift)"/><g><rect x="152" y="112" width="16" height="22" fill="#FFD37A" filter="url(#endM_lift)"/><rect x="434" y="112" width="16" height="22" fill="#FFD37A" filter="url(#endM_lift)"/><rect x="266" y="124" width="14" height="18" fill="#FFD37A" filter="url(#endM_lift)"/><rect x="320" y="124" width="14" height="18" fill="#FFD37A" filter="url(#endM_lift)"/></g><path d="M276 198 L276 164 Q300 142 324 164 L324 198 Z" fill="#FFD37A" filter="url(#endM_lift)"/><path d="M300 108 L300 64" stroke="#7a4e22" stroke-width="3" fill="none"/><path class="flag" d="M300 66 L334 76 L300 86 Z" fill="#d6453a" filter="url(#endM_lift)"/></g><path d="M120 60 Q255 30 300 42 Q345 30 480 58" fill="none" stroke="#2a3344" stroke-width="2"/><g class="bulb"><circle cx="120" cy="60" r="9" fill="url(#endM_warmpool)"/><circle cx="120" cy="60" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="210" cy="46" r="9" fill="url(#endM_warmpool)"/><circle cx="210" cy="46" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="300" cy="42" r="9" fill="url(#endM_warmpool)"/><circle cx="300" cy="42" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="390" cy="46" r="9" fill="url(#endM_warmpool)"/><circle cx="390" cy="46" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="480" cy="58" r="9" fill="url(#endM_warmpool)"/><circle cx="480" cy="58" r="4" fill="#FFE39A"/></g></svg>',
+    // ART-ASK 12: grandest variant (sref-chained). FLAG CONTINUITY: she specced BLUE in
+    // Scene 2; this SVG flies RED. Founder ruling needed - recommend blue - see register
+    endH:'<svg viewBox="0 0 600 230" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><filter id="endH_lift" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="2.5" stdDeviation="1.2" flood-color="#000" flood-opacity=".42"/></filter><filter id="endH_liftbig" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".38"/></filter><filter id="endH_paper"><feTurbulence type="fractalNoise" baseFrequency="0.05 0.1" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .055 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="c"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="c"/></feMerge></filter><radialGradient id="endH_glow" cx="50%" cy="0%" r="90%"><stop offset="0%" stop-color="#FFE6A8" stop-opacity=".7"/><stop offset="100%" stop-color="#FFE6A8" stop-opacity="0"/></radialGradient><radialGradient id="endH_warmpool" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFD37A" stop-opacity=".55"/><stop offset="100%" stop-color="#FFD37A" stop-opacity="0"/></radialGradient></defs><rect width="600" height="230" fill="#3a4660" filter="url(#endH_paper)"/><g fill="#cdd8ee" opacity=".7"><circle cx="120" cy="40" r="1.6"/><circle cx="470" cy="32" r="1.8"/><circle cx="520" cy="64" r="1.3"/></g><rect x="0" y="178" width="600" height="52" fill="#3a5a44" filter="url(#endH_paper)"/><g transform="translate(300,200) scale(1.08) translate(-300,-200)"><path d="M150 196 L150 92 L172 92 L172 76 L196 76 L196 92 L220 92 L220 196 Z" fill="#a06a32" filter="url(#endH_liftbig)"/><path d="M380 196 L380 76 L404 76 L404 92 L428 92 L428 76 L452 76 L452 196 Z" fill="#a06a32" filter="url(#endH_liftbig)"/><path d="M214 196 L214 116 L300 108 L386 116 L386 196 Z" fill="#c39256" filter="url(#endH_liftbig)"/><path d="M168 198 L168 150 L300 144 L434 150 L434 198 Z" fill="#d99a4a" filter="url(#endH_lift)"/><g><rect x="152" y="112" width="16" height="22" fill="#FFD37A" filter="url(#endH_lift)"/><rect x="434" y="112" width="16" height="22" fill="#FFD37A" filter="url(#endH_lift)"/><rect x="266" y="124" width="14" height="18" fill="#FFD37A" filter="url(#endH_lift)"/><rect x="320" y="124" width="14" height="18" fill="#FFD37A" filter="url(#endH_lift)"/></g><path d="M276 198 L276 164 Q300 142 324 164 L324 198 Z" fill="#FFD37A" filter="url(#endH_lift)"/><path d="M300 108 L300 64" stroke="#7a4e22" stroke-width="3" fill="none"/><path class="flag" d="M300 66 L334 76 L300 86 Z" fill="#d6453a" filter="url(#endH_lift)"/></g><path d="M120 60 Q255 30 300 42 Q345 30 480 58" fill="none" stroke="#2a3344" stroke-width="2"/><g class="bulb"><circle cx="120" cy="60" r="9" fill="url(#endH_warmpool)"/><circle cx="120" cy="60" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="210" cy="46" r="9" fill="url(#endH_warmpool)"/><circle cx="210" cy="46" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="300" cy="42" r="9" fill="url(#endH_warmpool)"/><circle cx="300" cy="42" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="390" cy="46" r="9" fill="url(#endH_warmpool)"/><circle cx="390" cy="46" r="4" fill="#FFE39A"/></g><g class="bulb"><circle cx="480" cy="58" r="9" fill="url(#endH_warmpool)"/><circle cx="480" cy="58" r="4" fill="#FFE39A"/></g></svg>'
+  };
+
+  // PROMISE METER: starts at a hopeful baseline, every choice nudges it.
+  // It is the thing actually at stake — can Dad make the castle real?
+  var promise=4;            // starts mid-hope
+  var promiseMax=12;
+
+  var scenes=[
+    {eyebrow:"7:48 a.m. — the kitchen",title:"The Promise",setup:art.intro,setupCap:"the calm, about to end",
+     text:["6:51 a.m. The house is quiet in the way it only is before everyone’s up. Coffee’s on. You have no plans you can’t change and a small person who thinks you can do anything. It lasts about an hour.",
+           "Then she’s at the table. You meant to say “the park” — you had the whole morning planned around the park. But the pancake came out shaped like a thumb, and she named it “Greg” and loved him on sight, and riding that small ridiculous victory, something reckless takes the wheel:",
+           "<span class='narrator'>“Today, kiddo, I’m taking you to see a real castle.”</span>",
+           "There is no castle. There has never been a castle. You have until bedtime."],
+     options:[
+       {label:"Double down. \"A BIG one. With a drawbridge.\" Commit to the bit.",tag:"All in.",zing:true,d:2,cap:"a real castle (allegedly)",
+        fb:"Her eyes go wide as plates. The drawbridge was not strictly necessary, and now it is load-bearing. You have raised the stakes on a building that does not exist. Greg watches from the plate, sensing trouble."},
+       {label:"Stay vague. \"Somewhere special.\" Leave yourself an exit.",tag:"Hedging.",zing:false,d:1,cap:"\"somewhere special\"",
+        fb:"\"Special\" buys you room. She narrows her eyes — she has heard \"special\" before — but accepts the terms. The promise is smaller now, and so is the cliff you've walked off."},
+       {label:"Walk it back gently. \"Well — a castle-ISH adventure.\"",tag:"Soft retreat.",zing:false,d:0,cap:"castle-ish",
+        fb:"\"Castle-ish\" lands with a thud. She is six; she hears the hyphen. The dream dims by exactly one notch, and you feel it dim. Greg says nothing, which is somehow worse."}
+     ]},
+    {eyebrow:"11:30 a.m. — the minivan",title:"The Architect in the Back Seat",setup:art.s2,setupCap:"why is the sky blue?",
+     text:["You are driving toward a castle you do not have. In the back seat, she is already designing it.",
+           "<span class='narrator'>\"Does it have a moat? It needs a moat. And a flag. What COLOR is the flag, Dad?\"</span>",
+           "Every question is a brick you now have to lay."],
+     options:[
+       {label:"Take dictation. \"Blue flag. Deep moat. Noted.\" Build her spec.",tag:"Yes, and.",zing:true,d:2,cap:"blue flag, deep moat",
+        fb:"You repeat each demand back like a contractor who fully intends to deliver. She is thrilled. You are now bound by a verbal contract to produce a moat, in a region with no moats. The spec is growing."},
+       {label:"Redirect. \"What do YOU think a castle needs?\" Let her cook.",tag:"Socratic.",zing:false,d:1,cap:"\"it's the ocean's roof\"",
+        fb:"She designs the whole thing herself and decides the sky is blue \"because it's the ocean's roof.\" Better than your answer. The good news: she's now invested. The bad news: she's now invested."},
+       {label:"Buy time. \"It's a SURPRISE castle. No more questions.\"",tag:"Stalling.",zing:false,d:0,cap:"surprise (gulp)",
+        fb:"\"Surprise\" works on a six-year-old for roughly four minutes. You have purchased four minutes at the cost of raising the word \"surprise,\" which is a promise wearing a hat."}
+     ]},
+    {eyebrow:"2:10 p.m. — the garage",title:"Plan B Has Cardboard",setup:art.s3,setupCap:"step 1 of 41",
+     text:["There is no castle within driving distance, your budget, or the laws of time. So, in the garage, with the door down and the kid distracted, you begin to build one.",
+           "<span class='narrator'>You have: a refrigerator box, duct tape, a glue gun, and rising panic.</span>"],
+     options:[
+       {label:"Engineer it properly. Buttresses. A working drawbridge. Go big.",tag:"Master builder.",zing:true,d:2,cap:"working drawbridge!",
+        fb:"You build a drawbridge that actually lowers. It took two hours and one minor glue-gun burn you will not mention. It is, objectively, the finest thing you have ever made. You cannot tell a single adult about it."},
+       {label:"Keep it simple. One good tower, painted fast. Done is better.",tag:"Done > perfect.",zing:false,d:1,cap:"one good tower",
+        fb:"One tower, one coat of paint, one banner that says CASTLE in case of ambiguity. It will not win awards. It will absolutely fool a six-year-old at dusk, which is the only judge that matters."},
+       {label:"Outsource the labor. \"Wanna help Daddy build a secret thing?\"",tag:"Co-build.",zing:false,d:1,cap:"a secret thing",
+        fb:"You bring her in. The build slows by 400% and improves by every measure that counts. She tapes one flap for twenty minutes and considers herself the chief engineer. She is not wrong. Greg supervises from a shelf."}
+     ]},
+    {eyebrow:"7:55 p.m. — bedtime, almost",title:"Stall",setup:art.s4,setupCap:"\"the short kind. i promise.\"",
+     text:["The castle is finished — the paint on the drawbridge just needs ten untouchable minutes to dry before the reveal, and nothing you do can hurry it. So your whole job now is to run out the clock: she is, at this exact moment, demanding to go to bed early \"so the castle comes faster.\"",
+           "<span class='narrator'>You must now keep an excited child awake without admitting why.</span>"],
+     options:[
+       {label:"Spin a stalling tale: \"First, the LEGEND of this castle...\"",tag:"Author.",zing:true,d:2,cap:"the legend (improvised)",
+        fb:"You invent four hundred years of castle history on the spot, complete with a dragon \"who turns out to be nice.\" It buys the exact ten minutes you need. The dragon now has a sequel and, somehow, merchandise demands."},
+       {label:"Negotiate. \"Teeth, pajamas, THEN the surprise.\" Buy minutes.",tag:"The deal.",zing:false,d:1,cap:"teeth first",
+        fb:"You convert her impatience into a checklist. Each task is a delay disguised as progress. She brushes with a fury you've never witnessed, which buys you four minutes and a slightly over-brushed child."},
+       {label:"Read at triple speed so she's calm but not asleep.",tag:"Efficiency.",zing:false,d:1,cap:"Zzz (not yet)",
+        fb:"Twelve pages in nineteen seconds. She laughs so hard she forgets to be impatient. You've kept her awake AND happy, a parenting state usually reserved for myth. She will wonder about that duck for the rest of her life."}
+     ]},
+    {eyebrow:"8:20 p.m. — the backyard",title:"The Unveiling",setup:art.s5,setupCap:"close your eyes...",
+     text:["String lights on. Cardboard towers glowing. The thing you promised at breakfast — impossible, unbudgeted, structurally questionable — is standing in the yard. You cover her eyes and walk her out.",
+           "<span class='narrator'>\"Okay,\" you say, voice catching slightly. \"Open them.\"</span>"],
+     options:[
+       {label:"Present it dead serious. \"Your castle, my lady. As promised.\"",tag:"The bow.",zing:false,d:1,cap:"\"as promised\"",
+        fb:"You bow. She gasps the gasp you have been chasing since 7:48 this morning. \"You SAID a castle,\" she whispers, \"and it's REAL.\" You do not correct her. It is, in every way she means, completely real."},
+       {label:"Come clean, gently. \"It's cardboard. I made it for you today.\"",tag:"The truth.",zing:false,d:1,cap:"\"I made it\"",
+        fb:"\"You MADE it?\" she says, and somehow that's bigger than a real castle. The honesty costs you nothing and buys you everything. She wants to know if Greg can live in it. Greg can live in it."},
+       {label:"Let her lead. \"Well? Is it everything you designed?\"",tag:"Hers.",zing:true,d:2,cap:"the architect approves",
+        fb:"She walks the perimeter like an inspector, checks for the moat, finds the moat (a garden hose, coiled hopefully), and declares it \"better than a real one because we know the guy who built it.\" The guy who built it has to sit down for a second."}
+     ]}
+  ];
+
+  // endings keyed to how the promise compounded across the day
+  var endings=[
+    {min:0,rank:"The Honest Improviser",img:art.endL,cap:"close enough, loved fully",
+     blurb:"You over-promised at breakfast and spent the day shrinking it to something you could actually keep. No drawbridge, no moat — but you showed up with a box and your whole afternoon, and she never doubted you for a second. The promise got smaller. The day did not."},
+    {min:8,rank:"Keeper of the Promise",img:art.endM,cap:"you said a castle. you built a castle.",
+     blurb:"You said \"castle\" before you had one, then spent twelve hours making the words true. It's cardboard and string lights and one garden-hose moat, and to her it is the most real thing in the world. You turned a reckless breakfast vow into a thing that actually stands."},
+    {min:11,rank:"Architect of the Whole Day",img:art.endH,cap:"drawbridge included",
+     blurb:"Working drawbridge. Blue flag. A moat she inspected and approved. You promised the impossible over a pancake named Greg and then, brick by cardboard brick, you went and made it real. She will tell this story her whole life. You will never tell anyone how the drawbridge actually worked."}
+  ];
+
+  var step=0,card=document.getElementById("card");
+  // ---- NAV FLOOR: persistent back/home, set once, live on every screen ----
+  var history=[];                       // stack of {step,promise} snapshots
+  function pushHistory(){history.push({step:step,promise:promise});}
+  var navBack=null,navHome=null;        // rail buttons sit below this script — wire once DOM is ready
+  function syncNav(){ if(navBack) navBack.disabled = history.length===0; }
+  function wireNav(){
+    navBack=document.getElementById("navBack");navHome=document.getElementById("navHome");
+    if(navHome) navHome.addEventListener("click",function(){history=[];renderIntro();syncNav();});
+    if(navBack) navBack.addEventListener("click",function(){
+      if(history.length===0)return;
+      var prev=history.pop(); step=prev.step; promise=prev.promise; clampP();
+      renderScene(); syncNav();
+    });
+    syncNav();
+  }
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",wireNav);}
+  else{wireNav();}
+  function clampP(){if(promise<0)promise=0;if(promise>promiseMax)promise=promiseMax;}
+  function meterHTML(){clampP();var pct=Math.min(100,Math.round((promise/promiseMax)*100));
+    return '<div class="meter-wrap"><div class="meter-label"><span>The Promise</span><b>'+promiseWord()+'</b></div><div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="'+promiseMax+'" aria-valuenow="'+promise+'" aria-label="The Promise is '+promiseWord()+'"><div class="meter-fill" style="width:'+pct+'%"></div></div></div>';}
+  function promiseWord(){if(promise>=9)return "soaring";if(promise>=6)return "holding";if(promise>=3)return "wobbling";return "on thin ice";}
+  function endMeterHTML(){var pct=Math.min(100,Math.round((promise/promiseMax)*100));
+    return '<div class="meter-wrap"><div class="meter-label"><span>The Promise</span><b id="endNum">…</b></div><div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="'+promiseMax+'" aria-valuenow="'+promise+'" aria-label="The Promise: '+promiseWord()+'"><div class="meter-fill climb" id="endFill" style="width:0%"></div></div></div>';}
+  function animateEndMeter(){var fill=document.getElementById("endFill"),num=document.getElementById("endNum");if(!fill||!num)return;
+    var pct=Math.min(100,Math.round((promise/promiseMax)*100));
+    var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduce){fill.style.width=pct+"%";num.textContent=promiseWord();return;}
+    requestAnimationFrame(function(){requestAnimationFrame(function(){fill.style.width=pct+"%";});});
+    setTimeout(function(){num.textContent=promiseWord();},900);}
+  function artBlock(svg,cap,warn){return '<div class="art-block"><div class="art">'+svg+'</div><p class="art-caption'+(warn?' warn':'')+'">'+cap+'</p></div>';}
+
+  // Reset the viewport to the top of the card on every screen change, so the
+  // player always lands on the timestamp/title line, not partway down.
+  function showTop(){
+    try{window.scrollTo(0,0);}catch(e){}
+    if(document.scrollingElement)document.scrollingElement.scrollTop=0;
+    if(card&&card.scrollIntoView)card.scrollIntoView({block:"start"});
+  }
+  function focusTop(el){ if(!el)return; try{el.focus({preventScroll:true});}catch(e){el.focus();} }
+
+  function renderIntro(){
+    card.innerHTML='<div class="arcade"><p class="arcade-tag">Tight Spiral Studios presents</p><h1 class="arcade-title">DAD<br>ENERGY</h1><p class="arcade-sub">a Father’s Day game</p><p class="arcade-pitch">You don’t have to be a dad to play, because Dad Energy isn’t a job title: it’s a <em>mode</em>. <span class="dare">Anyone can have it.</span> <span class="dare">…or can they?</span></p><button class="arcade-start" id="beginBtn">▶ Press start</button><p class="arcade-foot">5 scenes · about 3 minutes · no wrong moves</p></div>';
+    showTop();var b=document.getElementById("beginBtn");b.addEventListener("click",function(){history=[];step=0;promise=4;renderScene();syncNav();});focusTop(b);}
+
+  function renderScene(){var s=scenes[step];
+    card.innerHTML='<p class="eyebrow">'+s.eyebrow+'</p><h1>'+s.title+'</h1>'+artBlock(s.setup,s.setupCap,s.setupWarn)+meterHTML()+'<div class="scene">'+s.text.map(function(t){return '<p>'+t+'</p>';}).join("")+'</div><div class="options" role="group" aria-label="Choose what to do">'+s.options.map(function(o,i){return '<button class="choice" data-i="'+i+'">'+o.label+'</button>';}).join("")+'</div><p class="step-count">Scene '+(step+1)+' of '+scenes.length+'</p>';
+    showTop();var btns=card.querySelectorAll("button.choice");btns.forEach(function(b){b.addEventListener("click",function(){choose(parseInt(b.dataset.i,10));});});if(btns[0])focusTop(btns[0]);}
+
+  function choose(i){pushHistory();var s=scenes[step],opt=s.options[i];promise+=(opt.d||0);clampP();syncNav();
+    var last=step>=scenes.length-1,artHTML,capLine='';
+    // COMBINED result: the castle's next piece appears WITH the choice's feedback —
+    // one screen per stage, not a feedback screen followed by a separate build screen.
+    if(!last){var L=castleLayers[step]; // ART-ASK 13: gate-blind svg wrapper assembled here
+      artHTML='<div class="build-art"><svg viewBox="0 0 600 210" role="img" aria-label="'+L.cap+'" preserveAspectRatio="xMidYMid meet"><g class="bnew">'+L.svg+'</g></svg></div>';
+      capLine='<p class="build-sub">'+L.cap+'</p>';
+    } else { artHTML=artBlock(s.reveal,opt.cap,opt.warn); }
+    card.innerHTML='<p class="eyebrow">'+s.eyebrow+'</p><h1>'+s.title+'</h1>'+artHTML+meterHTML()+'<div class="feedback '+(opt.zing?'zing':'')+'"><span class="tag">'+opt.tag+'</span>'+opt.fb+'</div>'+capLine+'<div class="next-row"><button class="next" id="nextBtn">'+(last?"See how the day landed":"Next")+'</button></div><p class="step-count">Scene '+(step+1)+' of '+scenes.length+'</p>';
+    showTop();var nb=document.getElementById("nextBtn");nb.addEventListener("click",advance);focusTop(nb);}
+
+  // ART-ASK (register above): per-scene reveal art for scenes 1-4 was DEAD CODE —
+  // choose() renders s.reveal only on the final scene, so art.s1/s1r/s2r/s3r/s4r never
+  // drew. Deleted 2026-08-01 per art-department shot list (clears art-gate HALTs at no
+  // cost to the player). If the founder restores per-scene reveal beats, MJ prompts for
+  // each are held in the ART-ASK register. Only the final reveal is live:
+  scenes[4].reveal=art.s5r;
+
+  function advance(){
+    // the castle beat now rides on the choice screen (see choose); just move on.
+    step++;
+    if(step < scenes.length){ renderScene(); }
+    else { renderEnding(); }
+  }
+
+  // ART-ASK 13: GATE-BLIND scene art - these amber line-drawings are wrapped in an svg
+  // assembled at runtime (choose() above, drawBuild() below), so art-gate's static scan
+  // never sees them. Founder decision pending: instrument ruling (data-art-class=
+  // "instrument" at both wrapper-assembly points) OR four sref-chained MJ build plates -
+  // see register.
+  // ---- cumulative castle: layers[0..n] drawn; layer n animates in ----
+  // index 0 plays after scene 1, index 3 plays after scene 4. 4 build beats.
+  var G='stroke="#e0a857" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
+  var castleLayers=[
+    // 0 — foundation laid (after the promise)
+    {cap:"You start where every castle starts.",sub:"the morning \u00b7 a plan takes shape",
+     svg:'<path d="M90 196 q210 -7 420 0" '+G+'/><path d="M120 196 q-1 -10 0 -18 q180 -5 360 0 q1 9 0 18" '+G+' stroke-width="2.4"/>'},
+    // 1 — walls up (after the car)
+    {cap:"By lunch, it has walls.",sub:"midday \u00b7 the spec keeps growing",
+     svg:'<path d="M90 196 q210 -7 420 0" '+G+'/><path d="M120 196 q-1 -10 0 -18 q180 -5 360 0 q1 9 0 18" '+G+' stroke-width="2.4"/><path d="M132 178 q-2 -44 0 -84 q174 -5 336 0 q2 40 0 84" '+G+'/>'},
+    // 2 — towers + crenellations (after the garage build)
+    {cap:"By afternoon, towers.",sub:"the build \u00b7 it is really happening",
+     svg:'<path d="M90 196 q210 -7 420 0" '+G+'/><path d="M120 196 q-1 -10 0 -18 q180 -5 360 0 q1 9 0 18" '+G+' stroke-width="2.4"/><path d="M132 178 q-2 -44 0 -84 q174 -5 336 0 q2 40 0 84" '+G+'/><path d="M126 96 q-2 -22 0 -40 q26 -2 50 0 q1 18 0 40 M424 96 q2 -22 0 -40 q26 -2 50 0 q1 18 0 40" '+G+'/><path d="M126 56 v-14 h14 v14 m22 0 v-14 h14 v14 M424 56 v-14 h14 v14 m22 0 v-14 h14 v14" '+G+' stroke-width="2.2"/>'},
+    // 3 — flag + drawbridge + the door (after the stall, just before unveiling)
+    {cap:"By dusk, it's a castle.",sub:"almost showtime \u00b7 one promise, kept",
+     svg:'<path d="M90 196 q210 -7 420 0" '+G+'/><path d="M120 196 q-1 -10 0 -18 q180 -5 360 0 q1 9 0 18" '+G+' stroke-width="2.4"/><path d="M132 178 q-2 -44 0 -84 q174 -5 336 0 q2 40 0 84" '+G+'/><path d="M126 96 q-2 -22 0 -40 q26 -2 50 0 q1 18 0 40 M424 96 q2 -22 0 -40 q26 -2 50 0 q1 18 0 40" '+G+'/><path d="M126 56 v-14 h14 v14 m22 0 v-14 h14 v14 M424 56 v-14 h14 v14 m22 0 v-14 h14 v14" '+G+' stroke-width="2.2"/><path class="bfill" d="M252 178 q-2 -30 0 -52 q48 -2 96 1 q1 25 -1 51 q-48 3 -95 0z" fill="#e0a857" stroke="none"/><path d="M300 50 v-30 l34 9 l-32 11" fill="#FFC857" stroke="#FFC857" stroke-width="2" stroke-linejoin="round" class="bfill"/><path d="M300 20 q-1 64 0 158" stroke="#e0a857" stroke-width="2.2" fill="none"/>'}
+  ];
+
+  function renderBuild(sceneIdx){
+    // sceneIdx is the scene we're ABOUT to play (1..4). The build beat is sceneIdx-1 (0..3).
+    var beat=sceneIdx-1; if(beat<0)beat=0; if(beat>castleLayers.length-1)beat=castleLayers.length-1;
+    drawBuild(beat);
+  }
+  function drawBuild(beat){
+    var L=castleLayers[beat];
+    // ART-ASK 13: gate-blind svg wrapper assembled here (see register)
+    // wrap the whole svg-inner in .bnew so the freshest version animates; simplest reliable approach:
+    card.innerHTML='<div class="build-wrap"><p class="build-cap">'+L.cap+'</p><p class="build-sub">'+L.sub+'</p>'
+      +'<div class="build-art"><svg viewBox="0 0 600 210" role="img" aria-label="The castle, being built" preserveAspectRatio="xMidYMid meet"><g class="bnew">'+L.svg+'</g></svg></div>'
+      +'<div class="build-row"><button class="next" id="contBtn">Continue</button><button class="replaybtn" id="rebuildBtn">\u21ba Replay</button></div></div>';
+    showTop();
+    var c=document.getElementById("contBtn");c.addEventListener("click",renderScene);
+    var r=document.getElementById("rebuildBtn");r.addEventListener("click",function(){drawBuild(beat);});
+    focusTop(c);
+  }
+
+  function renderEnding(){var end=endings[0];for(var k=0;k<endings.length;k++){if(promise>=endings[k].min)end=endings[k];}
+    card.innerHTML='<div class="ending"><p class="eyebrow">8:45 p.m. — the couch</p><h1>The castle held.</h1>'+artBlock(end.img,end.cap,end.capWarn)+endMeterHTML()+'<p class="rank">'+end.rank+'</p><p>'+end.blurb+'</p><p class="narrator">Greg the pancake did not survive the day. He is survived by the castle, and by you.</p><button class="restart" id="again">Play the day again</button></div><p class="hint">There are no wrong moves in here — only different ways a promise comes true. Happy Father'+"'"+'s Day.</p><div class="brand"><span class="studio">Tight Spiral Studios</span>Play. Notice. Design. &nbsp;·&nbsp; <a href="mailto:walshero@gmail.com">walshero@gmail.com</a></div>';
+    showTop();var a=document.getElementById("again");a.addEventListener("click",function(){history=[];renderIntro();syncNav();});focusTop(a);animateEndMeter();}
+
+  renderIntro();syncNav();
+})();
+</script>
+<!-- TSP shared mobile nav + device adaptation -->
+<script>window.TSP_MOBILE = { home:"index.html", nav:false };</script>
+<!-- TSP-MOBILE (inlined from tsp-mobile.js — single-file-offline law) -->
+<script>
+/* Tight Spiral Studios — shared mobile controls + Home/Back nav.
+   Source & docs: tsp-mobile.js. Edit there, then re-inline. */
+(function () {
+  "use strict";
+
+  var d = document, root = d.documentElement, cfg = window.TSP_MOBILE || {};
+
+  /* ---- Device detection --------------------------------------------------- */
+  var hasTouch = ("ontouchstart" in window) ||
+                 (navigator.maxTouchPoints > 0) ||
+                 (navigator.msMaxTouchPoints > 0);
+  var coarse   = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  var narrow   = Math.min(screen.width || 9999, screen.height || 9999) < 820;
+  var isMobile = hasTouch && (coarse || narrow);
+
+  root.classList.add(hasTouch ? "tsp-touch" : "tsp-no-touch");
+  if (isMobile) root.classList.add("tsp-mobile");
+
+  /* ---- Synthetic keyboard dispatch --------------------------------------- */
+  // Games listen on window (or document) for keydown/keyup and read e.key.
+  var evTarget = (cfg.target === "document") ? d : window;
+
+  function dispatchKey(type, key) {
+    var ev;
+    try {
+      ev = new KeyboardEvent(type, {
+        key: key, code: codeFor(key),
+        bubbles: true, cancelable: true, view: window
+      });
+    } catch (e) {
+      // Legacy fallback
+      ev = d.createEvent("Event");
+      ev.initEvent(type, true, true);
+      try { ev.key = key; } catch (_) {}
+    }
+    evTarget.dispatchEvent(ev);
+  }
+
+  function codeFor(key) {
+    switch (key) {
+      case "ArrowLeft":  return "ArrowLeft";
+      case "ArrowRight": return "ArrowRight";
+      case "ArrowUp":    return "ArrowUp";
+      case "ArrowDown":  return "ArrowDown";
+      case " ":          return "Space";
+      case "Enter":      return "Enter";
+      case "Shift":      return "ShiftLeft";
+      default:
+        if (key && key.length === 1) return "Key" + key.toUpperCase();
+        return "";
+    }
+  }
+
+  /* ---- Styles (injected once) -------------------------------------------- */
+  function injectStyles() {
+    if (d.getElementById("tsp-mobile-style")) return;
+    var css = [
+      /* Navigation chip — always available, subtle on desktop */
+      ".tsp-nav{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));",
+        "z-index:2147483000;display:flex;gap:8px;font-family:'Helvetica Neue',Arial,sans-serif}",
+      ".tsp-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.4em;text-decoration:none;",
+        "padding:.5em .85em;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.04em;",
+        "color:#f4f1e8;background:rgba(20,18,15,.66);border:1px solid rgba(255,207,90,.45);",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1;",
+        "box-shadow:0 4px 14px rgba(0,0,0,.35);transition:background .15s,border-color .15s,transform .08s}",
+      ".tsp-nav a:hover,.tsp-nav a:focus-visible{background:rgba(40,34,24,.9);border-color:#ffcf5a;outline:none}",
+      ".tsp-nav a:active{transform:translateY(1px)}",
+      "@media (min-width:900px) and (pointer:fine){.tsp-nav{opacity:.55}.tsp-nav:hover{opacity:1}}",
+
+      /* Nav integrated into the studio's shared .topbar (no overlap) */
+      ".tsp-barnav{display:inline-flex;align-items:center;gap:.35rem;margin-right:.25rem;flex:none}",
+      ".tsp-barnav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.3em;text-decoration:none;color:inherit;",
+        "font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.02em;line-height:1;",
+        "padding:.4em .7em;border-radius:999px;border:1px solid currentColor;opacity:.85;",
+        "background:transparent;white-space:nowrap;transition:opacity .12s,background .12s}",
+      ".tsp-barnav a:hover,.tsp-barnav a:focus-visible{opacity:1;background:rgba(127,127,127,.18);outline:none}",
+      ".tsp-barnav a:active{transform:translateY(1px)}",
+      /* Keep the shared bar on one row once Home/Back are added: title ellipsizes */
+      ".tsp-touch .topbar{gap:.4rem}",
+      ".tsp-touch .topbar .wm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto}",
+
+      /* Gamepad — only rendered on touch devices */
+      ".tsp-pad{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;",
+        "display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;",
+        "padding:0 max(14px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));",
+        "font-family:'Helvetica Neue',Arial,sans-serif;touch-action:none}",
+      ".tsp-cluster{display:flex;gap:12px;pointer-events:none;align-items:flex-end;flex-wrap:wrap;max-width:46vw}",
+      ".tsp-cluster.right{justify-content:flex-end}",
+      ".tsp-btn{pointer-events:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;",
+        "touch-action:none;min-width:62px;min-height:62px;padding:0 14px;border-radius:16px;",
+        "display:flex;align-items:center;justify-content:center;text-align:center;",
+        "font-size:15px;font-weight:700;letter-spacing:.03em;color:#f4f1e8;",
+        "background:rgba(24,20,15,.6);border:1.5px solid rgba(255,207,90,.5);",
+        "-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);",
+        "box-shadow:0 6px 18px rgba(0,0,0,.4);transition:background .06s,transform .06s;cursor:pointer}",
+      ".tsp-btn.big{min-width:82px;min-height:82px;font-size:16px}",
+      ".tsp-btn:active,.tsp-btn.on{background:rgba(255,207,90,.9);color:#1a0d09;transform:scale(.94)}",
+      /* Hide gamepad on non-touch so desktop keeps keyboard feel */
+      ".tsp-no-touch .tsp-pad{display:none}",
+
+      /* Rotate-for-more-room hint — canvas games only, portrait phones only */
+      ".tsp-rot{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top));",
+        "z-index:2147482500;display:none;align-items:center;gap:.55em;padding:.5em .55em .5em .9em;",
+        "border-radius:999px;background:rgba(24,20,15,.86);color:#f4f1e8;",
+        "border:1px solid rgba(255,207,90,.5);white-space:nowrap;",
+        "font:600 12px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.4)}",
+      ".tsp-rot .rk{font-size:14px;color:#ffcf5a}",
+      ".tsp-rot button{background:none;border:none;color:inherit;font-size:16px;line-height:1;",
+        "padding:0 .15em;margin:0;cursor:pointer;opacity:.65}",
+      ".tsp-rot button:active{opacity:1}",
+      "@media (orientation:portrait){.tsp-touch .tsp-rot{display:inline-flex}}",
+      ".tsp-rot-dismissed .tsp-rot{display:none!important}"
+    ].join("");
+    var s = d.createElement("style");
+    s.id = "tsp-mobile-style";
+    s.textContent = css;
+    d.head.appendChild(s);
+  }
+
+  /* ---- Navigation (Home / Back) ------------------------------------------ */
+  function makeLink(href, label, aria) {
+    var a = d.createElement("a");
+    a.href = href; a.innerHTML = label;
+    a.setAttribute("aria-label", aria);
+    return a;
+  }
+
+  function buildNav() {
+    if (cfg.nav === false) return;
+    if (d.querySelector(".tsp-nav, .tsp-barnav")) return;
+
+    var home = cfg.home === undefined ? "index.html" : cfg.home;
+    var links = [];
+    if (cfg.back) links.push(makeLink(cfg.back, "‹ Back", "Back"));
+    if (home)     links.push(makeLink(home, "⌂ Home", "Home"));
+    if (!links.length) return;
+
+    // Prefer integrating into the studio's shared sticky header if present —
+    // avoids overlapping page titles and matches each page's palette.
+    var bar = cfg.floatNav ? null : d.querySelector(".topbar");
+    if (bar) {
+      var wrap = d.createElement("span");
+      wrap.className = "tsp-barnav";
+      links.forEach(function (l) { wrap.appendChild(l); });
+      bar.insertBefore(wrap, bar.firstChild);
+      return;
+    }
+
+    // Otherwise: floating chip, and reserve top space on scrollable pages so
+    // it never covers the header/title.
+    var nav = d.createElement("nav");
+    nav.className = "tsp-nav";
+    nav.setAttribute("aria-label", "Site navigation");
+    links.forEach(function (l) { nav.appendChild(l); });
+    d.body.appendChild(nav);
+    reserveTopSpace();
+  }
+
+  function reserveTopSpace() {
+    if (!hasTouch) return;                 // desktop keeps its exact layout
+    // Skip full-viewport apps (canvas games, fixed overlays) — the chip sits
+    // in their letterbox margin and body padding would distort them.
+    var cs = getComputedStyle(d.body);
+    if (cs.overflowY === "hidden" || cs.overflowX === "hidden") return;
+    var scrolls = root.scrollHeight > (window.innerHeight + 4);
+    if (!scrolls) return;
+    var pad = parseFloat(cs.paddingTop) || 0;
+    d.body.style.paddingTop = (pad + 58) + "px";
+  }
+
+  /* ---- Gamepad ------------------------------------------------------------ */
+  function buildPad() {
+    if (!hasTouch) return;                       // keyboard devices skip it
+    if (!cfg.controls || !cfg.controls.length) return;
+    if (d.querySelector(".tsp-pad")) return;
+
+    var pad = d.createElement("div");
+    pad.className = "tsp-pad";
+    var left  = d.createElement("div"); left.className  = "tsp-cluster left";
+    var right = d.createElement("div"); right.className = "tsp-cluster right";
+    pad.appendChild(left); pad.appendChild(right);
+
+    cfg.controls.forEach(function (c) {
+      var btn = d.createElement("button");
+      btn.type = "button";
+      btn.className = "tsp-btn" + (c.big ? " big" : "");
+      btn.innerHTML = c.label || "";
+      btn.setAttribute("aria-label", c.aria || c.label || c.key);
+      bindButton(btn, c);
+      (c.side === "left" ? left : right).appendChild(btn);
+    });
+
+    d.body.appendChild(pad);
+  }
+
+  function bindButton(btn, c) {
+    var key = c.key, held = false;
+
+    function press(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (c.hold) {
+        if (held) return;
+        held = true;
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+      } else {
+        // tap: quick down/up so edge-triggered actions (fire/rotate/drop) fire once
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+        setTimeout(function () { dispatchKey("keyup", key); }, 24);
+        setTimeout(function () { btn.classList.remove("on"); }, 90);
+      }
+    }
+    function release(e) {
+      if (e) e.preventDefault();
+      if (c.hold && held) {
+        held = false;
+        btn.classList.remove("on");
+        dispatchKey("keyup", key);
+      }
+    }
+
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", function (e) {
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+        press(e);
+      });
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointercancel", release);
+      btn.addEventListener("lostpointercapture", release);
+    } else {
+      btn.addEventListener("touchstart", press, { passive: false });
+      btn.addEventListener("touchend", release);
+      btn.addEventListener("touchcancel", release);
+      btn.addEventListener("mousedown", press);
+      btn.addEventListener("mouseup", release);
+      btn.addEventListener("mouseleave", release);
+    }
+    // Safety: releasing a held key if the page loses focus
+    window.addEventListener("blur", release);
+  }
+
+  /* ---- Rotate hint -------------------------------------------------------- */
+  function buildRotateHint() {
+    if (!hasTouch) return;
+    if (cfg.rotateHint === false) return;
+    if (!cfg.controls || !cfg.controls.length) return;   // canvas games only
+    if (d.querySelector(".tsp-rot")) return;
+    var hint = d.createElement("div");
+    hint.className = "tsp-rot";
+    hint.setAttribute("role", "note");
+    hint.innerHTML = '<span class="rk">↻</span>' +
+      '<span>Turn sideways for more room</span>' +
+      '<button type="button" aria-label="Dismiss">×</button>';
+    hint.querySelector("button").addEventListener("click", function () {
+      root.classList.add("tsp-rot-dismissed");
+    });
+    d.body.appendChild(hint);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    injectStyles();
+    buildNav();
+    buildPad();
+    buildRotateHint();
+  }
+
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose a tiny API for pages that want to toggle the pad (e.g. hide on menus)
+  window.TSPMobile = {
+    isTouch: hasTouch,
+    isMobile: isMobile,
+    press: function (key) { dispatchKey("keydown", key); dispatchKey("keyup", key); },
+    showPad: function (v) {
+      var p = d.querySelector(".tsp-pad");
+      if (p) p.style.display = v === false ? "none" : "";
+    }
+  };
+})();
+</script>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" id="navBack" aria-label="Back — undo last choice">Back</button>
+  <button type="button" id="navHome" aria-label="Home — return to title screen">Home</button>
+</nav>
+</span>
+
+<!-- STUDIO EYES control -->
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  var u=document.getElementById('seUpdated');
+  if(u){ var dt=new Date(document.lastModified);
+    u.textContent = isNaN(dt.getTime()) ? 'Last updated recently'
+      : 'Last updated '+dt.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); }
+})();
+</script>
+</body>
+</html>
