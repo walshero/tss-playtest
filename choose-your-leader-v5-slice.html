@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  ══════════════════════════════════════════════════════════════════
+  CHOOSE YOUR LEADER — v5 VERTICAL SLICE  (JFK · October 22, 1962)
+  Tight Spiral Studios · walshero@gmail.com
+  Built 2026-07-10. A playable v5 slice: one scene, end to end.
+
+  What this is: the FULL v5 beat structure realized for one sourced
+  Cold War scene — media prelude → scene-first room → blind directional
+  reaction → the record turns → re-react → visual Maslow descent → arc.
+  Room and figure are CSS/SVG-composed (Kodachrome-cool 1962 living room,
+  TV as sole light source, withheld scan-line figure, the empty chair
+  that is you). Period sound is Web Audio, OFF by default, keyboard-
+  reachable, every sound paired to a visible event.
+
+  Floors held: single-file, offline, in-memory only. No network at
+  runtime. Scene-first (no opening wall). Full-contrast type. 44px
+  targets. Keyboard nav. Visible focus. Scroll-reset each screen.
+  Reduced-motion respected. FERPA: public figure, no capture.
+
+  Instrument (v5 reframe, §1.4): plain more/less/neutral shown to the
+  player, resolving onto a 5-point capture underneath; identical wording
+  blind + post-record; scored ipsatively against the player's own prior.
+
+  Living-president scenes: NOT in this slice (gated until sourced).
+  ══════════════════════════════════════════════════════════════════
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Choose Your Leader — October 22, 1962</title>
+<style>
+  /* ─── TOKENS ─────────────────────────────────────────────────
+     Palette is the 1962 room itself: Kodachrome-cool walls, one warm
+     screen-glow, austere B&W broadcast. Not the arcade default — this
+     scene's Medium Gate chose photographic period, so the tokens ARE
+     the period. Full-contrast ink floor holds over every surface. */
+  :root{
+    --paper:#12161c;         /* the dark room */
+    --wall:#1b2530;          /* cool mid-century wall in shadow */
+    --wall-lit:#26333f;      /* wall catching screen-light */
+    --ink:#eef1f4;           /* TEXT — near-white, full strength (16:1 on paper) */
+    --ink-dim:#c4ccd4;       /* TEXT dim — 9.5:1 on wall; never muted-gray */
+    --label:#d8b98a;         /* TEXT accent — readable warm sand (8.3:1), NOT the glow */
+    /* SCREEN = cool B&W phosphor of a 1962 tube set. Never warm, never pure white. */
+    --screen:#c9d4dc; --screen-hot:#dfe8ee;
+    /* GLOW = atmosphere ONLY (screen-rim, room edge-light). NEVER used as text. */
+    --glow:#b8863a; --glow-soft:#7a5f2c;
+    /* UI accent = quiet parchment for buttons; dark ink rides on it. */
+    --accent:#c7b28a; --accent-ink:#171208;
+    --chair:#0d1116;
+    --rule:#39434e;
+    --brake:#6bb6ae;         /* the catch — cool teal (decoration: border/fill) */
+    --brake-ink:#8fd4cc;     /* the catch, as TEXT — brighter, clears floor on dark */
+    --pull:#c9744f;          /* the fall — warm clay (decoration) */
+    --pull-ink:#e8a583;      /* the fall, as TEXT — brighter, clears floor on dark */
+    --focus:#9fd0ff;         /* cool focus ring — reads as light, not a warning */
+    --measure:1.5rem;
+    --tap:44px;
+    /* ── STUDIO EYES chrome tokens (day/default) — dark chrome to match the room ── */
+    --se-surface:#1b2530; --se-surface-2:#26333f; --se-ink:#eef1f4; --se-ink-2:#c4ccd4;
+    --se-line:#3a4a58; --se-accent:#c7b28a; --se-on-accent:#171208; --se-focus:#9fd0ff;
+    --se-ui:"Helvetica Neue",Arial,system-ui,sans-serif;
+    --se-serif:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+    --se-r:10px;
+  }
+  /* ── STUDIO EYES · Light = DUSK (was the "softer" stop) — separated paper, text near-white ── */
+  html[data-light="dusk"]{
+    --paper:#20272f; --wall:#2b3742; --wall-lit:#38454f;
+    --ink:#fbf7ef; --ink-dim:#dfe4ea; --label:#e0c79c;
+    --se-surface:#2b3742; --se-surface-2:#38454f; --se-ink:#fbf7ef; --se-ink-2:#dfe4ea;
+    --se-line:#4a5560; --se-accent:#d8c19a; --se-on-accent:#1a130a; --se-focus:#bfe0ff;
+  }
+  /* ── STUDIO EYES · Light = WARM-DARK (was "warm") — amber on warm charcoal, never pure black ── */
+  html[data-light="night"]{
+    --paper:#161009; --wall:#241a0e; --wall-lit:#33260f;
+    --ink:#ffe6b8; --ink-dim:#f0d29a; --label:#ffcf8a;
+    --screen:#e6d4ad; --screen-hot:#f3e6c8; --glow:#e0952f;
+    --se-surface:#241a0e; --se-surface-2:#33260f; --se-ink:#ffe6b8; --se-ink-2:#f0d29a;
+    --se-line:#4a3a1e; --se-accent:#e0c79c; --se-on-accent:#161009; --se-focus:#f0c357;
+  }
+  /* ── STUDIO EYES · text size ── */
+  html.se-a1 body{ font-size:clamp(19px,2.9vw,22px); }
+  html.se-a2 body{ font-size:clamp(21px,3.3vw,25px); }
+  /* ── STUDIO EYES · high contrast (raise ink only; never lowers a ratio) ── */
+  html.se-contrast{ --ink:#ffffff; --ink-dim:#f2f5f8; }
+  html.se-contrast[data-light="night"]{ --ink:#fff3d6; --ink-dim:#ffe6b8; }
+  /* ── STUDIO EYES · reduce motion ── */
+  html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+  /* ── STUDIO EYES · colorblind cues ── */
+  html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif;
+    font-size:clamp(17px,2.6vw,20px); line-height:1.55;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    min-height:100vh; overflow-x:hidden;
+  }
+  /* utility face for labels/data */
+  .u{font-family:"Helvetica Neue",Arial,system-ui,sans-serif;
+     letter-spacing:.06em; text-transform:uppercase; font-size:.72rem; font-weight:700;}
+
+  .stage{max-width:640px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 20px 96px;}
+  .screen{display:none;animation:fade .5s ease both}
+  .screen.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){
+    .screen{animation:none}
+    *{animation-duration:.001s !important;transition-duration:.001s !important}
+  }
+
+  h1,h2{font-weight:700;line-height:1.15;letter-spacing:-.01em;margin:0 0 .5em}
+  /* h1 receives a programmatic tabindex="-1" as a focus landing target on each
+     stage; give it a control-sized box so the render gate's target floor is met. */
+  h1{font-size:clamp(1.9rem,7vw,2.7rem);min-height:44px}
+  h2{font-size:clamp(1.4rem,5vw,1.9rem)}
+  p{margin:0 0 1em;max-width:38ch}
+  .lead{font-size:1.12rem;color:var(--ink)}
+
+  /* ─── BUTTONS (44px floor, visible focus) ───────────────────── */
+  button{font-family:inherit;cursor:pointer}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:.5em;
+    min-height:var(--tap);padding:.7em 1.3em;
+    background:var(--accent);color:var(--accent-ink);border:2px solid var(--accent);
+    border-radius:2px;font-weight:700;font-size:1.05rem;letter-spacing:.01em;
+    transition:transform .15s,box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(200,162,74,.3)}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+  .btn.ghost:hover{border-color:var(--glow);box-shadow:none}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:2px}
+  button:focus:not(:focus-visible){outline:none}
+
+  /* ═══ RESERVED CHROME — grid header (Home · teaspoon brand · Studio Eyes); reserves its own row ═══ */
+  .se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--se-surface);border-bottom:2px solid var(--se-line);
+    position:sticky;top:0;z-index:100}
+  .se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+    padding:8px 12px;border:1.5px solid var(--se-line);border-radius:8px;background:var(--se-surface-2);
+    color:var(--se-ink);font-family:var(--se-ui);font-weight:700;font-size:13px;letter-spacing:.04em;text-decoration:none}
+  .se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--se-ink)}
+  .se-brand svg{width:34px;height:20px;color:var(--se-accent);flex:0 0 auto}
+  .se-brand .wm{font-family:var(--se-serif);font-size:16px;letter-spacing:.01em;white-space:nowrap;color:var(--se-ink)}
+  .se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+    padding:8px 13px;border:2px solid transparent;border-radius:8px;background:var(--se-accent);
+    color:var(--se-on-accent);font-family:var(--se-ui);font-weight:700;font-size:13px;letter-spacing:.04em;cursor:pointer}
+  .se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px}
+  @media (max-width:560px){ .se-brand .wm{display:none} }
+
+  /* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+  .se-panel{position:fixed;right:12px;top:calc(var(--tap) + 24px);z-index:101;
+    width:min(320px,calc(100vw - 24px));background:var(--se-surface);color:var(--se-ink);
+    border:2px solid var(--se-accent);border-radius:var(--se-r);padding:15px;
+    box-shadow:0 10px 34px rgba(0,0,0,.5);display:none}
+  .se-panel[data-open="1"]{display:block}
+  .se-panel h2{font-family:var(--se-ui);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--se-ink-2);margin:0 0 8px}
+  .se-prow{display:flex;gap:6px;margin-bottom:14px}
+  .se-btn{flex:1;min-height:var(--tap);padding:8px 4px;border:1.5px solid var(--se-line);border-radius:8px;
+    background:var(--se-surface-2);color:var(--se-ink);font-family:var(--se-ui);font-weight:700;font-size:12.5px;cursor:pointer}
+  .se-btn[aria-pressed="true"]{background:var(--se-accent);color:var(--se-on-accent);border-color:var(--se-accent)}
+  .se-btn:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px}
+  .se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    min-height:var(--tap);padding:8px 11px;margin-bottom:6px;border:1.5px solid var(--se-line);border-radius:8px;
+    background:var(--se-surface-2);color:var(--se-ink);font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;text-align:left}
+  .se-tog[aria-pressed="true"]{border-color:var(--se-accent)}
+  .se-tog .st{font-family:var(--se-ui);font-size:11px;color:var(--se-ink-2)}
+  .se-tog[aria-pressed="true"] .st{color:var(--se-accent);font-weight:700}
+  .se-tog:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px}
+  .se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{display:flex;gap:10px;justify-content:center;padding:20px;border-top:2px solid var(--se-line);background:var(--se-surface)}
+  .se-rail a,.se-rail button{min-height:var(--tap);padding:10px 18px;border:1.5px solid var(--se-line);border-radius:8px;
+    background:var(--se-surface-2);color:var(--se-ink);font-family:var(--se-ui);font-weight:700;font-size:13px;letter-spacing:.04em;text-decoration:none;cursor:pointer}
+  .se-rail a:focus-visible,.se-rail button:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px}
+
+  /* ─── SOUND (gameplay control, live, never a gate) — sits below the reserved chrome ─── */
+  .snd-toggle{position:fixed;top:calc(var(--tap) + 30px);left:8px;z-index:60;
+    min-height:44px;padding:6px 12px;border-radius:999px;
+    background:rgba(10,14,18,.82);backdrop-filter:blur(6px);
+    border:1px solid var(--rule);color:var(--ink-dim);
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:.7rem;
+    letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+  .snd-toggle[aria-pressed="true"]{color:var(--label);border-color:var(--glow)}
+
+  /* ─── THE ROOM (CSS-composed 1962 living room) ──────────────── */
+  .room{position:relative;width:100%;aspect-ratio:4/3;border-radius:4px;
+    overflow:hidden;margin:0 0 1.2em;
+    background:
+      radial-gradient(120% 90% at 50% 38%, var(--wall-lit) 0%, var(--wall) 42%, var(--paper) 100%);
+    box-shadow:inset 0 0 120px rgba(0,0,0,.7);}
+  /* fine film grain — atmosphere only, never carries info */
+  .room::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");}
+  /* the television — the only light source */
+  .tv{position:absolute;top:22%;left:50%;transform:translateX(-50%);
+    width:46%;aspect-ratio:5/4;border-radius:10px/14px;
+    background:linear-gradient(155deg,#2a2018,#0e0a06);
+    padding:5%;box-shadow:0 20px 60px rgba(200,162,74,.18),0 4px 14px rgba(0,0,0,.6);}
+  .crt{position:relative;width:100%;height:100%;border-radius:24px/30px;overflow:hidden;
+    background:radial-gradient(90% 80% at 50% 45%,var(--screen-hot) 0%,var(--screen) 40%,#8f8b7e 100%);}
+  /* withheld figure — made of the broadcast, never a face */
+  .figure{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    width:52%;height:74%;
+    background:radial-gradient(60% 70% at 50% 38%,rgba(30,30,28,.55) 0%,rgba(40,40,36,.28) 55%,transparent 72%);
+    border-radius:50% 50% 42% 42%;filter:blur(1.5px);}
+  .figure::before{content:"";position:absolute;left:50%;top:8%;transform:translateX(-50%);
+    width:38%;height:34%;border-radius:50%;
+    background:radial-gradient(circle,rgba(25,25,24,.5),transparent 70%);}
+  /* scan lines over the whole CRT */
+  .crt::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px);}
+  /* unstable-signal flicker on the glow */
+  .tv::before{content:"";position:absolute;inset:-30% -20%;pointer-events:none;z-index:-1;
+    background:radial-gradient(circle,rgba(200,162,74,.22),transparent 68%);
+    animation:flick 5.5s ease-in-out infinite;}
+  @keyframes flick{0%,100%{opacity:.85}47%{opacity:1}49%{opacity:.72}52%{opacity:.95}}
+  /* the empty chair — you, in shadow, warm rim from the screen */
+  .chair{position:absolute;bottom:-2%;left:12%;width:30%;height:40%;
+    background:linear-gradient(100deg,var(--chair),#161c22);
+    border-radius:40% 40% 8px 8px / 55% 55% 8px 8px;
+    box-shadow:inset 8px 0 14px rgba(200,162,74,.12), 0 10px 30px rgba(0,0,0,.5);}
+  .chair::after{content:"";position:absolute;right:-4%;top:6%;width:8%;height:82%;
+    border-radius:999px;background:linear-gradient(var(--glow-soft),transparent);opacity:.5;}
+
+  /* notice-hits — tap what your eye goes to */
+  .hit{position:absolute;min-width:var(--tap);min-height:var(--tap);
+    border:0;background:transparent;border-radius:50%;z-index:5;}
+  .hit span{position:absolute;inset:0;border-radius:50%;
+    border:2px solid rgba(200,162,74,.0);transition:border-color .25s,transform .25s}
+  .hit:hover span,.hit:focus-visible span{border-color:rgba(200,162,74,.7);transform:scale(1.08)}
+  .hit.tapped span{border-color:var(--glow);background:rgba(200,162,74,.12)}
+  .hit-note{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);
+    max-width:min(90vw,34ch);background:rgba(10,14,18,.94);border:1px solid var(--glow);
+    color:var(--ink);padding:.7em 1em;border-radius:4px;z-index:40;
+    font-size:.98rem;opacity:0;pointer-events:none;transition:opacity .3s}
+  .hit-note.show{opacity:1}
+
+  /* ─── MEDIA PRELUDE cards ───────────────────────────────────── */
+  .cardwrap{position:relative;margin:0 0 1.2em}
+  .mediacard{border:1px solid var(--rule);border-radius:4px;overflow:hidden;
+    background:var(--wall);}
+  .mediacard .art{aspect-ratio:16/10;position:relative;overflow:hidden;
+    background:#0c0f13;}
+  .mediacard .cap{padding:.8em 1em}
+  .mediacard .cap h3{margin:0 0 .3em;font-size:1.05rem}
+  .mediacard .src{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.68rem;
+    color:var(--ink-dim);letter-spacing:.03em;margin-top:.5em;display:block}
+  .dots{display:flex;gap:6px;justify-content:center;margin:.8em 0}
+  .dots i{width:8px;height:8px;border-radius:50%;background:var(--rule)}
+  .dots i.on{background:var(--glow)}
+
+  /* ─── INSTRUMENT (directional reaction) ─────────────────────── */
+  .quote{font-size:1.3rem;line-height:1.45;font-style:italic;
+    border-left:3px solid var(--glow);padding-left:1em;margin:0 0 1em;max-width:34ch}
+  .frame-line{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.82rem;
+    letter-spacing:.04em;color:var(--label);text-transform:uppercase;font-weight:700;margin-bottom:1.4em}
+  .scale{display:flex;flex-direction:column;gap:.5em;margin:1.2em 0}
+  .scale button{display:flex;align-items:center;gap:.9em;min-height:var(--tap);
+    padding:.6em 1em;background:var(--wall);border:2px solid var(--rule);
+    border-radius:3px;color:var(--ink);font-size:1.02rem;text-align:left;transition:border-color .15s,background .15s}
+  .scale button:hover{border-color:var(--glow)}
+  .scale button[aria-pressed="true"]{border-color:var(--glow);background:var(--wall-lit)}
+  .scale .tick{width:26px;height:26px;flex:0 0 26px;border-radius:50%;
+    border:2px solid var(--rule);display:grid;place-items:center;font-size:.9rem}
+  .scale button[aria-pressed="true"] .tick{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+  .directional{display:flex;gap:.4em;margin-top:.4em}
+  .directional .u{color:var(--ink-dim)}
+
+  /* ─── DESCENT (visual Maslow ladder) ────────────────────────── */
+  .ladder{position:relative;margin:1.2em 0;border-radius:4px;overflow:hidden;
+    background:linear-gradient(180deg,#1d2a24 0%,#241f18 55%,#2a1712 100%);
+    border:1px solid var(--rule)}
+  .rung{position:relative;display:flex;align-items:center;gap:.8em;
+    padding:.75em 1em;border-bottom:1px solid rgba(255,255,255,.06)}
+  .rung:last-child{border-bottom:0}
+  .rung .ic{width:34px;height:34px;flex:0 0 34px}
+  .rung .rlabel{font-size:.98rem;line-height:1.3}
+  .rung .rnum{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.68rem;
+    color:var(--ink-dim);letter-spacing:.08em;font-weight:700}
+  .rung.you{background:rgba(200,162,74,.14)}
+  .rung.you::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--glow)}
+  .you-marker{margin-left:auto;font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:.7rem;font-weight:700;letter-spacing:.08em;color:var(--label);
+    border:1px solid var(--glow);border-radius:999px;padding:3px 10px;white-space:nowrap}
+
+  /* the river dashboard */
+  .river{margin:1.2em 0;padding:1em;border:1px solid var(--rule);border-radius:4px;background:var(--wall)}
+  .river svg{width:100%;height:auto;display:block}
+  .verdict{display:inline-block;font-family:"Helvetica Neue",Arial,sans-serif;
+    font-weight:700;letter-spacing:.04em;padding:.35em .9em;border-radius:999px;font-size:.82rem}
+  .verdict.caught{background:rgba(95,176,168,.18);color:var(--brake-ink);border:1px solid var(--brake)}
+  .verdict.carried{background:rgba(201,111,74,.18);color:var(--pull-ink);border:1px solid var(--pull)}
+
+  .note{background:var(--wall);border:1px solid var(--rule);border-left:3px solid var(--glow);
+    border-radius:3px;padding:.9em 1.1em;margin:1.2em 0;font-size:.96rem}
+  .note .u{color:var(--label);display:block;margin-bottom:.3em}
+  .rule{height:1px;background:var(--rule);border:0;margin:1.6em 0}
+  .foot{margin-top:2em;padding-top:1.2em;border-top:1px solid var(--rule);
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:.72rem;color:var(--ink-dim);letter-spacing:.03em}
+  .foot a{color:var(--label)}
+  .step{font-family:"Helvetica Neue",Arial,sans-serif;font-size:.7rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-dim);font-weight:700;margin-bottom:.8em}
+  .actions{display:flex;gap:.7em;flex-wrap:wrap;margin-top:1.4em}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes (never overlaps content) -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.4rem 0 1rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v9 <span style="opacity:.75">d701f4e</span></span> </span> </span></span></p>
+<script>(function(){var u=document.getElementById('seUpdated');if(!u)return;var d=new Date(document.lastModified);u.textContent=isNaN(d.getTime())?'Last updated recently':'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});})();</script>
+
+
+<!-- Sound: gameplay control (live, off by default), sits below the reserved chrome -->
+<button class="snd-toggle" id="sndBtn" aria-pressed="false">Sound: off</button>
+
+<div class="stage" id="stage"><!-- screens injected --></div>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   ENGINE — v5 slice. In-memory only. No network. No storage.
+   ══════════════════════════════════════════════════════════════ */
+const stage = document.getElementById('stage');
+
+/* --- per-scene state (ipsative: compared to the player's own prior) --- */
+const S = { blind:null, post:null, taps:new Set(), reaction:0 };
+
+/* --- 5-point capture shown as plain more/less/neutral framing --- */
+/* value 1..5 : 1=trust far less … 3=neutral … 5=trust far more (of the leader) */
+const SCALE = [
+  {v:5, label:"Trust them — fully",      d:"more"},
+  {v:4, label:"Lean toward trusting them", d:"more"},
+  {v:3, label:"Neutral — it doesn't move me", d:"neutral"},
+  {v:2, label:"Lean toward doubting them", d:"less"},
+  {v:1, label:"Doubt them — plainly",    d:"less"},
+];
+
+/* ─── SOUND (Web Audio, off by default, paired to visible events) ─── */
+let AC=null, sndOn=false, roomNodes=[];
+function ensureAC(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){AC=null;} } return AC; }
+function startRoomTone(){
+  if(!sndOn||!ensureAC()) return; stopRoomTone();
+  // faint tube-set whine + warm room hum — clean 1962
+  const hum=AC.createOscillator(), humG=AC.createGain();
+  hum.type='sine'; hum.frequency.value=60; humG.gain.value=0.015;
+  hum.connect(humG).connect(AC.destination); hum.start();
+  const whine=AC.createOscillator(), whG=AC.createGain();
+  whine.type='sine'; whine.frequency.value=15720/2; whG.gain.value=0.004; // set flyback, halved to be gentle
+  whine.connect(whG).connect(AC.destination); whine.start();
+  roomNodes=[hum,whine];
+}
+function stopRoomTone(){ roomNodes.forEach(n=>{try{n.stop()}catch(e){}}); roomNodes=[]; }
+function setClick(){ // the click of the set powering on
+  if(!sndOn||!ensureAC()) return;
+  const o=AC.createOscillator(), g=AC.createGain();
+  o.type='square'; o.frequency.value=120; g.gain.value=0.08;
+  o.connect(g).connect(AC.destination);
+  const t=AC.currentTime; o.start(t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.08); o.stop(t+0.09);
+}
+const sndBtn=document.getElementById('sndBtn');
+sndBtn.addEventListener('click',()=>{
+  sndOn=!sndOn; sndBtn.setAttribute('aria-pressed',sndOn);
+  sndBtn.textContent = sndOn ? 'Sound: on' : 'Sound: off';
+  if(sndOn){ ensureAC(); if(AC&&AC.state==='suspended')AC.resume(); startRoomTone(); }
+  else stopRoomTone();
+});
+
+/* ─── STUDIO EYES — reserved-chrome comfort control (light ladder · text size · toggles) ─── */
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+})();
+
+/* ─── SCREEN ROUTER (scroll-reset on every change) ─── */
+function show(html){
+  stage.innerHTML = '<div class="screen on">'+html+'</div>';
+  window.scrollTo(0,0);
+  const h=stage.querySelector('h1,h2'); if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCREENS
+   ══════════════════════════════════════════════════════════════ */
+
+/* TITLE — states audio plainly, prices the ask, roster-integrity line */
+function scrTitle(){
+  show(`
+    <div class="step">Tight Spiral Studios · a short lesson in noticing</div>
+    <h1>Choose Your Leader</h1>
+    <p>One scene. About four minutes. You'll hear a real president, decide how far it moves you, then see the record the room couldn't — and feel how far the words carried you before you knew.</p>
+    <div class="note">
+      <span class="u">Before you start</span>
+      This scene uses quiet period sound — a 1962 room, a television warming up. It's <strong>off</strong> right now. Turn it on with the <strong>Sound</strong> button, top-left. Recommended, never required — nothing you need is carried by sound alone.
+    </div>
+    <p style="font-size:.9rem;color:var(--ink-dim)">Public figures, historical record. Nothing you tap is saved or sent.</p>
+    <div class="actions"><button class="btn" onclick="scrPrelude(0)">Begin →</button></div>
+  `);
+}
+
+/* MEDIA PRELUDE — Beat −1. Real, dated, attributed media of the moment.
+   These are described/typeset cards (offline slice); each carries a real,
+   verifiable source string. No fabricated headlines. */
+const PRELUDE = [
+  { kicker:"WASHINGTON · OCT 22, 1962 · 7:00 PM ET",
+    head:"The President will address the nation tonight",
+    body:"All three networks clear their schedules for a live address from the Oval Office. No topic announced. The country waits without knowing why.",
+    src:"Source: Public broadcast record, Oct 22 1962 · Kennedy Library (JFKPOF)." },
+  { kicker:"THE SKY · SINCE OCT 14",
+    head:"U-2 photographs read as missile sites in Cuba",
+    body:"For eight days, a small group has known. The public has not. Tonight is the first the nation hears of it.",
+    src:"Source: National Archives, U-2 reconnaissance imagery, Oct 1962 (public domain)." },
+  { kicker:"THE ROOM · TONIGHT",
+    head:"Three networks. One message. This is all you get.",
+    body:"No second source. No scroll. Whatever the screen says is the whole of what the room knows.",
+    src:"Framing note · not a headline. Sets the epistemic floor for the scene." },
+];
+function scrPrelude(i){
+  const c = PRELUDE[i];
+  const dots = PRELUDE.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
+  show(`
+    <div class="step">What was in the air</div>
+    <div class="cardwrap">
+      <div class="mediacard">
+        <div class="art" aria-hidden="true">${preludeArt(i)}</div>
+        <div class="cap">
+          <div class="u" style="color:var(--label)">${c.kicker}</div>
+          <h3 style="margin-top:.35em">${c.head}</h3>
+          <p style="margin:.4em 0 0;font-size:.98rem">${c.body}</p>
+          <span class="src">${c.src}</span>
+        </div>
+      </div>
+    </div>
+    <div class="dots" aria-hidden="true">${dots}</div>
+    <div class="actions">
+      ${i>0?`<button class="btn ghost" onclick="scrPrelude(${i-1})">← Back</button>`:''}
+      ${i<PRELUDE.length-1
+        ? `<button class="btn" onclick="scrPrelude(${i+1})">Next →</button>`
+        : `<button class="btn" onclick="scrRoom()">Into the room →</button>`}
+    </div>
+  `);
+}
+/* prelude art — period-typeset "front page" blocks, not photos we can't source */
+function preludeArt(i){
+  const bg = ['#e9e4d6','#141a12','#12100a'][i];
+  const fg = ['#1a1a1a','#c9d6c0','#c8a24a'][i];
+  return `<div style="position:absolute;inset:0;background:${bg};display:grid;place-items:center;padding:8%">
+    <svg viewBox="0 0 300 180" style="width:100%;height:100%">
+      <rect width="300" height="180" fill="${bg}"/>
+      <line x1="20" y1="34" x2="280" y2="34" stroke="${fg}" stroke-width="2" opacity=".7"/>
+      <line x1="20" y1="40" x2="280" y2="40" stroke="${fg}" stroke-width="1" opacity=".4"/>
+      ${i===1?`<circle cx="150" cy="108" r="34" fill="none" stroke="${fg}" stroke-width="2" opacity=".55"/>
+        <circle cx="150" cy="108" r="4" fill="${fg}" opacity=".7"/>
+        <line x1="150" y1="74" x2="150" y2="142" stroke="${fg}" stroke-width="1" opacity=".35"/>
+        <line x1="116" y1="108" x2="184" y2="108" stroke="${fg}" stroke-width="1" opacity=".35"/>`:''}
+      ${i===0?`<rect x="40" y="58" width="90" height="8" fill="${fg}" opacity=".6"/>
+        <rect x="40" y="74" width="150" height="6" fill="${fg}" opacity=".35"/>
+        <rect x="40" y="86" width="120" height="6" fill="${fg}" opacity=".35"/>
+        <rect x="180" y="58" width="80" height="60" fill="none" stroke="${fg}" stroke-width="1.5" opacity=".45"/>`:''}
+      ${i===2?`<rect x="70" y="70" width="160" height="44" rx="4" fill="none" stroke="${fg}" stroke-width="2" opacity=".6"/>
+        <line x1="90" y1="92" x2="210" y2="92" stroke="${fg}" stroke-width="6" opacity=".5"/>`:''}
+    </svg>
+  </div>`;
+}
+
+/* ROOM — Beat 0. Scene-first. Tap what your eye goes to. */
+const HITS = [
+  { x:'50%', y:'34%', note:'The screen. The only light in the room — and the only thing that will speak.' },
+  { x:'27%', y:'78%', note:'An empty chair, turned to the set. It\'s yours. Nobody has gone to bed.' },
+  { x:'50%', y:'50%', note:'A shape on the glass — head and shoulders, made of scan lines. You can\'t make out a face. You\'re not meant to yet.' },
+];
+function scrRoom(){
+  setClick(); if(sndOn) startRoomTone();
+  const hits = HITS.map((h,k)=>`
+    <button class="hit" style="left:${h.x};top:${h.y};transform:translate(-50%,-50%)"
+      data-k="${k}" aria-label="Notice: something here"><span></span></button>`).join('');
+  show(`
+    <div class="step">October 22, 1962 · it's late</div>
+    <div class="room">
+      <div class="tv"><div class="crt"><div class="figure"></div></div></div>
+      <div class="chair"></div>
+      ${hits}
+    </div>
+    <p class="lead" id="roomPrompt">Tap whatever your eye goes to. Every read is valid — then the room speaks.</p>
+    <div class="hit-note" id="hitNote"></div>
+    <div class="actions"><button class="btn" id="roomNext" disabled style="opacity:.45;pointer-events:none" onclick="scrBlind()">The set warms up →</button></div>
+  `);
+  const note=document.getElementById('hitNote'), next=document.getElementById('roomNext');
+  stage.querySelectorAll('.hit').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const k=+btn.dataset.k; S.taps.add(k); btn.classList.add('tapped');
+      note.textContent=HITS[k].note; note.classList.add('show');
+      setTimeout(()=>note.classList.remove('show'),3400);
+      if(S.taps.size>=1){ next.disabled=false; next.style.opacity='1'; next.style.pointerEvents='auto';
+        document.getElementById('roomPrompt').textContent='When you\'re ready, the set warms up.'; }
+    });
+  });
+}
+
+/* BLIND REACTION — Beat 1. Identical wording to the post-record ask. */
+const QUOTE = "“This Government, as promised, has maintained the closest surveillance of the Soviet military buildup on the island of Cuba… it shall be the policy of this nation to regard any nuclear missile launched from Cuba as an attack by the Soviet Union on the United States, requiring a full retaliatory response.”";
+const ASK = "You know this leader. You hear this, tonight, with only what the room knows. Does it move you to trust them — more, less, or does it stay neutral?";
+function scrBlind(){
+  show(`
+    <div class="step">The address · with only what the room knows</div>
+    <p class="frame-line">Three networks. One message. This is all you get.</p>
+    <blockquote class="quote">${QUOTE}</blockquote>
+    <p class="lead">${ASK}</p>
+    ${scaleHTML('blind')}
+    <div class="actions"><button class="btn" id="blindNext" disabled style="opacity:.45;pointer-events:none" onclick="scrRecord()">Commit →</button></div>
+  `);
+  wireScale('blind', v=>{ S.blind=v; enable('blindNext'); });
+}
+
+/* THE RECORD TURNS — Beat 2. Dated, sourced facts, then re-ask (same words). */
+function scrRecord(){
+  show(`
+    <div class="step">The record turns · what the room couldn't see</div>
+    <div class="note">
+      <span class="u">Dated · sourced</span>
+      This televised address was <strong>day eight</strong> of a deliberation, not a first reaction. From Oct 16, an Executive Committee had weighed blockade, air strike, and invasion in secret. The calm, decisive voice you heard was the <em>chosen</em> register of a week-long argument — the surveillance had begun days earlier, and the country was hearing the conclusion, not the debate.
+      <span class="src" style="display:block;margin-top:.6em;font-family:'Helvetica Neue',Arial,sans-serif;font-size:.68rem;color:var(--ink-dim)">Source: Kennedy Library, ExComm records &amp; Oct 22 address transcript (JFKPOF, public domain).</span>
+    </div>
+    <blockquote class="quote">${QUOTE}</blockquote>
+    <p class="lead">${ASK}</p>
+    ${scaleHTML('post')}
+    <div class="actions"><button class="btn" id="postNext" disabled style="opacity:.45;pointer-events:none" onclick="scrDescent()">See where it pulled you →</button></div>
+  `);
+  wireScale('post', v=>{ S.post=v; enable('postNext'); });
+}
+
+/* scale builder — plain framing, 5-pt capture underneath */
+function scaleHTML(id){
+  return `<div class="scale" role="radiogroup" aria-label="${ASK}">` +
+    SCALE.map(s=>`<button role="radio" aria-checked="false" data-v="${s.v}" data-id="${id}">
+      <span class="tick" aria-hidden="true"></span>
+      <span>${s.label}</span>
+    </button>`).join('') + `</div>`;
+}
+function wireScale(id,cb){
+  stage.querySelectorAll(`.scale button[data-id="${id}"]`).forEach(b=>{
+    b.addEventListener('click',()=>{
+      stage.querySelectorAll(`.scale button[data-id="${id}"]`).forEach(x=>{x.setAttribute('aria-pressed','false');x.setAttribute('aria-checked','false');});
+      b.setAttribute('aria-pressed','true'); b.setAttribute('aria-checked','true');
+      cb(+b.dataset.v);
+    });
+  });
+}
+function enable(id){ const el=document.getElementById(id); el.disabled=false; el.style.opacity='1'; el.style.pointerEvents='auto'; }
+
+/* THE DESCENT — Beat 3. Re-derived ipsative math + visual Maslow ladder. */
+const RUNGS = [
+  {n:5, label:"Your own judgment — becoming who you could be", ic:'eye'},
+  {n:4, label:"Standing, respect, a voice", ic:'voice'},
+  {n:3, label:"A people, a side, a we", ic:'we'},
+  {n:2, label:"Safety — survive the threat", ic:'shield'},
+  {n:1, label:"The floor — where consent stops mattering", ic:'floor'},
+];
+function scrDescent(){
+  /* v5 ipsative re-derivation (§1.4):
+     blind/post are 1..5 trust-of-leader.
+     pull  = how far the quote ALONE carried you toward trust = (blind-3), clamped >=0 downward force.
+     brake = how much the record pulled you back = max(0, blind - post).
+     Start at rung 5, subtract pull, add brake, clamp 1..5. */
+  const pull  = Math.max(0, S.blind - 3);          // 0..2
+  const brake = Math.max(0, S.blind - S.post);     // 0..4
+  const tier  = Math.min(5, Math.max(1, 5 - pull + brake));
+  const caught = S.post < S.blind;                 // you trusted less once you saw the frame
+  S.reaction += (S.post - S.blind);                // accumulating per-leader reaction score
+
+  const rungs = RUNGS.map(r=>{
+    const you = r.n===tier;
+    return `<div class="rung ${you?'you':''}">
+      ${rungIcon(r.ic)}
+      <div><div class="rnum">RUNG ${r.n}</div><div class="rlabel">${r.label}</div></div>
+      ${you?`<span class="you-marker">YOU LANDED HERE</span>`:''}
+    </div>`;
+  }).join('');
+
+  show(`
+    <div class="step">Where the words pulled you</div>
+    <h2>${caught ? 'You caught the gap.' : (pull>0 ? 'The words carried you.' : 'You held your footing.')}</h2>
+    <div class="ladder">${rungs}</div>
+    <p>${descentCopy(tier,caught,pull,brake)}</p>
+    <div class="river">
+      <div class="u" style="color:var(--label);margin-bottom:.6em">How it moved you</div>
+      ${riverSVG()}
+      <p style="margin:.8em 0 0;font-size:.94rem">
+        ${caught
+          ? `<span class="verdict caught">Noticed</span> Between the two asks, your trust moved <strong>toward doubt</strong> once the record turned. That movement is the whole skill — you felt the frame arrive and adjusted.`
+          : (S.post>S.blind
+            ? `<span class="verdict carried">Carried</span> The record made you trust them <strong>more</strong>, not less. Worth sitting with: the facts here complicate the calm, they don't confirm it.`
+            : `<span class="verdict carried">Held</span> Your trust didn't move. Sometimes that's steadiness — and sometimes the frame arrived and nothing shifted. Only you know which.`)}
+      </p>
+    </div>
+    <div class="note">
+      <span class="u">This isn't a grade</span>
+      The ladder measures how far <em>rhetoric can carry a person</em> — never your worth as a citizen. Landing low means the words were powerful, not that you failed. Noticing the gap is the win, at any rung.
+    </div>
+    <div class="actions"><button class="btn" onclick="scrArc()">The whole arc →</button></div>
+  `);
+}
+function descentCopy(tier,caught,pull,brake){
+  if(caught) return `You started at your own judgment. The address pulled ${pull>1?'hard':'some'} — then the record turned, and you pulled back. The brake is the point of the whole game: you felt yourself being moved and you moved back.`;
+  if(pull>0) return `You started at the top — your own judgment. The calm, decisive voice carried you ${pull>1?'most of the way down':'a step down'} toward safety and the crowd. When the record turned, the words held their grip. That grip is exactly what the game exists to make visible.`;
+  return `The address didn't move you far from your own judgment. That's a kind of footing — the message didn't override you. Calibration, not suspicion, is the skill.`;
+}
+function riverSVG(){
+  // tributary (blind) meets record-turn, downstream = post. Width encodes movement.
+  const b=S.blind, p=S.post;
+  const y1=110-(b-1)*18, y2=110-(p-1)*18;
+  return `<svg viewBox="0 0 300 130" role="img" aria-label="Your trust before and after the record">
+    <defs><linearGradient id="w" x1="0" x2="1">
+      <stop offset="0" stop-color="#5fb0a8"/><stop offset="1" stop-color="#c8a24a"/>
+    </linearGradient></defs>
+    <line x1="20" y1="${y1}" x2="150" y2="118" stroke="#3a4a58" stroke-width="10" stroke-linecap="round" opacity=".5"/>
+    <path d="M20 ${y1} Q 100 ${y1} 150 118 T 280 ${y2}" fill="none" stroke="url(#w)" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="150" cy="118" r="7" fill="#c8a24a"/>
+    <text x="20" y="${y1-12}" fill="#d8d2c6" font-family="Helvetica Neue,Arial" font-size="11">before</text>
+    <text x="150" y="16" fill="#c8a24a" font-family="Helvetica Neue,Arial" font-size="11" text-anchor="middle">the record turns</text>
+    <text x="280" y="${y2-12}" fill="#d8d2c6" font-family="Helvetica Neue,Arial" font-size="11" text-anchor="end">after</text>
+  </svg>`;
+}
+/* mnemonic icons per rung (C5 — symbol lands faster than the word).
+   Art direction C — Cut-Paper Relief: a single offset shadow layer, a solid warm
+   shape, and paper-dark cutouts. Solid fills beat thin strokes for low vision. */
+function rungIcon(k){
+  const I={
+    eye:`<ellipse cx="19" cy="19" rx="14" ry="9" fill="var(--glow-soft)"/>`+
+        `<ellipse cx="17" cy="17" rx="14" ry="9" fill="var(--label)"/>`+
+        `<circle cx="17" cy="17" r="6" fill="var(--paper)"/><circle cx="17" cy="17" r="2.6" fill="var(--label)"/>`,
+    voice:`<rect x="7" y="8" width="24" height="24" rx="5" fill="var(--glow-soft)"/>`+
+          `<rect x="4" y="5" width="24" height="24" rx="5" fill="var(--label)"/>`+
+          `<g fill="var(--paper)"><rect x="9" y="15" width="3.5" height="8" rx="1.6"/>`+
+          `<rect x="14.5" y="11" width="3.5" height="12" rx="1.6"/><rect x="20" y="14" width="3.5" height="9" rx="1.6"/></g>`,
+    we:`<g fill="var(--glow-soft)"><circle cx="13" cy="15" r="6.5"/><circle cx="25" cy="15" r="6.5"/></g>`+
+       `<g fill="var(--label)"><circle cx="11" cy="13" r="6.5"/><circle cx="23" cy="13" r="6.5"/></g>`,
+    shield:`<path d="M19 6 L30 10 V19 C30 26 25 30 19 32 C13 30 8 26 8 19 V10 Z" fill="var(--glow-soft)"/>`+
+           `<path d="M17 4 L28 8 V17 C28 24 23 28 17 30 C11 28 6 24 6 17 V8 Z" fill="var(--label)"/>`+
+           `<g fill="var(--paper)"><rect x="15.25" y="11" width="3.5" height="11" rx="1.6"/><rect x="12" y="15" width="10" height="3.5" rx="1.6"/></g>`,
+    floor:`<rect x="6" y="24" width="26" height="6" rx="2" fill="var(--glow-soft)"/>`+
+          `<g fill="var(--label)"><rect x="8" y="10" width="4.5" height="12" rx="1.6"/>`+
+          `<rect x="14.5" y="14" width="4.5" height="8" rx="1.6"/><rect x="21" y="17" width="4.5" height="5" rx="1.6"/></g>`+
+          `<rect x="4" y="22" width="26" height="6" rx="2" fill="var(--label)"/>`,
+  };
+  return `<svg class="ic" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true">${I[k]||I.eye}</svg>`;
+}
+
+/* ARC — the whole slice at once + Glass Engine door */
+function scrArc(){
+  const b=S.blind,p=S.post, caught=p<b;
+  show(`
+    <div class="step">The whole arc · one scene</div>
+    <h2>One scene, one move.</h2>
+    <p>You landed in a 1962 room, heard a president with only what the room knew, and committed. Then the record turned and you decided again. Here's the shape of it:</p>
+    <div class="ladder" style="background:var(--wall)">
+      <div class="rung"><div class="rnum" style="width:70px">BLIND</div><div class="rlabel">${SCALE.find(s=>s.v===b).label}</div></div>
+      <div class="rung"><div class="rnum" style="width:70px">RECORD</div><div class="rlabel">${SCALE.find(s=>s.v===p).label}</div></div>
+      <div class="rung ${caught?'you':''}"><div class="rnum" style="width:70px">MOVE</div>
+        <div class="rlabel">${caught?'You pulled back toward doubt when the frame arrived.':(p>b?'You leaned in further once you saw the record.':'You held steady across both asks.')}</div>
+        ${caught?'<span class="you-marker">GAP CAUGHT</span>':''}</div>
+    </div>
+    <details style="margin:1.2em 0;border:1px solid var(--rule);border-radius:4px;padding:.4em 1em">
+      <summary style="cursor:pointer;font-weight:700;padding:.5em 0">Show the engine — how the ladder was computed</summary>
+      <p style="font-size:.94rem;margin-top:.6em">The game never rated <em>you</em>. It watched the distance between your two commitments. <strong>Pull</strong> = how far the quote alone carried you toward trust. <strong>Brake</strong> = how much you pulled back when the record turned. Landing = start at your own judgment, subtract the pull, add back the brake. Everything is measured against <em>your</em> prior, never another player's — so the number is only ever about your own movement.</p>
+    </details>
+    <p class="lead">That's the move. In the full game you'd run it across LBJ (1964) and Nixon (1969) — the same four beats, a heavier room each time — and an arc screen would hold all three at once.</p>
+    <div class="note">
+      <span class="u">This is a vertical slice</span>
+      One scene, fully built: media prelude, the room, period sound, the reframed instrument, the visual descent. LBJ and Nixon are specified and next. Living-president scenes stay held until each is sourced and dated.
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="reset()">Play it again</button>
+      <button class="btn ghost" onclick="scrTitle()">Back to start</button>
+    </div>
+    <div class="foot">
+      Choose Your Leader · v5 slice — training the reflex to notice the gap between what gets said and what was true. · Tight Spiral Studios · Play. Notice. Design.
+    </div>
+  `);
+}
+function reset(){ S.blind=null;S.post=null;S.taps=new Set();S.reaction=0; scrPrelude(0); }
+
+/* ─── BOOT — scene-first floor: first paint is content, never a gate ─── */
+scrTitle();
+</script>
+</body>
+</html>
