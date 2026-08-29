@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cliché Line — Tight Spiral Studios</title>
+<style>
+/* STUDIO EYES v4 CLASS-FIX 2026-07-11: lock the palette. */
+:root{ color-scheme: light; }
+
+  :root{--ink:#f4f1e8;--paper:#12100f;--paper2:#1c1917;--hot-ink:#ff5a3c;--hot-fill:#ff5a3c;--cool-ink:#57c7ff;--cool-fill:#57c7ff;--dim:#8a857b;--gold-ink:#ffcf5a;--gold-fill:#ffcf5a;--wound:#e0384f;--keep:#dfe6ec;--field:#57c7ff;}
+  /* STUDIO EYES v2 — light ladder remaps (Default / Dusk / Warm-dark) + comfort toggles */
+  :root{ --se-line:#4a443c; --se-accent:#ffcf5a; --se-onaccent:#1a0d09; --se-focus:#ffcf5a; --se-muted:#bcb3a4; }
+  html[data-light="dusk"]{ --paper:#241d15; --paper2:#2c241b; --dim:#a49b8d; }
+  html[data-light="night"]{ --paper:#1a1712; --paper2:#211d18; --dim:#948d81; }
+  html.se-contrast{ --paper:#0c0b0a; --ink:#fdfaf2; --dim:#cfc8ba; --se-line:#6a6357; }
+  html.se-a1{ zoom:1.15; } html.se-a2{ zoom:1.3; }
+  html.se-reduce *{ animation:none!important; transition:none!important; }
+  html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:"Georgia","Times New Roman",serif;
+    min-height:100vh;transition:background .18s ease,color .18s ease;}
+  .se-main{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;padding:22px 16px;}
+  .bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(1200px 800px at 50% -10%, #241f1c 0%, var(--paper) 62%);}
+  #stage{z-index:1}
+  #stage{position:relative;width:min(96vw,1200px);aspect-ratio:3/2;
+    background:var(--paper);
+    border:2px solid #3a352f;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.6);}
+  canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  #hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:8px;
+    padding:12px 20px;pointer-events:none;font-family:"Helvetica Neue",Arial,sans-serif;letter-spacing:.05em;}
+  .hud-item{font-size:clamp(11px,1.4vw,15px);text-transform:uppercase;color:var(--dim);white-space:nowrap}
+  .hud-item b{color:var(--ink);font-size:clamp(16px,2vw,24px);font-family:"Georgia",serif;margin-left:.35em}
+  .hud-item.hot b{color:var(--hot-ink)}.hud-item.gold b{color:var(--gold-ink)}.hud-item.cool b{color:var(--cool-ink)}
+  .meterwrap{display:flex;align-items:center;gap:.5em}
+  .meter{width:90px;height:9px;border:1px solid #4a443c;border-radius:5px;overflow:hidden;background:#0c0b0a}
+  .meter i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--wound),var(--gold-fill),var(--cool-fill));transition:width .25s ease}
+  #attrib{position:absolute;left:0;right:0;bottom:0;padding:9px 18px;pointer-events:none;
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:clamp(10px,1.3vw,13px);color:#8a857b;letter-spacing:.03em;text-align:center;}
+  #attrib b{color:#a49b8d;font-weight:600}
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    background:#0e0c0b;padding:5vh 8vw;z-index:5;}
+  .screen.hidden{display:none}
+  .kicker{font-family:"Helvetica Neue",Arial,sans-serif;text-transform:uppercase;letter-spacing:.4em;font-size:clamp(11px,1.4vw,15px);color:var(--hot-ink);margin-bottom:1.1rem;}
+  h1{font-size:clamp(38px,7.5vw,88px);line-height:.92;font-weight:400;letter-spacing:-.01em;margin-bottom:.35em;}
+  h1 .strike{position:relative;color:var(--dim)}
+  h1 .strike::after{content:"";position:absolute;left:-2%;right:-2%;top:52%;height:5px;background:var(--hot-fill);transform:rotate(-3deg);}
+  .lede{max-width:52ch;font-size:clamp(15px,2vw,21px);line-height:1.5;margin-bottom:1.3em;}
+  .rules{max-width:52ch;font-size:clamp(13px,1.7vw,17px);line-height:1.6;color:var(--dim);margin-bottom:1.6em;font-family:"Helvetica Neue",Arial,sans-serif;}
+  .rules .hot{color:var(--hot-ink)}.rules .keepc{color:var(--keep)}.rules .fieldc{color:var(--field)}.rules b{color:var(--ink)}
+  .controls{font-family:"Helvetica Neue",Arial,sans-serif;display:flex;gap:1.4em;flex-wrap:wrap;justify-content:center;color:var(--dim);font-size:clamp(12px,1.5vw,16px);margin-bottom:1.8em;}
+  .controls b{color:var(--ink)}
+  kbd{display:inline-block;background:var(--paper2);border:1px solid #4a443c;border-bottom-width:3px;border-radius:6px;padding:.15em .5em;font-family:"Helvetica Neue",Arial,sans-serif;color:var(--ink);font-size:.95em;margin:0 .1em;}
+  button{font-family:"Helvetica Neue",Arial,sans-serif;background:var(--hot-fill);color:#1a0d09;border:none;border-radius:999px;min-height:44px;padding:.75em 2.1em;font-size:clamp(16px,2vw,20px);font-weight:700;letter-spacing:.04em;cursor:pointer;text-transform:uppercase;box-shadow:0 6px 0 #b93b23;transition:transform .08s ease;}
+  button:hover{transform:translateY(-1px)}button:active{transform:translateY(3px);box-shadow:0 3px 0 #b93b23}
+  .tag{position:absolute;bottom:12px;right:18px;z-index:6;font-family:"Helvetica Neue",Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;font-size:11px;color:#8a857b;pointer-events:none;}
+  .final{font-size:clamp(20px,3vw,30px);color:var(--gold-ink);margin-bottom:.3em;font-family:"Georgia",serif}
+  .verdict{color:var(--dim);font-style:italic;margin-bottom:1.6em;max-width:44ch}
+
+  /* ═══ RESERVED CHROME — grid header (Home · teaspoon · Studio Eyes), own row ═══ */
+  .se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--paper2);border-bottom:2px solid var(--se-line);
+    position:sticky;top:0;z-index:100;font-family:"Helvetica Neue",Arial,sans-serif;}
+  .se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:44px;
+    padding:8px 14px;border:1.5px solid var(--se-line);border-radius:8px;background:var(--paper);
+    color:var(--ink);font-weight:700;font-size:13px;letter-spacing:.05em;text-decoration:none;text-transform:uppercase;box-shadow:none;}
+  .se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--ink);}
+  .se-brand svg{width:34px;height:20px;color:var(--gold-ink);flex:0 0 auto;}
+  .se-brand .wm{font-family:"Georgia",serif;font-size:16px;letter-spacing:.01em;white-space:nowrap;color:var(--ink);}
+  .se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:44px;
+    padding:8px 15px;border:2px solid transparent;border-radius:8px;background:var(--se-accent);
+    color:var(--se-onaccent);font-weight:700;font-size:13px;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;box-shadow:none;}
+  .se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px;}
+  @media (max-width:560px){.se-brand .wm{display:none;}}
+
+  /* ═══ STUDIO EYES panel ═══ */
+  .se-panel{position:fixed;right:12px;top:60px;z-index:101;
+    width:min(320px,calc(100vw - 24px));background:var(--paper2);color:var(--ink);
+    border:2px solid var(--se-accent);border-radius:10px;padding:15px;
+    box-shadow:0 10px 34px rgba(0,0,0,.55);display:none;font-family:"Helvetica Neue",Arial,sans-serif;}
+  .se-panel[data-open="1"]{display:block;}
+  .se-panel h2{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--se-muted);margin:0 0 8px;font-family:"Helvetica Neue",Arial,sans-serif;font-weight:700;}
+  .se-row{display:flex;gap:6px;margin-bottom:14px;}
+  .se-btn{flex:1;min-height:44px;padding:8px 4px;border:1.5px solid var(--se-line);border-radius:8px;
+    background:var(--paper);color:var(--ink);font-family:"Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:12.5px;cursor:pointer;text-transform:none;box-shadow:none;letter-spacing:0;}
+  .se-btn[aria-pressed="true"]{background:var(--se-accent);color:var(--se-onaccent);border-color:var(--se-accent);}
+  .se-btn:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px;}
+  .se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    min-height:44px;padding:8px 11px;margin-bottom:6px;border:1.5px solid var(--se-line);border-radius:8px;
+    background:var(--paper);color:var(--ink);font-family:"Helvetica Neue",Arial,sans-serif;font-weight:600;font-size:14px;cursor:pointer;text-align:left;text-transform:none;box-shadow:none;}
+  .se-tog[aria-pressed="true"]{border-color:var(--se-accent);}
+  .se-tog .st{font-family:"Helvetica Neue",Arial,sans-serif;font-size:11px;color:var(--se-muted);}
+  .se-tog[aria-pressed="true"] .st{color:var(--gold-ink);font-weight:700;}
+  .se-tog:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px;}
+  .se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  .se-eyes:active,.se-btn:active,.se-tog:active,.se-rail a:active{transform:none;box-shadow:none;}
+
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{position:relative;z-index:1;display:flex;gap:10px;justify-content:center;padding:18px 16px;
+    border-top:2px solid var(--se-line);background:var(--paper);font-family:"Helvetica Neue",Arial,sans-serif;}
+  .se-rail a{min-height:44px;display:inline-flex;align-items:center;padding:10px 18px;border:1.5px solid var(--se-line);border-radius:8px;
+    background:var(--paper2);color:var(--ink);font-weight:700;font-size:13px;letter-spacing:.05em;text-decoration:none;cursor:pointer;text-transform:uppercase;box-shadow:none;}
+  .se-rail a:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px;}
+  .se-stamp{position:relative;z-index:1;text-align:center;font-family:"Helvetica Neue",Arial,sans-serif;font-size:12px;
+    color:var(--se-muted);background:var(--paper);margin:0;padding:0 16px 22px;letter-spacing:.04em;}
+</style>
+<style>
+/* LAB STATUS — founder ruling 2026-08-27. This build is an experiment on the
+   bench, not a finished game. The chip inherits the heading's own colour, so it
+   carries the heading's contrast on every ground this file already ships, and the
+   dashed edge states the status without relying on colour. */
+.tsp-lab{ display:inline-block; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:20px; line-height:1; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  color:currentColor; border:2px dashed currentColor; border-radius:3px;
+  padding:.16em .42em; margin-left:.45em; vertical-align:.1em; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<!-- RESERVED CHROME — Studio Eyes v2 -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+
+
+<main class="se-main">
+<div id="stage">
+  <canvas id="game"></canvas>
+  <div id="hud">
+    <div class="hud-item">Cut<b id="score">0</b></div>
+    <div class="hud-item gold">Line<b id="wave">1</b></div>
+    <div class="hud-item cool meterwrap">Control<span class="meter"><i id="ctrlbar"></i></span></div>
+    <div class="hud-item hot">Lives<b id="lives">3</b></div>
+  </div>
+  <div id="attrib"></div>
+
+  <div class="screen" id="startScreen">
+    <div class="kicker">Tight Spiral Studios</div>
+    <h1>Cliché <span class="strike">Line</span> <span class="tsp-lab" title="Lab: an experiment on the bench, not a finished game">Lab</span></h1>
+    <p class="lede">A real sentence locks behind a force field. You get a few seconds to read it and find the cliché. Then the field drops — and the sentence starts falling toward print.</p>
+    <p class="rules">
+      <span class="fieldc">Field up:</span> read only. You can move, but you <b>cannot fire</b> yet.<br>
+      <span class="fieldc">Field down:</span> the line marches. Cut the <span class="hot">hot</span> cliché before it reaches press.<br>
+      Never shoot a <span class="keepc">pale</span> word — it doesn't die, it <b>stays wounded</b>, and Control drops.
+    </p>
+    <div class="controls">
+      <span><b>Move</b> <kbd>&larr;</kbd><kbd>&rarr;</kbd></span>
+      <span><b>Fire</b> <kbd>Space</kbd> <span style="opacity:.7">(after field drops)</span></span>
+    </div>
+    <button id="startBtn">Hold the line</button>
+    <p style="margin-top:1.1em;color:#8a857b;font-family:Arial,sans-serif;font-size:13px">Read while the field holds. Fire only when it's down.</p>
+  </div>
+
+  <div class="screen hidden" id="waveScreen">
+    <div class="kicker" id="waveKicker">Line held</div>
+    <h1 id="waveTitle">Clean.</h1>
+    <p class="lede" id="waveLine"></p>
+    <button id="nextBtn">Next line</button>
+  </div>
+
+  <div class="screen hidden" id="overScreen">
+    <div class="kicker">Sent to press</div>
+    <h1>Game over</h1>
+    <p class="final" id="finalScore"></p>
+    <p class="verdict" id="verdict"></p>
+    <button id="againBtn">Set it again</button>
+  </div>
+
+  <div class="tag">Tight Spiral Studios · control build</div>
+  <a href="cliche-cowpaths.html" style="position:absolute;bottom:12px;left:18px;z-index:6;font-family:'Helvetica Neue',Arial,sans-serif;letter-spacing:.2em;text-transform:uppercase;font-size:11px;color:#8a857b;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;padding:0 8px">&lsaquo; Cabinet</a>
+</div>
+</main>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <a href="cliche-cowpaths.html" aria-label="Back to the Cabinet">Back</a>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+<p class="se-stamp" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v15 <span style="opacity:.75">75e938c</span></span> </span>
+
+<!-- TSP mobile controls: move / fire -->
+<script>
+  window.TSP_MOBILE = {
+    home: "index.html",
+    back: "cliche-cowpaths.html",
+    nav: false,
+    controls: [
+      { label:"◀", key:"ArrowLeft",  hold:true, side:"left", big:true, aria:"Move left" },
+      { label:"▶", key:"ArrowRight", hold:true, side:"left", big:true, aria:"Move right" },
+      { label:"FIRE", key:" ", side:"right", big:true, aria:"Fire" }
+    ]
+  };
+</script>
+<!-- TSP-MOBILE (inlined from tsp-mobile.js — single-file-offline law) -->
+<script>
+/* Tight Spiral Studios — shared mobile controls + Home/Back nav.
+   Source & docs: tsp-mobile.js. Edit there, then re-inline. */
+(function () {
+  "use strict";
+
+  var d = document, root = d.documentElement, cfg = window.TSP_MOBILE || {};
+
+  /* ---- Device detection --------------------------------------------------- */
+  var hasTouch = ("ontouchstart" in window) ||
+                 (navigator.maxTouchPoints > 0) ||
+                 (navigator.msMaxTouchPoints > 0);
+  var coarse   = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  var narrow   = Math.min(screen.width || 9999, screen.height || 9999) < 820;
+  var isMobile = hasTouch && (coarse || narrow);
+
+  root.classList.add(hasTouch ? "tsp-touch" : "tsp-no-touch");
+  if (isMobile) root.classList.add("tsp-mobile");
+
+  /* ---- Synthetic keyboard dispatch --------------------------------------- */
+  // Games listen on window (or document) for keydown/keyup and read e.key.
+  var evTarget = (cfg.target === "document") ? d : window;
+
+  function dispatchKey(type, key) {
+    var ev;
+    try {
+      ev = new KeyboardEvent(type, {
+        key: key, code: codeFor(key),
+        bubbles: true, cancelable: true, view: window
+      });
+    } catch (e) {
+      // Legacy fallback
+      ev = d.createEvent("Event");
+      ev.initEvent(type, true, true);
+      try { ev.key = key; } catch (_) {}
+    }
+    evTarget.dispatchEvent(ev);
+  }
+
+  function codeFor(key) {
+    switch (key) {
+      case "ArrowLeft":  return "ArrowLeft";
+      case "ArrowRight": return "ArrowRight";
+      case "ArrowUp":    return "ArrowUp";
+      case "ArrowDown":  return "ArrowDown";
+      case " ":          return "Space";
+      case "Enter":      return "Enter";
+      case "Shift":      return "ShiftLeft";
+      default:
+        if (key && key.length === 1) return "Key" + key.toUpperCase();
+        return "";
+    }
+  }
+
+  /* ---- Styles (injected once) -------------------------------------------- */
+  function injectStyles() {
+    if (d.getElementById("tsp-mobile-style")) return;
+    var css = [
+      /* Navigation chip — always available, subtle on desktop */
+      ".tsp-nav{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));",
+        "z-index:2147483000;display:flex;gap:8px;font-family:'Helvetica Neue',Arial,sans-serif}",
+      ".tsp-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.4em;text-decoration:none;",
+        "padding:.5em .85em;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.04em;",
+        "color:#f4f1e8;background:rgba(20,18,15,.66);border:1px solid rgba(255,207,90,.45);",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1;",
+        "box-shadow:0 4px 14px rgba(0,0,0,.35);transition:background .15s,border-color .15s,transform .08s}",
+      ".tsp-nav a:hover,.tsp-nav a:focus-visible{background:rgba(40,34,24,.9);border-color:#ffcf5a;outline:none}",
+      ".tsp-nav a:active{transform:translateY(1px)}",
+      "@media (min-width:900px) and (pointer:fine){.tsp-nav{opacity:.55}.tsp-nav:hover{opacity:1}}",
+
+      /* Nav integrated into the studio's shared .topbar (no overlap) */
+      ".tsp-barnav{display:inline-flex;align-items:center;gap:.35rem;margin-right:.25rem;flex:none}",
+      ".tsp-barnav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.3em;text-decoration:none;color:inherit;",
+        "font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.02em;line-height:1;",
+        "padding:.4em .7em;border-radius:999px;border:1px solid currentColor;opacity:.85;",
+        "background:transparent;white-space:nowrap;transition:opacity .12s,background .12s}",
+      ".tsp-barnav a:hover,.tsp-barnav a:focus-visible{opacity:1;background:rgba(127,127,127,.18);outline:none}",
+      ".tsp-barnav a:active{transform:translateY(1px)}",
+      /* Keep the shared bar on one row once Home/Back are added: title ellipsizes */
+      ".tsp-touch .topbar{gap:.4rem}",
+      ".tsp-touch .topbar .wm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto}",
+
+      /* Gamepad — only rendered on touch devices */
+      ".tsp-pad{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;",
+        "display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;",
+        "padding:0 max(14px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));",
+        "font-family:'Helvetica Neue',Arial,sans-serif;touch-action:none}",
+      ".tsp-cluster{display:flex;gap:12px;pointer-events:none;align-items:flex-end;flex-wrap:wrap;max-width:46vw}",
+      ".tsp-cluster.right{justify-content:flex-end}",
+      ".tsp-btn{pointer-events:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;",
+        "touch-action:none;min-width:62px;min-height:62px;padding:0 14px;border-radius:16px;",
+        "display:flex;align-items:center;justify-content:center;text-align:center;",
+        "font-size:15px;font-weight:700;letter-spacing:.03em;color:#f4f1e8;",
+        "background:rgba(24,20,15,.6);border:1.5px solid rgba(255,207,90,.5);",
+        "-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);",
+        "box-shadow:0 6px 18px rgba(0,0,0,.4);transition:background .06s,transform .06s;cursor:pointer}",
+      ".tsp-btn.big{min-width:82px;min-height:82px;font-size:16px}",
+      ".tsp-btn:active,.tsp-btn.on{background:rgba(255,207,90,.9);color:#1a0d09;transform:scale(.94)}",
+      /* Hide gamepad on non-touch so desktop keeps keyboard feel */
+      ".tsp-no-touch .tsp-pad{display:none}",
+
+      /* Rotate-for-more-room hint — canvas games only, portrait phones only */
+      ".tsp-rot{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top));",
+        "z-index:2147482500;display:none;align-items:center;gap:.55em;padding:.5em .55em .5em .9em;",
+        "border-radius:999px;background:rgba(24,20,15,.86);color:#f4f1e8;",
+        "border:1px solid rgba(255,207,90,.5);white-space:nowrap;",
+        "font:600 12px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.4)}",
+      ".tsp-rot .rk{font-size:14px;color:#ffcf5a}",
+      ".tsp-rot button{background:none;border:none;color:inherit;font-size:16px;line-height:1;",
+        "padding:0 .15em;margin:0;cursor:pointer;opacity:.65;min-width:44px;min-height:44px}",
+      ".tsp-rot button:active{opacity:1}",
+      "@media (orientation:portrait){.tsp-touch .tsp-rot{display:inline-flex}}",
+      ".tsp-rot-dismissed .tsp-rot{display:none!important}"
+    ].join("");
+    var s = d.createElement("style");
+    s.id = "tsp-mobile-style";
+    s.textContent = css;
+    d.head.appendChild(s);
+  }
+
+  /* ---- Navigation (Home / Back) ------------------------------------------ */
+  function makeLink(href, label, aria) {
+    var a = d.createElement("a");
+    a.href = href; a.innerHTML = label;
+    a.setAttribute("aria-label", aria);
+    return a;
+  }
+
+  function buildNav() {
+    if (cfg.nav === false) return;
+    if (d.querySelector(".tsp-nav, .tsp-barnav")) return;
+
+    var home = cfg.home === undefined ? "index.html" : cfg.home;
+    var links = [];
+    if (cfg.back) links.push(makeLink(cfg.back, "‹ Back", "Back"));
+    if (home)     links.push(makeLink(home, "⌂ Home", "Home"));
+    if (!links.length) return;
+
+    // Prefer integrating into the studio's shared sticky header if present —
+    // avoids overlapping page titles and matches each page's palette.
+    var bar = cfg.floatNav ? null : d.querySelector(".topbar");
+    if (bar) {
+      var wrap = d.createElement("span");
+      wrap.className = "tsp-barnav";
+      links.forEach(function (l) { wrap.appendChild(l); });
+      bar.insertBefore(wrap, bar.firstChild);
+      return;
+    }
+
+    // Otherwise: floating chip, and reserve top space on scrollable pages so
+    // it never covers the header/title.
+    var nav = d.createElement("nav");
+    nav.className = "tsp-nav";
+    nav.setAttribute("aria-label", "Site navigation");
+    links.forEach(function (l) { nav.appendChild(l); });
+    d.body.appendChild(nav);
+    reserveTopSpace();
+  }
+
+  function reserveTopSpace() {
+    if (!hasTouch) return;                 // desktop keeps its exact layout
+    // Skip full-viewport apps (canvas games, fixed overlays) — the chip sits
+    // in their letterbox margin and body padding would distort them.
+    var cs = getComputedStyle(d.body);
+    if (cs.overflowY === "hidden" || cs.overflowX === "hidden") return;
+    var scrolls = root.scrollHeight > (window.innerHeight + 4);
+    if (!scrolls) return;
+    var pad = parseFloat(cs.paddingTop) || 0;
+    d.body.style.paddingTop = (pad + 58) + "px";
+  }
+
+  /* ---- Gamepad ------------------------------------------------------------ */
+  function buildPad() {
+    if (!hasTouch) return;                       // keyboard devices skip it
+    if (!cfg.controls || !cfg.controls.length) return;
+    if (d.querySelector(".tsp-pad")) return;
+
+    var pad = d.createElement("div");
+    pad.className = "tsp-pad";
+    var left  = d.createElement("div"); left.className  = "tsp-cluster left";
+    var right = d.createElement("div"); right.className = "tsp-cluster right";
+    pad.appendChild(left); pad.appendChild(right);
+
+    cfg.controls.forEach(function (c) {
+      var btn = d.createElement("button");
+      btn.type = "button";
+      btn.className = "tsp-btn" + (c.big ? " big" : "");
+      btn.innerHTML = c.label || "";
+      btn.setAttribute("aria-label", c.aria || c.label || c.key);
+      bindButton(btn, c);
+      (c.side === "left" ? left : right).appendChild(btn);
+    });
+
+    d.body.appendChild(pad);
+  }
+
+  function bindButton(btn, c) {
+    var key = c.key, held = false;
+
+    function press(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (c.hold) {
+        if (held) return;
+        held = true;
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+      } else {
+        // tap: quick down/up so edge-triggered actions (fire/rotate/drop) fire once
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+        setTimeout(function () { dispatchKey("keyup", key); }, 24);
+        setTimeout(function () { btn.classList.remove("on"); }, 90);
+      }
+    }
+    function release(e) {
+      if (e) e.preventDefault();
+      if (c.hold && held) {
+        held = false;
+        btn.classList.remove("on");
+        dispatchKey("keyup", key);
+      }
+    }
+
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", function (e) {
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+        press(e);
+      });
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointercancel", release);
+      btn.addEventListener("lostpointercapture", release);
+    } else {
+      btn.addEventListener("touchstart", press, { passive: false });
+      btn.addEventListener("touchend", release);
+      btn.addEventListener("touchcancel", release);
+      btn.addEventListener("mousedown", press);
+      btn.addEventListener("mouseup", release);
+      btn.addEventListener("mouseleave", release);
+    }
+    // Safety: releasing a held key if the page loses focus
+    window.addEventListener("blur", release);
+  }
+
+  /* ---- Rotate hint -------------------------------------------------------- */
+  function buildRotateHint() {
+    if (!hasTouch) return;
+    if (cfg.rotateHint === false) return;
+    if (!cfg.controls || !cfg.controls.length) return;   // canvas games only
+    if (d.querySelector(".tsp-rot")) return;
+    var hint = d.createElement("div");
+    hint.className = "tsp-rot";
+    hint.setAttribute("role", "note");
+    hint.innerHTML = '<span class="rk">↻</span>' +
+      '<span>Turn sideways for more room</span>' +
+      '<button type="button" aria-label="Dismiss">×</button>';
+    hint.querySelector("button").addEventListener("click", function () {
+      root.classList.add("tsp-rot-dismissed");
+    });
+    d.body.appendChild(hint);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    injectStyles();
+    buildNav();
+    buildPad();
+    buildRotateHint();
+  }
+
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose a tiny API for pages that want to toggle the pad (e.g. hide on menus)
+  window.TSPMobile = {
+    isTouch: hasTouch,
+    isMobile: isMobile,
+    press: function (key) { dispatchKey("keydown", key); dispatchKey("keyup", key); },
+    showPad: function (v) {
+      var p = d.querySelector(".tsp-pad");
+      if (p) p.style.display = v === false ? "none" : "";
+    }
+  };
+})();
+</script>
+
+<script>
+(() => {
+  "use strict";
+
+  // shared cliché bank (feeds Cliché City). Safe if storage is blocked.
+  function bankAdd(phrase){
+    try{
+      const k="tsp_cliche_bank";
+      const cur=JSON.parse(localStorage.getItem(k)||"[]");
+      cur.push({t:phrase,src:"line",at:Date.now()});
+      localStorage.setItem(k,JSON.stringify(cur.slice(-250)));
+    }catch(e){}
+  }
+
+  const LINES=[
+    {attrib:"M. Walsh, “Ludic Pedagogy,” Sabbatical Report, MassBay, 2012",
+     tokens:[{t:"the",keep:1},{t:"recursive",keep:1},{t:"process",keep:1},{t:"is",keep:1},{t:"a",keep:1},{t:"tight",keep:1},{t:"spiral",keep:1},{t:"at the end of the day",cliche:1}]},
+    {attrib:"Herman Melville, Moby-Dick, 1851 (public domain)",
+     tokens:[{t:"Call",keep:1},{t:"me",keep:1},{t:"Ishmael",keep:1},{t:"the calm before the storm",cliche:1}]},
+    {attrib:"Henry David Thoreau, Walden, 1854 (public domain)",
+     tokens:[{t:"I",keep:1},{t:"wished",keep:1},{t:"to",keep:1},{t:"live",keep:1},{t:"deliberately",keep:1},{t:"think outside the box",cliche:1}]},
+    {attrib:"Jane Austen, Pride and Prejudice, 1813 (public domain)",
+     tokens:[{t:"a",keep:1},{t:"single",keep:1},{t:"man",keep:1},{t:"in",keep:1},{t:"possession",keep:1},{t:"when all is said and done",cliche:1},{t:"of",keep:1},{t:"a",keep:1},{t:"good",keep:1},{t:"fortune",keep:1}]},
+    {attrib:"M. Walsh, Sabbatical Report, MassBay, 2012",
+     tokens:[{t:"players",keep:1},{t:"themselves",keep:1},{t:"dictate",keep:1},{t:"the",keep:1},{t:"course",keep:1},{t:"in this day and age",cliche:1},{t:"of",keep:1},{t:"the",keep:1},{t:"game",keep:1}]}
+  ];
+  const EXTRA_CLICHES=["low-hanging fruit","move the needle","paradigm shift","circle back","it is what it is","the elephant in the room","last but not least","game changer"];
+
+  const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+  let W=0,H=0,DPR=1;
+  function resize(){const r=canvas.getBoundingClientRect();DPR=Math.min(window.devicePixelRatio||1,2);W=r.width;H=r.height;
+    canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);}
+  window.addEventListener("resize",()=>{resize();if(formation)layoutFormation();});
+
+  const State={START:0,PLAY:1,WAVE:2,OVER:3};
+  let state=State.START;
+  let ship=null,bullets=[],particles=[],floaters=[],formation=null;
+  let score=0,lives=3,wave=1,control=100,fireCooldown=0,last=0;
+  const READ_SECS=3.6;
+  const keys=Object.create(null);
+  const rand=(a,b)=>a+Math.random()*(b-a),TAU=Math.PI*2;
+  const PRINT_Y=()=>H-70;
+
+  function buildLine(idx,chapter){
+    const src=LINES[idx];
+    let toks=src.tokens.map(o=>Object.assign({},o));
+    const extra=Math.max(0,chapter-1);
+    for(let e=0;e<extra&&e<2;e++){
+      const pos=1+Math.floor(rand(0,toks.length));
+      toks.splice(pos,0,{t:EXTRA_CLICHES[Math.floor(rand(0,EXTRA_CLICHES.length))],cliche:1});
+    }
+    return {attrib:src.attrib,toks};
+  }
+  function layoutFormation(){
+    if(!formation)return;
+    ctx.font="600 15px Georgia, serif";
+    const padX=14,gap=10,h=34;let total=0;
+    for(const tk of formation.tiles){tk.w=Math.min(ctx.measureText(tk.t).width+padX*2,W*0.34);tk.h=h;total+=tk.w+gap;}
+    total-=gap;
+    formation.scale=Math.min(1,(W-40)/total);
+    formation.width=total*formation.scale;
+    let x=0;for(const tk of formation.tiles){tk.relx=x;x+=(tk.w+gap)*formation.scale;}
+    if(formation.x+formation.width>W-16)formation.x=W-16-formation.width;
+    if(formation.x<16)formation.x=16;
+  }
+  function startLine(idx,chapter){
+    const built=buildLine(idx,chapter);
+    formation={
+      attrib:built.attrib,
+      tiles:built.toks.map(o=>({t:o.t,cliche:!!o.cliche,keep:!!o.keep,state:o.cliche?"target":"ok",flash:0,jitter:0,w:0,h:0,relx:0})),
+      x:40,y:118,dir:1,scale:1,width:0,
+      hspeed:24+chapter*9,dropStep:20+chapter*3,descend:6+chapter*3,
+      phase:"read",readTimer:READ_SECS,fieldFade:0,fieldPulse:0
+    };
+    layoutFormation();
+    formation.x=(W-formation.width)/2;formation.y=118;
+    document.getElementById("attrib").innerHTML="Line under revision — <b>"+escapeHTML(formation.attrib)+"</b>";
+  }
+  function escapeHTML(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+  function remainingCliches(){return formation.tiles.filter(t=>t.cliche&&t.state==="target").length;}
+
+  function resetShip(){ship={x:W/2,y:H-44,speed:6};}
+  window.addEventListener("keydown",e=>{if(["ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();
+    keys[e.key.toLowerCase()]=true;if(e.key===" "&&state===State.PLAY)fire();});
+  window.addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;});
+  function fire(){
+    if(!formation||formation.phase!=="live")return;   // no fire while field is up
+    if(fireCooldown>0||bullets.length>=2)return;
+    bullets.push({x:ship.x,y:ship.y-14,vy:-9});fireCooldown=10;
+  }
+
+  function newGame(){score=0;lives=3;wave=1;control=100;bullets=[];particles=[];floaters=[];
+    resetShip();startLine(0,1);updateHUD();state=State.PLAY;
+    show("startScreen",false);show("waveScreen",false);show("overScreen",false);}
+
+  function loseLife(reason){lives--;updateHUD();if(lives<=0)gameOver(reason);else advanceLine();}
+  function advanceLine(){
+    const nextIdx=wave%LINES.length,chapter=1+Math.floor(wave/LINES.length);
+    wave++;bullets=[];resetShip();startLine(nextIdx,chapter);updateHUD();state=State.PLAY;show("waveScreen",false);
+  }
+  function holdLine(){
+    const wounds=formation.tiles.filter(t=>t.keep&&t.state==="wounded").length;
+    const clean=wounds===0;
+    score+=60+(clean?40:0);
+    if(clean)control=Math.min(100,control+8);
+    updateHUD();state=State.WAVE;
+    const kept=formation.tiles.filter(t=>t.keep).map(t=>t.t).join(" ");
+    document.getElementById("waveKicker").textContent=clean?"Clean cut":"Line held (with scars)";
+    document.getElementById("waveTitle").textContent=clean?pick(["Clean.","Sharp.","Nothing wasted."]):pick(["Held.","It'll do.","Bruised but standing."]);
+    const msg=clean?"You lifted the cliché out and left the sentence whole:"
+      :(wounds+(wounds===1?" honest word took a hit. Still readable, but it shows:":" honest words took hits. The sentence survived, scarred:"));
+    document.getElementById("waveLine").innerHTML=msg+"<br><span style='color:#dfe6ec;font-style:italic'>“"+escapeHTML(kept)+"”</span>";
+    show("waveScreen",true);
+  }
+  function pick(a){return a[Math.floor(Math.random()*a.length)];}
+  function gameOver(reason){
+    state=State.OVER;
+    document.getElementById("finalScore").textContent="You cut "+score+" and held "+(wave-1)+" lines.";
+    let v=reason==="cliche"?"A cliché slipped past into print. That's how they survive — one distracted editor at a time.":"The press ran before the line was clean.";
+    if(control<40)v+=" Control ran low; too many honest words caught a bullet.";
+    document.getElementById("verdict").textContent=v;show("overScreen",true);
+  }
+
+  function update(dt){
+    if(state!==State.PLAY)return;
+    if(keys["arrowleft"]||keys["a"])ship.x-=ship.speed;
+    if(keys["arrowright"]||keys["d"])ship.x+=ship.speed;
+    ship.x=Math.max(20,Math.min(W-20,ship.x));
+    if(fireCooldown>0)fireCooldown--;
+    const f=formation;
+    f.fieldPulse+=dt;
+
+    if(f.phase==="read"){
+      f.readTimer-=dt;
+      if(f.readTimer<=0){f.phase="live";f.fieldFade=0.5;}
+      // no march, no fire, no crossing checks during read
+    } else {
+      if(f.fieldFade>0)f.fieldFade-=dt;
+      f.x+=f.dir*f.hspeed*dt;f.y+=f.descend*dt;
+      if(f.x+f.width>W-16){f.x=W-16-f.width;f.dir=-1;f.y+=f.dropStep;}
+      else if(f.x<16){f.x=16;f.dir=1;f.y+=f.dropStep;}
+    }
+
+    for(const tk of f.tiles){if(tk.flash>0)tk.flash-=dt*3;if(tk.jitter>0)tk.jitter-=dt*4;}
+
+    for(let i=bullets.length-1;i>=0;i--){
+      const b=bullets[i];b.y+=b.vy;
+      if(b.y<0){bullets.splice(i,1);continue;}
+      for(const tk of f.tiles){
+        if(tk.state==="cut")continue;
+        const tx=f.x+tk.relx,tw=tk.w*f.scale,ty=f.y;
+        if(b.x>=tx&&b.x<=tx+tw&&b.y<=ty+tk.h&&b.y>=ty){onHit(tk);bullets.splice(i,1);break;}
+      }
+    }
+
+    if(f.phase==="live"){
+      for(const tk of f.tiles){
+        if(tk.cliche&&tk.state==="target"&&f.y+tk.h>=PRINT_Y()){
+          burst(f.x+tk.relx+tk.w*f.scale/2,PRINT_Y(),"#ff5a3c",26);loseLife("cliche");return;
+        }
+      }
+      if(remainingCliches()===0){holdLine();}
+    }
+
+    for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.96;p.vy*=0.96;p.life-=dt*1.6;if(p.life<=0)particles.splice(i,1);}
+    for(let i=floaters.length-1;i>=0;i--){const fl=floaters[i];fl.y-=18*dt;fl.life-=dt;if(fl.life<=0)floaters.splice(i,1);}
+  }
+
+  function onHit(tk){
+    if(tk.cliche){
+      tk.state="cut";score+=25;bankAdd(tk.t);
+      const cx=formation.x+tk.relx+tk.w*formation.scale/2;
+      burst(cx,formation.y+tk.h/2,"#ff5a3c",16);
+      floaters.push({x:cx,y:formation.y,text:"cut",color:"#ffcf5a",life:1});updateHUD();
+    } else {
+      if(tk.state!=="wounded"){
+        tk.state="wounded";control=Math.max(0,control-14);score=Math.max(0,score-15);
+        const cx=formation.x+tk.relx+tk.w*formation.scale/2;
+        floaters.push({x:cx,y:formation.y,text:"–15  wounded",color:"#e0384f",life:1.1});updateHUD();
+      }
+      tk.flash=1;tk.jitter=1;
+      const cx=formation.x+tk.relx+tk.w*formation.scale/2;
+      burst(cx,formation.y+tk.h/2,"#e0384f",8);
+    }
+  }
+  function burst(x,y,color,n){for(let i=0;i<n;i++){const a=rand(0,TAU),s=rand(.5,3.2);particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color});}}
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    if(state===State.START)return;
+    const py=PRINT_Y();
+    ctx.save();ctx.setLineDash([6,7]);ctx.strokeStyle="#4a423a";ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(W,py);ctx.stroke();ctx.setLineDash([]);
+    ctx.font="11px 'Helvetica Neue',Arial,sans-serif";ctx.fillStyle="#6f685e";ctx.textAlign="left";ctx.fillText("PRESS",14,py-6);ctx.restore();
+
+    if(formation){
+      drawForceField();
+      for(const tk of formation.tiles)drawTile(tk);
+    }
+    ctx.fillStyle="#fff";for(const b of bullets)ctx.fillRect(b.x-1.6,b.y-8,3.2,10);
+    for(const p of particles){ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.fillRect(p.x-1.5,p.y-1.5,3,3);}
+    ctx.globalAlpha=1;
+    for(const fl of floaters){ctx.globalAlpha=Math.max(0,fl.life);ctx.fillStyle=fl.color;ctx.font="600 14px 'Helvetica Neue',Arial,sans-serif";ctx.textAlign="center";ctx.fillText(fl.text,fl.x,fl.y-10);}
+    ctx.globalAlpha=1;
+    if(state===State.PLAY)drawShip();
+  }
+
+  function drawForceField(){
+    const f=formation;
+    let alpha=0;
+    if(f.phase==="read")alpha=1;
+    else if(f.fieldFade>0)alpha=Math.max(0,f.fieldFade/0.5);
+    if(alpha<=0)return;
+    const pad=16;
+    const x=f.x-pad,y=f.y-pad,w=f.width+pad*2,h=f.tiles[0].h+pad*2;
+    const glow=0.55+0.35*Math.sin(f.fieldPulse*4);
+    ctx.save();
+    ctx.globalAlpha=alpha;
+    // panel
+    roundRect(x,y,w,h,14);
+    ctx.fillStyle="rgba(60,140,190,0.12)";ctx.fill();
+    // scanlines
+    ctx.save();ctx.clip();
+    ctx.globalAlpha=alpha*0.25;ctx.strokeStyle="#57c7ff";ctx.lineWidth=1;
+    for(let sy=y;sy<y+h;sy+=6){ctx.beginPath();ctx.moveTo(x,sy);ctx.lineTo(x+w,sy);ctx.stroke();}
+    ctx.restore();
+    // border
+    ctx.globalAlpha=alpha;
+    ctx.shadowColor="rgba(87,199,255,"+glow.toFixed(2)+")";ctx.shadowBlur=18;
+    roundRect(x,y,w,h,14);ctx.strokeStyle="#57c7ff";ctx.lineWidth=2.5;ctx.stroke();ctx.shadowBlur=0;
+    // read label + timer
+    if(f.phase==="read"){
+      ctx.globalAlpha=alpha;ctx.textAlign="center";
+      ctx.fillStyle="#9fdcff";ctx.font="700 13px 'Helvetica Neue',Arial,sans-serif";
+      ctx.fillText("FIELD UP — READ THE LINE", x+w/2, y-14);
+      // timer bar under panel
+      const frac=Math.max(0,f.readTimer/READ_SECS);
+      const bw=w*0.8,bx=x+w/2-bw/2,by=y+h+12;
+      ctx.strokeStyle="#3a6377";ctx.lineWidth=1;ctx.strokeRect(bx,by,bw,6);
+      ctx.fillStyle="#57c7ff";ctx.fillRect(bx,by,bw*frac,6);
+    }
+    ctx.restore();
+  }
+
+  function drawTile(tk){
+    if(tk.state==="cut")return;
+    const f=formation;
+    const jx=tk.jitter>0?rand(-2,2):0;
+    const x=f.x+tk.relx+jx,y=f.y,w=tk.w*f.scale,h=tk.h;
+    ctx.save();
+    let stroke,fillText,glow=null;
+    if(tk.cliche){stroke="#ff5a3c";fillText="#ffb199";glow="rgba(255,90,60,.5)";}
+    else if(tk.state==="wounded"){stroke="#e0384f";fillText="#e0384f";glow="rgba(224,56,79,.45)";}
+    else{stroke="#7d8fa0";fillText="#dfe6ec";}
+    if(tk.flash>0)stroke="#fff";
+    roundRect(x,y,w,h,h/2);ctx.fillStyle="rgba(20,18,16,.6)";ctx.fill();
+    if(glow){ctx.shadowColor=glow;ctx.shadowBlur=10;}
+    ctx.lineWidth=tk.cliche?2:1.4;ctx.strokeStyle=stroke;ctx.stroke();ctx.shadowBlur=0;
+    ctx.font="600 "+(15*Math.max(.8,f.scale))+"px Georgia, serif";ctx.textAlign="center";ctx.textBaseline="middle";
+    let label=tk.t;
+    if(ctx.measureText(label).width>w-16){while(label.length>2&&ctx.measureText(label+"…").width>w-16)label=label.slice(0,-1);label+="…";}
+    ctx.fillStyle=fillText;ctx.fillText(label,x+w/2,y+h/2+1);
+    if(tk.state==="wounded"){ctx.strokeStyle="#e0384f";ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(x+8,y+h/2);ctx.lineTo(x+w-8,y+h/2);ctx.stroke();}
+    ctx.restore();
+  }
+  function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+
+  function drawShip(){
+    ctx.save();ctx.translate(ship.x,ship.y);
+    ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(13,10);ctx.lineTo(4,10);ctx.lineTo(0,2);ctx.lineTo(-4,10);ctx.lineTo(-13,10);ctx.closePath();
+    const canFire=formation&&formation.phase==="live";
+    ctx.fillStyle="#1c1917";ctx.strokeStyle=canFire?"#ffcf5a":"#5a6b74";ctx.lineWidth=2.5;
+    ctx.shadowColor=canFire?"#ffcf5a":"#3a6377";ctx.shadowBlur=canFire?12:6;
+    ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.restore();
+  }
+
+  function updateHUD(){
+    document.getElementById("score").textContent=score;
+    document.getElementById("wave").textContent=wave;
+    document.getElementById("lives").textContent=Math.max(0,lives);
+    document.getElementById("ctrlbar").style.width=Math.max(0,control)+"%";
+  }
+  function show(id,on){document.getElementById(id).classList.toggle("hidden",!on);}
+
+  document.getElementById("startBtn").onclick=newGame;
+  document.getElementById("againBtn").onclick=newGame;
+  document.getElementById("nextBtn").onclick=advanceLine;
+
+  function frame(t){if(!last)last=t;let dt=(t-last)/1000;last=t;if(dt>0.05)dt=0.05;update(dt);draw();requestAnimationFrame(frame);}
+  resize();requestAnimationFrame(frame);
+})();
+</script>
+<script>
+/* STUDIO EYES v2 — controller for the reserved chrome panel. */
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+</body>
+</html>
