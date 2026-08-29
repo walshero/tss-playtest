@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Creative Writing Arcade — Tight Spiral Productions</title>
+<style>
+/* STUDIO EYES v2: the OS does not get a vote — light modes are html[data-light]. */
+:root{ color-scheme: dark; }
+
+/* ── LIGHT: DEFAULT (day) — the arcade's native dark room ─────────────── */
+:root{
+  --floor:#1a1d21;      /* the room */
+  --floor-2:#22262b;
+  --panel:#1e2228;      /* the opaque body panel under card text */
+  --paper:#e8e2d6;      /* the ink (text) */
+  --paper-fill:#e8e2d6; /* the same value, used only as decoration (focus ring) */
+  --amber-ink:#ffcf5a;  /* the marquee — TEXT role */
+  --amber-fill:#ffcf5a; /* the marquee — DECORATION/ground role */
+  --amber-dim:#c9a03f;
+  --glow:rgba(255,207,90,.16);
+  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  --serif:Georgia,"Times New Roman",serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  /* Studio Eyes chrome tokens (adapted to the dark room). --ink is the chrome
+     text: LIGHT here, because every chrome ground is dark. */
+  --ink:#e8e2d6;
+  --ink-2:#c9a03f;
+  --surface:#22262b;
+  --surface-2:#2b3037;
+  --line:rgba(255,207,90,.30);
+  --accent:#ffcf5a;
+  --accent-strong:#ffcf5a;
+  --on-accent:#1a1d21;
+  --focus:#ffcf5a;
+  --r:10px; --tap:44px;
+}
+/* ── LIGHT: DUSK — warmer, dimmer room; ink stays light ──────────────── */
+html[data-light="dusk"]{
+  --floor:#241f18; --floor-2:#2d281f; --panel:#241f19;
+  --amber-ink:#ffd873; --amber-fill:#ffd873; --amber-dim:#d6ad52;
+  --glow:rgba(255,216,115,.16);
+  --ink-2:#d6ad52;
+  --surface:#2a2418; --surface-2:#342d20;
+  --line:rgba(255,216,115,.30);
+  --accent:#ffd873; --accent-strong:#ffd873; --focus:#ffd873;
+}
+/* ── LIGHT: WARM-DARK (night) — warm charcoal, never pure black ──────── */
+html[data-light="night"]{
+  --floor:#161310; --floor-2:#1e1a13; --panel:#1f1b14;
+  --amber-ink:#ffcf5a; --amber-fill:#ffcf5a; --amber-dim:#c9a03f;
+  --glow:rgba(255,207,90,.16);
+  --ink-2:#c9a03f;
+  --surface:#201c15; --surface-2:#2a251b;
+  --line:rgba(255,207,90,.30);
+  --accent:#ffcf5a; --accent-strong:#ffcf5a; --focus:#ffcf5a;
+}
+/* ── STUDIO EYES toggles ─────────────────────────────────────────────── */
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+html.se-contrast{ --paper:#fdf9ef; --amber-dim:#ffdf8f; --line:rgba(255,207,90,.55); }
+html.se-reduce *,@media (prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+html.se-cb a.cab{ outline:1px solid var(--line); }
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--floor);
+  color:var(--paper);
+  font-family:var(--sans);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── THE ROOM: carpet + haze. This is a place, not a page. ───────────── */
+.room{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 120% 60% at 50% 0%, var(--glow), transparent 60%),
+    repeating-linear-gradient(115deg, transparent 0 22px, rgba(255,255,255,.012) 22px 44px),
+    linear-gradient(180deg, var(--floor) 0%, var(--floor-2) 55%, var(--floor) 100%);
+}
+
+.wrap{position:relative; z-index:1; max-width:760px; margin:0 auto; padding:0 1rem 5rem}
+
+/* ── MARQUEE ─────────────────────────────────────────────────────────── */
+.marquee{ text-align:center; padding:1.3rem 0 1rem }
+.tube{
+  display:inline-block; padding:.42rem 1.1rem; margin-bottom:.7rem;
+  border:2px solid var(--amber-fill); border-radius:3px;
+  color:var(--amber-ink); font:700 .68rem/1 var(--sans);
+  letter-spacing:.22em; text-transform:uppercase;
+  box-shadow:0 0 22px var(--glow), inset 0 0 22px var(--glow);
+}
+h1{
+  font-family:var(--serif); font-weight:400;
+  font-size:clamp(1.7rem,6.6vw,2.5rem); line-height:1.04;
+  color:var(--paper); margin-bottom:.5rem;
+}
+h1 b{ color:var(--amber-ink); font-weight:700; display:block }
+.sub{
+  font-family:var(--serif); font-style:italic;
+  font-size:.96rem; line-height:1.45; color:var(--paper); opacity:.9;
+  max-width:30rem; margin:.7rem auto 0;
+}
+.count{
+  margin-top:.75rem; font:700 .7rem/1 var(--sans);
+  letter-spacing:.16em; text-transform:uppercase; color:var(--amber-dim);
+}
+
+/* ── THE CABINETS ────────────────────────────────────────────────────── */
+.floor{ display:flex; flex-direction:column; gap:1.1rem; margin-top:1.1rem }
+
+.cab{
+  display:block; text-decoration:none; color:inherit;
+  background:linear-gradient(175deg, #2b3037, #1e2228);
+  border:1px solid rgba(255,207,90,.20);
+  border-radius:12px; overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.cab:hover, .cab:focus-visible{
+  transform:translateY(-3px);
+  border-color:var(--amber-fill);
+  box-shadow:0 14px 40px rgba(0,0,0,.45), 0 0 0 1px var(--amber-fill);
+}
+.cab:focus-visible{ outline:3px solid var(--amber-fill); outline-offset:3px }
+
+/* the screen: every cabinet is >50% image (userPreferences floor) */
+.screen{
+  position:relative; height:200px;
+  background:#0e1114;
+  border-bottom:1px solid rgba(255,207,90,.18);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.screen svg{ width:100%; height:100%; display:block }
+.scan{
+  position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 3px);
+}
+
+/* Opaque body panel: the auditor cannot sample the card's gradient, so the text
+   needs a real, known ground under it — matches the gradient's lower stop. */
+.body{ background:var(--panel); padding:1rem 1.1rem 1.15rem }
+.no{
+  display:inline-block; min-width:26px; text-align:center;
+  padding:.18rem .42rem; margin-bottom:.5rem;
+  background:var(--amber-fill); color:#1a1d21;
+  font:800 .74rem/1 var(--sans); border-radius:3px;
+}
+h2{ font-family:var(--serif); font-size:1.42rem; font-weight:400; color:var(--paper); margin-bottom:.18rem }
+.after{ font:700 .66rem/1 var(--sans); letter-spacing:.13em; text-transform:uppercase; color:var(--amber-dim); margin-bottom:.55rem }
+.blurb{ font-size:.96rem; line-height:1.5; color:var(--paper); opacity:.92 }
+.verb{
+  margin-top:.7rem; padding-top:.7rem;
+  border-top:1px solid rgba(232,226,214,.14);
+  display:flex; align-items:center; justify-content:space-between; gap:.6rem;
+}
+.does{ font-size:.86rem; color:var(--paper); opacity:.85 }
+.does b{ color:var(--amber-ink) }
+.play{
+  flex:none; padding:.5rem .8rem; min-height:44px;
+  display:flex; align-items:center;
+  background:var(--amber-fill); color:#1a1d21;
+  font:800 .74rem/1 var(--sans); letter-spacing:.06em;
+  border-radius:6px; text-transform:uppercase;
+}
+
+.foot{
+  margin-top:2.6rem; padding-top:1.2rem;
+  border-top:1px solid rgba(232,226,214,.14);
+  text-align:center; font-size:.86rem; line-height:1.6;
+  color:var(--paper); opacity:.8;
+}
+.foot b{ color:var(--amber-ink); opacity:1 }
+
+@media(prefers-reduced-motion:reduce){ *{transition:none!important} }
+
+/* ═══ STUDIO EYES v2 — RESERVED CHROME (own row, never overlaps content) ═══ */
+.se-chrome{ position:relative; z-index:100; display:grid; grid-template-columns:1fr auto 1fr;
+  align-items:center; gap:10px; padding:9px 14px; background:var(--surface);
+  border-bottom:2px solid var(--line); }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent-strong); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-strong);
+  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 22px); z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink);
+  border:2px solid var(--accent-strong); border-radius:var(--r); padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.5); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 8px; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-eyebtn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-eyebtn[aria-pressed="true"]{ background:var(--accent-strong); color:var(--on-accent); border-color:var(--accent-strong); }
+.se-eyebtn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent-strong); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--accent-strong); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; margin-top:2.4rem;
+  border-top:2px solid var(--line); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes (own row) -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.4rem 0 1rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v10 <span style="opacity:.75">75e938c</span></span></span></p>
+<script>(function(){var u=document.getElementById('seUpdated');if(!u)return;var d=new Date(document.lastModified);u.textContent=isNaN(d.getTime())?'Last updated recently':'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});})();</script>
+
+
+<div class="room" aria-hidden="true"></div>
+
+<div class="wrap">
+
+  <header class="marquee">
+    <div class="tube">Tight Spiral Productions</div>
+    <h1>The Creative Writing<b>Arcade</b></h1>
+    <p class="sub">Five machines that teach a writing move by making you do it.
+       No lecture. No quiz. You play, and the craft is the mechanic.</p>
+    <div class="count">Five cabinets + a guest · Free · Works offline</div>
+  </header>
+
+  <main class="floor">
+
+    <!-- 1 — COWPATHS -->
+    <a class="cab" href="cliche-cowpaths.html">
+      <div class="screen">
+        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
+          <rect width="300" height="170" fill="#0e1114"/>
+          <path d="M0 150 Q60 148 90 130 T150 105 T210 78 T300 50" stroke="#3d4148" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <path d="M0 150 Q60 148 90 130 T150 105 T210 78 T300 50" stroke="#ffcf5a" stroke-width="2.5" fill="none" stroke-dasharray="7 9" opacity=".85"/>
+          <path d="M0 160 Q80 156 120 142 T220 118 T300 100" stroke="#2c3037" stroke-width="9" fill="none"/>
+          <path d="M0 132 Q70 130 110 112 T200 88 T300 70" stroke="#262a30" stroke-width="6" fill="none"/>
+          <g fill="#4a4f57">
+            <ellipse cx="52" cy="70" rx="13" ry="9"/><ellipse cx="96" cy="52" rx="10" ry="7"/>
+            <ellipse cx="196" cy="132" rx="11" ry="8"/><ellipse cx="248" cy="118" rx="9" ry="6"/>
+          </g>
+          <circle cx="240" cy="42" r="4" fill="#ffcf5a"/>
+          <circle cx="262" cy="36" r="2.5" fill="#ffcf5a" opacity=".6"/>
+        </svg>
+        <div class="scan"></div>
+      </div>
+      <div class="body">
+        <span class="no">1</span>
+        <h2>Cliché Cowpaths</h2>
+        <div class="after">Three cartridges · Field, Line, City</div>
+        <p class="blurb">The cows never planned the route. They followed the cow in front.
+           Three hundred years later the street still bends. A cliché is the same —
+           nobody chose it, everybody walks it, and now it's paved.</p>
+        <div class="verb">
+          <span class="does"><b>Notice.</b> The worn path under your sentence.</span>
+          <span class="play">Play</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 2 — SANDBAGS -->
+    <a class="cab" href="sandbags.html">
+      <div class="screen">
+        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
+          <rect width="300" height="170" fill="#0e1114"/>
+          <ellipse cx="150" cy="46" rx="34" ry="40" fill="#3d4148" stroke="#ffcf5a" stroke-width="2"/>
+          <path d="M150 86 L142 100 M150 86 L158 100" stroke="#ffcf5a" stroke-width="1.6"/>
+          <rect x="132" y="100" width="36" height="24" rx="3" fill="#2c3037" stroke="#ffcf5a" stroke-width="1.6"/>
+          <g fill="#4a4f57" stroke="#5a606a" stroke-width="1">
+            <rect x="108" y="132" width="26" height="17" rx="4"/>
+            <rect x="138" y="132" width="26" height="17" rx="4"/>
+            <rect x="168" y="132" width="26" height="17" rx="4"/>
+            <rect x="123" y="152" width="26" height="16" rx="4"/>
+            <rect x="153" y="152" width="26" height="16" rx="4"/>
+          </g>
+          <path d="M118 128 L124 118 M150 128 L150 118 M182 128 L176 118" stroke="#5a606a" stroke-width="1.2"/>
+          <path d="M30 30 h18 M34 40 h10" stroke="#2c3037" stroke-width="2"/>
+          <path d="M252 30 h18 M256 40 h10" stroke="#2c3037" stroke-width="2"/>
+        </svg>
+        <div class="scan"></div>
+      </div>
+      <div class="body">
+        <span class="no">2</span>
+        <h2>Sandbags</h2>
+        <div class="after">A flash fiction climb</div>
+        <p class="blurb">The balloon won't rise. Every word you cut is ballast over the side.
+           Cut too little and you never leave the ground. Cut the wrong thing and you crash.</p>
+        <div class="verb">
+          <span class="does"><b>Compress.</b> Find what the story can't lose.</span>
+          <span class="play">Play</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 3 — THE TELL -->
+    <a class="cab" href="the-tell.html">
+      <div class="screen">
+        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
+          <rect width="300" height="170" fill="#0e1114"/>
+          <rect x="52" y="34" width="70" height="98" rx="6" fill="#2c3037" stroke="#4a4f57" stroke-width="1.6" transform="rotate(-7 87 83)"/>
+          <rect x="115" y="30" width="70" height="98" rx="6" fill="#3d4148" stroke="#ffcf5a" stroke-width="2"/>
+          <rect x="178" y="34" width="70" height="98" rx="6" fill="#2c3037" stroke="#4a4f57" stroke-width="1.6" transform="rotate(7 213 83)"/>
+          <g stroke="#ffcf5a" stroke-width="2" stroke-linecap="round">
+            <path d="M132 56 h36"/><path d="M132 68 h26"/><path d="M132 80 h32"/>
+          </g>
+          <circle cx="150" cy="104" r="9" fill="none" stroke="#ffcf5a" stroke-width="2"/>
+          <circle cx="150" cy="104" r="3" fill="#ffcf5a"/>
+          <path d="M30 150 h240" stroke="#2c3037" stroke-width="2"/>
+        </svg>
+        <div class="scan"></div>
+      </div>
+      <div class="body">
+        <span class="no">3</span>
+        <h2>The Tell</h2>
+        <div class="after">An async workshop game</div>
+        <p class="blurb">Every draft leaks. The writer knows what they meant; the page knows
+           what they said. Read for the gap — the place the story tells on itself.</p>
+        <div class="verb">
+          <span class="does"><b>Read.</b> What the draft admits by accident.</span>
+          <span class="play">Play</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 4 — WORKSHOP WALL -->
+    <a class="cab" href="workshop-wall.html">
+      <div class="screen">
+        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
+          <rect width="300" height="170" fill="#0e1114"/>
+          <g fill="#2c3037" stroke="#4a4f57" stroke-width="1.2">
+            <rect x="34" y="28" width="56" height="44" rx="3" transform="rotate(-3 62 50)"/>
+            <rect x="102" y="34" width="56" height="44" rx="3" transform="rotate(2 130 56)"/>
+            <rect x="170" y="26" width="56" height="44" rx="3" transform="rotate(-2 198 48)"/>
+            <rect x="66" y="88" width="56" height="44" rx="3" transform="rotate(3 94 110)"/>
+            <rect x="204" y="88" width="56" height="44" rx="3" transform="rotate(-4 232 110)"/>
+          </g>
+          <rect x="134" y="82" width="60" height="50" rx="3" fill="#3d4148" stroke="#ffcf5a" stroke-width="2"/>
+          <g stroke="#ffcf5a" stroke-width="1.8" stroke-linecap="round">
+            <path d="M146 96 h34"/><path d="M146 106 h24"/><path d="M146 116 h30"/>
+          </g>
+          <g fill="#ffcf5a"><circle cx="62" cy="30" r="3"/><circle cx="130" cy="36" r="3"/><circle cx="198" cy="28" r="3"/><circle cx="94" cy="90" r="3"/><circle cx="232" cy="90" r="3"/><circle cx="164" cy="84" r="3.5"/></g>
+        </svg>
+        <div class="scan"></div>
+      </div>
+      <div class="body">
+        <span class="no">4</span>
+        <h2>The Workshop Wall</h2>
+        <div class="after">Writerly moves, labeled</div>
+        <p class="blurb">A move you can name is a move you can steal. The wall pins the craft
+           where you can see it — and hands you the pin.</p>
+        <div class="verb">
+          <span class="does"><b>Name.</b> The move, so you can use it.</span>
+          <span class="play">Play</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 5 — REVIEW BENCH -->
+    <a class="cab" href="review-bench.html">
+      <div class="screen">
+        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
+          <rect width="300" height="170" fill="#0e1114"/>
+          <path d="M150 30 v14" stroke="#4a4f57" stroke-width="3"/>
+          <path d="M78 48 h144" stroke="#ffcf5a" stroke-width="3" stroke-linecap="round"/>
+          <path d="M150 44 v66" stroke="#4a4f57" stroke-width="3"/>
+          <path d="M78 48 l-16 32 h32 z" fill="#2c3037" stroke="#ffcf5a" stroke-width="1.8"/>
+          <path d="M222 48 l-16 32 h32 z" fill="#3d4148" stroke="#ffcf5a" stroke-width="1.8"/>
+          <rect x="66" y="84" width="24" height="4" rx="2" fill="#4a4f57"/>
+          <rect x="210" y="84" width="24" height="4" rx="2" fill="#ffcf5a"/>
+          <rect x="106" y="112" width="88" height="34" rx="4" fill="#2c3037" stroke="#4a4f57" stroke-width="1.4"/>
+          <g stroke="#5a606a" stroke-width="1.6" stroke-linecap="round">
+            <path d="M118 124 h44"/><path d="M118 134 h30"/>
+          </g>
+          <circle cx="150" cy="30" r="4" fill="#ffcf5a"/>
+        </svg>
+        <div class="scan"></div>
+      </div>
+      <div class="body">
+        <span class="no">5</span>
+        <h2>The Review Bench</h2>
+        <div class="after">Flash fiction peer workshop</div>
+        <p class="blurb">Praise is cheap and vague is worse. The bench makes you weigh a draft
+           against something — and say what you'd trade.</p>
+        <div class="verb">
+          <span class="does"><b>Judge.</b> With a reason you can defend.</span>
+          <span class="play">Play</span>
+        </div>
+      </div>
+    </a>
+
+<!-- 6 — BARCELONA SUMMERS (guest · student game, external) -->
+    <a class="cab" href="https://eclectic-youtiao-c065da.netlify.app/" rel="noopener">
+      <div class="screen">
+        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
+          <rect width="300" height="170" fill="#0e1114"/>
+          <rect x="0" y="0" width="300" height="120" fill="#17140f"/>
+          <circle cx="232" cy="46" r="26" fill="#ffcf5a" opacity=".9"/>
+          <circle cx="232" cy="46" r="42" fill="#ffcf5a" opacity=".14"/>
+          <g fill="#2c3037">
+            <rect x="24" y="86" width="46" height="34"/><rect x="96" y="74" width="54" height="46"/>
+            <rect x="170" y="94" width="40" height="26"/>
+          </g>
+          <rect x="0" y="120" width="300" height="50" fill="#0e1114"/>
+          <g stroke="#4a4f57" stroke-width="4">
+            <line x1="24" y1="120" x2="24" y2="168"/><line x1="74" y1="120" x2="74" y2="168"/>
+            <line x1="124" y1="120" x2="124" y2="168"/><line x1="174" y1="120" x2="174" y2="168"/>
+            <line x1="224" y1="120" x2="224" y2="168"/><line x1="274" y1="120" x2="274" y2="168"/>
+          </g>
+          <rect x="0" y="126" width="300" height="5" fill="#ffcf5a" opacity=".85"/>
+        </svg>
+        <div class="scan"></div>
+      </div>
+      <div class="body">
+        <span class="no">6</span>
+        <h2>Barcelona Summers</h2>
+        <div class="after">Guest cabinet &middot; Hamish K. &middot; EN195 Creative Writing (summer 6-week online)</div>
+        <p class="blurb">A summer in Barcelona, read three ways. Make the editor&rsquo;s cut &mdash;
+           keep what shows, lose what tells &mdash; and watch a scene carry its meaning
+           without stopping to explain itself.</p>
+        <div class="verb">
+          <span class="does"><b>Notice.</b> What the image does that the sentence can&rsquo;t say.</span>
+          <span class="play">Play</span>
+        </div>
+      </div>
+    </a>
+
+  </main>
+
+  <footer class="foot">
+    <b>Play. Notice. Design.</b><br>
+    Built by Tight Spiral Productions. Every machine runs offline, keeps nothing,
+    and costs nothing. Take them into a classroom if they're useful.
+  </footer>
+
+</div>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" id="seBack" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  // Studio Eyes: open/close
+  // Back rail
+  var back=document.getElementById('seBack');
+  if(back) back.addEventListener('click',function(){ history.back(); });
+})();
+</script>
+
+<!--
+  PROVENANCE — The Creative Writing Arcade
+  Tight Spiral Productions. Built 2026-07-11.
+
+  CHANGELOG
+  2026-07-11  Created. The public front door: EN195's games, minus the semester.
+              One arcade, five cabinets. Cowpaths carries three cartridges of its
+              own; it is a cabinet here, not a second arcade (Aleph: do not nest
+              arcades).
+  2026-07-29  Migrated to Comfort Kernel v2 (Studio Eyes). Reserved chrome header
+              (Home / teaspoon brand / Studio Eyes) + bottom Back/Home rail.
+              Light modes are html[data-light] day/dusk/night (warm-dark = warm
+              charcoal, never black); the arcade's native dark room IS the default.
+              Removed the legacy corner Comfort FAB (default/softer/warm) and the
+              duplicate mobile Home chip; nav now lives only in the chrome + rail.
+
+  FLOORS HELD
+  - NO OPENING WALL: first paint is the room + the marquee + the cabinets.
+    Comfort is Studio Eyes in the chrome, never a door.
+  - LIGHT LADDER: day / dusk / night via html[data-light]; night stays warm-dark.
+    Every visible text >=4.5:1 in all three modes (comfort-gate verified).
+  - Every cabinet screen is >50% image.
+  - 44px minimum on every control.
+-->
+
+</body>
+</html>
