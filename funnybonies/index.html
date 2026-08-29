@@ -3,20 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>The Laugh Workshop v9.1</title>
-<meta name="description" content="Two parts. Two kinds of funny. The order between them is the whole joke.">
-<meta name="spec-source" content="funnybonies/SPEC-LINK-v9.md">
+<title>Funny Boney's Factory v10.0</title>
+<meta name="description" content="Put parts on the track. Press GO. Watch what happens to the ball.">
+<meta name="spec-source" content="funnybonies/SPEC-LINK-v10.md">
 <meta name="audience" content="kids, grades 3 to 6">
 <style>
 /* ===========================================================
-   The Laugh Workshop  ·  v9.1
-   Funnybonies, rebuilt on the Laughter Foundry lineage.
-   Spec: funnybonies/SPEC-LINK-v9.md
+   Funny Boney's Factory  ·  v10.0
+   Spec: funnybonies/SPEC-LINK-v10.md
    Audience: kids, grades 3 to 6.
-   Onion layers built here: 4 (Too much), 2 (Surprise), 3 (Again but different).
-   Register: Samorost + Lumino City. A miniature that was BUILT and LIT.
-   Layered cardboard, cut paper, one warm lamp, real cast shadow.
-   Light theme = the shutters are open. Dark theme = the work lamp at night.
+
+   v10 REBUILD, founder-called 2026-08-28. Two rulings:
+     "The echo makes no sense. I can't hear anything."
+     "The game makes no intuitive sense."
+   v9 asked a kid to ORDER three abstractions and read a paragraph of
+   comedy theory. It also built a joke out of a bell, in a game with no
+   sound. Both are gone.
+
+   v10 is ONE TRACK, ONE BALL, THREE SOCKETS. Parts go on the track.
+   Press GO. The ball travels left to right and each part does something
+   visibly stupid to it. Nothing is scored. Nothing is wrong.
+   The naming arrives AFTER the laugh and never blocks play.
+
+   EVERY GAG IS VISIBLE. Nothing here depends on hearing anything.
+
+   Register: Samorost + Lumino City. Built and lit, not drawn flat.
+   Light theme = shutters open. Dark theme = the work lamp at night.
    Nothing is stored. In memory only.
    =========================================================== */
 :root{
@@ -29,7 +41,6 @@
   --rule:#A8916E;
   --pad:18px; --r:12px;
 }
-/* the work lamp at night. same room, later hour. */
 @media (prefers-color-scheme: dark){
   :root{
     --room:#141010; --wall:#1E1714; --panel:#241C17;
@@ -64,137 +75,68 @@ body{
   -webkit-text-size-adjust:100%; padding:0 0 40px;
 }
 .wrap{max-width:560px; margin:0 auto; padding:0 var(--pad)}
+h1{font-size:30px; line-height:1.08; margin:14px 0 10px; letter-spacing:-.4px}
+.ver{
+  display:inline-block; font-size:20px; font-weight:700; color:var(--lamp-ink);
+  border:2px solid var(--lamp-ink); border-radius:8px; padding:1px 8px;
+  vertical-align:3px; white-space:nowrap;
+}
+p{margin:0 0 12px}
+.tiny{font-size:18px; color:var(--soft)}
 
-h1{font-size:32px; line-height:1.08; margin:14px 0 6px; letter-spacing:-.4px}
-h2{font-size:25px; line-height:1.2; margin:0 0 6px}
-p{margin:0 0 14px}
-.lede{font-size:21px; margin:0 0 14px}
-.tiny{font-size:18px}
-.ver{display:inline-block; font-size:20px; font-weight:700; letter-spacing:0;
-  color:var(--lamp-ink); border:2.5px solid var(--lamp-ink); border-radius:9px;
-  padding:1px 9px; vertical-align:middle; white-space:nowrap}
+/* ---------- the machine ---------- */
+.stage{
+  position:relative; width:100%; border-radius:var(--r); overflow:hidden;
+  box-shadow:0 6px 0 var(--shade); background:var(--wall);
+}
+.stage svg{display:block; width:100%; height:auto}
 
-button{font:inherit; color:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent}
-.primary{display:block; width:100%; min-height:60px; padding:15px 20px;
-  background:var(--lamp); color:var(--onlamp); border:none; border-radius:var(--r);
-  font-size:22px; font-weight:700; box-shadow:0 3px 0 var(--card3)}
-.primary:active{transform:translateY(2px); box-shadow:0 1px 0 var(--card3)}
-.primary[disabled]{background:var(--panel); color:var(--ink);
-  border:2.5px dashed var(--rule); box-shadow:none}
-.ghost{min-height:52px; padding:12px 16px; background:transparent; color:var(--ink);
-  border:2.5px solid var(--ink); border-radius:var(--r); font-size:19px; font-weight:600}
-.navbar{display:flex; gap:10px; padding:12px 0 8px}
-.navbar button{flex:1}
-button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--lamp-ink); outline-offset:3px}
+/* ---------- the tray ---------- */
+.trayhead{margin:16px 0 8px; font-size:21px; font-weight:700}
+.tray{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.part{
+  min-height:112px; border:3px solid var(--card3); border-radius:var(--r);
+  background:var(--panel); color:var(--ink); padding:8px 6px 10px;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  gap:4px; cursor:pointer; font:inherit; font-size:18px; font-weight:700;
+  box-shadow:0 4px 0 var(--shade);
+}
+.part:active{transform:translateY(2px); box-shadow:0 2px 0 var(--shade)}
+.part:disabled{opacity:.42; cursor:default}
+.part svg{width:52px; height:44px; display:block}
+.part:focus-visible, .primary:focus-visible, .ghost:focus-visible, .socketbtn:focus-visible{
+  outline:4px solid var(--lamp-ink); outline-offset:3px;
+}
 
-.screen{display:none}
-.screen.on{display:block}
+/* ---------- controls ---------- */
+.row{display:flex; gap:10px; margin-top:14px}
+.primary{
+  flex:1; min-height:64px; border:0; border-radius:var(--r);
+  background:var(--lamp); color:var(--onlamp);
+  font:inherit; font-size:26px; font-weight:800; letter-spacing:.5px;
+  cursor:pointer; box-shadow:0 5px 0 var(--shade);
+}
+.primary:active{transform:translateY(2px); box-shadow:0 3px 0 var(--shade)}
+.primary[disabled]{background:var(--panel); color:var(--ink); opacity:.55; cursor:default}
+.ghost{
+  min-height:64px; min-width:112px; border:3px solid var(--card3); border-radius:var(--r);
+  background:transparent; color:var(--ink); font:inherit; font-size:20px; font-weight:700;
+  cursor:pointer;
+}
 
-/* ---- the stage: one built room, reused everywhere ---- */
-.stage{width:100%; display:block; margin:0 0 14px; border-radius:var(--r);
-  background:var(--wall); box-shadow:0 6px 0 var(--card3)}
-
-/* ---- part cards on the bench ---- */
-.parts{display:grid; gap:12px; margin:0 0 16px}
-.part{display:flex; align-items:center; gap:14px; width:100%; text-align:left;
-  background:var(--panel); border:3px solid var(--ink); border-radius:var(--r);
-  padding:12px 14px; min-height:88px}
-.part.known{border-color:var(--lamp-ink); box-shadow:inset 0 0 0 2px var(--lamp-ink)}
-.part svg{width:56px; height:56px; flex:0 0 56px}
-.part .col{flex:1; min-width:0; display:block}
-.part .nm{font-size:21px; font-weight:700; display:block}
-.part .why{font-size:18px; display:block; color:var(--soft)}
-.part .tag{font-size:18px; font-weight:700; color:var(--lamp-ink); display:block}
-
-/* ---- the order rail ---- */
-.rail{display:grid; gap:10px; margin:0 0 16px}
-.slot .ord{font-size:18px; color:var(--soft); font-weight:700}
-.slot{display:flex; flex-direction:row; align-items:center; gap:12px; min-height:76px; border:3px dashed var(--rule); border-radius:var(--r);
-  background:var(--panel); font-size:19px; font-weight:700; padding:8px 14px}
-.slot.filled{border-style:solid; border-color:var(--ink)}
-.slot svg{width:44px; height:44px; flex:0 0 44px}
-.arrow{flex:0 0 26px}
-.arrow svg{width:26px; height:26px; display:block}
-
-.say{border-left:5px solid var(--lamp-ink); padding:8px 0 8px 14px; margin:0 0 16px;
-  font-size:19px}
-.foot{border-top:2px solid var(--rule); margin-top:24px; padding-top:14px; font-size:18px}
-
-/* ---- ambient life: the set breathes when nobody touches it ---- */
-@keyframes mote{0%{transform:translate(0,0);opacity:0}
-  12%{opacity:.75} 88%{opacity:.55} 100%{transform:translate(26px,-96px);opacity:0}}
-@keyframes flick{0%,100%{opacity:.30} 45%{opacity:.38} 70%{opacity:.27}}
-@keyframes sway{0%,100%{transform:rotate(-1.2deg)} 50%{transform:rotate(1.2deg)}}
-.mote{animation:mote 11s linear infinite}
-.mote:nth-of-type(2){animation-duration:14s; animation-delay:-4s}
-.mote:nth-of-type(3){animation-duration:9s;  animation-delay:-7s}
-#beam,.beam{animation:flick 6s ease-in-out infinite}
-#hang{transform-origin:172px 6px; animation:sway 7s ease-in-out infinite}
-/* Cleese rule (studio canon): the player laughs before they read. The splash does
-   the joke by itself, on a loop, so nothing has to be understood first. */
-@keyframes plop{
-  0%,48%{opacity:0; transform:translate(0,0)}
-  50%{opacity:1; transform:translate(0,0)}
-  63%{opacity:1; transform:translate(4px,36px)}
-  69%{opacity:1; transform:translate(7px,20px)}
-  76%{opacity:1; transform:translate(14px,36px)}
-  80%{opacity:1; transform:translate(19px,29px)}
-  85%{opacity:1; transform:translate(26px,36px)}
-  99%{opacity:1; transform:translate(96px,36px)}
-  100%{opacity:0; transform:translate(100px,36px)}}
-#plop{animation:plop 5.5s cubic-bezier(.5,0,.85,.5) infinite}
-
-/* ---- THE JACK: crank, the pause, the pop ---- */
-#crank{transform-origin:250px 214px; transition:transform .40s cubic-bezier(.4,0,.5,1)}
-#lid{transform-origin:222px 190px; transition:transform .34s cubic-bezier(.2,1.6,.5,1)}
-#spring{transform-origin:250px 196px; transform:scaleY(.06); opacity:0;
-  transition:transform .34s cubic-bezier(.2,1.7,.5,1), opacity .1s}
-#head{transform-origin:250px 150px; transform:translateY(46px) scale(.5); opacity:0;
-  transition:transform .34s cubic-bezier(.2,1.9,.5,1), opacity .12s}
-.jack-open #spring{transform:scaleY(1); opacity:1}
-.jack-open #head{transform:translateY(0) scale(1); opacity:1}
-.jack-open #lid{transform:rotate(-118deg) translate(-8px,-6px)}
-.jack-wob #head{animation:wob .5s ease-out 1}
-@keyframes wob{0%{transform:translateY(-7px) scale(1.06)}
-  45%{transform:translateY(2px) scale(.97)} 100%{transform:translateY(0) scale(1)}}
-
-/* ---- THE ECHO: two the same makes a rule, the third one breaks it ---- */
-#arm{transform-origin:140px 50px; transition:transform .26s cubic-bezier(.35,0,.4,1)}
-.arm-up   #arm{transform:translateX(0px)   rotate(-30deg)}
-.arm-hit1 #arm{transform:translateX(40px)  rotate(6deg)}
-.arm-hit2 #arm{transform:translateX(82px)  rotate(6deg)}
-.arm-hit3 #arm{transform:translateX(124px) rotate(96deg)}
-.bell{transform-origin:center top; transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
-.ring1 #bell1,.ring2 #bell2{animation:ring .46s ease-out 1}
-@keyframes ring{0%{transform:rotate(0)} 22%{transform:rotate(13deg)}
-  55%{transform:rotate(-9deg)} 80%{transform:rotate(4deg)} 100%{transform:rotate(0)}}
-#bell3{transition:transform .34s cubic-bezier(.3,0,.4,1)}
-.bolt #bell3{transform:translateY(-118px)}
-.wave{opacity:0}
-.ring1 .w1,.ring2 .w2{animation:wave .55s ease-out 1}
-@keyframes wave{0%{opacity:.9; transform:scale(.4)} 100%{opacity:0; transform:scale(1.9)}}
-
-/* ---- THE AVALANCHE: it does not know when to stop ---- */
-#hopper{transform-origin:96px 168px; transition:transform .35s cubic-bezier(.4,0,.4,1)}
-.hop-back #hopper{transform:rotate(-5deg)}
-.hop-pour #hopper{transform:rotate(42deg)}
-.hop-shake #hopper{animation:shake .16s linear 5}
-@keyframes shake{0%,100%{transform:rotate(42deg)} 50%{transform:rotate(38deg)}}
-#hopper2{transform:translateY(-190px); opacity:0;
-  transition:transform .5s cubic-bezier(.35,0,.4,1), opacity .2s}
-#hopper2.in{transform:translateY(0) rotate(34deg); opacity:1}
-.pel{opacity:0}
-.pel.go{animation:drop var(--d,1.1s) cubic-bezier(.45,0,.75,.55) forwards}
-@keyframes drop{0%{opacity:1; transform:translate(0,0)}
-  70%{opacity:1} 100%{opacity:1; transform:translate(var(--dx,0px),var(--dy,150px))}}
-#puff{opacity:0; transform-origin:150px 330px}
-#puff.go{animation:puff .9s ease-out 1}
-@keyframes puff{0%{opacity:.0; transform:scale(.4)} 25%{opacity:.55}
-  100%{opacity:0; transform:scale(1.7)}}
+/* ---------- the naming, after the fact ---------- */
+.after{margin-top:16px; border-top:3px solid var(--rule); padding-top:12px}
+.after[hidden]{display:none}
+.named{font-size:23px; font-weight:800; margin:0 0 6px}
+.why{font-size:20px; margin:0 0 10px; color:var(--soft)}
+.chip{
+  display:inline-block; border:2px solid var(--rule); border-radius:8px;
+  padding:2px 8px; font-size:18px; font-weight:700; margin:0 6px 6px 0;
+}
+footer{margin-top:22px; border-top:2px solid var(--rule); padding-top:10px}
 
 @media (prefers-reduced-motion: reduce){
-  *{animation:none !important; transition:none !important}
-  .primary:active{transform:none}
+  .ball, .rig, .lidg, .extra{transition:none !important}
 }
 </style>
 </head>
@@ -202,243 +144,127 @@ button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--lamp-ink);
 
 <div class="wrap">
 
-<!-- ================= SCREEN 0 : the workshop ================= -->
-<section class="screen on" id="s0" aria-labelledby="t0">
-  <h1 id="t0">The Laugh Workshop <span class="ver">v9.1</span></h1>
+<h1>Funny Boney's Factory <span class="ver">v10.0</span></h1>
 
-  <svg class="stage" viewBox="0 0 360 372" role="img"
-       aria-label="A workshop built out of cardboard. A lamp hangs over a bench and lights it. On the bench sit a hopper full of paper balls and a box with a crank. Both throw shadows.">
-    <defs>
-      <clipPath id="room"><rect x="0" y="0" width="360" height="372" rx="12"/></clipPath>
-      <!-- the lamp actually lights the room: falloff, not an overlay triangle -->
-      <radialGradient id="fall0" cx="172" cy="70" r="270" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="var(--glow)" stop-opacity=".55"/>
-        <stop offset=".42" stop-color="var(--glow)" stop-opacity=".18"/>
-        <stop offset="1" stop-color="var(--glow)" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="vig0" cx="180" cy="190" r="270" gradientUnits="userSpaceOnUse">
-        <stop offset=".45" stop-color="#000" stop-opacity="0"/>
-        <stop offset="1" stop-color="#000" stop-opacity=".42"/>
-      </radialGradient>
-      <!-- cardboard fibre. corrugation is what makes it read as a built thing -->
-      <pattern id="grain0" width="7" height="7" patternUnits="userSpaceOnUse">
-        <path d="M0 0 L0 7" stroke="var(--card3)" stroke-width="1" opacity=".22"/>
-      </pattern>
-      <pattern id="corr0" width="6" height="5" patternUnits="userSpaceOnUse">
-        <path d="M3 0 L3 5" stroke="var(--card3)" stroke-width="1.6" opacity=".55"/>
-      </pattern>
-    </defs>
-    <g clip-path="url(#room)">
-      <rect x="0" y="0" width="360" height="372" fill="var(--wall)"/>
-      <rect x="0" y="0" width="360" height="372" fill="url(#grain0)"/>
-      <g stroke="var(--card3)" stroke-width="1.4" opacity=".38">
-        <path d="M0 34 H360"/><path d="M0 78 H360"/><path d="M0 122 H360"/><path d="M0 166 H360"/>
-      </g>
-      <rect x="0" y="0" width="360" height="372" fill="url(#fall0)"/>
+<div class="stage">
+<svg id="scene" viewBox="0 0 360 300" role="img"
+     aria-label="A workshop bench under a hanging lamp. A track runs left to right with three empty sockets on it.">
+  <defs>
+    <radialGradient id="lampfall" cx="50%" cy="6%" r="85%">
+      <stop offset="0%" stop-color="var(--glow)" stop-opacity=".55"/>
+      <stop offset="55%" stop-color="var(--glow)" stop-opacity=".12"/>
+      <stop offset="100%" stop-color="var(--glow)" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="plank" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--card)"/>
+      <stop offset="100%" stop-color="var(--card2)"/>
+    </linearGradient>
+    <clipPath id="stageclip"><rect x="0" y="0" width="360" height="300"/></clipPath>
+  </defs>
 
-      <!-- the hopper: cut edge behind the face, shadow thrown away from the lamp -->
-      <ellipse cx="105" cy="291" rx="30" ry="7" fill="#000" opacity=".30"/>
-      <g transform="translate(30,164) scale(.62)">
-        <path d="M68 126 L92 206 L164 206 L188 126 Z" fill="var(--card3)"/>
-        <path d="M60 120 L84 200 L156 200 L180 120 Z" fill="var(--card)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>
-        <path d="M60 120 L180 120 L176 132 L64 132 Z" fill="url(#corr0)" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>
-        <circle cx="98" cy="156" r="11" fill="var(--cut)" stroke="var(--ink)" stroke-width="3"/>
-        <circle cx="126" cy="152" r="11" fill="var(--cut)" stroke="var(--ink)" stroke-width="3"/>
-        <circle cx="112" cy="178" r="11" fill="var(--cut)" stroke="var(--ink)" stroke-width="3"/>
-      </g>
-
-      <!-- the box: same treatment, shadow falls right because the lamp is left of it -->
-      <ellipse cx="261" cy="291" rx="38" ry="7" fill="#000" opacity=".30"/>
-      <g transform="translate(214,198) scale(.62)">
-        <rect x="27" y="67" width="112" height="86" rx="6" fill="var(--card3)"/>
-        <rect x="20" y="60" width="112" height="86" rx="6" fill="var(--card)" stroke="var(--ink)" stroke-width="4"/>
-        <rect x="20" y="60" width="112" height="13" fill="url(#corr0)" stroke="var(--ink)" stroke-width="4"/>
-        <circle cx="146" cy="112" r="9" fill="var(--card2)" stroke="var(--ink)" stroke-width="4"/>
-        <path d="M146 112 L170 96" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
-      </g>
-
-      <!-- the bench, with its cut edge and a dark front rail: three depth layers -->
-      <rect x="0" y="288" width="360" height="16" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
-      <rect x="0" y="304" width="360" height="12" fill="url(#corr0)"/>
-      <rect x="0" y="304" width="360" height="12" fill="var(--card3)" opacity=".55"/>
-      <rect x="34" y="316" width="14" height="56" fill="var(--card2)" stroke="var(--ink)" stroke-width="2"/>
-      <rect x="308" y="316" width="14" height="56" fill="var(--card2)" stroke="var(--ink)" stroke-width="2"/>
-
-      <!-- the lamp last, so it sits in front of its own light -->
-      <g id="hang">
-        <path d="M172 0 L172 34" stroke="var(--card3)" stroke-width="3"/>
-        <path d="M143 72 L172 32 L201 72 Z" fill="var(--card3)"/>
-        <path d="M146 70 L172 34 L198 70 Z" fill="var(--card2)" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
-        <ellipse cx="172" cy="70" rx="26" ry="6" fill="var(--glow)"/>
-        <ellipse cx="172" cy="70" rx="14" ry="3.5" fill="var(--cut)" opacity=".8"/>
-      </g>
-      <circle class="mote" cx="140" cy="252" r="2.6" fill="var(--cut)" opacity="0"/>
-      <circle class="mote" cx="182" cy="266" r="2" fill="var(--cut)" opacity="0"/>
-      <circle class="mote" cx="164" cy="242" r="2.3" fill="var(--cut)" opacity="0"/>
-      <circle id="plop" cx="104" cy="252" r="9" fill="var(--cut)" stroke="var(--ink)" stroke-width="2.5"/>
-      <rect x="0" y="0" width="360" height="372" fill="url(#vig0)"/>
+  <g clip-path="url(#stageclip)">
+    <!-- back wall -->
+    <rect x="0" y="0" width="360" height="300" fill="var(--wall)"/>
+    <rect x="0" y="0" width="360" height="300" fill="url(#lampfall)"/>
+    <!-- wall boards, faint depth -->
+    <g stroke="var(--card3)" stroke-opacity=".18" stroke-width="1">
+      <line x1="0" y1="58" x2="360" y2="58"/>
+      <line x1="0" y1="112" x2="360" y2="112"/>
+      <line x1="0" y1="166" x2="360" y2="166"/>
     </g>
-  </svg>
 
-  <button class="primary" id="startBtn">Start</button>
-  <p class="foot tiny">Nothing is saved. Tight Spiral Studios.</p>
-</section>
+    <!-- the lamp -->
+    <line x1="180" y1="0" x2="180" y2="26" stroke="var(--card3)" stroke-width="3"/>
+    <path d="M156 56 L180 26 L204 56 Z" fill="var(--card2)" stroke="var(--card3)" stroke-width="3"/>
+    <ellipse cx="180" cy="56" rx="24" ry="7" fill="var(--lamp)"/>
+    <ellipse cx="180" cy="55" rx="13" ry="4" fill="var(--cut)" fill-opacity=".85"/>
 
-<!-- ================= SCREEN 1 : the bench ================= -->
-<section class="screen" id="s1" aria-labelledby="t1">
-  <div class="navbar">
-    <button class="ghost" id="backBtn">Back</button>
-    <button class="ghost" id="homeBtn" aria-label="Start over from the beginning">Start over</button>
-  </div>
-  <h2 id="t1">Tap a part</h2>
-  <p class="tiny" id="benchHint">It will go, then tell you what kind of funny it is.</p>
+    <!-- the bench -->
+    <rect x="0" y="228" width="360" height="14" fill="url(#plank)" stroke="var(--card3)" stroke-width="3"/>
+    <rect x="0" y="242" width="360" height="10" fill="var(--card3)" fill-opacity=".55"/>
+    <rect x="38" y="252" width="14" height="48" fill="var(--card2)" stroke="var(--card3)" stroke-width="3"/>
+    <rect x="308" y="252" width="14" height="48" fill="var(--card2)" stroke="var(--card3)" stroke-width="3"/>
 
-  <svg class="stage" id="bench" viewBox="0 0 360 380" role="img" aria-labelledby="benchDesc">
-    <desc id="benchDesc">The workshop bench. A hopper of paper balls on the left, a box with a crank on the right.</desc>
-    <defs>
-      <clipPath id="room2"><rect x="0" y="0" width="360" height="380" rx="12"/></clipPath>
-      <radialGradient id="fall1" cx="180" cy="10" r="300" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="var(--glow)" stop-opacity=".50"/>
-        <stop offset=".45" stop-color="var(--glow)" stop-opacity=".16"/>
-        <stop offset="1" stop-color="var(--glow)" stop-opacity="0"/>
-      </radialGradient>
-      <radialGradient id="vig1" cx="180" cy="190" r="270" gradientUnits="userSpaceOnUse">
-        <stop offset=".45" stop-color="#000" stop-opacity="0"/>
-        <stop offset="1" stop-color="#000" stop-opacity=".40"/>
-      </radialGradient>
-      <pattern id="grain1" width="7" height="7" patternUnits="userSpaceOnUse">
-        <path d="M0 0 L0 7" stroke="var(--card3)" stroke-width="1" opacity=".22"/>
-      </pattern>
-      <pattern id="corr1" width="6" height="5" patternUnits="userSpaceOnUse">
-        <path d="M3 0 L3 5" stroke="var(--card3)" stroke-width="1.6" opacity=".55"/>
-      </pattern>
-    </defs>
-    <g clip-path="url(#room2)">
-      <rect x="0" y="0" width="360" height="380" fill="var(--wall)"/>
-      <rect x="0" y="0" width="360" height="380" fill="url(#grain1)"/>
-      <g stroke="var(--card3)" stroke-width="1.4" opacity=".34">
-        <path d="M0 40 H360"/><path d="M0 86 H360"/><path d="M0 132 H360"/>
+    <!-- three sockets, drawn as notches in the bench -->
+    <g id="sockets">
+      <g class="sock" data-i="0">
+        <rect x="52" y="216" width="64" height="14" rx="4"
+              fill="none" stroke="var(--card3)" stroke-width="3" stroke-dasharray="7 6"/>
       </g>
-      <rect id="beam" x="0" y="0" width="360" height="380" fill="url(#fall1)"/>
-      <ellipse cx="96" cy="326" rx="34" ry="8" fill="#000" opacity=".30"/>
-      <ellipse cx="250" cy="292" rx="60" ry="10" fill="#000" opacity=".26"/>
-      <circle class="mote" cx="150" cy="280" r="2.6" fill="var(--cut)" opacity="0"/>
-      <circle class="mote" cx="206" cy="300" r="2" fill="var(--cut)" opacity="0"/>
-      <circle class="mote" cx="176" cy="266" r="2.3" fill="var(--cut)" opacity="0"/>
-
-      <!-- ===== THE ECHO: three bells, one hammer, and a rule to break ===== -->
-      <g id="echoGroup">
-        <path d="M120 8 L120 62 M300 8 L300 46" stroke="var(--card3)" stroke-width="2.5"/>
-        <path d="M120 46 H300" stroke="var(--card3)" stroke-width="4"/>
-        <g class="bell" id="bell1">
-          <path d="M180 46 L180 62" stroke="var(--card3)" stroke-width="2"/>
-          <path d="M168 92 C168 74 172 64 180 64 C188 64 192 74 192 92 Z" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/>
-          <path d="M164 92 H196" stroke="var(--ink)" stroke-width="3"/>
-        </g>
-        <g class="bell" id="bell2">
-          <path d="M222 46 L222 62" stroke="var(--card3)" stroke-width="2"/>
-          <path d="M210 92 C210 74 214 64 222 64 C230 64 234 74 234 92 Z" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/>
-          <path d="M206 92 H238" stroke="var(--ink)" stroke-width="3"/>
-        </g>
-        <g id="bell3">
-          <path d="M264 46 L264 62" stroke="var(--card3)" stroke-width="2"/>
-          <path d="M252 92 C252 74 256 64 264 64 C272 64 276 74 276 92 Z" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/>
-          <path d="M248 92 H280" stroke="var(--ink)" stroke-width="3"/>
-        </g>
-        <circle class="wave w1" cx="180" cy="80" r="16" fill="none" stroke="var(--lamp)" stroke-width="3.5" opacity="0"/>
-        <circle class="wave w2" cx="222" cy="80" r="16" fill="none" stroke="var(--lamp)" stroke-width="3.5" opacity="0"/>
-        <g id="arm">
-          <path d="M140 50 L140 80" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/>
-          <rect x="129" y="78" width="22" height="15" rx="3" fill="var(--card3)"/>
-          <rect x="127" y="76" width="22" height="15" rx="3" fill="var(--card2)" stroke="var(--ink)" stroke-width="3"/>
-        </g>
-        <circle cx="140" cy="50" r="6" fill="var(--card3)" stroke="var(--ink)" stroke-width="3"/>
+      <g class="sock" data-i="1">
+        <rect x="148" y="216" width="64" height="14" rx="4"
+              fill="none" stroke="var(--card3)" stroke-width="3" stroke-dasharray="7 6"/>
       </g>
-
-      <!-- ===== THE AVALANCHE ===== -->
-      <g id="avaGroup">
-        <g id="pellets"></g>
-        <g id="hopper2" transform="translate(0,0)">
-          <g transform="translate(52,20)">
-            <path d="M44 60 L62 118 L114 118 L132 60 Z" fill="var(--card2)" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round"/>
-            <path d="M44 60 L132 60" stroke="var(--ink)" stroke-width="3.5"/>
-          </g>
-        </g>
-        <g id="hopper">
-          <path d="M62 134 L82 202 L142 202 L162 134 Z" fill="var(--card3)"/>
-          <path d="M56 128 L76 196 L136 196 L156 128 Z" fill="var(--card)" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round"/>
-          <path d="M56 128 L156 128 L153 140 L59 140 Z" fill="url(#corr1)" stroke="var(--ink)" stroke-width="3.5" stroke-linejoin="round"/>
-          <path d="M56 128 L48 122 M156 128 L164 122" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/>
-          <circle cx="86" cy="154" r="9" fill="var(--cut)" stroke="var(--ink)" stroke-width="2.5"/>
-          <circle cx="110" cy="150" r="9" fill="var(--cut)" stroke="var(--ink)" stroke-width="2.5"/>
-          <circle cx="126" cy="160" r="9" fill="var(--cut)" stroke="var(--ink)" stroke-width="2.5"/>
-          <circle cx="100" cy="174" r="9" fill="var(--cut)" stroke="var(--ink)" stroke-width="2.5"/>
-        </g>
-        <rect x="88" y="196" width="14" height="126" fill="var(--card3)" stroke="var(--ink)" stroke-width="2.5"/>
-        <ellipse id="puff" cx="150" cy="330" rx="34" ry="12" fill="var(--cut)" opacity="0"/>
+      <g class="sock" data-i="2">
+        <rect x="244" y="216" width="64" height="14" rx="4"
+              fill="none" stroke="var(--card3)" stroke-width="3" stroke-dasharray="7 6"/>
       </g>
-
-      <!-- ===== THE JACK ===== -->
-      <g id="jackGroup">
-        <g id="spring">
-          <path d="M250 196 L232 182 L268 168 L232 154 L268 140 L250 126"
-                fill="none" stroke="var(--ink)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        </g>
-        <g id="head">
-          <circle cx="250" cy="126" r="24" fill="var(--cut)" stroke="var(--ink)" stroke-width="3.5"/>
-          <path d="M239 119 C242 113 247 113 250 119" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <path d="M254 119 C257 113 262 113 265 119" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
-          <ellipse cx="252" cy="136" rx="8" ry="10" fill="var(--lamp)" stroke="var(--ink)" stroke-width="3"/>
-        </g>
-        <g id="lid">
-          <rect x="204" y="180" width="92" height="14" rx="3" fill="var(--card2)" stroke="var(--ink)" stroke-width="3.5"/>
-        </g>
-        <rect x="210" y="200" width="92" height="86" rx="5" fill="var(--card3)"/>
-        <rect x="204" y="194" width="92" height="86" rx="5" fill="var(--card)" stroke="var(--ink)" stroke-width="3.5"/>
-        <rect x="204" y="194" width="92" height="13" fill="url(#corr1)" stroke="var(--ink)" stroke-width="3.5"/>
-        <g id="crank">
-          <circle cx="250" cy="214" r="0" fill="none"/>
-          <g transform="translate(0,0)">
-            <circle cx="304" cy="238" r="8" fill="var(--card2)" stroke="var(--ink)" stroke-width="3.5"/>
-            <path d="M304 238 L324 224" stroke="var(--ink)" stroke-width="4.5" stroke-linecap="round"/>
-          </g>
-        </g>
-        <rect x="196" y="280" width="108" height="10" fill="var(--card3)" stroke="var(--ink)" stroke-width="2.5"/>
-      </g>
-
-      <rect x="0" y="322" width="360" height="16" fill="var(--card)" stroke="var(--ink)" stroke-width="3"/>
-      <rect x="0" y="338" width="360" height="14" fill="url(#corr1)"/>
-      <rect x="0" y="338" width="360" height="42" fill="var(--card3)" opacity=".7"/>
-      <rect x="0" y="0" width="360" height="380" fill="url(#vig1)"/>
     </g>
-  </svg>
 
-  <div class="parts" id="parts"></div>
+    <!-- installed parts get drawn here -->
+    <g id="rigs"></g>
 
-  <div id="orderBlock" hidden>
-  <h2 id="t1b">Now put them in order</h2>
-  <p class="tiny">Tap a part, then tap a slot.</p>
-  <div class="rail" id="rail">
-    <div class="slot" id="slot0" role="button" tabindex="0" aria-label="First slot, empty">1st</div>
-    <div class="slot" id="slot1" role="button" tabindex="0" aria-label="Second slot, empty">2nd</div>
-    <div class="slot" id="slot2" role="button" tabindex="0" aria-label="Third slot, empty">3rd</div>
-  </div>
-  <button class="primary" id="runBtn" disabled>Fill all three slots to run it</button>
-  </div>
-</section>
+    <!-- the bucket at the end -->
+    <path d="M330 196 L356 196 L352 228 L334 228 Z"
+          fill="var(--card2)" stroke="var(--card3)" stroke-width="3"/>
 
-<!-- ================= SCREEN 2 : the run ================= -->
-<section class="screen" id="s2" aria-labelledby="t2">
-  <div class="navbar">
-    <button class="ghost back">Back</button>
-    <button class="ghost home" aria-label="Start over from the beginning">Start over</button>
-  </div>
-  <h2 id="t2">Run it</h2>
-  <div id="stageHost"></div>
-  <div class="say" id="verdict" role="status" aria-live="polite"></div>
-  <button class="primary" id="swapBtn">Shift the order and run it again</button>
-  <div class="navbar"><button class="ghost" id="benchBtn">Back to the bench</button></div>
-</section>
+    <!-- extra balls the parts spit out -->
+    <g id="extras"></g>
+
+    <!-- the one ball -->
+    <g id="ball" class="ball" transform="translate(14,217)">
+      <circle r="11" fill="var(--cut)" stroke="var(--card3)" stroke-width="3"/>
+      <circle cx="-3" cy="-4" r="3" fill="var(--card3)" fill-opacity=".35"/>
+    </g>
+  </g>
+</svg>
+</div>
+
+<div class="trayhead" id="trayhead">Tap a part to put it on the track</div>
+
+<div class="tray">
+  <button class="part" id="p-hopper" data-k="hopper">
+    <svg viewBox="0 0 52 44" aria-hidden="true">
+      <path d="M8 6 H44 L34 30 H18 Z" fill="var(--card)" stroke="var(--card3)" stroke-width="3"/>
+      <circle cx="22" cy="16" r="4" fill="var(--cut)" stroke="var(--card3)" stroke-width="2"/>
+      <circle cx="32" cy="18" r="4" fill="var(--cut)" stroke="var(--card3)" stroke-width="2"/>
+      <circle cx="26" cy="38" r="4" fill="var(--cut)" stroke="var(--card3)" stroke-width="2"/>
+    </svg>
+    Hopper
+  </button>
+  <button class="part" id="p-jack" data-k="jack">
+    <svg viewBox="0 0 52 44" aria-hidden="true">
+      <rect x="10" y="16" width="32" height="24" fill="var(--card)" stroke="var(--card3)" stroke-width="3"/>
+      <rect x="8" y="10" width="36" height="7" fill="var(--card2)" stroke="var(--card3)" stroke-width="3"/>
+      <path d="M26 16 v-8" stroke="var(--card3)" stroke-width="3" fill="none"/>
+    </svg>
+    Jack
+  </button>
+  <button class="part" id="p-triplet" data-k="triplet">
+    <svg viewBox="0 0 52 44" aria-hidden="true">
+      <path d="M6 34 Q26 6 46 34" fill="none" stroke="var(--card3)" stroke-width="3"/>
+      <circle cx="14" cy="34" r="5" fill="var(--cut)" stroke="var(--card3)" stroke-width="2"/>
+      <circle cx="26" cy="34" r="5" fill="var(--cut)" stroke="var(--card3)" stroke-width="2"/>
+      <circle cx="40" cy="32" r="9" fill="var(--cut)" stroke="var(--card3)" stroke-width="2"/>
+    </svg>
+    Triplet
+  </button>
+</div>
+
+<div class="row">
+  <button class="primary" id="go" disabled>GO</button>
+  <button class="ghost" id="clear">Clear</button>
+</div>
+
+<div class="after" id="after" hidden>
+  <p class="named" id="named"></p>
+  <p class="why" id="why"></p>
+  <div id="chips"></div>
+</div>
+
+<footer>
+  <p class="tiny">Nothing is saved. Tight Spiral Studios.</p>
+</footer>
 
 </div>
 
@@ -446,267 +272,271 @@ button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--lamp-ink);
 (function(){
 "use strict";
 var $ = function(id){ return document.getElementById(id); };
-var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/* Socket geometry, in the scene's own viewBox units. */
+var SOCK_X = [84, 180, 276];   /* centres */
+var TRACK_Y = 217;
+var END_X   = 343;
+
+/* The three parts. Each gag is VISIBLE. None of them makes a sound,
+   because a kid holding a muted phone must get the whole joke. */
 var PARTS = {
-  ava: {
-    name: "The Avalanche",
-    layer: "Too much",
-    why: "It does not know when to stop. The funny is that it keeps going after you thought it was done.",
-    glyph: '<path d="M14 20 L22 44 L44 44 L52 20 Z"/><path d="M14 20 L52 20"/>' +
-           '<circle cx="26" cy="30" r="5"/><circle cx="40" cy="28" r="5"/><circle cx="33" cy="38" r="5"/>'
-  },
-  echo: {
-    name: "The Echo",
-    layer: "Again, but different",
-    why: "Two the same makes a rule. The third one breaks it. Break it too early and there was never a rule.",
-    glyph: '<path d="M10 14 H54"/><path d="M20 14 L20 22"/><path d="M32 14 L32 22"/><path d="M44 14 L44 22"/>' +
-           '<path d="M14 40 C14 30 16 24 20 24 C24 24 26 30 26 40 Z"/>' +
-           '<path d="M26 40 C26 30 28 24 32 24 C36 24 38 30 38 40 Z"/>' +
-           '<path d="M44 30 L52 22 M44 22 L52 30"/>'
+  hopper: {
+    name: "The Hopper",
+    line: "It does not know when to stop.",
+    made: "You made it not stop.",
+    dur:  1500
   },
   jack: {
     name: "The Jack",
-    layer: "Surprise",
-    why: "The waiting is the joke, not the popping. Take the pause away and it stops being funny.",
-    glyph: '<rect x="16" y="30" width="34" height="24" rx="3"/><path d="M16 30 L50 30"/>' +
-           '<path d="M33 30 L24 22 L42 16 L33 8"/><circle cx="33" cy="8" r="6"/>'
+    line: "The waiting is the joke, not the popping.",
+    made: "You made everybody wait.",
+    dur:  1700
+  },
+  triplet: {
+    name: "The Triplet",
+    line: "Two the same makes a rule. The third one breaks it.",
+    made: "You set up a rule and broke it.",
+    dur:  1600
   }
 };
-var ORDER = [null, null, null];
-var picked = null;
 
-function glyph(k, cls){
-  return '<svg class="'+(cls||"")+'" viewBox="0 0 64 64" aria-hidden="true" focusable="false" '+
-    'fill="none" stroke="var(--ink)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">'
-    + PARTS[k].glyph + '</svg>';
-}
-function show(n){
-  var all = document.querySelectorAll(".screen");
-  for (var i=0;i<all.length;i++) all[i].classList.remove("on");
-  $("s"+n).classList.add("on");
-  window.scrollTo(0,0);
-  var h = $("s"+n).querySelector("h1,h2");
-  if (h){ h.setAttribute("tabindex","-1"); h.focus(); }
-}
+var slots = [null, null, null];
+var running = false;
 
-/* ---------- build the pellets once ---------- */
-function makePellets(){
-  var g = $("pellets"), h = "";
-  for (var i=0;i<34;i++){
-    var x = 96 + (i%7)*3 - 9;
-    h += '<circle class="pel" data-i="'+i+'" cx="'+x+'" cy="188" r="8" '+
-         'fill="var(--cut)" stroke="var(--ink)" stroke-width="2.5"/>';
+/* ---------- drawing the installed parts ---------- */
+function svgEl(n, attrs){
+  var e = document.createElementNS("http://www.w3.org/2000/svg", n);
+  for (var k in attrs) e.setAttribute(k, attrs[k]);
+  return e;
+}
+function rigFor(kind, cx){
+  var g = svgEl("g", {"class":"rig", "data-kind":kind});
+  if (kind === "hopper"){
+    g.appendChild(svgEl("path", {d:"M"+(cx-30)+" 166 H"+(cx+30)+" L"+(cx+16)+" 228 H"+(cx-16)+" Z",
+      fill:"var(--card)", stroke:"var(--card3)", "stroke-width":"3"}));
+    g.appendChild(svgEl("line", {x1:cx-22, y1:178, x2:cx+22, y2:178,
+      stroke:"var(--card3)", "stroke-width":"2", "stroke-opacity":".5"}));
+  } else if (kind === "jack"){
+    var lid = svgEl("g", {"class":"lidg", "data-cx":cx});
+    lid.appendChild(svgEl("rect", {x:cx-30, y:178, width:60, height:11,
+      fill:"var(--card2)", stroke:"var(--card3)", "stroke-width":"3"}));
+    g.appendChild(svgEl("rect", {x:cx-28, y:189, width:56, height:39,
+      fill:"var(--card)", stroke:"var(--card3)", "stroke-width":"3"}));
+    g.appendChild(lid);
+  } else {
+    g.appendChild(svgEl("path", {d:"M"+(cx-30)+" 228 Q"+cx+" 166 "+(cx+30)+" 228",
+      fill:"none", stroke:"var(--card3)", "stroke-width":"4"}));
   }
-  g.innerHTML = h;
+  return g;
 }
-function resetStage(){
-  var s = $("bench");
-  s.classList.remove("hop-back","hop-pour","hop-shake","jack-open","jack-wob",
-    "arm-up","arm-hit1","arm-hit2","arm-hit3","ring1","ring2","bolt");
-  $("hopper2").classList.remove("in");
-  $("puff").classList.remove("go");
-  $("crank").style.transform = "";
-  var p = s.querySelectorAll(".pel");
-  for (var i=0;i<p.length;i++){ p[i].classList.remove("go"); p[i].style.cssText=""; }
-}
-
-/* ---------- the three performances ---------- */
-var T = [];
-function at(ms, fn){ T.push(setTimeout(fn, ms)); }
-function clearAll(){ for (var i=0;i<T.length;i++) clearTimeout(T[i]); T = []; }
-
-function fireAvalanche(t0, done){
-  var s = $("bench");
-  var pel = s.querySelectorAll(".pel");
-  function drop(i, delay, dur, dx, dy){
-    at(t0+delay, function(){
-      var e = pel[i]; if(!e) return;
-      e.style.setProperty("--dx", dx+"px");
-      e.style.setProperty("--dy", dy+"px");
-      e.style.setProperty("--d", dur+"ms");
-      e.classList.add("go");
-    });
-  }
-  at(t0,     function(){ s.classList.add("hop-back"); });                 // anticipation
-  at(t0+160, function(){ s.classList.remove("hop-back"); s.classList.add("hop-pour"); });
-  drop(0, 520, 620, 18, 140);                                            // ONE. plink.
-  at(t0+900, function(){ /* THE PAUSE. nothing happens. */ });
-  for (var i=1;i<6;i++)  drop(i, 1300 + i*70,  700, 10+i*9,  138);
-  at(t0+1700, function(){ s.classList.add("hop-shake"); });
-  for (var j=6;j<20;j++) drop(j, 1720 + j*32,  760, -30+j*6, 136);
-  at(t0+2300, function(){ $("hopper2").classList.add("in"); });           // a SECOND hopper
-  for (var k=20;k<34;k++) drop(k, 2460 + k*26, 820, -46+k*5, 190);
-  at(t0+2900, function(){ $("puff").classList.add("go"); });
-  drop(33, 3120, 560, 4, 138);                                           // one last, late
-  at(t0+3300, done);
-}
-
-function fireJack(t0, done){
-  var s = $("bench"), c = $("crank"), deg = 0;
-  for (var i=1;i<=3;i++){
-    (function(n){ at(t0 + n*400, function(){ deg += 360; c.style.transform = "rotate("+deg+"deg)"; }); })(i-1);
-  }
-  /* THE PAUSE. 900ms of nothing at all. This is the joke. */
-  at(t0+2100, function(){ s.classList.add("jack-open"); });
-  at(t0+2380, function(){ s.classList.add("jack-wob"); });
-  at(t0+2900, function(){ s.classList.remove("jack-wob"); done && done(); });
-}
-
-function fireEcho(t0, done){
-  var s = $("bench");
-  function swing(delay, hit, ring){
-    at(t0+delay,      function(){ s.classList.remove("arm-hit1","arm-hit2","arm-hit3"); s.classList.add("arm-up"); });
-    at(t0+delay+240,  function(){ s.classList.remove("arm-up"); s.classList.add(hit); });
-    if (ring) at(t0+delay+380, function(){ s.classList.add(ring); });
-    at(t0+delay+900,  function(){ if(ring) s.classList.remove(ring); });
-  }
-  swing(0,    "arm-hit1", "ring1");        // one. a thing happened.
-  swing(1000, "arm-hit2", "ring2");        // two. now it is a RULE.
-  at(t0+2000, function(){ /* THE PAUSE. the rule is hanging there. */ });
-  at(t0+2350, function(){ s.classList.add("bolt"); });   // the bell leaves
-  swing(2400, "arm-hit3", null);                          // three. nothing to hit.
-  at(t0+3500, function(){ s.classList.remove("bolt","arm-hit3"); done && done(); });
-}
-
-var FIRE = { ava: fireAvalanche, jack: fireJack, echo: fireEcho };
-var DUR  = { ava: 3300, jack: 2900, echo: 3500 };
-
-/* ---------- screen 1: the bench ---------- */
-function drawParts(){
-  var h = "", ks = ["echo","ava","jack"];
-  for (var i=0;i<ks.length;i++){
-    var k = ks[i], p = PARTS[k], known = !!p.seen;
-    h += '<button class="part'+(known?" known":"")+'" data-part="'+k+'" '+
-      'aria-label="'+(known ? p.name+". "+p.layer+". "+p.why : "Unlabelled part "+(i+1)+". Tap to make it go.")+'">'+
-      glyph(k) + '<span class="col">' +
-      (known
-        ? '<span class="tag">'+p.layer+'</span><span class="nm">'+p.name+'</span><span class="why">'+p.why+'</span>'
-        : '<span class="nm">Part '+(i+1)+'</span><span class="why">Tap it and see what it does.</span>') +
-      '</span></button>';
-  }
-  $("parts").innerHTML = h;
-  var all = PARTS.echo.seen && PARTS.ava.seen && PARTS.jack.seen;
-  $("orderBlock").hidden = !all;
-  $("t1").textContent   = all ? "You have all three" : "Tap a part";
-  $("benchHint").textContent = all
-    ? "Now the order is up to you. Put them in the slots below."
-    : "It will go, then tell you what kind of funny it is.";
-}
-var ORD = ["1st","2nd","3rd"];
-function drawRail(){
-  for (var i=0;i<3;i++){
-    var el = $("slot"+i), k = ORDER[i];
-    if (k){
-      el.className = "slot filled";
-      el.innerHTML = '<span class="ord">'+ORD[i]+'</span>' + glyph(k) + '<span>'+PARTS[k].name+'</span>';
-      el.setAttribute("aria-label", ORD[i]+": "+PARTS[k].name+". Tap to clear.");
-    } else {
-      el.className = "slot";
-      el.innerHTML = '<span class="ord">'+ORD[i]+'</span><span>empty</span>';
-      el.setAttribute("aria-label", ORD[i]+" slot, empty."+(picked?" Tap to put "+PARTS[picked].name+" here.":""));
-    }
-  }
-  var n = 0; for (var j=0;j<3;j++) if (ORDER[j]) n++;
-  $("runBtn").disabled = n < 3;
-  $("runBtn").textContent = n < 3 ? "Fill all three slots to run it" : "Run the machine";
-}
-function place(i){
-  if (ORDER[i]){ ORDER[i] = null; drawRail(); return; }
-  if (!picked) return;
-  for (var o=0;o<3;o++) if (ORDER[o] === picked) ORDER[o] = null;   // a part sits in one slot only
-  ORDER[i] = picked; picked = null;
-  var ps = document.querySelectorAll("[data-part]");
-  for (var n=0;n<ps.length;n++) ps[n].style.outline = "";
-  drawRail();
-}
-
-/* ---------- screen 2: run, then say what happened ---------- */
-/* Six orders, judged on principle instead of a lookup table: what it costs to OPEN
-   with a kind of funny, and what it earns to END on one. The middle is the middle. */
-var OPENS = {
-  echo: "You opened with a rule. Two the same, then a break. Everything after that had a shape to sit in.",
-  ava:  "You opened with the flood. Loud, and it used up most of the room straight away.",
-  jack: "You opened with the pop. It went off before anything had built, so it was only a noise."
-};
-var ENDS = {
-  jack: "Ending on the surprise worked. The room went quiet, and then one small thing moved.",
-  ava:  "Ending on the flood buried whatever came before it. Big is not the same as last.",
-  echo: "Ending on the rule is a strange place to put it. By then nobody was counting, so the break had nothing to break."
-};
-var BEST = "Rule, then flood, then one small pop into the quiet. That is the shape comedy usually wants: " +
-           "something to set up, something to build, and something small to finish it.";
-
-function runIt(){
-  show(2);
-  $("stageHost").appendChild($("bench"));
-  $("verdict").textContent = "";
-  resetStage(); clearAll();
-  if (reduced){
-    $("bench").classList.add("hop-pour","jack-open","arm-hit3");
-    $("hopper2").classList.add("in");
-    tell(true); return;
-  }
-  /* fire the three in the chosen order, each waiting on the one before it */
-  var i = 0;
-  (function next(){
-    if (i >= 3){ at(450, function(){ tell(false); }); return; }
-    var k = ORDER[i]; i++;
-    FIRE[k](i === 1 ? 260 : 0, function(){ at(650, next); });
-  })();
-}
-function tell(still){
-  var o = ORDER, names = PARTS[o[0]].name + ", then " + PARTS[o[1]].name + ", then " + PARTS[o[2]].name + ". ";
-  var lead = still ? "Still picture, because motion is turned down. " + names : "";
-  var body = (o[0] === "echo" && o[1] === "ava" && o[2] === "jack")
-    ? BEST
-    : OPENS[o[0]] + " " + ENDS[o[2]];
-  $("verdict").textContent = lead + body;
-}
-
-/* ---------- wiring ---------- */
-makePellets(); drawParts(); drawRail();
-
-$("parts").addEventListener("click", function(e){
-  var t = e.target.closest("[data-part]"); if (!t) return;
-  var k = t.getAttribute("data-part");
-  resetStage(); clearAll();
-  FIRE[k](160, function(){
-    at(220, function(){ PARTS[k].seen = true; drawParts(); });
+function drawRigs(){
+  var host = $("rigs");
+  while (host.firstChild) host.removeChild(host.firstChild);
+  slots.forEach(function(k, i){ if (k) host.appendChild(rigFor(k, SOCK_X[i])); });
+  Array.prototype.forEach.call(document.querySelectorAll("#sockets .sock"), function(el){
+    el.style.opacity = slots[+el.getAttribute("data-i")] ? "0" : "1";
   });
-  picked = k;
-  var ps = document.querySelectorAll("[data-part]");
-  for (var n=0;n<ps.length;n++) ps[n].style.outline = "";
-  t.style.outline = "4px solid var(--lamp-ink)";
-  drawRail();
+  syncControls();
+}
+function syncControls(){
+  var placed = slots.filter(Boolean).length;
+  $("go").disabled = (placed === 0) || running;
+  $("clear").disabled = (placed === 0) || running;
+  $("trayhead").textContent = running ? "Watch the ball."
+    : placed === 0 ? "Tap a part to put it on the track"
+    : placed < 3   ? "Add another, or press GO"
+    : "Track is full. Press GO";
+
+  ["hopper","jack","triplet"].forEach(function(k){
+    $("p-" + k).disabled = running || (placed >= 3) || slots.indexOf(k) !== -1;
+  });
+}
+
+/* ---------- animation helpers ---------- */
+function moveBall(x, y, ms){
+  var b = $("ball");
+  b.style.transition = REDUCED ? "none" : "transform " + ms + "ms linear";
+  b.style.transform = "";
+  b.setAttribute("transform", "translate(" + x + "," + y + ")");
+}
+function ballTo(x, y, ms, ease){
+  var b = $("ball");
+  b.style.transition = REDUCED ? "none" : "transform " + ms + "ms " + (ease || "linear");
+  b.setAttribute("transform", "translate(" + x + "," + y + ")");
+}
+function spawnExtra(x, y, r){
+  var g = svgEl("g", {"class":"extra", transform:"translate(" + x + "," + y + ")"});
+  g.appendChild(svgEl("circle", {r:r, fill:"var(--cut)", stroke:"var(--card3)", "stroke-width":"3"}));
+  $("extras").appendChild(g);
+  return g;
+}
+function slideExtra(g, x, y, ms){
+  g.style.transition = REDUCED ? "none" : "transform " + ms + "ms cubic-bezier(.3,0,.5,1)";
+  g.setAttribute("transform", "translate(" + x + "," + y + ")");
+}
+function clearExtras(){
+  var e = $("extras");
+  while (e.firstChild) e.removeChild(e.firstChild);
+}
+
+/* ---------- the gags ---------- */
+/* Each returns the timeline entries it wants, relative to its own start.
+   The ball is AT the socket centre when a gag begins, and each gag is
+   responsible for leaving the ball travelling right again. */
+function gagHopper(cx, t, push){
+  /* ball vanishes into the funnel, then far too many come back out */
+  push(t, function(){ ballTo(cx, 176, 220, "cubic-bezier(.4,0,.7,1)"); });
+  push(t + 240, function(){ $("ball").style.opacity = "0"; });
+  /* THE PAUSE: one beat of nothing, so the flood is a surprise */
+  push(t + 520, function(){
+    for (var i = 0; i < 14; i++){
+      (function(i){
+        var g = spawnExtra(cx, 184, 8);
+        setTimeout(function(){
+          slideExtra(g, cx + 26 + i * 5, TRACK_Y + (i % 3) * 4, 520 + i * 22);
+        }, i * 34);
+      })(i);
+    }
+  });
+  push(t + 1180, function(){
+    $("ball").style.opacity = "1";
+    moveBall(cx + 20, TRACK_Y, 0);
+  });
+  return 1500;
+}
+function gagJack(cx, t, push){
+  /* ball goes in. Then nothing. Then nothing. Then the lid leaves. */
+  push(t, function(){ ballTo(cx, 204, 200, "cubic-bezier(.4,0,.7,1)"); });
+  push(t + 220, function(){ $("ball").style.opacity = "0"; });
+  /* the wait IS the joke. Two small wobbles so the box looks like it is
+     holding something in, then a long flat pause with nothing at all. */
+  push(t + 500,  function(){ wobble(cx, 3); });
+  push(t + 820,  function(){ wobble(cx, -2); });
+  push(t + 1320, function(){
+    var lid = document.querySelector('.lidg[data-cx="' + cx + '"]');
+    if (lid){
+      lid.style.transition = REDUCED ? "none" : "transform 420ms cubic-bezier(.2,1.6,.4,1)";
+      lid.setAttribute("transform", "translate(" + (cx * 0) + ",-74) rotate(-18)");
+    }
+    $("ball").style.opacity = "1";
+    moveBall(cx, 204, 0);
+    ballTo(cx + 18, 128, 300, "cubic-bezier(.15,.9,.4,1)");
+  });
+  push(t + 1620, function(){ ballTo(cx + 34, TRACK_Y, 220, "cubic-bezier(.5,0,.9,.6)"); });
+  return 1700;
+}
+function gagTriplet(cx, t, push){
+  /* same, same, then absurdly not the same */
+  push(t, function(){ ballTo(cx - 6, 194, 200, "cubic-bezier(.4,0,.7,1)"); });
+  push(t + 210, function(){ $("ball").style.opacity = "0"; });
+  push(t + 420, function(){
+    var a = spawnExtra(cx, 198, 11); slideExtra(a, cx + 16, TRACK_Y, 360);
+  });
+  push(t + 760, function(){
+    var b = spawnExtra(cx, 198, 11); slideExtra(b, cx + 16, TRACK_Y, 360);
+  });
+  /* THE PAUSE. The rule is established, so the break needs room. */
+  push(t + 1260, function(){
+    var c = spawnExtra(cx, 184, 24);
+    slideExtra(c, cx + 22, TRACK_Y - 12, 420);
+  });
+  push(t + 1480, function(){
+    $("ball").style.opacity = "1";
+    moveBall(cx + 20, TRACK_Y, 0);
+  });
+  return 1600;
+}
+function wobble(cx, deg){
+  var rig = document.querySelector('.rig[data-kind="jack"]');
+  if (!rig) return;
+  rig.style.transition = "transform 160ms ease-out";
+  rig.style.transformOrigin = cx + "px 228px";
+  rig.style.transform = "rotate(" + deg + "deg)";
+  setTimeout(function(){ rig.style.transform = "rotate(0deg)"; }, 170);
+}
+
+/* ---------- the run ---------- */
+function run(){
+  if (running) return;
+  running = true;
+  $("after").hidden = true;
+  clearExtras();
+  $("ball").style.opacity = "1";
+  moveBall(14, TRACK_Y, 0);
+  syncControls();
+
+  var timeline = [];
+  var push = function(t, fn){ timeline.push([t, fn]); };
+  var t = 260;
+
+  for (var i = 0; i < 3; i++){
+    var cx = SOCK_X[i];
+    var kind = slots[i];
+    (function(cx){ push(t, function(){ ballTo(cx, TRACK_Y, 620, "linear"); }); })(cx);
+    t += 640;
+    if (kind === "hopper")  t += gagHopper(cx, t, push);
+    if (kind === "jack")    t += gagJack(cx, t, push);
+    if (kind === "triplet") t += gagTriplet(cx, t, push);
+  }
+  push(t, function(){ ballTo(END_X, TRACK_Y, 520, "cubic-bezier(.4,0,.8,1)"); });
+  t += 560;
+  push(t, function(){ ballTo(END_X, 212, 220, "cubic-bezier(.4,0,1,1)"); });
+  t += 300;
+  push(t, function(){ running = false; syncControls(); tellThem(); });
+
+  if (REDUCED){
+    /* no motion: jump to the end state and go straight to the telling */
+    moveBall(END_X, 212, 0);
+    running = false; syncControls(); tellThem();
+    return;
+  }
+  timeline.forEach(function(step){ setTimeout(step[1], step[0]); });
+}
+
+/* ---------- the naming, AFTER the laugh ---------- */
+function tellThem(){
+  var used = slots.filter(Boolean);
+  if (!used.length) return;
+  var last = used[used.length - 1];
+  $("named").textContent = PARTS[last].made;
+  $("why").textContent = used.length > 1
+    ? "Three things in a row. The last one is the one they remember."
+    : PARTS[last].line;
+  var chips = $("chips");
+  while (chips.firstChild) chips.removeChild(chips.firstChild);
+  used.forEach(function(k){
+    var s = document.createElement("span");
+    s.className = "chip";
+    s.textContent = PARTS[k].name + ": " + PARTS[k].line;
+    chips.appendChild(s);
+  });
+  $("after").hidden = false;
+}
+
+/* ---------- input ---------- */
+["hopper","jack","triplet"].forEach(function(k){
+  $("p-" + k).addEventListener("click", function(){
+    if (running) return;
+    var i = slots.indexOf(null);
+    if (i === -1) return;
+    slots[i] = k;
+    $("after").hidden = true;
+    drawRigs();
+  });
 });
-$("slot0").onclick = function(){ place(0); };
-$("slot1").onclick = function(){ place(1); };
-$("slot2").onclick = function(){ place(2); };
-$("slot0").onkeydown = $("slot1").onkeydown = $("slot2").onkeydown = function(e){
-  if (e.key === "Enter" || e.key === " "){ e.preventDefault(); this.click(); }
-};
+$("go").addEventListener("click", run);
+$("clear").addEventListener("click", function(){
+  if (running) return;
+  slots = [null, null, null];
+  clearExtras();
+  moveBall(14, TRACK_Y, 0);
+  $("after").hidden = true;
+  drawRigs();
+});
 
-$("startBtn").onclick = function(){ show(1); };
-$("runBtn").onclick   = runIt;
-/* rotate rather than swap: with three parts, a rotation reaches a new order every tap */
-$("swapBtn").onclick  = function(){ ORDER.push(ORDER.shift()); drawRail(); runIt(); };
-$("benchBtn").onclick = function(){
-  clearAll(); resetStage();
-  $("s1").insertBefore($("bench"), $("parts"));
-  drawRail(); show(1);
-};
-$("backBtn").onclick  = function(){ show(0); };
-
-var backs = document.querySelectorAll(".ghost.back");
-for (var i=0;i<backs.length;i++) backs[i].onclick = function(){ $("benchBtn").click(); };
-var homes = document.querySelectorAll("#homeBtn, .ghost.home");
-for (var j=0;j<homes.length;j++) homes[j].onclick = function(){
-  clearAll(); resetStage(); ORDER = [null,null,null]; picked = null;
-  PARTS.ava.seen = PARTS.jack.seen = PARTS.echo.seen = false;
-  $("s1").insertBefore($("bench"), $("parts"));
-  drawParts(); drawRail(); show(0);
-};
+drawRigs();
 })();
 </script>
 </body>
