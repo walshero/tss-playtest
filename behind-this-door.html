@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behind This Door — Tight Spiral Productions</title>
+<!--
+  BEHIND THIS DOOR
+  Tight Spiral Productions · walshero@gmail.com · Play. Notice. Design.
+  Single-file, offline, in-memory. Nothing about you leaves this page.
+  Ten real doors — pubs, hotels, and homes of writers, musicians, artists.
+  Read the door like a text. Guess who is behind it. Learn the world it opens onto.
+  All doors are cut-paper interpretations, not photographs. TSP-META at end of file.
+-->
+<style>
+:root{
+  /* -ink names carry text, plain names paint (TOKEN-ROLE law). */
+  --paper:#faf5ec; --paper-ink:#faf5ec; --ink:#211d18; --ink-fill:#211d18;
+  --card:#fffdf7; --edge:#d8cfbe;
+  --brass:#a8791f; --brick:#8a4a3b; --moss:#3f6b4f; --wine:#7c2f33;
+  --dim:#5a5348; --dim-fill:#5a5348; --focus:#1f5fa8; --glow:#f7d98b;
+  --ok:#2e6b46; --ok-fill:#2e6b46; --no:#8a4030;
+  --tap:44px; --mono:ui-monospace,"SF Mono",Menlo,monospace;
+}
+/* STUDIO EYES · Light ladder — token remaps keyed on html[data-light].
+   Dusk = a calmer, dimmer cream (>=0.12 luminance below Default).
+   Warm-dark(night) = warm charcoal, NEVER pure black; amber ink stays >=4.5:1. */
+html[data-light="dusk"]{ --paper:#ece0c4; --paper-ink:#ece0c4; --ink:#2c2721; --ink-fill:#2c2721;
+  --card:#faf4e6; --edge:#d3c8b2; --dim:#5e5748; --dim-fill:#5e5748; }
+html[data-light="night"]{ --paper:#26221c; --paper-ink:#26221c; --ink:#ecc57a; --ink-fill:#ecc57a;
+  --card:#2f2a22; --edge:#4a4234;
+  --dim:#c9a967; --dim-fill:#c9a967; --brass:#e0b45c; --focus:#7fb4e8;
+  --ok:#8fce9f; --ok-fill:#8fce9f; --no:#e09a7c; }
+/* STUDIO EYES · high contrast (halation floor) */
+html.se-contrast:not([data-light="night"]){ --paper:#fbfaf7; --paper-ink:#fbfaf7; --card:#fbfaf7;
+  --edge:#b9a06a; --ink:#141109; --ink-fill:#141109; --dim:#2c2517; --dim-fill:#2c2517; }
+html.se-contrast[data-light="night"]{ --paper:#0e0d0b; --paper-ink:#0e0d0b; --card:#161410;
+  --ink:#fff7e6; --ink-fill:#fff7e6; --dim:#efe0bc; --dim-fill:#efe0bc; }
+/* STUDIO EYES · text size A / A+ / A++ */
+html.se-a1 body{ font-size:20.5px; } html.se-a1{ font-size:107%; }
+html.se-a2 body{ font-size:22px; }   html.se-a2{ font-size:115%; }
+/* STUDIO EYES · reduce motion */
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+html.se-reduce svg.open .leaf{ transform:none; opacity:.25; }
+html.se-reduce svg.open .mote{ opacity:0; }
+/* STUDIO EYES · colorblind cues (non-color redundancy) */
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+html.se-cb .choice.hit{ border-style:double; }
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:auto;}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  font-size:19px; line-height:1.55; min-height:100vh;
+}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 60px;}
+h1{font-size:2rem;line-height:1.15;letter-spacing:.01em;margin-bottom:.4em;min-height:44px;}
+h2{font-size:1.5rem;line-height:1.2;margin-bottom:.4em;}
+/* Headings are script-focus landing points (tabindex -1) on every screen change;
+   give that landing a visible ring for keyboard / low-vision users. */
+h1:focus,h2:focus,.reveal-name:focus{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px;}
+p{margin-bottom:.8em;}
+.screen{display:none;}
+.screen.on{display:block;}
+.eyebrow{font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:.5em;}
+button{
+  font-family:inherit;font-size:1.05rem;color:var(--ink);
+  background:var(--card);border:2px solid var(--ink-fill);border-radius:10px;
+  min-height:52px;padding:12px 18px;cursor:pointer;width:100%;
+  text-align:left;line-height:1.35;
+}
+button.center{text-align:center;}
+button:focus-visible{outline:3px solid var(--focus);outline-offset:3px;}
+button.primary{background:var(--ink-fill);color:var(--paper-ink);font-weight:700;}
+html[data-light="night"] button.primary{background:var(--brass);color:#26221c;border-color:var(--brass);}
+button.ghost{border-color:var(--edge);color:var(--dim);background:transparent;}
+button.ghost:focus-visible{outline:3px solid var(--focus);}
+button:disabled{opacity:.45;cursor:default;}
+.stack{display:flex;flex-direction:column;gap:12px;margin:14px 0;}
+.choice .kbd{
+  display:inline-block;min-width:1.6em;text-align:center;margin-right:10px;
+  border:1.5px solid var(--dim-fill);border-radius:6px;font-size:.85rem;
+  padding:1px 4px;color:var(--dim);vertical-align:2px;
+}
+.choice.out{opacity:.45;text-decoration:line-through;}
+.choice.hit{border-color:var(--ok-fill);border-width:3px;}
+.tally{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.95rem;color:var(--dim);margin-bottom:10px;
+}
+.tally b{color:var(--ink);}
+.doorbox{
+  background:var(--card);border:2px solid var(--edge);border-radius:14px;
+  padding:14px 14px 8px;margin:0 auto 16px;max-width:340px;
+}
+.doorbox svg{display:block;width:100%;height:auto;}
+.clueline{
+  background:var(--card);border-left:5px solid var(--brass);
+  padding:10px 14px;border-radius:0 10px 10px 0;margin:12px 0;font-style:italic;
+}
+.reveal-name{font-size:1.6rem;font-weight:700;margin:.3em 0 .1em;}
+.reveal-place{color:var(--dim);margin-bottom:.7em;}
+.worldcard{
+  background:var(--card);border:2px solid var(--edge);border-radius:12px;
+  padding:14px 16px;margin:12px 0;
+}
+.worldcard .eyebrow{margin-bottom:.3em;}
+.award{font-weight:700;color:var(--ok);margin:10px 0;}
+.award.zero{color:var(--dim);}
+.keyring{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0;}
+.kr{
+  background:var(--card);border:2px solid var(--edge);border-radius:10px;
+  padding:8px;font-size:.85rem;text-align:center;
+}
+.kr svg{width:64px;height:auto;display:block;margin:0 auto 4px;}
+.kr .who{font-weight:700;display:block;}
+.kr .got{color:var(--ok);} .kr .miss{color:var(--dim);}
+details{margin:18px 0;border:2px solid var(--edge);border-radius:10px;background:var(--card);}
+summary{padding:12px 16px;cursor:pointer;font-weight:700;min-height:52px;display:flex;align-items:center;}
+summary:focus-visible{outline:3px solid var(--focus);outline-offset:-3px;}
+details .inner{padding:0 16px 14px;font-size:.95rem;}
+.foot{font-size:.82rem;color:var(--dim);margin-top:30px;line-height:1.5;}
+
+/* ═══ STUDIO EYES — RESERVED CHROME (grid header, own row, never overlaps) ═══ */
+.se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+  padding:8px 14px;background:var(--card);border-bottom:2px solid var(--ink-fill);
+  position:sticky;top:0;z-index:100;}
+.se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+  padding:8px 12px;border:1.5px solid var(--edge);border-radius:8px;background:var(--paper);
+  color:var(--ink);font-family:var(--mono);font-weight:700;font-size:13px;text-decoration:none;width:auto;}
+.se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--ink);}
+.se-brand svg{width:34px;height:20px;color:var(--brass);flex:0 0 auto;}
+.se-brand .wm{font-family:inherit;font-size:16px;letter-spacing:.01em;white-space:nowrap;color:var(--ink);}
+.se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+  padding:8px 13px;border:2px solid transparent;border-radius:8px;background:var(--ink-fill);
+  color:var(--paper-ink);font-family:var(--mono);font-weight:700;font-size:13px;cursor:pointer;width:auto;}
+.se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+@media (max-width:560px){.se-brand .wm{display:none;}}
+
+/* ═══ STUDIO EYES panel ═══ */
+.se-panel{position:fixed;right:12px;top:calc(var(--tap) + 16px);z-index:101;
+  width:min(320px,calc(100vw - 24px));background:var(--card);color:var(--ink);
+  border:2px solid var(--ink-fill);border-radius:12px;padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28);display:none;}
+.se-panel[data-open="1"]{display:block;}
+.se-panel h2{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);margin:0 0 8px;min-height:0;}
+.se-row{display:flex;gap:6px;margin-bottom:14px;}
+.se-btn{flex:1;min-height:var(--tap);padding:8px 4px;border:1.5px solid var(--edge);border-radius:8px;
+  background:var(--paper);color:var(--ink);font-family:var(--mono);font-weight:700;font-size:12.5px;cursor:pointer;width:auto;text-align:center;line-height:1.2;}
+.se-btn[aria-pressed="true"]{background:var(--ink-fill);color:var(--paper-ink);border-color:var(--ink-fill);}
+.se-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+.se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+  min-height:var(--tap);padding:8px 11px;margin-bottom:6px;border:1.5px solid var(--edge);border-radius:8px;
+  background:var(--paper);color:var(--ink);font-family:inherit;font-weight:600;font-size:14px;cursor:pointer;text-align:left;}
+.se-tog[aria-pressed="true"]{border-color:var(--ink-fill);}
+.se-tog .st{font-family:var(--mono);font-size:11px;color:var(--dim);}
+.se-tog[aria-pressed="true"] .st{color:var(--ink);font-weight:700;}
+.se-tog:focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+.se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-updated{font-family:var(--mono);font-size:.78rem;color:var(--dim);text-align:center;margin:26px 0 0;}
+.se-rail{display:flex;gap:10px;justify-content:center;padding:16px 20px 26px;border-top:2px solid var(--edge);margin-top:10px;}
+.se-rail a,.se-rail button{min-height:var(--tap);padding:10px 18px;border:1.5px solid var(--edge);border-radius:8px;
+  background:var(--paper);color:var(--ink);font-family:var(--mono);font-weight:700;font-size:13px;text-decoration:none;cursor:pointer;width:auto;}
+.se-rail a:focus-visible,.se-rail button:focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+/* Title screen leads with the door itself — the hero fills the column so the first
+   paint is scene-first, not prose-first. */
+#titleDoor{max-width:none;padding:0;}
+/* Injected mobile nav needs a visible keyboard focus ring (its default has none
+   when it docks into the shared .topbar). */
+body .tsp-barnav a:focus-visible, body .tsp-nav a:focus-visible{outline:3px solid var(--focus);outline-offset:2px;}
+/* door-open flourish */
+.leaf{transition:transform .8s cubic-bezier(.3,.7,.3,1);}
+.glowlight{opacity:0;transition:opacity .9s ease .2s;}
+svg.open .leaf{transform:scaleX(.1) translateX(-8px);}
+svg.open .glowlight{opacity:1;}
+.mote{opacity:0;}
+svg.open .mote{animation:rise 1.6s ease-out .3s forwards;}
+@keyframes rise{0%{opacity:0;transform:translateY(0);}25%{opacity:.9;}100%{opacity:0;transform:translateY(-46px);}}
+@media (prefers-reduced-motion: reduce){
+  .leaf{transition:none;}
+  svg.open .leaf{transform:none;opacity:.25;}
+  .glowlight{transition:none;}
+  svg.open .mote{animation:none;opacity:0;}
+}
+</style>
+<style>
+/* LAB STATUS BAND - founder ruling 2026-08-27, "put in lab not as done game."
+   New builds carry a .tsp-lab chip inside the h1, beside the version chip. This is
+   a RETROFIT across 19 shipped games whose heading structures have nothing in
+   common: some carry four h1 elements, one builds its title from a JS template, and
+   three have no h1 at all. Rewriting the title markup of nineteen shipped games to
+   add a label is a large blast radius for a label, so the status mounts as its own
+   band instead. Colours are fixed rather than tokenised, because these files do not
+   share a palette and a status that inherits an unknown token can arrive invisible.
+   #f6efe0 on #241a11 is 13.4:1, which clears the studio floor of 7:1 with room. */
+.tsp-labband{
+  display:block; box-sizing:border-box; width:100%;
+  background:#241a11; color:#f6efe0;
+  border-bottom:3px solid #b98c39;
+  padding:9px 16px; margin:0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:18px; line-height:1.35; font-weight:700; letter-spacing:.02em;
+}
+.tsp-labband b{
+  display:inline-block; color:#f3c675;
+  border:2px dashed #f3c675; border-radius:3px;
+  padding:.06em .38em; margin-right:.5em; letter-spacing:.09em;
+}
+@media print{ .tsp-labband{background:#fff; color:#000; border-bottom:2px solid #000;} }
+</style>
+</head>
+<body>
+<p class="tsp-labband"><b>LAB</b>An experiment on the bench, not a finished game.</p>
+
+
+<!-- STUDIO EYES — RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.45rem .9rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><p class="se-updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v9 <span style="opacity:.75">a3cda75</span></span>  </p>
+
+
+<div class="wrap">
+
+  <!-- TITLE (screen one — the door itself; comfort is a corner knob, never a wall) -->
+  <section class="screen on" id="title" aria-label="Title">
+    <p class="eyebrow">Tight Spiral Productions</p>
+    <h1 tabindex="-1">Behind This Door</h1>
+    <div class="doorbox" id="titleDoor" aria-hidden="true"></div>
+    <p>Doors from the real world, dealt in decks by interest. Read each one — color, hardware, street — and guess who is behind it.</p>
+    <p><b>Door alone: two keys. With a clue: one.</b></p>
+    <div class="stack">
+      <button class="primary center" id="startWorld">Knock: World Doors</button>
+      <button class="primary center" id="startIreland">Knock: Ireland's Writers</button>
+    </div>
+  </section>
+
+  <!-- ROUND -->
+  <section class="screen" id="round" aria-label="Guess the door">
+    <div class="tally"><span>Door <b id="rNum">1</b> of <span id="rMax">10</span></span><span>Keys: <b id="rKeys">0</b></span></div>
+    <div class="doorbox"><div id="doorArt"></div></div>
+    <div id="askBlock">
+      <h2 tabindex="-1">Whose door is this?</h2>
+      <div class="clueline" id="clueLine" hidden></div>
+      <div class="stack" id="choices"></div>
+      <button class="ghost center" id="clueBtn">Take a clue (drops the prize to one key)</button>
+    </div>
+    <div id="revealBlock" hidden>
+      <p class="reveal-name" id="revName" tabindex="-1"></p>
+      <p class="reveal-place" id="revPlace"></p>
+      <p class="award" id="revAward"></p>
+      <p id="revFact"></p>
+      <div class="worldcard">
+        <p class="eyebrow">The world behind it</p>
+        <p id="revWorld" style="margin:0"></p>
+      </div>
+      <div class="stack">
+        <button class="primary center" id="nextBtn">Next door</button>
+        <button class="ghost center" id="swingBtn">Swing the door again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- END -->
+  <section class="screen" id="end" aria-label="Your keyring">
+    <p class="eyebrow">The keyring</p>
+    <h1 tabindex="-1"><span id="finalKeys"></span> of <span id="maxKeys">20</span> keys</h1>
+    <p id="finalLine"></p>
+    <div class="keyring" id="keyring"></div>
+    <div class="stack">
+      <button class="primary center" id="replayBtn">Walk the street again</button>
+    </div>
+    <details>
+      <summary>How this was made</summary>
+      <div class="inner">
+        <p>Every door here is a cut-paper interpretation built in code — layered SVG shapes, not photographs. The details you read as clues (a fanlight, a porthole, a striped crossing) are mnemonic design: each door remembers its world for you.</p>
+        <p>Facts are held to verifiable general knowledge about each artist and place; where a door's exact paint color isn't certain, the art interprets rather than claims. Built by Claude in the Tight Spiral production pipeline; the founder's eyes are the final gate on every visual call.</p>
+        <p>Single-file, offline, in-memory. Nothing about you leaves this page.</p>
+      </div>
+    </details>
+    <div class="foot">Tight Spiral Productions · walshero@gmail.com · Play. Notice. Design. — <b>Behind This Door</b>. Inspired by the "Doors of Dublin" poster tradition and one standing studio question: is there a world behind this world?</div>
+  </section>
+
+</div>
+
+<!-- STUDIO EYES — last-updated stamp + bottom nav rail -->
+</span>
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" id="seBack" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- DOOR RENDERER (Lane A cut-paper SVG) ---------- */
+var DEFS = '<defs>'
+ +'<pattern id="brR" width="26" height="16" patternUnits="userSpaceOnUse">'
+ +'<rect width="26" height="16" fill="#8a4a3b"/>'
+ +'<path d="M0 .6h26M0 8h26M0 15.4h26M13 0v8M6 8v8M20 8v8" stroke="#70392d" stroke-width="1.4"/></pattern>'
+ +'<pattern id="brB" width="26" height="16" patternUnits="userSpaceOnUse">'
+ +'<rect width="26" height="16" fill="#6e5138"/>'
+ +'<path d="M0 .6h26M0 8h26M0 15.4h26M13 0v8M6 8v8M20 8v8" stroke="#57402c" stroke-width="1.4"/></pattern>'
+ +'<pattern id="brL" width="26" height="16" patternUnits="userSpaceOnUse">'
+ +'<rect width="26" height="16" fill="#a3604c"/>'
+ +'<path d="M0 .6h26M0 8h26M0 15.4h26M13 0v8M6 8v8M20 8v8" stroke="#8a4d3c" stroke-width="1.4"/></pattern>'
+ +'<linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">'
+ +'<stop offset="0" stop-color="#fbe6ac"/><stop offset="1" stop-color="#e8a94f"/></linearGradient>'
+ +'<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n"/>'
+ +'<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .05 0" result="g"/>'
+ +'<feComposite in="g" in2="SourceGraphic" operator="over"/></filter>'
+ +'</defs>';
+
+function shade(hex,f){ // darken hex by factor f (0..1)
+  var n=parseInt(hex.slice(1),16),r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  r=Math.round(r*f);g=Math.round(g*f);b=Math.round(b*f);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+
+function doorSVG(c, idPrefix){
+  // geometry: viewBox 0 0 260 360; door leaf x72..188, y132..310
+  var s='';
+  var wall = c.wall.charAt(0)==='#' ? c.wall : 'url(#'+c.wall+')';
+  s+='<rect x="0" y="0" width="260" height="360" fill="'+wall+'"/>';
+  if(c.wallBand){ s+='<rect x="0" y="250" width="260" height="110" fill="'+c.wallBand+'"/>'; }
+  // ground + steps
+  s+='<rect x="0" y="336" width="260" height="24" fill="'+(c.ground||'#5b5147')+'"/>';
+  s+='<rect x="46" y="322" width="168" height="14" rx="2" fill="'+(c.step||'#c9bda6')+'"/>';
+  s+='<rect x="56" y="310" width="148" height="12" rx="2" fill="'+shade(c.step||'#c9bda6',0.85)+'"/>';
+  // surround
+  var trim=c.trim||'#f2ead9';
+  if(c.arch){
+    s+='<path d="M52 312 L52 138 A78 78 0 0 1 208 138 L208 312 L190 312 L190 138 A60 60 0 0 0 70 138 L70 312 Z" fill="'+trim+'"/>';
+    // fanlight
+    s+='<path d="M70 132 L190 132 A60 60 0 0 0 70 132 Z" fill="#fdf3d2"/>';
+    if(c.fan!=='plain'){
+      var fl='';
+      for(var a=20;a<=160;a+=28){
+        var rad=a*Math.PI/180;
+        fl+='<line x1="130" y1="130" x2="'+(130+56*Math.cos(Math.PI-rad)).toFixed(1)+'" y2="'+(130-56*Math.sin(rad)).toFixed(1)+'" stroke="'+shade(trim,0.55)+'" stroke-width="3"/>';
+      }
+      s+=fl+'<circle cx="130" cy="130" r="10" fill="'+shade(trim,0.75)+'"/>';
+    }
+  } else {
+    s+='<rect x="52" y="138" width="18" height="174" fill="'+trim+'"/>';
+    s+='<rect x="190" y="138" width="18" height="174" fill="'+trim+'"/>';
+    s+='<rect x="46" y="114" width="168" height="24" rx="3" fill="'+trim+'"/>';
+    if(c.transom){ s+='<rect x="76" y="119" width="108" height="14" rx="6" fill="#fdf3d2" stroke="'+shade(trim,0.6)+'" stroke-width="2"/>'; }
+  }
+  // glow behind leaf
+  s+='<rect class="glowlight" x="72" y="132" width="116" height="178" fill="url(#glow)"/>';
+  s+='<circle class="mote" cx="104" cy="272" r="4" fill="#fdf0c0"/>';
+  s+='<circle class="mote" cx="140" cy="286" r="3" fill="#fdf0c0"/>';
+  s+='<circle class="mote" cx="162" cy="262" r="3.4" fill="#fdf0c0"/>';
+  // door leaf group
+  var d=c.door, dd=shade(d,0.72), dl=shade(d,1.0);
+  s+='<g class="leaf" style="transform-origin:72px 220px">';
+  s+='<rect x="72" y="132" width="116" height="178" fill="'+d+'"/>';
+  s+='<rect x="72" y="132" width="116" height="178" fill="none" stroke="'+dd+'" stroke-width="3"/>';
+  // panels 2x2
+  var px=[82,136], py=[[146,64],[224,72]];
+  for(var i=0;i<2;i++)for(var j=0;j<2;j++){
+    s+='<rect x="'+px[i]+'" y="'+py[j][0]+'" width="42" height="'+py[j][1]+'" rx="2" fill="'+d+'" stroke="'+dd+'" stroke-width="3"/>';
+    s+='<rect x="'+(px[i]+4)+'" y="'+(py[j][0]+4)+'" width="34" height="'+(py[j][1]-8)+'" rx="2" fill="'+shade(d,0.92)+'"/>';
+  }
+  // hardware
+  if(c.knocker==='ring'){
+    s+='<circle cx="130" cy="204" r="9" fill="none" stroke="'+(c.brassC||'#c9962e')+'" stroke-width="4"/>';
+    s+='<circle cx="130" cy="196" r="3.5" fill="'+(c.brassC||'#c9962e')+'"/>';
+  }
+  if(c.knocker==='trumpet'){
+    s+='<path d="M118 200 h18 l12 -7 v18 l-12 -7 h-18 Z" fill="'+(c.brassC||'#c9962e')+'"/>';
+    s+='<circle cx="115" cy="202" r="3.4" fill="'+(c.brassC||'#c9962e')+'"/>';
+  }
+  if(c.letterbox){ s+='<rect x="108" y="252" width="44" height="9" rx="2" fill="'+(c.brassC||'#c9962e')+'"/>'; }
+  if(c.number){
+    s+='<rect x="112" y="140" width="36" height="22" rx="3" fill="#fdf3d2" stroke="'+dd+'" stroke-width="2"/>';
+    s+='<text x="130" y="157" font-size="17" font-weight="700" text-anchor="middle" fill="#211d18" font-family="Georgia,serif">'+c.number+'</text>';
+  }
+  if(c.porthole){
+    s+='<circle cx="130" cy="176" r="20" fill="#cfe6ea" stroke="'+(c.brassC||'#c9962e')+'" stroke-width="6"/>';
+    s+='<path d="M116 170 q10 -8 24 -2" stroke="#f2fafc" stroke-width="3" fill="none"/>';
+  }
+  s+='</g>';
+  // motifs (in front of / beside leaf)
+  if(c.motif==='zebra'){
+    for(var z=0;z<5;z++){ s+='<rect x="'+(14+z*48)+'" y="338" width="26" height="20" fill="#f2ead9"/>'; }
+  }
+  if(c.motif==='pubsign'){
+    s+='<line x1="208" y1="118" x2="246" y2="118" stroke="#3a332a" stroke-width="4"/>';
+    s+='<line x1="240" y1="118" x2="240" y2="130" stroke="#3a332a" stroke-width="3"/>';
+    s+='<rect x="218" y="130" width="42" height="46" rx="5" fill="#f2ead9" stroke="#3a332a" stroke-width="3"/>';
+    s+='<circle cx="239" cy="148" r="7" fill="#3a332a"/><path d="M239 155 q-8 10 0 16 q8 -6 0 -16" fill="#3a332a"/>';
+  }
+  if(c.motif==='balcony'){
+    s+='<line x1="44" y1="102" x2="216" y2="102" stroke="#2e2a24" stroke-width="5"/>';
+    for(var b=52;b<=208;b+=16){ s+='<line x1="'+b+'" y1="102" x2="'+b+'" y2="128" stroke="#2e2a24" stroke-width="3"/>'; }
+    s+='<path d="M124 108 q6 8 12 0" stroke="#2e2a24" stroke-width="3" fill="none"/>';
+  }
+  if(c.motif==='water'){
+    s+='<path d="M0 350 q16 -8 32 0 t32 0 t32 0 t32 0 t32 0 t32 0 t32 0 t32 0" stroke="#5f93a8" stroke-width="5" fill="none"/>';
+  }
+  if(c.motif==='shutters'){
+    s+='<rect x="20" y="150" width="22" height="120" rx="2" fill="#3f6b4f"/><path d="M23 160h16M23 176h16M23 192h16M23 208h16M23 224h16M23 240h16M23 256h16" stroke="#2e5039" stroke-width="3"/>';
+    s+='<rect x="218" y="150" width="22" height="120" rx="2" fill="#3f6b4f"/><path d="M221 160h16M221 176h16M221 192h16M221 208h16M221 224h16M221 240h16M221 256h16" stroke="#2e5039" stroke-width="3"/>';
+  }
+  if(c.motif==='battlement'){
+    for(var t=0;t<5;t++){ s+='<rect x="'+(30+t*44)+'" y="14" width="28" height="26" fill="#6e6a5e"/>'; }
+    s+='<rect x="0" y="38" width="260" height="10" fill="#5c5850"/>';
+  }
+  if(c.motif==='baretree'){
+    s+='<path d="M232 336 V220 M232 268 l-20 -28 M232 244 l16 -26 M212 240 l-10 -16 M248 218 l10 -18" stroke="#4a443a" stroke-width="5" fill="none" stroke-linecap="round"/>';
+  }
+  return '<svg id="'+idPrefix+'" viewBox="0 0 260 360" role="img" aria-label="'+c.alt+'">'+DEFS
+       +'<g filter="url(#grain)">'+s+'</g></svg>';
+}
+
+/* ---------- THE TEN DOORS ---------- */
+var DOORS=[
+ { name:"Oscar Wilde", place:"1 Merrion Square, Dublin, Ireland",
+   choices:["Oscar Wilde","W. B. Yeats","George Bernard Shaw"], right:0,
+   clue:"This Dubliner claimed he had nothing to declare but his genius.",
+   fact:"Oscar Wilde grew up at 1 Merrion Square, a Georgian townhouse facing the park, before Oxford, London, and everything that followed.",
+   world:"Georgian Dublin's lease rules kept the brick facades nearly identical — so residents made the doors loud. Scarlet, cobalt, canary: on these streets, the door is the signature.",
+   cfg:{wall:"brR",arch:true,door:"#b6382f",trim:"#f2ead9",knocker:"ring",letterbox:true,number:"1",
+        alt:"A scarlet Georgian door under a white fanlight of radiating spokes, set in red brick, with brass ring knocker and the number 1."} },
+
+ { name:"Leopold Bloom — Joyce's Ulysses", place:"No. 7 Eccles Street, Dublin, Ireland",
+   choices:["Leopold Bloom — Joyce's Ulysses","Samuel Beckett","Bram Stoker"], right:0,
+   clue:"The resident never existed. The door is real anyway.",
+   fact:"No. 7 Eccles Street is the fictional home of Leopold Bloom in James Joyce's Ulysses. When the house was demolished, the actual front door was rescued — it is kept at the James Joyce Centre.",
+   world:"Dublin takes its fiction seriously enough to save the hardware. A novel made an ordinary address permanent; the city keeps the door the way other cities keep relics.",
+   cfg:{wall:"brB",arch:true,door:"#2b2a28",trim:"#e9e0cd",knocker:"ring",letterbox:true,number:"7",
+        alt:"A near-black Georgian door with a large number 7, brass knocker and letterbox, under a plain fanlight in brown brick."} },
+
+ { name:"Frida Kahlo", place:"La Casa Azul, Coyoacán, Mexico City",
+   choices:["Frida Kahlo","Octavio Paz","José Clemente Orozco"], right:0,
+   clue:"She painted self-portraits inside walls of cobalt blue.",
+   fact:"Frida Kahlo was born, worked, and died at La Casa Azul — the Blue House — in Coyoacán. It is now the museum of her life and work.",
+   world:"In Mexican building tradition, saturated color is structure, not decoration. The cobalt announces the house from the end of the street; the door only has to hold the note.",
+   cfg:{wall:"#1f4e94",wallBand:"#173b70",arch:false,door:"#1c7a6f",trim:"#c96a3f",step:"#b3663d",ground:"#6e4630",
+        knocker:null,letterbox:false,
+        alt:"A deep teal door set flat into a cobalt blue wall with terracotta trim and step — the Casa Azul palette."} },
+
+ { name:"The Inklings — Tolkien & C. S. Lewis", place:"The Eagle and Child pub, Oxford, England",
+   choices:["The Inklings — Tolkien & C. S. Lewis","Lewis Carroll","Oscar Wilde"], right:0,
+   clue:"Hobbits and Narnia both passed through this door as manuscripts.",
+   fact:"For years the Inklings — J. R. R. Tolkien, C. S. Lewis, and their circle — met at this Oxford pub to read drafts aloud. Regulars call it the Bird and Baby.",
+   world:"The British pub as workshop: low rooms where The Lord of the Rings got its first hearing over beer, one chapter at a time, from friends allowed to say no.",
+   cfg:{wall:"#e9dfc6",arch:false,transom:true,door:"#2f2c28",trim:"#4a4238",step:"#a99a80",motif:"pubsign",
+        knocker:"ring",letterbox:false,
+        alt:"A black pub door in a cream wall with a transom window above and a hanging sign showing a bird, Oxford style."} },
+
+ { name:"Emily Dickinson", place:"The Homestead, Amherst, Massachusetts",
+   choices:["Emily Dickinson","Louisa May Alcott","Robert Frost"], right:0,
+   clue:"She told the truth but told it slant, mostly from an upstairs room.",
+   fact:"Emily Dickinson lived and wrote at the Homestead in Amherst, rarely leaving the property in her later years. Nearly 1,800 poems were found after her death — almost none published in her lifetime.",
+   world:"A door can face inward. Hers guarded a Federal-style brick house where a whole cosmos was built quietly, in slant rhyme, in a room with a small desk.",
+   cfg:{wall:"brL",arch:false,transom:true,door:"#f4efe2",trim:"#efe8d6",motif:"shutters",step:"#b7a98d",
+        knocker:"ring",brassC:"#7a7264",letterbox:false,
+        alt:"A white paneled door with an elliptical transom, flanked by dark green shutters in light red brick — New England Federal style."} },
+
+ { name:"The Beatles", place:"Abbey Road Studios, London, England",
+   choices:["The Beatles","The Rolling Stones","Pink Floyd"], right:0,
+   clue:"The crossing out front may be the most photographed stripes in music.",
+   fact:"The Beatles recorded most of their music at Abbey Road Studios and named their 1969 album for the street outside. (Pink Floyd made Dark Side of the Moon here too — a fair guess.)",
+   world:"The wall by the door fills with fans' messages and gets repainted, again and again. A door the whole world keeps signing, and the building keeps forgiving.",
+   cfg:{wall:"#efe8d8",arch:false,transom:true,door:"#2a2a2e",trim:"#dcd2ba",motif:"zebra",step:"#c4b899",
+        knocker:null,letterbox:true,brassC:"#8f8878",
+        alt:"A dark townhouse door at the top of steps in a pale stucco wall, with the stripes of a zebra crossing across the foreground."} },
+
+ { name:"Hotel Chelsea", place:"222 West 23rd Street, New York City",
+   choices:["Hotel Chelsea","The Algonquin Hotel","CBGB"], right:0,
+   clue:"One New York door; the keys belonged to Dylan Thomas, Leonard Cohen, and Patti Smith.",
+   fact:"The Hotel Chelsea housed Dylan Thomas, Leonard Cohen, and Patti Smith, among decades of others; Arthur C. Clarke worked on 2001: A Space Odyssey there.",
+   world:"The residential hotel as bohemian commons — one door, one lobby, and generations of tenants who rewired American music and literature from the rooms upstairs.",
+   cfg:{wall:"brR",arch:false,transom:true,door:"#5e1f22",trim:"#e3d8c2",motif:"balcony",step:"#b0a48a",
+        knocker:"ring",letterbox:false,
+        alt:"A deep wine-red door in red brick beneath a black iron balcony rail — Victorian New York."} },
+
+ { name:"Pablo Neruda", place:"La Chascona, Santiago, Chile",
+   choices:["Pablo Neruda","Gabriel García Márquez","Isabel Allende"], right:0,
+   clue:"A Nobel poet who built his house like a landlocked ship.",
+   fact:"Pablo Neruda built La Chascona in Santiago and named it for Matilde Urrutia's untamable hair. He filled his houses like ships — portholes, figureheads, rooms that pretend to be at sea.",
+   world:"A door with a porthole is a promise: inside, the rules of the street stop applying. Chile keeps his houses as museums of that promise.",
+   cfg:{wall:"#e8ddc2",wallBand:"#2b5a8c",arch:false,door:"#2b6fb0",trim:"#d8cba8",porthole:true,step:"#b7a98d",
+        knocker:null,letterbox:false,
+        alt:"A bright blue door with a round brass porthole window, set in a cream wall banded with sea blue."} },
+
+ { name:"Dylan Thomas", place:"The Boathouse, Laugharne, Wales",
+   choices:["Dylan Thomas","W. B. Yeats","Seamus Heaney"], right:0,
+   clue:"He wrote in a small shed above the water, up the path from this door.",
+   fact:"Dylan Thomas spent his last four years at the Boathouse in Laugharne, writing in a small shed perched above the estuary. You met his name once already tonight — he also held a key at the Chelsea.",
+   world:"Laugharne seeped into the work: the town is a model for the sleeping village of Under Milk Wood. Some doors open onto water, and the water gets the last word.",
+   cfg:{wall:"#eef0ea",arch:false,transom:true,door:"#7fa8b8",trim:"#dfe2d8",motif:"water",step:"#c2c6bc",
+        knocker:"ring",brassC:"#7a7264",letterbox:false,
+        alt:"A pale seaside blue door in a whitewashed wall, a line of estuary water rippling across the ground."} },
+
+ { name:"Louis Armstrong", place:"Corona, Queens, New York City",
+   choices:["Louis Armstrong","Duke Ellington","Ella Fitzgerald"], right:0,
+   clue:"The world's most famous trumpet came home to Queens every night.",
+   fact:"Louis Armstrong bought a modest brick house in Corona, Queens, in 1943 and stayed until his death in 1971. It is now the Louis Armstrong House Museum.",
+   world:"The biggest sound in American music chose a small door on a working-class block — and kept it, for decades, while the whole world asked him to move somewhere louder.",
+   cfg:{wall:"brB",arch:false,transom:true,door:"#c98a2e",trim:"#e3d8c2",knocker:"trumpet",letterbox:true,step:"#b0a48a",
+        alt:"A warm gold door in brown brick with a small brass trumpet-shaped knocker."} }
+];
+
+/* ---------- SUB-DECK: IRELAND'S WRITERS (discourse-area deck) ---------- */
+var IRELAND=[ DOORS[0], DOORS[1],
+ { name:"W. B. Yeats", place:"Thoor Ballylee, County Galway, Ireland",
+   choices:["W. B. Yeats","Lady Gregory","J. M. Synge"], right:0,
+   clue:"He bought a Norman tower, restored it, and named a whole book after it.",
+   fact:"Yeats bought and restored Thoor Ballylee, a medieval tower house in Galway, summering and writing there. It became the central symbol of his 1928 collection The Tower. Nobel Prize, 1923.",
+   world:"An Irish poet answering a ruin: instead of describing the tower, he moved in. The door of a fortress became the door of a study.",
+   cfg:{wall:"#8b877a",arch:true,fan:"plain",door:"#4a3a2c",trim:"#a9a496",motif:"battlement",step:"#7d786c",
+        knocker:"ring",brassC:"#7a7264",letterbox:false,
+        alt:"A heavy dark door in a gray stone tower wall, battlements across the top."} },
+
+ { name:"George Bernard Shaw", place:"33 Synge Street, Dublin, Ireland",
+   choices:["George Bernard Shaw","Sean O'Casey","Oscar Wilde"], right:0,
+   clue:"The only person to win both a Nobel Prize and an Academy Award.",
+   fact:"Shaw was born at 33 Synge Street, Dublin, in 1856. He won the Nobel Prize in 1925 and later an Academy Award for the screen adaptation of Pygmalion — a double no one else has managed.",
+   world:"A modest terraced Dublin door produced a man who spent seventy years arguing with the entire English-speaking world, and mostly winning.",
+   cfg:{wall:"brL",arch:false,transom:true,door:"#2f5d43",trim:"#e3d8c2",number:"33",step:"#b0a48a",
+        knocker:"ring",letterbox:true,
+        alt:"A deep green paneled door with the number 33 in light red brick under a flat transom."} },
+
+ { name:"Samuel Beckett", place:"Cooldrinagh, Foxrock, County Dublin",
+   choices:["Samuel Beckett","Brendan Behan","Flann O'Brien"], right:0,
+   clue:"Two men wait by a bare tree. Nobody comes. It's a masterpiece.",
+   fact:"Beckett was born at Cooldrinagh in Foxrock, a Dublin suburb, in 1906. He wrote Waiting for Godot in French, then translated himself back into English. Nobel Prize, 1969.",
+   world:"He stripped the stage to a road, a tree, and a door that never opens. The barest set in theater history came from a comfortable suburban one.",
+   cfg:{wall:"#dad7ce",arch:false,transom:true,door:"#2b2a28",trim:"#c8c4b8",motif:"baretree",step:"#b3aea0",
+        knocker:null,letterbox:false,
+        alt:"A plain black door in a pale gray wall, a single bare tree standing beside it."} },
+
+ { name:"Jonathan Swift", place:"St Patrick's Cathedral Deanery, Dublin",
+   choices:["Jonathan Swift","Oliver Goldsmith","Thomas Moore"], right:0,
+   clue:"Dean by day, Gulliver by candlelight, savage indignation always.",
+   fact:"Swift served as Dean of St Patrick's Cathedral, Dublin, for some thirty years, writing Gulliver's Travels and A Modest Proposal from the deanery. He is buried in the cathedral, under an epitaph of his own composing.",
+   world:"The fiercest satirist in English held a church post the whole time. The door says decorum; the desk behind it said otherwise.",
+   cfg:{wall:"#a39d8d",arch:true,fan:"plain",door:"#4a3423",trim:"#d7d0be",step:"#8f8a7c",
+        knocker:"ring",brassC:"#7a7264",letterbox:false,
+        alt:"A massive dark oak door under a plain stone arch in a cathedral wall."} },
+
+ { name:"Brendan Behan", place:"McDaid's pub, Harry Street, Dublin",
+   choices:["Brendan Behan","Patrick Kavanagh","Flann O'Brien"], right:0,
+   clue:"He described himself as a drinker with a writing problem.",
+   fact:"Behan held court at McDaid's, the Harry Street pub at the center of Dublin's mid-century literary scene. Borstal Boy and The Quare Fellow made him famous; the pub kept him local.",
+   world:"The Dublin literary pub as an institution: part office, part stage, part hazard. Half the city's books were argued into existence behind doors like this.",
+   cfg:{wall:"#7c2f33",arch:false,transom:true,door:"#2f2c28",trim:"#e9dfc6",motif:"pubsign",step:"#a99a80",
+        knocker:"ring",letterbox:false,
+        alt:"A black pub door in a wine-red painted front with a hanging sign, Dublin style."} },
+
+ { name:"Bram Stoker", place:"Clontarf, Dublin, Ireland",
+   choices:["Bram Stoker","Sheridan Le Fanu","J. M. Synge"], right:0,
+   clue:"A Dublin civil servant who invented the world's most famous houseguest.",
+   fact:"Stoker was born in Clontarf, Dublin, in 1847, worked as a civil servant at Dublin Castle, then managed Henry Irving's Lyceum Theatre in London — writing Dracula (1897) on the side.",
+   world:"Gothic fiction's most famous door-crossing rule — the vampire must be invited in — came from a mannerly Dubliner who understood thresholds.",
+   cfg:{wall:"brB",arch:true,fan:"plain",door:"#2e2333",trim:"#d7cdb8",step:"#9a9082",
+        knocker:"ring",letterbox:true,
+        alt:"A near-black door with a purple cast under a plain fanlight in dark brick."} },
+
+ { name:"J. M. Synge — the Abbey Theatre", place:"Abbey Street, Dublin, Ireland",
+   choices:["J. M. Synge — the Abbey Theatre","Sean O'Casey","Lady Gregory"], right:0,
+   clue:"His comedy about a boastful stranger started actual riots behind this door.",
+   fact:"The Playboy of the Western World premiered at the Abbey Theatre in 1907 and sparked riots in the stalls. The Abbey — co-founded by Yeats and Lady Gregory — was Ireland's national stage from the start.",
+   world:"A theater door works both ways: the play goes out into the country, and the country storms back in. In 1907 it did, loudly.",
+   cfg:{wall:"#e9dfc6",arch:false,transom:true,door:"#8e2430",trim:"#4a4238",motif:"pubsign",step:"#a99a80",
+        knocker:null,letterbox:false,
+        alt:"A crimson theater door in a cream front with a playbill board hanging beside it."} },
+
+ { name:"Patrick Kavanagh", place:"Inniskeen, County Monaghan, Ireland",
+   choices:["Patrick Kavanagh","Seamus Heaney","Thomas Moore"], right:0,
+   clue:"He farmed stony gray soil, then wrote the poem that named it.",
+   fact:"Kavanagh grew up farming in Inniskeen, County Monaghan, and made that parish the whole world of his poems, from The Great Hunger to the late canal-bank sonnets. Dublin remembers him with a seat by the Grand Canal.",
+   world:"He argued that the parish, fully seen, beats the globe half-seen. One farmhouse door, looked at hard enough, opened onto everything.",
+   cfg:{wall:"#efe9da",arch:false,transom:false,door:"#3f6b4f",trim:"#d8cfba",step:"#a08b6a",ground:"#6e5a40",
+        knocker:null,letterbox:false,
+        alt:"A plain green farmhouse door in a whitewashed cottage wall on earthy ground."} }
+];
+
+/* ---------- STATE + FLOW ---------- */
+var DECK=DOORS, DECKNAME="World Doors";
+var state={i:0,keys:0,clueUsed:false,misses:0,results:[]};
+function $(id){return document.getElementById(id);}
+function show(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  var el=$(id); el.classList.add('on'); window.scrollTo(0,0);
+  var h=el.querySelector('h1,h2'); if(h){h.setAttribute('tabindex','-1');h.focus({preventScroll:true});}
+}
+/* scene-first: the first thing on screen is a door */
+$('titleDoor').innerHTML=doorSVG(DOORS[0].cfg,'tdoor');
+function startDeck(deck,name){ DECK=deck; DECKNAME=name; state={i:0,keys:0,clueUsed:false,misses:0,results:[]}; loadRound(); }
+$('startWorld').addEventListener('click',function(){ startDeck(DOORS,"World Doors"); });
+$('startIreland').addEventListener('click',function(){ startDeck(IRELAND,"Ireland's Writers"); });
+
+function loadRound(){
+  var d=DECK[state.i];
+  state.clueUsed=false; state.misses=0;
+  $('rNum').textContent=state.i+1; $('rMax').textContent=DECK.length; $('rKeys').textContent=state.keys;
+  $('doorArt').innerHTML=doorSVG(d.cfg,'door'+state.i);
+  $('clueLine').hidden=true; $('clueLine').textContent='';
+  $('clueBtn').disabled=false; $('clueBtn').hidden=false;
+  var order=[0,1,2].sort(function(){return Math.random()-0.5;});
+  var box=$('choices'); box.innerHTML='';
+  order.forEach(function(idx,pos){
+    var b=document.createElement('button'); b.className='choice';
+    b.innerHTML='<span class="kbd">'+(pos+1)+'</span>'+d.choices[idx];
+    b.setAttribute('data-right', idx===d.right ? '1':'0');
+    b.addEventListener('click',function(){pick(b);});
+    box.appendChild(b);
+  });
+  $('askBlock').hidden=false; $('revealBlock').hidden=true;
+  show('round');
+  var h=$('askBlock').querySelector('h2'); if(h)h.focus({preventScroll:true});
+}
+function showClue(){
+  if(state.clueUsed)return;
+  state.clueUsed=true;
+  $('clueLine').textContent=DECK[state.i].clue;
+  $('clueLine').hidden=false;
+  $('clueBtn').disabled=true;
+}
+$('clueBtn').addEventListener('click',showClue);
+
+function pick(btn){
+  if($('revealBlock').hidden===false)return;
+  if(btn.getAttribute('data-right')==='1'){
+    btn.classList.add('hit'); reveal(true);
+  } else {
+    btn.classList.add('out'); btn.disabled=true; state.misses++;
+    if(state.misses===1){ showClue(); }
+    else { reveal(false); }
+  }
+}
+function reveal(won){
+  var d=DECK[state.i];
+  var award = won ? (state.misses>0 ? 0 : (state.clueUsed?1:2)) : 0;
+  // rule: clean first guess no clue = 2; clue used (chosen or forced by a miss) then right = 1... 
+  // simplify per spec: no-clue first-try=2, clue-then-right=1, second-miss=0
+  if(won && state.misses===1) award=1;
+  state.keys+=award;
+  state.results.push({name:d.name,award:award,cfg:d.cfg});
+  $('rKeys').textContent=state.keys;
+  $('revName').textContent=d.name;
+  $('revPlace').textContent=d.place;
+  var aw=$('revAward');
+  aw.classList.remove('zero');
+  if(award===2){aw.textContent='Two keys — read from the door alone.';}
+  else if(award===1){aw.textContent='One key.';}
+  else {aw.textContent='No key this time — but the door opens anyway.'; aw.classList.add('zero');}
+  $('revFact').textContent=d.fact;
+  $('revWorld').textContent=d.world;
+  $('askBlock').hidden=true; $('revealBlock').hidden=false;
+  var svg=$('doorArt').querySelector('svg');
+  if(svg){ requestAnimationFrame(function(){svg.classList.add('open');}); }
+  $('revName').focus({preventScroll:true});
+  window.scrollTo(0,0);
+}
+$('swingBtn').addEventListener('click',function(){
+  var svg=$('doorArt').querySelector('svg'); if(!svg)return;
+  svg.classList.remove('open');
+  requestAnimationFrame(function(){requestAnimationFrame(function(){svg.classList.add('open');});});
+});
+$('nextBtn').addEventListener('click',function(){
+  state.i++;
+  if(state.i<DECK.length){ loadRound(); } else { finish(); }
+});
+function finish(){
+  var maxK=DECK.length*2;
+  $('finalKeys').textContent=state.keys;
+  $('maxKeys').textContent=maxK;
+  var line;
+  if(state.keys>=maxK*0.8) line='You read doors the way the street intends. Every one of these opens onto a shelf — the reading list is behind the glass.';
+  else if(state.keys>=maxK*0.45) line='A good walk. The doors you missed are the ones worth going back for — that is how noticing works.';
+  else line='First walks are for looking, not scoring. Walk the street again; the doors remember you now.';
+  $('finalLine').textContent=line;
+  var kr=$('keyring'); kr.innerHTML='';
+  state.results.forEach(function(r,idx){
+    var div=document.createElement('div'); div.className='kr';
+    div.innerHTML=doorSVG(r.cfg,'kr'+idx)
+      +'<span class="who">'+r.name+'</span>'
+      +'<span class="'+(r.award>0?'got':'miss')+'">'+(r.award===2?'Two keys':r.award===1?'One key':'Opened for free')+'</span>';
+    kr.appendChild(div);
+  });
+  show('end');
+}
+$('replayBtn').addEventListener('click',function(){ startDeck(DECK,DECKNAME); });
+
+/* keyboard */
+document.addEventListener('keydown',function(e){
+  if($('round').classList.contains('on')){
+    if($('revealBlock').hidden){
+      if(e.key>='1'&&e.key<='3'){ var b=$('choices').children[+e.key-1]; if(b&&!b.disabled){e.preventDefault();b.click();} }
+      if(e.key==='c'||e.key==='C'){ e.preventDefault(); showClue(); }
+    } else {
+      if(e.key==='Enter'){ e.preventDefault(); $('nextBtn').click(); }
+    }
+  }
+});
+})();
+</script>
+
+<!--
+  TSP-META BLOCK
+  { "file":"behind-this-door.html",
+    "role":"Studio catalog title: door-reading quiz — cultural + biographical noticing across ten real doors (writers, musicians, artists)",
+    "sub_decks":"v3: content dealt as interest-based sub-decks (discourse areas / semiotic domains, Gee; epistemic-frames research thread) — World Doors (10) + Ireland\u0027s Writers (10, two shared: Wilde, Bloom); the deck pattern is the studio scale move for noticing games",
+    "new_rule_this_build":"COMFORT IS A KNOB, NOT A WALL (founder ruling 2026-07-03, studio-wide floor): no accessibility choice may gate entry; the game opens scene-first and every accommodation lives as a live corner control, always reversible. Probe Sweep target: every build with a comfort-gate screen zero.",
+    "spine":"Read a door like a text; the world behind it is the reward.",
+    "wireframe_novelty":"the artwork IS the question — every visual detail (fanlight, porthole, zebra stripes, trumpet knocker) is admissible evidence; clue economy prices noticing (door alone = 2 keys, clue = 1)",
+    "win_condition":"player uses visual evidence before textual clues; measured by clue-tier at answer",
+    "construct":"visual-rhetoric noticing + cultural literacy; evidence = which tier the answer landed on (computed, not self-report)",
+    "panel":{"discipline":"semiotics of place / visual rhetoric","seats":["Gee (a door is a text in a semiotic domain)","Osterweil (freedom to fail: a miss buys a clue, never a wall)","Gaiman Door seat (is there a world behind this world? — here, literally)","flow (clue economy tunes challenge per door)"]},
+    "task_spine":"Roles-tier (Nunan): player as traveler-reader of doors; Four Freedoms: fail (miss->clue), experiment (clue optional), identity (traveler), replay free",
+    "medium_gate":"LANE A cut-paper SVG — ruling: photos (Lane C) would cost licensing + weight + offline floor; procedural SVG doors are mnemonic-situated (each culture's door grammar becomes the memory hook) and scale clean at any zoom for low-vision play",
+    "art_craft":"Lane A ceiling pass: layered cut shapes, computed edge shades, feTurbulence paper grain, door-swing reveal with warm-light gradient; reduced-motion honored (fade, no swing)",
+    "pipeline_run":{
+      "stage_-1_intake":"BUILD NOW — catalog title, culture+craft learning, founder-commissioned",
+      "stage_0_medium":"GO — Lane A, novelty named",
+      "stage_0.5_panel":"GO — four seats, spine named",
+      "feeling_first_entry":"PENDING FOUNDER EYES — opens on a door, zero menus; agent pre-flight clean",
+      "stage_1_construct":"GO — clue-tier evidence model, computed",
+      "stage_2_spine_freedoms":"GO",
+      "stage_3_fidelity_checklist":"SIGNED — floors listed below",
+      "stage_4_mvp":"SHIPPED — this file",
+      "stage_5_playtest":"AGENT PRE-FLIGHT CLEAN; founder play = the open gate",
+      "stage_6_paper_craft":"RUN IN-BUILD (grain, shades, motifs)",
+      "stage_7_harvest":"parameterized doorSVG() renderer — reusable component (one function, ten cultures)",
+      "harvest_back":"NEW RULE CANDIDATE: photo-referenced builds risk fact drift on physical details (exact paint colors); rule = art interprets, never claims; every reveal fact held to verifiable-general knowledge. Probe Sweep target: CYL period scenes."},
+    "hitl_active":["founder eyes on every visual call (standing)","fact pass: all ten reveal facts are verifiable-general; no quoted copyrighted text (Dickinson/Wilde phrases are public domain era)"],
+    "hitl_NEEDED":["founder feeling-first verdict on entry","founder fact spot-check before any student-facing ship","palette check across three comfort stops on Matt's actual screen"],
+    "founder_open":["approve or re-order the ten doors","decide if this joins the public catalog or stays studio demo","v2 candidates: rotating door pools, a Dublin-only round honoring the poster, audio clue lane (Lane C) for music doors"],
+    "sources":"all text original; facts general-knowledge biographical/architectural; no lyrics, no copyrighted quotes; door art procedural interpretation, not photographic claim",
+    "ferpa":"n/a — no student data, no storage, in-memory only",
+    "engagement_honesty":"keys map 1:1 to noticing tier; no randomization, streaks, or timers; joy flourish (door swing) has replay control",
+    "floor_states_verified":["single-file offline in-memory","3 comfort stops (Softer/Default/Warm-dark amber-on-charcoal, no #000/#fff)","near-black ink on light paper at full strength","44px+ targets (52px buttons)","full keyboard: 1/2/3 choose, C clue, Enter advance","visible focus rings","scroll-reset + heading focus per screen","reduced-motion respected","no emoji","C6: every instruction screen under 50 words","SVG doors carry alt text describing the visual evidence"],
+    "c6_audit":{"title":"27 words","round_prompt":"4 words + priced clue button","reveal":"content not instruction"},
+    "assets_promoted":["doorSVG() parameterized renderer","clue-economy pattern (price the hint, measure the noticing)","keyring end-grid"] }
+-->
+
+<!-- TSP shared mobile nav + device adaptation -->
+<!-- STUDIO EYES — control wiring -->
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  var back=document.getElementById('seBack'); if(back) back.addEventListener('click',function(){ history.back(); });
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+
+<script>window.TSP_MOBILE = { home:"index.html", nav:false };</script>
+<!-- TSP-MOBILE (inlined from tsp-mobile.js — single-file-offline law) -->
+<script>
+/* Tight Spiral Studios — shared mobile controls + Home/Back nav.
+   Source & docs: tsp-mobile.js. Edit there, then re-inline. */
+(function () {
+  "use strict";
+
+  var d = document, root = d.documentElement, cfg = window.TSP_MOBILE || {};
+
+  /* ---- Device detection --------------------------------------------------- */
+  var hasTouch = ("ontouchstart" in window) ||
+                 (navigator.maxTouchPoints > 0) ||
+                 (navigator.msMaxTouchPoints > 0);
+  var coarse   = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  var narrow   = Math.min(screen.width || 9999, screen.height || 9999) < 820;
+  var isMobile = hasTouch && (coarse || narrow);
+
+  root.classList.add(hasTouch ? "tsp-touch" : "tsp-no-touch");
+  if (isMobile) root.classList.add("tsp-mobile");
+
+  /* ---- Synthetic keyboard dispatch --------------------------------------- */
+  // Games listen on window (or document) for keydown/keyup and read e.key.
+  var evTarget = (cfg.target === "document") ? d : window;
+
+  function dispatchKey(type, key) {
+    var ev;
+    try {
+      ev = new KeyboardEvent(type, {
+        key: key, code: codeFor(key),
+        bubbles: true, cancelable: true, view: window
+      });
+    } catch (e) {
+      // Legacy fallback
+      ev = d.createEvent("Event");
+      ev.initEvent(type, true, true);
+      try { ev.key = key; } catch (_) {}
+    }
+    evTarget.dispatchEvent(ev);
+  }
+
+  function codeFor(key) {
+    switch (key) {
+      case "ArrowLeft":  return "ArrowLeft";
+      case "ArrowRight": return "ArrowRight";
+      case "ArrowUp":    return "ArrowUp";
+      case "ArrowDown":  return "ArrowDown";
+      case " ":          return "Space";
+      case "Enter":      return "Enter";
+      case "Shift":      return "ShiftLeft";
+      default:
+        if (key && key.length === 1) return "Key" + key.toUpperCase();
+        return "";
+    }
+  }
+
+  /* ---- Styles (injected once) -------------------------------------------- */
+  function injectStyles() {
+    if (d.getElementById("tsp-mobile-style")) return;
+    var css = [
+      /* Navigation chip — always available, subtle on desktop */
+      ".tsp-nav{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));",
+        "z-index:2147483000;display:flex;gap:8px;font-family:'Helvetica Neue',Arial,sans-serif}",
+      ".tsp-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.4em;text-decoration:none;",
+        "padding:.5em .85em;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.04em;",
+        "color:#f4f1e8;background:rgba(20,18,15,.66);border:1px solid rgba(255,207,90,.45);",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1;",
+        "box-shadow:0 4px 14px rgba(0,0,0,.35);transition:background .15s,border-color .15s,transform .08s}",
+      ".tsp-nav a:hover,.tsp-nav a:focus-visible{background:rgba(40,34,24,.9);border-color:#ffcf5a;outline:none}",
+      ".tsp-nav a:active{transform:translateY(1px)}",
+      "@media (min-width:900px) and (pointer:fine){.tsp-nav{opacity:.55}.tsp-nav:hover{opacity:1}}",
+
+      /* Nav integrated into the studio's shared .topbar (no overlap) */
+      ".tsp-barnav{display:inline-flex;align-items:center;gap:.35rem;margin-right:.25rem;flex:none}",
+      ".tsp-barnav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.3em;text-decoration:none;color:inherit;",
+        "font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.02em;line-height:1;",
+        "padding:.4em .7em;border-radius:999px;border:1px solid currentColor;opacity:.85;",
+        "background:transparent;white-space:nowrap;transition:opacity .12s,background .12s}",
+      ".tsp-barnav a:hover,.tsp-barnav a:focus-visible{opacity:1;background:rgba(127,127,127,.18);outline:none}",
+      ".tsp-barnav a:active{transform:translateY(1px)}",
+      /* Keep the shared bar on one row once Home/Back are added: title ellipsizes */
+      ".tsp-touch .topbar{gap:.4rem}",
+      ".tsp-touch .topbar .wm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto}",
+
+      /* Gamepad — only rendered on touch devices */
+      ".tsp-pad{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;",
+        "display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;",
+        "padding:0 max(14px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));",
+        "font-family:'Helvetica Neue',Arial,sans-serif;touch-action:none}",
+      ".tsp-cluster{display:flex;gap:12px;pointer-events:none;align-items:flex-end;flex-wrap:wrap;max-width:46vw}",
+      ".tsp-cluster.right{justify-content:flex-end}",
+      ".tsp-btn{pointer-events:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;",
+        "touch-action:none;min-width:62px;min-height:62px;padding:0 14px;border-radius:16px;",
+        "display:flex;align-items:center;justify-content:center;text-align:center;",
+        "font-size:15px;font-weight:700;letter-spacing:.03em;color:#f4f1e8;",
+        "background:rgba(24,20,15,.6);border:1.5px solid rgba(255,207,90,.5);",
+        "-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);",
+        "box-shadow:0 6px 18px rgba(0,0,0,.4);transition:background .06s,transform .06s;cursor:pointer}",
+      ".tsp-btn.big{min-width:82px;min-height:82px;font-size:16px}",
+      ".tsp-btn:active,.tsp-btn.on{background:rgba(255,207,90,.9);color:#1a0d09;transform:scale(.94)}",
+      /* Hide gamepad on non-touch so desktop keeps keyboard feel */
+      ".tsp-no-touch .tsp-pad{display:none}",
+
+      /* Rotate-for-more-room hint — canvas games only, portrait phones only */
+      ".tsp-rot{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top));",
+        "z-index:2147482500;display:none;align-items:center;gap:.55em;padding:.5em .55em .5em .9em;",
+        "border-radius:999px;background:rgba(24,20,15,.86);color:#f4f1e8;",
+        "border:1px solid rgba(255,207,90,.5);white-space:nowrap;",
+        "font:600 12px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.4)}",
+      ".tsp-rot .rk{font-size:14px;color:#ffcf5a}",
+      ".tsp-rot button{background:none;border:none;color:inherit;font-size:16px;line-height:1;",
+        "padding:0 .15em;margin:0;cursor:pointer;opacity:.65}",
+      ".tsp-rot button:active{opacity:1}",
+      "@media (orientation:portrait){.tsp-touch .tsp-rot{display:inline-flex}}",
+      ".tsp-rot-dismissed .tsp-rot{display:none!important}"
+    ].join("");
+    var s = d.createElement("style");
+    s.id = "tsp-mobile-style";
+    s.textContent = css;
+    d.head.appendChild(s);
+  }
+
+  /* ---- Navigation (Home / Back) ------------------------------------------ */
+  function makeLink(href, label, aria) {
+    var a = d.createElement("a");
+    a.href = href; a.innerHTML = label;
+    a.setAttribute("aria-label", aria);
+    return a;
+  }
+
+  function buildNav() {
+    if (cfg.nav === false) return;
+    if (d.querySelector(".tsp-nav, .tsp-barnav")) return;
+
+    var home = cfg.home === undefined ? "index.html" : cfg.home;
+    var links = [];
+    if (cfg.back) links.push(makeLink(cfg.back, "‹ Back", "Back"));
+    if (home)     links.push(makeLink(home, "⌂ Home", "Home"));
+    if (!links.length) return;
+
+    // Prefer integrating into the studio's shared sticky header if present —
+    // avoids overlapping page titles and matches each page's palette.
+    var bar = cfg.floatNav ? null : d.querySelector(".topbar");
+    if (bar) {
+      var wrap = d.createElement("span");
+      wrap.className = "tsp-barnav";
+      links.forEach(function (l) { wrap.appendChild(l); });
+      bar.insertBefore(wrap, bar.firstChild);
+      return;
+    }
+
+    // Otherwise: floating chip, and reserve top space on scrollable pages so
+    // it never covers the header/title.
+    var nav = d.createElement("nav");
+    nav.className = "tsp-nav";
+    nav.setAttribute("aria-label", "Site navigation");
+    links.forEach(function (l) { nav.appendChild(l); });
+    d.body.appendChild(nav);
+    reserveTopSpace();
+  }
+
+  function reserveTopSpace() {
+    if (!hasTouch) return;                 // desktop keeps its exact layout
+    // Skip full-viewport apps (canvas games, fixed overlays) — the chip sits
+    // in their letterbox margin and body padding would distort them.
+    var cs = getComputedStyle(d.body);
+    if (cs.overflowY === "hidden" || cs.overflowX === "hidden") return;
+    var scrolls = root.scrollHeight > (window.innerHeight + 4);
+    if (!scrolls) return;
+    var pad = parseFloat(cs.paddingTop) || 0;
+    d.body.style.paddingTop = (pad + 58) + "px";
+  }
+
+  /* ---- Gamepad ------------------------------------------------------------ */
+  function buildPad() {
+    if (!hasTouch) return;                       // keyboard devices skip it
+    if (!cfg.controls || !cfg.controls.length) return;
+    if (d.querySelector(".tsp-pad")) return;
+
+    var pad = d.createElement("div");
+    pad.className = "tsp-pad";
+    var left  = d.createElement("div"); left.className  = "tsp-cluster left";
+    var right = d.createElement("div"); right.className = "tsp-cluster right";
+    pad.appendChild(left); pad.appendChild(right);
+
+    cfg.controls.forEach(function (c) {
+      var btn = d.createElement("button");
+      btn.type = "button";
+      btn.className = "tsp-btn" + (c.big ? " big" : "");
+      btn.innerHTML = c.label || "";
+      btn.setAttribute("aria-label", c.aria || c.label || c.key);
+      bindButton(btn, c);
+      (c.side === "left" ? left : right).appendChild(btn);
+    });
+
+    d.body.appendChild(pad);
+  }
+
+  function bindButton(btn, c) {
+    var key = c.key, held = false;
+
+    function press(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (c.hold) {
+        if (held) return;
+        held = true;
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+      } else {
+        // tap: quick down/up so edge-triggered actions (fire/rotate/drop) fire once
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+        setTimeout(function () { dispatchKey("keyup", key); }, 24);
+        setTimeout(function () { btn.classList.remove("on"); }, 90);
+      }
+    }
+    function release(e) {
+      if (e) e.preventDefault();
+      if (c.hold && held) {
+        held = false;
+        btn.classList.remove("on");
+        dispatchKey("keyup", key);
+      }
+    }
+
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", function (e) {
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+        press(e);
+      });
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointercancel", release);
+      btn.addEventListener("lostpointercapture", release);
+    } else {
+      btn.addEventListener("touchstart", press, { passive: false });
+      btn.addEventListener("touchend", release);
+      btn.addEventListener("touchcancel", release);
+      btn.addEventListener("mousedown", press);
+      btn.addEventListener("mouseup", release);
+      btn.addEventListener("mouseleave", release);
+    }
+    // Safety: releasing a held key if the page loses focus
+    window.addEventListener("blur", release);
+  }
+
+  /* ---- Rotate hint -------------------------------------------------------- */
+  function buildRotateHint() {
+    if (!hasTouch) return;
+    if (cfg.rotateHint === false) return;
+    if (!cfg.controls || !cfg.controls.length) return;   // canvas games only
+    if (d.querySelector(".tsp-rot")) return;
+    var hint = d.createElement("div");
+    hint.className = "tsp-rot";
+    hint.setAttribute("role", "note");
+    hint.innerHTML = '<span class="rk">↻</span>' +
+      '<span>Turn sideways for more room</span>' +
+      '<button type="button" aria-label="Dismiss">×</button>';
+    hint.querySelector("button").addEventListener("click", function () {
+      root.classList.add("tsp-rot-dismissed");
+    });
+    d.body.appendChild(hint);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    injectStyles();
+    buildNav();
+    buildPad();
+    buildRotateHint();
+  }
+
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose a tiny API for pages that want to toggle the pad (e.g. hide on menus)
+  window.TSPMobile = {
+    isTouch: hasTouch,
+    isMobile: isMobile,
+    press: function (key) { dispatchKey("keydown", key); dispatchKey("keyup", key); },
+    showPad: function (v) {
+      var p = d.querySelector(".tsp-pad");
+      if (p) p.style.display = v === false ? "none" : "";
+    }
+  };
+})();
+</script>
+</body>
+</html>
