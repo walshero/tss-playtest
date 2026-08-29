@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<!--
+  EN195 — THE LAST WEEK · a hub. Tight Spiral Productions · walshero@gmail.com
+
+  WHY THIS EXISTS (2026-07-06): the EN195 pieces were loose doors on the index and
+  flash-ballast.html had NO door at all (orphan). This hub is the single room they
+  live in. Each mode is a CARD THAT TURNS — front = the scene, back = what it is and
+  the way in. "Modes feel like own hubs" (founder note) resolved as: one hub, four
+  cards, each its own scene before any text.
+
+  MIGRATED 2026-07-29 to Comfort Kernel v2: legacy 3-stop palette button retired for
+  the reserved chrome header + Studio Eyes panel (Light Default/Dusk/Warm-dark, Text
+  size A/A+/A++, High contrast, Reduce motion, Colorblind cues). Light modes now ride
+  html[data-light]; back+home rail at the bottom. Card 2's generic single-weight
+  geometric glyphs redrawn to Cut-Paper (direction C) for a classroom/game surface.
+
+  FLOOR: single-file, offline, in-memory; comfort never #000/#fff; large type; 44px+
+  targets; keyboard; visible focus; reduced-motion safe; scroll-reset; no emoji;
+  shape+label not color alone; phone-width. Cards are >50% image on face.
+
+  LINKS OUT (opens by filename in the same folder; says so plainly if absent):
+    flash-ballast.html · play-the-semester-flash.html · en195-last-week.html ·
+    workshop-wall.html · review-bench.html
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- This is a hub, not a game: it is scene-forward (each card face is >50% image)
+     but its first paint is chrome + prose, so it is not graded as a game. -->
+<meta name="tsp:surface" content="hub">
+<title>EN195 — The Last Week</title>
+<style>
+/* ---- LIGHT: DAY (default) ---- */
+:root{
+  /* ink/fill split per TOKEN-ROLE law: -ink names carry text, plain names paint. */
+  --paper:#f4efe6; --paper-ink:#f4efe6; --ink:#1a1408; --ink-fill:#1a1408;
+  --accent:#6e4700; --accent-fill:#6e4700; --line:#c9b98f;
+  --card:#faf6ee; --gold:#8a5a00;
+  --teal:#0d5466; --plum:#5a2a52; --rust:#8a3a1c; --slate:#324a5e;
+  --tap:48px;
+}
+/* ---- LIGHT: DUSK (was "softer") ---- */
+html[data-light="dusk"]{
+  --paper:#e6ddc9; --paper-ink:#e6ddc9; --card:#efe7d4; --line:#c2b288;
+}
+/* ---- LIGHT: WARM-DARK (was "warmdark"; warm charcoal, never pure black) ---- */
+html[data-light="night"]{
+  --paper:#241c10; --paper-ink:#241c10; --ink:#f5d9a0; --ink-fill:#f5d9a0;
+  --accent:#f5c869; --accent-fill:#f5c869; --line:#5a4a2a; --card:#2e2416; --gold:#f5c869;
+  --teal:#7fd6e6; --plum:#e3a8d6; --rust:#e8a07c; --slate:#9bb8cc;
+}
+/* ---- TOGGLE: high contrast (still warm, never #000/#fff) ---- */
+html.se-contrast:not([data-light="night"]){
+  --paper:#fefdf9; --paper-ink:#fefdf9; --card:#fefdf9; --ink:#120d05; --ink-fill:#120d05;
+  --accent:#4a3000; --line:#a8905c;
+}
+html.se-contrast[data-light="night"]{
+  --paper:#0e0b06; --paper-ink:#0e0b06; --card:#171009; --ink:#fff3d6; --ink-fill:#fff3d6;
+  --accent:#ffd57a; --line:#6a5730;
+}
+/* ---- TOGGLE: text size A / A+ / A++ (root scales all rem text) ---- */
+html{ font-size:100%; }
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+/* ---- TOGGLE: reduce motion ---- */
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+/* ---- TOGGLE: colorblind cues ---- */
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+*{box-sizing:border-box;}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:1.375rem; line-height:1.55; margin:0 auto; padding:0 16px 44px;
+  max-width:720px;
+  transition:background .18s ease, color .18s ease;
+}
+
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 4px; margin:0 -16px; padding-left:16px; padding-right:16px;
+  background:var(--card); border-bottom:3px solid var(--ink);
+  position:sticky; top:0; z-index:100; }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:44px;
+  padding:8px 14px; border:2px solid var(--gold); border-radius:8px; background:var(--card);
+  color:var(--accent); font-weight:bold; font-size:.9375rem; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent); flex:0 0 auto; }
+.se-brand .wm{ font-size:1rem; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:44px;
+  padding:8px 14px; border:2px solid var(--gold); border-radius:8px; background:var(--ink-fill);
+  color:var(--paper-ink); font-weight:bold; font-size:.9375rem; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:4px solid var(--gold); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+.se-panel{ position:fixed; right:12px; top:64px; z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--card); color:var(--ink);
+  border:3px solid var(--gold); border-radius:12px; padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-size:.8125rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin:0 0 8px; font-weight:bold; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:44px; padding:8px 4px; border:2px solid var(--line); border-radius:8px;
+  background:var(--card); color:var(--ink); font-family:inherit; font-weight:bold; font-size:.875rem; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--ink-fill); color:var(--paper-ink); border-color:var(--ink-fill); }
+.se-btn:focus-visible{ outline:4px solid var(--gold); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:44px; padding:8px 12px; margin-bottom:6px; border:2px solid var(--line); border-radius:8px;
+  background:var(--card); color:var(--ink); font-family:inherit; font-weight:bold; font-size:.9375rem; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--gold); }
+.se-tog .st{ font-size:.8125rem; color:var(--accent); }
+.se-tog[aria-pressed="true"] .st{ color:var(--accent); font-weight:bold; }
+.se-tog:focus-visible{ outline:4px solid var(--gold); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+h1{font-size:2rem; line-height:1.18; margin:18px 0 4px;}
+.tag{font-size:1.25rem; margin:0 0 4px; font-weight:bold; color:var(--accent);}
+.sub{font-size:1.1875rem; margin:0 0 6px;}
+.updated{font-size:.875rem; font-weight:bold; color:var(--accent); margin:0 0 22px;}
+
+/* the grid of turnable cards */
+.grid{ display:flex; flex-direction:column; gap:16px; }
+.card{ display:block; width:100%; text-align:left; background:none; border:none;
+  padding:0; cursor:pointer; color:var(--ink); font-family:inherit; }
+.card:focus-visible{ outline:4px solid var(--gold); outline-offset:3px; }
+.face{ border:3px solid var(--line); border-radius:16px; overflow:hidden;
+  background:var(--card); }
+.card:hover .face, .card.turned .face{ border-color:var(--gold); }
+
+/* SCENE (>50% of the face is image) */
+.scene{ position:relative; height:200px; display:block; }
+.scene svg{ position:absolute; inset:0; width:100%; height:100%; }
+.card .label{ padding:12px 16px 14px; }
+.card .name{ font-size:1.5rem; font-weight:bold; display:block; }
+.card .what{ font-size:1.125rem; display:block; margin-top:2px; line-height:1.4; }
+.card .turn{ font-size:1rem; font-weight:bold; color:var(--accent); margin-top:8px; display:block; }
+
+/* BACK of the card (revealed on turn) */
+.back-panel{ display:none; padding:14px 16px 16px; border-top:2px dashed var(--line); }
+.card.turned .back-panel{ display:block; }
+.back-panel p{ margin:0 0 12px; font-size:1.1875rem; line-height:1.5; }
+.enter{ display:block; text-align:center; background:var(--accent-fill); color:var(--paper-ink);
+  text-decoration:none; font-size:1.25rem; font-weight:bold; min-height:56px;
+  padding:15px; border-radius:12px; }
+.enter:focus-visible{ outline:4px solid var(--gold); outline-offset:3px; }
+.enter:hover{ filter:brightness(1.08); }
+.missing{ font-size:1.0625rem; color:var(--accent); margin-top:8px; display:none; }
+
+.foot,footer{
+  margin-top:36px; padding:18px; border-radius:12px;
+  background:#241c10; color:#f5d9a0; font-size:1.125rem; line-height:1.6;
+}
+.foot a,footer a{color:#f5d9a0; text-decoration:underline;}
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:22px 0 6px; margin-top:22px; border-top:2px solid var(--line); }
+.se-rail a,.se-rail button{ min-height:44px; padding:10px 22px; border:2px solid var(--gold); border-radius:8px;
+  background:var(--card); color:var(--accent); font-family:inherit; font-weight:bold; font-size:1rem; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:4px solid var(--gold); outline-offset:2px; }
+
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important;} }
+@media (max-width:520px){ body{font-size:1.25rem;} h1{font-size:1.75rem;} .scene{height:170px;} }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+
+
+<h1>EN195 — the last week</h1>
+<p class="tag">Creative Writing · Week 6</p>
+<p class="sub">Four ways into the same week. Each card is its own room. Tap a card to see the way in, then walk through.</p>
+<p class="updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v10 <span style="opacity:.75">75e938c</span></span> </span>
+
+<div class="grid" id="grid">
+
+  <!-- CARD 1 — BALLAST (the balloon, the orphan, now with a door) -->
+  <div class="card" tabindex="0" role="button" aria-expanded="false" data-file="flash-ballast.html">
+    <div class="face">
+      <div class="scene" aria-hidden="true">
+        <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="200" fill="var(--card)"/>
+          <line x1="24" y1="176" x2="296" y2="176" stroke="var(--ink)" stroke-width="3"/>
+          <g transform="translate(160 84)">
+            <path d="M0 -56 C34 -56 52 -28 52 0 C52 28 26 46 10 56 L-10 56 C-26 46 -52 28 -52 0 C-52 -28 -34 -56 0 -56 Z" fill="var(--rust)" stroke="var(--ink)" stroke-width="3"/>
+            <path d="M0 -56 C12 -30 12 40 12 56 M0 -56 C-12 -30 -12 40 -12 56" stroke="var(--ink)" stroke-width="2" fill="none" opacity=".5"/>
+            <rect x="-13" y="58" width="26" height="16" rx="3" fill="var(--gold)" stroke="var(--ink)" stroke-width="2.5"/>
+          </g>
+          <rect x="40" y="150" width="26" height="20" rx="3" fill="var(--slate)" stroke="var(--ink)" stroke-width="2"/>
+          <rect x="72" y="156" width="22" height="16" rx="3" fill="var(--slate)" stroke="var(--ink)" stroke-width="2"/>
+          <line x1="200" y1="40" x2="296" y2="40" stroke="var(--gold)" stroke-width="2.5" stroke-dasharray="7 6"/>
+        </svg>
+      </div>
+      <div class="label">
+        <span class="name">Ballast</span>
+        <span class="what">The compression move, made physical. Cut words fall as ballast; the piece rises.</span>
+        <span class="turn">Tap to see the way in &rarr;</span>
+      </div>
+      <div class="back-panel">
+        <p>A bloated draft is roped to a balloon. Tap the words it doesn't need — each one drops to the ground as ballast, and the piece climbs. You win at altitude, not at zero.</p>
+        <a class="enter" href="flash-ballast.html">Walk up to the balloon &rarr;</a>
+        <p class="missing">This game's file isn't here yet. Add flash-ballast.html to this folder.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2 — PLAY THE SEMESTER (glyphs redrawn to Cut-Paper, direction C) -->
+  <div class="card" tabindex="0" role="button" aria-expanded="false" data-file="play-the-semester-flash.html">
+    <div class="face">
+      <div class="scene" aria-hidden="true">
+        <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="200" fill="var(--card)"/>
+          <path d="M0 150 Q80 120 160 150 T320 150" fill="none" stroke="var(--teal)" stroke-width="4"/>
+          <path d="M0 168 Q80 138 160 168 T320 168" fill="none" stroke="var(--teal)" stroke-width="3" opacity=".55"/>
+          <!-- cut-paper circle: offset shadow, solid fill, punched center -->
+          <circle cx="73" cy="73" r="20" fill="var(--line)"/>
+          <circle cx="70" cy="70" r="20" fill="var(--teal)"/>
+          <circle cx="70" cy="70" r="7" fill="var(--card)"/>
+          <!-- cut-paper square -->
+          <rect x="143" y="55" width="38" height="38" rx="4" fill="var(--line)"/>
+          <rect x="140" y="52" width="38" height="38" rx="4" fill="var(--plum)"/>
+          <rect x="152" y="64" width="14" height="14" rx="2" fill="var(--card)"/>
+          <!-- cut-paper triangle -->
+          <path d="M253 53 L275 93 L231 93 Z" fill="var(--line)"/>
+          <path d="M250 50 L272 90 L228 90 Z" fill="var(--gold)"/>
+          <circle cx="250" cy="78" r="5" fill="var(--card)"/>
+          <!-- token marker (kept: already a solid) -->
+          <path d="M160 118 l10 7 v10 l-10 7 -10 -7 v-10 Z" fill="var(--rust)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="label">
+        <span class="name">Play the Semester</span>
+        <span class="what">The flash-fiction unit as one playable run. A score unlocks the genre games.</span>
+        <span class="turn">Tap to see the way in &rarr;</span>
+      </div>
+      <div class="back-panel">
+        <p>One genre, end to end. Report where you landed on the flash piece — the score opens Sandbags and the Review Bench. Nothing is stored; nothing leaves the page.</p>
+        <a class="enter" href="play-the-semester-flash.html">Start the run &rarr;</a>
+        <p class="missing">This file isn't here yet. Add play-the-semester-flash.html to this folder.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3 — WHAT COUNTS NOW -->
+  <div class="card" tabindex="0" role="button" aria-expanded="false" data-file="en195-last-week.html">
+    <div class="face">
+      <div class="scene" aria-hidden="true">
+        <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="200" fill="var(--card)"/>
+          <rect x="30" y="34" width="120" height="18" rx="4" fill="var(--line)" opacity=".7"/>
+          <rect x="30" y="62" width="150" height="18" rx="4" fill="var(--line)" opacity=".5"/>
+          <rect x="30" y="90" width="90" height="18" rx="4" fill="var(--line)" opacity=".35"/>
+          <rect x="30" y="118" width="130" height="18" rx="4" fill="var(--line)" opacity=".25"/>
+          <g transform="translate(214 60)">
+            <rect x="0" y="0" width="80" height="90" rx="8" fill="var(--card)" stroke="var(--gold)" stroke-width="4"/>
+            <path d="M18 46 l14 16 l30 -36" fill="none" stroke="var(--gold)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </div>
+      <div class="label">
+        <span class="name">What Counts Now</span>
+        <span class="what">Six weeks of noise on the board. This week, only some of it counts.</span>
+        <span class="turn">Tap to see the way in &rarr;</span>
+      </div>
+      <div class="back-panel">
+        <p>Everything the course still lists is shouting the same volume. Claim the work you've finished, tell it about your week, and watch the noise drop until you can see what's left.</p>
+        <a class="enter" href="en195-last-week.html">See what counts &rarr;</a>
+        <p class="missing">This file isn't here yet. Add en195-last-week.html to this folder.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 4 — THE WRITING ROOM (paired: wall + bench) -->
+  <div class="card" tabindex="0" role="button" aria-expanded="false" data-file="workshop-wall.html">
+    <div class="face">
+      <div class="scene" aria-hidden="true">
+        <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice">
+          <rect width="320" height="200" fill="var(--card)"/>
+          <rect x="34" y="40" width="70" height="52" rx="3" fill="var(--card)" stroke="var(--slate)" stroke-width="3" transform="rotate(-4 69 66)"/>
+          <rect x="128" y="36" width="70" height="52" rx="3" fill="var(--card)" stroke="var(--slate)" stroke-width="3" transform="rotate(3 163 62)"/>
+          <rect x="222" y="42" width="70" height="52" rx="3" fill="var(--card)" stroke="var(--slate)" stroke-width="3" transform="rotate(-2 257 68)"/>
+          <line x1="44" y1="56" x2="94" y2="56" stroke="var(--ink)" stroke-width="2" opacity=".5"/>
+          <line x1="44" y1="66" x2="88" y2="66" stroke="var(--ink)" stroke-width="2" opacity=".5"/>
+          <path d="M40 140 h240" stroke="var(--plum)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M60 140 v22 M260 140 v22" stroke="var(--plum)" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="label">
+        <span class="name">The Writing Room</span>
+        <span class="what">Where drafts meet readers, and where you sit and really read one.</span>
+        <span class="turn">Tap to see the way in &rarr;</span>
+      </div>
+      <div class="back-panel">
+        <p>Two rooms, one wall. The Workshop Wall is where drafts go up for readers. The Review Bench is where you slow down and read a single piece the way it deserves.</p>
+        <a class="enter" href="workshop-wall.html">Workshop Wall &rarr;</a>
+        <a class="enter" href="review-bench.html" style="margin-top:10px;">Review Bench &rarr;</a>
+        <p class="missing">One or both files aren't here yet: workshop-wall.html, review-bench.html.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="foot">
+Tight Spiral Productions · walshero@gmail.com<br>
+EN195 Creative Writing · offline-capable, accessible-first. The human always has the last touch.
+</footer>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+  var root=document.documentElement, sr=document.getElementById('seSr');
+
+  /* last-updated: computed, not typed */
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+
+  /* STUDIO EYES panel open/close */
+
+  /* turn a card: reveal its back panel */
+  function turn(card){
+    var open=card.classList.contains('turned');
+    document.querySelectorAll('.card.turned').forEach(function(c){
+      c.classList.remove('turned'); c.setAttribute('aria-expanded','false');
+    });
+    if(!open){
+      card.classList.add('turned'); card.setAttribute('aria-expanded','true');
+      var m=card.querySelector('.enter');
+      if(m) m.focus({preventScroll:true});
+      card.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }
+  }
+  document.querySelectorAll('.card').forEach(function(card){
+    card.addEventListener('click',function(e){
+      /* let the actual enter-links work without re-turning */
+      if(e.target.closest('.enter')) return;
+      turn(card);
+    });
+    card.addEventListener('keydown',function(e){
+      if(e.target.closest('.enter')) return;
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); turn(card); }
+    });
+  });
+  window.scrollTo(0,0);
+})();
+</script>
+</body>
+</html>
