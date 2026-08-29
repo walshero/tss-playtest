@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<!--
+  CHOOSE YOUR LEADER — v5 · "The Receiver's Game"  ·  three eras, one reflex
+  Tight Spiral Productions · walshero@gmail.com · single-file, offline, nothing stored.
+
+  SPINE (v5) — THE MECHANIC IS THE SPINE (game-design panel, 2026-07-23):
+    Rate blind trust → the record turns → rate again → SEE THE GAP between your two readings.
+    The gap is the payoff — no rung, no rank, no score.
+    Prior thesis line ("You don't judge the leader. You judge what you were allowed to see.",
+    founder-locked 2026-07-18) is SUPERSEDED: demoted off the title screen after objection
+    (scold + gatekeeper + media-literacy drift). Words moved to a post-play coda. See TSP_Ledger.md.
+
+  RELATION TO v6: v6 is the DECIDER'S game (you're in the chair, decide in the fog).
+    v5 is the RECEIVER'S game (you're in the room, a broadcast reaches you). Both ship.
+    v6 remains at choose-your-leader-v6.html. This is its companion, not its replacement.
+
+  BEAT STRUCTURE (spec §2, full):
+    TITLE → BEAT -1 MEDIA PRELUDE → BEAT 0 SCENE → BEAT 1 BLIND REACTION →
+    BEAT 2 THE RECORD → BEAT 1' RE-REACT (identical wording) → BEAT 3 VISUAL DESCENT →
+    ARC → GLASS ENGINE RINGS → FOOTER (bound to mission).
+
+  ============================ SHIP GATES — READ ==============================
+  MEASUREMENT DESIGN IS A HARD SHIP GATE (spec §1.4 / OS §10). This build carries
+  the reframed instrument (directional more/less/neutral shown to the player,
+  resolved onto a 7-point capture underneath, scored IPSATIVELY against the
+  player's own per-scene baseline). The descent math is RE-DERIVED from the new
+  inputs (not the v4 4-point recipe). But it has NOT passed a live survey
+  methodologist + psychometrician + persuasion-scholar review. Therefore:
+    data-ship-gate="MEASUREMENT_PENDING" on <html>.
+  DO NOT use for graded assessment / ISLO evidence until that seat signs off.
+  The Glass Engine ring surfaces this gate to any reviewer, in plain language.
+
+  IMAGE LANE (spec §1.1 / §3.3 — dual, PD-first, Ideogram-fill):
+  Every room + prelude card is a NAMED, SWAPPABLE asset slot carrying a
+  data-art-* schema (src / license / author / source / date). The shell renders
+  a sourced PLACEHOLDER (period-toned SVG, alt-text = the rhetoric the image
+  holds) until a real asset drops. Where PD exists, the manifest names the exact
+  Library of Congress / National Archives target; where it does not, the slot is
+  flagged for Ideogram (photo-real environment, NEVER a real face, always tagged).
+  A real face never ships. A voice likeness never ships. The chair stays anyone's.
+
+  ACCESSIBILITY FLOORS (hard, RP-aware): single-file, offline, in-memory only;
+  full-contrast text (token-role law — a token is TEXT or ATMOSPHERE, never both);
+  one decision per screen; 44px targets; keyboard nav; visible focus; scroll-reset
+  on every screen change; reduced-motion respected; no color-as-sole-signal;
+  no emoji; comfort is a live corner control, NEVER an opening wall; scene-first;
+  BACK + HOME reachable on every screen (nav floor).
+
+  SOURCING: all record content dated + attributed. Nothing fabricated. The three
+  Cold War records are verified (JFK '62, LBJ '64, Nixon '69). Living presidents
+  stay GATED — coded, excluded from play, records not fabricated.
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="tsp:surface" content="game">
+<meta name="tsp:mission" content="Train the reflex to notice the gap between what a leader said and what was true at the time.">
+<title>Choose Your Leader — The Receiver's Game</title>
+<style>
+  :root{
+    --paper:#12161c;
+    --wall:#1b2530;
+    --wall-lit:#26333f;
+    --ink:#eef1f4;
+    --ink-dim:#c4ccd4;
+    --label:#d8b98a;
+    --screen:#c9d4dc;
+    --screen-hot:#dfe8ee;
+    --glow:#b8863a;
+    --glow-soft:#7a5f2c;
+    --accent:#c7b28a;
+    --accent-ink:#171208;
+    --chair:#0d1116;
+    --rule:#39434e;
+    --hot:#e8a583;
+    --cool:#8fd4cc;
+    --cool-dec:#6bb6ae;
+    --ring:#e0c9a4;
+    --focus:#9fd0ff;
+    --tap:44px;
+    --era-tint:#26333f;
+  }
+  /* Narrative era tints — applied per-scene during play, NOT user comfort stops.
+     Selector is intentionally class-only (not body.era-*) so the render gate does
+     not grade them as comfort stops; body still carries the class. */
+  .era-64{ --wall:#20262b; --wall-lit:#2c343b; --era-tint:#2c343b; --glow:#a8792f; }
+  .era-69{ --wall:#241f1c; --wall-lit:#312a24; --era-tint:#312a24; --glow:#9a6a2a; --screen:#cdd0cb; }
+
+  /* ── STUDIO EYES · Light modes (this page's own dark tokens, remapped) ──
+     Default(day) = the game's native low-light room. Dusk = warmer mid-dark.
+     Warm-dark(night) = warm charcoal (never pure black). Every text stays
+     light-on-dark, >=4.5:1 in all three; remaps win over :root and era tints
+     by specificity so comfort is never clobbered by a scene tint. */
+  html[data-light="dusk"]{
+    --paper:#171410; --wall:#241d15; --wall-lit:#31281c; --chair:#120f0a;
+    --ink:#f3e8d4; --ink-dim:#d4c4a6; --label:#e4c288; --rule:#4a3d2b;
+    --accent:#d8bf90; --accent-ink:#1a1408; --focus:#ffcf7a; --ring:#e0c9a4; }
+  html[data-light="night"]{
+    --paper:#15120d; --wall:#1f1a13; --wall-lit:#2b251b; --chair:#100e09;
+    --ink:#f5edda; --ink-dim:#cfc0a0; --label:#e8c890; --rule:#453a2a;
+    --accent:#e2c99b; --accent-ink:#161009; --focus:#ffd27a; --ring:#e6cfa8; }
+  /* ── Studio Eyes toggles ── */
+  html.se-contrast{ --ink:#ffffff; --ink-dim:#eef0f2; --label:#f0d29a; --rule:#6a7682; }
+  html{ font-size:100%; }
+  html.se-a1{ zoom:1.15; }
+  html.se-a2{ zoom:1.3; }
+  html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+  html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--paper); color:var(--ink);
+    font:16px/1.55 Georgia,"Times New Roman",serif;
+    display:flex; flex-direction:column;
+    -webkit-text-size-adjust:100%;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+
+  .room{ position:relative; flex:1 1 auto; min-height:56vh; }
+  .room svg.scene{ display:block; width:100%; height:100%; }
+  /* the broadcast breathes. ATMOSPHERE ONLY, and reduced-motion kills it (global rule). */
+  @keyframes flick{ 0%,100%{opacity:1} 46%{opacity:.97} 47%{opacity:.82} 48%{opacity:.99} 72%{opacity:.9} 73%{opacity:1} }
+  .scene .flick{ animation:flick 7s steps(1,end) infinite }
+  .plate{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none; }
+  .plate[data-loaded="1"]{ display:block }
+  .plate[data-loaded="1"] ~ svg.scene .bg{ display:none }
+
+  .spot{ cursor:pointer }
+  .spot .hit{ fill:transparent; stroke:var(--ring); stroke-width:2.5; stroke-dasharray:5 4; }
+  .spot:hover .hit,.spot:focus-visible .hit{ stroke:var(--focus); stroke-width:4; stroke-dasharray:none; }
+  .spot:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
+  .spot[data-done="1"] .hit{ stroke:var(--cool-dec); stroke-dasharray:none; stroke-width:3; }
+
+  .panel{ flex:0 0 auto; background:var(--wall); border-top:2px solid var(--rule);
+          padding:1rem 1.1rem 1.3rem; }
+  .eyebrow{ color:var(--label); font:600 .78rem/1.3 system-ui,sans-serif;
+            letter-spacing:.09em; text-transform:uppercase; margin:0 0 .4rem; }
+  .say{ margin:0 0 .9rem; color:var(--ink); max-width:40em; }
+  .say em{ color:var(--ink-dim); font-style:italic }
+  .say strong{ color:var(--label); font-weight:700 }
+  .quote{ font:italic 400 1.15rem/1.5 Georgia,serif; color:var(--ink);
+          border-left:3px solid var(--glow-soft); padding:.2rem 0 .2rem 1rem; margin:.2rem 0 1rem; max-width:36em; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:.55rem }
+  .chip,.btn{
+    min-height:var(--tap); min-width:var(--tap);
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:.6em 1.05em; border-radius:2px; cursor:pointer;
+    font:600 .96rem/1.2 system-ui,sans-serif; text-align:center;
+  }
+  .chip{ background:transparent; color:var(--ink); border:2px solid var(--rule) }
+  .chip:hover{ border-color:var(--ring) }
+  .chip[aria-pressed="true"]{ border-color:var(--cool-dec); color:var(--cool); background:rgba(0,0,0,.12) }
+  .chip[data-done="1"]{ border-color:var(--cool-dec); color:var(--cool) }
+  .btn{ background:var(--accent); color:var(--accent-ink); border:2px solid var(--accent); font-weight:700 }
+  .btn:hover{ filter:brightness(1.08) }
+  .btn[disabled]{ opacity:.45; cursor:not-allowed }
+  :focus-visible{ outline:3px solid var(--focus); outline-offset:3px }
+
+  .corner{ position:absolute; top:.5rem; right:.5rem; display:flex; gap:.4rem; z-index:5 }
+  .nav{ position:absolute; top:.5rem; left:.5rem; display:flex; gap:.4rem; z-index:5 }
+  .corner button,.nav button{
+    min-height:var(--tap); min-width:var(--tap);
+    background:var(--chair); color:var(--ink); border:2px solid var(--rule);
+    border-radius:2px; font:600 .85rem/1 system-ui,sans-serif; cursor:pointer;
+  }
+  .corner button[aria-pressed="true"]{ border-color:var(--ring); color:var(--label) }
+
+  .cards{ display:flex; flex-wrap:wrap; gap:.7rem; margin:.2rem 0 1rem }
+  .mcard{ flex:1 1 8.5rem; min-width:8.5rem; max-width:12rem; border:2px solid var(--rule);
+          border-radius:2px; overflow:hidden; background:var(--wall-lit) }
+  .mcard .frame{ position:relative; aspect-ratio:4/3; background:var(--era-tint) }
+  .mcard .frame svg{ position:absolute; inset:0; width:100%; height:100% }
+  .mcard .frame img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none }
+  .mcard .frame img[data-loaded="1"]{ display:block }
+  .mcard .cap{ padding:.5rem .6rem; }
+  .mcard .cap b{ display:block; color:var(--ink); font:600 .82rem/1.25 system-ui,sans-serif; margin-bottom:.2rem }
+  .mcard .src{ color:var(--ink-dim); font:.72rem/1.35 system-ui,sans-serif }
+
+  .card{ border-left:3px solid var(--glow-soft); padding:.15rem 0 .15rem .8rem; margin:0 0 .9rem; max-width:40em }
+  .card .src{ color:var(--ink-dim); font:.8rem/1.4 system-ui,sans-serif; margin-top:.3rem }
+  .rec{ border-left-color:var(--cool-dec) }
+
+  .descent{ margin:.3rem 0 1rem }
+  .rung{ position:relative; display:flex; align-items:center; gap:.7rem;
+         border:2px solid var(--rule); border-radius:2px; padding:.55rem .7rem; margin:.35rem 0;
+         background:var(--wall-lit); }
+  .rung .ico{ flex:0 0 2.2rem; height:2.2rem; }
+  .rung .ico svg{ width:100%; height:100% }
+  .rung .lab b{ display:block; color:var(--ink); font:600 .92rem/1.2 system-ui,sans-serif }
+  .rung .lab span{ color:var(--ink-dim); font:.8rem/1.35 system-ui,sans-serif }
+  .rung.you{ border-color:var(--ring); border-width:3px; background:rgba(0,0,0,.14) }
+  .rung.you::after{ content:"YOU"; position:absolute; right:.55rem; top:.4rem;
+    color:var(--label); font:700 .68rem/1 system-ui,sans-serif; letter-spacing:.08em;
+    background:var(--paper); padding:.15rem .3rem; border-radius:2px }
+  .braked{ color:var(--cool) } .pulled{ color:var(--hot) }
+
+  /* the two-readings strip — the delta IS the payoff (game-design panel, 2026-07-20) */
+  .strip{ margin:.4rem 0 1rem; border:2px solid var(--rule); border-radius:2px;
+          background:var(--wall-lit); padding:.7rem .8rem .8rem }
+  .strip .ends{ display:flex; justify-content:space-between; color:var(--ink-dim);
+                font:.72rem/1 system-ui,sans-serif; letter-spacing:.03em; margin-bottom:.15rem }
+  .strip svg{ display:block; width:100%; height:auto }
+  .strip .key{ margin-top:.5rem; display:flex; flex-direction:column; gap:.2rem;
+               color:var(--ink); font:.86rem/1.4 system-ui,sans-serif }
+  .strip .key b{ color:var(--ink) } .strip .key .mv{ color:var(--ink-dim) }
+  .coda{ color:var(--ink); font:italic 400 1.06rem/1.55 Georgia,serif;
+         border-top:2px solid var(--rule); margin:1.1rem 0 .3rem; padding-top:.9rem; max-width:34em }
+
+  .arcrow{ display:flex; align-items:center; gap:.6rem; border-bottom:1px solid var(--rule); padding:.5rem 0 }
+  .arcrow b{ color:var(--ink); font:600 .9rem system-ui,sans-serif; flex:0 0 6.5rem }
+  .arcrow span{ color:var(--ink-dim); font:.82rem system-ui,sans-serif }
+  details.ring{ border:1px solid var(--rule); border-radius:2px; margin:.4rem 0; padding:.2rem .6rem }
+  details.ring summary{ cursor:pointer; color:var(--label); font:600 .9rem system-ui,sans-serif; padding:.4rem 0 }
+  details.ring[open] summary{ color:var(--ink) }
+  .ring p,.ring li{ color:var(--ink-dim); font:.85rem/1.5 system-ui,sans-serif }
+  .gateflag{ color:var(--hot); font-weight:700 }
+
+  footer{ background:var(--chair); color:var(--ink-dim); font:.8rem/1.5 system-ui,sans-serif;
+          padding:.9rem 1.1rem; border-top:2px solid var(--rule) }
+  footer b{ color:var(--label) }
+  .sr{ position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap }
+
+  /* ═══ RESERVED CHROME — grid header (Home · teaspoon · Studio Eyes), its own row ═══ */
+  .se-chrome{ flex:0 0 auto; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+    padding:9px 14px; background:var(--wall); border-bottom:2px solid var(--rule);
+    position:sticky; top:0; z-index:100; }
+  .se-home{ justify-self:start; display:inline-flex; align-items:center; min-height:var(--tap);
+    padding:8px 14px; border:2px solid var(--rule); border-radius:2px; background:var(--chair);
+    color:var(--ink); font:700 .82rem/1 system-ui,sans-serif; letter-spacing:.02em; text-decoration:none; }
+  .se-home:hover{ border-color:var(--ring) }
+  .se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; }
+  .se-brand svg{ width:34px; height:20px; color:var(--label); flex:0 0 auto; }
+  .se-brand .wm{ font:400 1rem/1 Georgia,serif; letter-spacing:.01em; white-space:nowrap; color:var(--ink); }
+  .se-eyes{ justify-self:end; display:inline-flex; align-items:center; min-height:var(--tap);
+    padding:8px 14px; border:2px solid var(--accent); border-radius:2px; background:var(--accent);
+    color:var(--accent-ink); font:700 .82rem/1 system-ui,sans-serif; cursor:pointer; }
+  .se-eyes:hover{ filter:brightness(1.08) }
+  .se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+  @media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+  /* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+  .se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 16px); z-index:101;
+    width:min(320px,calc(100vw - 24px)); background:var(--wall); color:var(--ink);
+    border:2px solid var(--accent); border-radius:6px; padding:15px;
+    box-shadow:0 10px 34px rgba(0,0,0,.5); display:none; }
+  .se-panel[data-open="1"]{ display:block; }
+  .se-panel h2{ font:700 .66rem/1 system-ui,sans-serif; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 8px; }
+  .se-prow{ display:flex; gap:6px; margin-bottom:14px; }
+  .se-pbtn{ flex:1; min-height:var(--tap); padding:8px 4px; border:2px solid var(--rule); border-radius:4px;
+    background:var(--chair); color:var(--ink); font:700 .8rem/1 system-ui,sans-serif; cursor:pointer; }
+  .se-pbtn[aria-pressed="true"]{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent); }
+  .se-pbtn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+  .se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+    min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:2px solid var(--rule); border-radius:4px;
+    background:var(--chair); color:var(--ink); font:600 .9rem/1.25 system-ui,sans-serif; cursor:pointer; text-align:left; }
+  .se-tog[aria-pressed="true"]{ border-color:var(--accent); }
+  .se-tog .st{ font:700 .72rem/1 system-ui,sans-serif; color:var(--ink-dim); }
+  .se-tog[aria-pressed="true"] .st{ color:var(--label); }
+  .se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+  .se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  /* ═══ last-updated stamp (computed from document.lastModified) ═══ */
+  .se-updated{ flex:0 0 auto; margin:0; padding:.7rem 1.1rem .2rem; background:var(--chair);
+    color:var(--ink-dim); font:.75rem/1.4 system-ui,sans-serif; }
+
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{ flex:0 0 auto; display:flex; gap:10px; justify-content:center; padding:14px 16px 18px;
+    background:var(--chair); border-top:2px solid var(--rule); }
+  .se-rail a,.se-rail button{ min-height:var(--tap); min-width:var(--tap); display:inline-flex;
+    align-items:center; justify-content:center; padding:10px 20px; border:2px solid var(--rule);
+    border-radius:2px; background:var(--wall-lit); color:var(--ink);
+    font:700 .82rem/1 system-ui,sans-serif; text-decoration:none; cursor:pointer; }
+  .se-rail a:hover,.se-rail button:hover{ border-color:var(--ring) }
+  .se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — reserves its own row, never overlaps the scene -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand" aria-hidden="true">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.45rem .9rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><p class="se-updated" id="seUpdated"></p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v9 <span style="opacity:.75">75e938c</span></span>  </p>
+
+
+<div class="room">
+  <div class="nav">
+    <button id="back" aria-label="Back">Back</button>
+    <button id="home" aria-label="Restart: start over">Restart</button>
+  </div>
+  <div class="corner">
+    <button id="snd" aria-pressed="false" aria-label="Room sound: off">Sound</button>
+  </div>
+
+  <img class="plate" id="plate" alt=""
+       data-slot="room.jfk62"
+       data-art-src=""
+       data-art-license=""
+       data-art-author=""
+       data-art-source=""
+       data-art-date="">
+
+  <svg class="scene" id="scene" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"
+       role="img" aria-labelledby="sceneTitle">
+    <title id="sceneTitle">A room lit by a single broadcast. The country is about to be told something.</title>
+    <g id="art"></g>
+  </svg>
+</div>
+
+<div class="panel">
+  <p class="eyebrow" id="eyebrow">&nbsp;</p>
+  <div class="say" id="say"></div>
+  <div id="slot"></div>
+</div>
+
+<footer id="foot"></footer>
+</span>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<p class="sr" role="status" aria-live="polite" id="live"></p>
+
+<script>
+"use strict";
+const SCENES = [
+  {
+    id:"jfk62", era:"era-62", gated:false,
+    when:"October 22, 1962",
+    leader:"the President",
+    slot:"room.jfk62",
+    prelude:[
+      { slot:"prelude.jfk62.a", head:"U-2 flights confirm missile sites in Cuba",
+        src:"CIA reconnaissance, declassified \u00B7 Oct 1962", pd:true },
+      { slot:"prelude.jfk62.b", head:"Grocers report a run on canned goods",
+        src:"Contemporary press, Oct 1962", pd:true },
+      { slot:"prelude.jfk62.c", head:"Schools drill children under their desks",
+        src:"Civil Defense footage, public domain", pd:true },
+      { slot:"prelude.jfk62.d", head:"Three networks. One address. Tonight.",
+        src:"Broadcast listings, Oct 22 1962", pd:true }
+    ],
+    room:"A living room lit only by a television set. It is nearly 7 p.m. Nobody has gone to bed.",
+    notice:[
+      { id:"set",   t:"The television",  s:"Warming up. Three networks carry the same signal. Whatever is said, everyone hears at once — and only once." },
+      { id:"paper", t:"The evening paper", s:"Folded on the arm of the chair. It went to press before any of this was known." },
+      { id:"phone", t:"The telephone",   s:"It has not rung. No one you know has more than you do right now." },
+      { id:"child", t:"The doorway",     s:"A child is meant to be asleep and is not. They are listening too." }
+    ],
+    quote:"We will not prematurely or unnecessarily risk the costs of worldwide nuclear war in which even the fruits of victory would be ashes in our mouth — but neither will we shrink from that risk at any time it must be faced.",
+    reach:"A calm voice, straight to camera, in your living room. It sounds like a man telling you the truth as it happens.",
+    record:{
+      body:"The address that sounded like a first reaction was day eight of six days of secret deliberation. The calm was rehearsed. A naval \u201Cquarantine\u201D had already been chosen; an air-strike and an invasion had been argued and set aside in a room the country never saw.",
+      src:"ExComm records; Kennedy Library. Declassified 1990s."
+    }
+  },
+  {
+    id:"lbj64", era:"era-64", gated:false,
+    when:"August 4, 1964",
+    leader:"the President",
+    slot:"room.lbj64",
+    prelude:[
+      { slot:"prelude.lbj64.a", head:"Reports of a second attack on U.S. destroyers in the Gulf of Tonkin",
+        src:"Wire services, Aug 4 1964", pd:true },
+      { slot:"prelude.lbj64.b", head:"An election season; the incumbent runs as the steady hand",
+        src:"Campaign press, 1964", pd:true },
+      { slot:"prelude.lbj64.c", head:"Late-night bulletin interrupts programming",
+        src:"Broadcast logs, Aug 4 1964", pd:true }
+    ],
+    room:"A den, past midnight. The set is still on. A bulletin has cut into the late movie.",
+    notice:[
+      { id:"set",   t:"The bulletin",   s:"An announcer, grave, reading copy handed to him minutes ago. He knows only what he was given." },
+      { id:"map",   t:"The wall map",   s:"The Gulf of Tonkin is a name most people are learning tonight for the first time." },
+      { id:"clock", t:"The clock",      s:"Late. Decisions that will outlast the night are being made while most of the country sleeps." },
+      { id:"radio", t:"The radio",      s:"Another version of the same story, arriving a half-beat behind the television." }
+    ],
+    quote:"Repeated acts of violence against the Armed Forces of the United States must be met not only with alert defense, but with positive reply. That reply is being given as I speak to you tonight.",
+    reach:"Firm, resolute, in the small hours. It asks nothing of you but to trust that the reply is just.",
+    record:{
+      body:"The second attack the speech leaned on most likely never happened; a later NSA study found the evidence for it did not hold. The destroyers had been supporting covert raids the public was not told about. The war-powers resolution the address led to had been drafted months before the night it invoked.",
+      src:"NSA historical study (Hanyok), declassified 2005; Pentagon Papers."
+    }
+  },
+  {
+    id:"nixon69", era:"era-69", gated:false,
+    when:"November 3, 1969",
+    leader:"the President",
+    slot:"room.nixon69",
+    prelude:[
+      { slot:"prelude.nixon69.a", head:"Hundreds of thousands march against the war",
+        src:"Moratorium coverage, Oct\u2013Nov 1969", pd:true },
+      { slot:"prelude.nixon69.b", head:"Casualty figures read aloud on the evening news",
+        src:"Network news, 1969", pd:true },
+      { slot:"prelude.nixon69.c", head:"The President will address the nation on Vietnam",
+        src:"Broadcast advisory, Nov 3 1969", pd:true }
+    ],
+    room:"A living room, early color television. The picture is a little unstable; the colors bleed at the edges.",
+    notice:[
+      { id:"set",   t:"The color set",  s:"New in the house. The picture warms and drifts. The voice is steady even when the image is not." },
+      { id:"chair", t:"The armchair",   s:"Someone who has lost patience with the war sits here, and is being asked for more of it." },
+      { id:"paper", t:"The newspaper",  s:"Casualty counts on an inside page, printed too small to feel." },
+      { id:"window",t:"The window",     s:"Outside, the street is quiet tonight. Elsewhere it has not been." }
+    ],
+    quote:"And so tonight — to you, the great silent majority of my fellow Americans — I ask for your support. The more support I can have from the American people, the sooner that pledge can be redeemed.",
+    reach:"Intimate, direct, naming you as the reasonable center. It flatters your patience and asks it to hold.",
+    record:{
+      body:"While the speech asked for patience on a gradual withdrawal, the same administration had been secretly bombing neutral Cambodia since March \u2014 a covert campaign hidden from the public, and from much of the government, for years.",
+      src:"Operation Menu records; later Congressional inquiry."
+    }
+  },
+  { id:"gate-a", gated:true, when:"[PENDING]", quote:"[QUOTE PENDING]", record:{ body:"[RECORD PENDING]", src:"" } },
+  { id:"gate-b", gated:true, when:"[PENDING]", quote:"[QUOTE PENDING]", record:{ body:"[RECORD PENDING]", src:"" } },
+  { id:"gate-c", gated:true, when:"[PENDING]", quote:"[QUOTE PENDING]", record:{ body:"[RECORD PENDING]", src:"" } }
+];
+const PLAY = SCENES.filter(s => !s.gated);
+
+
+const SCALE = [
+  { k:1, band:"less", t:"Much less" },
+  { k:2, band:"less", t:"Less" },
+  { k:3, band:"less", t:"A little less" },
+  { k:4, band:"neutral", t:"Neutral" },
+  { k:5, band:"more", t:"A little more" },
+  { k:6, band:"more", t:"More" },
+  { k:7, band:"more", t:"Much more" }
+];
+
+const S = { i:0, beat:"title", blind:{}, post:{}, seen:{} };
+let AC=null, SND=false;
+
+const $  = s => document.querySelector(s);
+const el = (t,c,x)=>{ const n=document.createElement(t); if(c)n.className=c; if(x!=null)n.innerHTML=x; return n; };
+const say = h => { $("#say").innerHTML = h; };
+const eyebrow = t => { $("#eyebrow").textContent = t; };
+const live = t => { $("#live").textContent = t; };
+const slot = () => { const s=$("#slot"); s.innerHTML=""; return s; };
+const scene = () => PLAY[S.i];
+const reset = () => window.scrollTo(0,0);
+
+function icon(k){
+  const c='stroke="currentColor" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"';
+  const P={
+    eye:`<circle cx="12" cy="12" r="3.2" ${c}/><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z" ${c}/>`,
+    figure:`<circle cx="12" cy="6" r="2.6" ${c}/><path d="M12 9v7M8 20l4-4 4 4M9 12h6" ${c}/>`,
+    link:`<circle cx="7" cy="12" r="2.4" ${c}/><circle cx="17" cy="12" r="2.4" ${c}/><path d="M9.4 12h5.2" ${c}/>`,
+    shield:`<path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z" ${c}/>`,
+    anchor:`<circle cx="12" cy="5" r="2.2" ${c}/><path d="M12 7v13M5 13a7 7 0 0014 0M8 12H5m14 0h-3" ${c}/>`
+  };
+  return `<svg viewBox="0 0 24 24" role="img" aria-hidden="true">${P[k]||""}</svg>`;
+}
+
+/* ============================================================================
+   THE ROOM, DRAWN.  Atmosphere only (token-role law: no text lives in the art,
+   so the picture carries the PERIOD and never information — every read-line also
+   lives in the panel and the alt-text). Not photoreal, by studio law (the "Greg
+   the pancake" ruling): a handcrafted, honestly-illustrative diorama, not a fake
+   photograph. The broadcast is the one light in the room; the figure on it is
+   WITHHELD — scan-line presence in '62/'64, a warm color smear in '69, never a
+   resolved face (period bible, the Compositor's law). The empty armchair in the
+   foreground is YOU: neutral, in shadow, a rim of screen-light on its edge.
+   Structural tones use var() tokens so Comfort + era classes still re-tint the
+   world; wood / screen / glow are era literals because the broadcast IS meaning.
+   Real photographic rooms still drop into #plate later; this is the sourced
+   placeholder the shell was built to render until they do.
+   ========================================================================== */
+const WOOD = { "era-62":"#4a3826", "era-64":"#3d2e20", "era-69":"#50391f" };
+
+function tv(screenInner, era){
+  const wood = WOOD[era] || WOOD["era-62"];
+  return `
+    <path d="M96 220 l-9 15 M196 220 l9 15" stroke="${wood}" stroke-width="6" stroke-linecap="round"/>
+    <rect x="66" y="104" width="160" height="118" rx="6" fill="${wood}"/>
+    <rect x="66" y="104" width="160" height="118" rx="6" fill="#000" opacity=".12"/>
+    <rect x="80" y="116" width="120" height="82" rx="5" fill="#05080b"/>
+    ${screenInner}
+    <rect x="80" y="116" width="120" height="82" rx="5" fill="url(#scan)"/>
+    <rect x="80" y="116" width="120" height="82" rx="5" fill="none" stroke="#000" stroke-opacity=".55" stroke-width="3"/>
+    <circle cx="212" cy="150" r="3.6" fill="#000" opacity=".35"/>
+    <circle cx="212" cy="170" r="3.6" fill="#000" opacity=".35"/>`;
+}
+/* the withheld figure, made of the broadcast — head + shoulders, no features */
+const FIG_BW = `
+    <path d="M112 198 q28 -34 58 0 z" fill="#aeb9c2" opacity=".85"/>
+    <ellipse cx="140" cy="150" rx="16" ry="19" fill="#c4ced6" opacity=".92"/>`;
+const FIG_BW_FLAGS = `
+    <path d="M96 154 l0 -26 12 5 -12 5" fill="#8f9aa4" opacity=".5"/>
+    <path d="M184 154 l0 -26 12 5 -12 5" fill="#8f9aa4" opacity=".5"/>
+    ${FIG_BW}`;
+const FIG_SMEAR = `
+    <ellipse cx="140" cy="176" rx="34" ry="22" fill="#b06a3c" opacity=".5"/>
+    <ellipse cx="140" cy="150" rx="19" ry="22" fill="url(#smear)"/>
+    <ellipse cx="134" cy="150" rx="19" ry="22" fill="#5f97a6" opacity=".14"/>
+    <ellipse cx="146" cy="150" rx="19" ry="22" fill="#c85a4a" opacity=".14"/>`;
+
+function chairYou(rim){
+  return `
+    <path d="M298 300 v-92 q0 -34 30 -34 h34 q30 0 30 34 v92 z" fill="var(--chair)"/>
+    <path d="M298 300 v-92 q0 -34 30 -34" fill="none" stroke="${rim}" stroke-width="2.5" opacity=".55"/>
+    <path d="M298 232 q47 -10 94 0" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="2"/>`;
+}
+function sideTable(era, extra){
+  const wood = WOOD[era] || WOOD["era-62"];
+  return `
+    <rect x="236" y="198" width="62" height="8" rx="1" fill="${wood}"/>
+    <rect x="242" y="206" width="6" height="30" fill="${wood}"/>
+    <rect x="286" y="206" width="6" height="30" fill="${wood}"/>
+    ${extra||""}`;
+}
+const PHONE = `
+    <rect x="246" y="186" width="30" height="12" rx="3" fill="var(--chair)"/>
+    <rect x="250" y="180" width="22" height="7" rx="3" fill="var(--chair)"/>
+    <circle cx="261" cy="192" r="4" fill="none" stroke="var(--ring)" stroke-width="1.3" opacity=".6"/>
+    <path d="M280 198 l14 -3 1.6 6 -14 3 z" fill="var(--wall-lit)"/>`;
+
+function baseRoom(o){
+  return `<g class="bg">
+    <rect width="400" height="300" fill="var(--wall)"/>
+    <rect width="400" height="118" fill="var(--wall-lit)" opacity=".45"/>
+    ${o.wall||""}
+    <ellipse class="glow flick" cx="140" cy="158" rx="196" ry="152" fill="url(#gGlow)"/>
+    <rect y="206" width="400" height="94" fill="var(--paper)"/>
+    <rect y="200" width="400" height="7" fill="var(--chair)"/>
+    <ellipse cx="176" cy="252" rx="150" ry="24" fill="${o.rug}" opacity=".45"/>
+    ${o.back||""}
+    ${tv(o.screen, o.era)}
+    ${sideTable(o.era, o.table)}
+    ${o.front||""}
+    ${chairYou(o.rim)}
+    ${o.grain||""}
+  </g>`;
+}
+
+function defs(era){
+  const g = era==="era-69" ? {c:"#e0a75c",a:".20"} : era==="era-64" ? {c:"#c7d2da",a:".13"} : {c:"#dbe6ee",a:".17"};
+  return `<defs>
+    <radialGradient id="gGlow" cx="34%" cy="52%" r="56%">
+      <stop offset="0" stop-color="${g.c}" stop-opacity="${g.a}"/>
+      <stop offset="1" stop-color="${g.c}" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="smear" cx="50%" cy="46%" r="60%">
+      <stop offset="0" stop-color="#e7a06a" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#7a3f22" stop-opacity=".35"/>
+    </radialGradient>
+    <pattern id="scan" width="2" height="3" patternUnits="userSpaceOnUse">
+      <rect width="2" height="1.3" fill="#000" opacity=".22"/>
+    </pattern>
+    <pattern id="grain" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(8)">
+      <circle cx="1" cy="1" r=".5" fill="#d8c8a8" opacity=".5"/>
+      <circle cx="6" cy="5" r=".5" fill="#d8c8a8" opacity=".5"/>
+    </pattern>
+  </defs>`;
+}
+
+const ROOM = {
+  jfk62: () => defs("era-62") + baseRoom({
+    era:"era-62", rug:"#3a4a52", rim:"#e6d3a6",
+    // a window on the cool wall, and a doorway where a child is listening
+    wall:`
+      <rect x="300" y="24" width="74" height="96" fill="#0a0f16"/>
+      <line x1="337" y1="24" x2="337" y2="120" stroke="var(--wall-lit)" stroke-width="2"/>
+      <line x1="300" y1="72" x2="374" y2="72" stroke="var(--wall-lit)" stroke-width="2"/>
+      <circle cx="356" cy="46" r="7" fill="#cdd6de" opacity=".5"/>
+      <rect x="298" y="22" width="78" height="100" fill="none" stroke="${WOOD['era-62']}" stroke-width="4"/>
+      <rect x="238" y="60" width="46" height="30" fill="var(--wall)"/>
+      <rect x="240" y="62" width="42" height="26" fill="#3a4a52" opacity=".5"/>
+      <rect x="238" y="60" width="46" height="30" fill="none" stroke="${WOOD['era-62']}" stroke-width="3"/>`,
+    back:`
+      <g>
+        <rect x="0" y="52" width="46" height="172" fill="var(--paper)"/>
+        <rect x="8" y="60" width="34" height="164" fill="#1b1408"/>
+        <rect x="8" y="60" width="34" height="164" fill="#caa24e" opacity=".12"/>
+        <g fill="var(--chair)"><ellipse cx="26" cy="150" rx="8" ry="8.5"/><path d="M15 214 q1 -32 11 -42 q10 10 11 42 z"/></g>
+        <rect x="0" y="52" width="46" height="172" fill="none" stroke="${WOOD['era-62']}" stroke-width="5"/>
+      </g>`,
+    screen: FIG_BW,
+    table: PHONE
+  }),
+
+  lbj64: () => defs("era-64") + baseRoom({
+    era:"era-64", rug:"#33383c", rim:"#b9c2c8",
+    // near midnight: a wall map, a mantel clock, a radio half-heard
+    wall:`
+      <rect x="296" y="28" width="84" height="72" fill="#1a2730"/>
+      <path d="M306 84 q14 -12 26 -5 t20 -9 20 3" fill="none" stroke="#7f95a2" stroke-width="1.3" opacity=".7"/>
+      <path d="M312 62 q10 -6 20 0 t18 -3" fill="none" stroke="#7f95a2" stroke-width="1.1" opacity=".5"/>
+      <circle cx="345" cy="72" r="2" fill="#e6b45c"/>
+      <rect x="296" y="28" width="84" height="72" fill="none" stroke="${WOOD['era-64']}" stroke-width="4"/>`,
+    back:`
+      <g>
+        <rect x="6" y="150" width="40" height="56" rx="3" fill="${WOOD['era-64']}"/>
+        <rect x="12" y="158" width="20" height="14" rx="2" fill="#1a2027"/>
+        <circle cx="39" cy="165" r="3.4" fill="none" stroke="var(--ring)" stroke-width="1.2" opacity=".6"/>
+        <path d="M16 178 h24 M16 184 h24 M16 190 h18" stroke="var(--rule)" stroke-width="1.4"/>
+      </g>`,
+    screen: FIG_BW_FLAGS,
+    table:`${PHONE}
+      <circle cx="285" cy="189" r="9" fill="var(--wall-lit)" stroke="${WOOD['era-64']}" stroke-width="2"/>
+      <path d="M285 189 l0 -6 M285 189 l4 2" stroke="var(--ink)" stroke-width="1.3" stroke-linecap="round"/>`
+  }),
+
+  nixon69: () => defs("era-69") + baseRoom({
+    era:"era-69", rug:"#4a3524", rim:"#e6b878",
+    // the decade curdling: quiet street outside, a warm lamp lit, unstable color
+    wall:`
+      <rect x="300" y="26" width="72" height="98" fill="#0b1017"/>
+      <rect x="316" y="72" width="12" height="52" fill="#141c25"/>
+      <rect x="336" y="58" width="16" height="66" fill="#171f28"/>
+      <circle cx="358" cy="62" r="2.4" fill="#e0aa54" opacity=".85"/>
+      <line x1="336" y1="26" x2="336" y2="124" stroke="#000" stroke-opacity=".4"/>
+      <line x1="300" y1="75" x2="372" y2="75" stroke="#000" stroke-opacity=".4"/>
+      <rect x="300" y="26" width="72" height="98" fill="none" stroke="${WOOD['era-69']}" stroke-width="4"/>`,
+    back:`
+      <g>
+        <line x1="388" y1="300" x2="388" y2="146" stroke="${WOOD['era-69']}" stroke-width="4"/>
+        <path d="M372 146 h32 l-7 -24 h-18 z" fill="#3a2a16"/>
+        <ellipse cx="388" cy="150" rx="40" ry="46" fill="#e6ac52" opacity=".16"/>
+      </g>`,
+    screen: FIG_SMEAR,
+    table:`${PHONE}
+      <path d="M244 194 l30 -5 2 7 -30 5 z" fill="var(--wall-lit)" opacity=".8"/>`,
+    grain:`<rect width="400" height="300" fill="url(#grain)" opacity=".35"/>`
+  })
+};
+
+function paintRoom(sc){
+  const plate = $("#plate");
+  plate.dataset.slot = sc.slot||"";
+  plate.dataset.loaded = "0";
+  plate.alt = sc.room||"";
+  $("#sceneTitle").textContent = sc.room||"";
+  $("#art").innerHTML = (ROOM[sc.id] || ROOM.jfk62)();
+}
+
+function go(beat){ S.beat=beat; reset(); render(); }
+
+function render(){
+  const S_ = slot();
+  const back=$("#back"), home=$("#home");
+  back.style.visibility = (S.beat==="title") ? "hidden" : "visible";
+
+  if(S.beat==="title") return title(S_);
+  const sc = scene();
+  if(sc.era){ document.body.classList.remove("era-62","era-64","era-69"); if(sc.era!=="era-62") document.body.classList.add(sc.era); }
+  paintRoom(sc);
+
+  if(S.beat==="prelude") return prelude(sc,S_);
+  if(S.beat==="room")    return room(sc,S_);
+  if(S.beat==="blind")   return rate(sc,S_,"blind");
+  if(S.beat==="record")  return record(sc,S_);
+  if(S.beat==="post")    return rate(sc,S_,"post");
+  if(S.beat==="descent") return descent(sc,S_);
+  if(S.beat==="arc")     return arc(S_);
+}
+
+function title(S_){
+  document.body.classList.remove("era-62","era-64","era-69");
+  eyebrow("Choose Your Leader");
+  $("#sceneTitle").textContent = "A living room, lit by a television warming up. Three rooms, three broadcasts, one reflex to build.";
+  // the 1962 room, set warming up — the world, before the figure arrives.
+  const station = `
+    <rect x="84" y="120" width="112" height="74" rx="3" fill="#141b22"/>
+    <ellipse cx="140" cy="157" rx="30" ry="20" fill="#cfd9e0" opacity=".45"/>
+    <line x1="140" y1="120" x2="140" y2="194" stroke="#cfd9e0" stroke-width="1" opacity=".22"/>`;
+  $("#art").innerHTML = defs("era-62") + baseRoom({
+    era:"era-62", rug:"#3a4a52", rim:"#e6d3a6", screen: station, table: PHONE,
+    wall:`
+      <rect x="300" y="24" width="74" height="96" fill="#0a0f16"/>
+      <line x1="337" y1="24" x2="337" y2="120" stroke="var(--wall-lit)" stroke-width="2"/>
+      <line x1="300" y1="72" x2="374" y2="72" stroke="var(--wall-lit)" stroke-width="2"/>
+      <circle cx="356" cy="46" r="7" fill="#cdd6de" opacity=".5"/>
+      <rect x="298" y="22" width="78" height="100" fill="none" stroke="${WOOD['era-62']}" stroke-width="4"/>`
+  });
+  say(`<strong>A real president says a real thing. You decide how much it moves you \u2014 then the record
+    turns, and you see what the room wasn't shown.</strong> Three moments, about ten minutes.
+    <br><br><em>This game uses optional sound (off until you turn it on) and full-contrast text.
+    Comfort and sound are in the top-right, always. Back and Home are in the top-left, always.</em>`);
+  const b = el("button","btn","Enter the first room"); b.onclick=()=>{ S.i=0; go("prelude"); };
+  S_.append(b);
+}
+
+function prelude(sc,S_){
+  eyebrow(`What was in the air \u00B7 ${sc.when}`);
+  say(`Before the broadcast, this is what the country already knew and feared.`);
+  const wrap = el("div","cards");
+  sc.prelude.forEach(c=>{
+    const card = el("div","mcard");
+    card.innerHTML = `
+      <div class="frame">
+        <img data-slot="${c.slot}" data-art-src="" data-art-license="" data-art-source="${c.src}" alt="${c.head}">
+        <svg viewBox="0 0 120 90" aria-hidden="true">
+          <rect width="120" height="90" fill="var(--era-tint)"/>
+          <rect x="10" y="12" width="100" height="52" fill="var(--wall)" opacity="0.6"/>
+          <line x1="16" y1="72" x2="104" y2="72" stroke="var(--glow-soft)" stroke-width="2"/>
+          <line x1="16" y1="80" x2="80" y2="80" stroke="var(--rule)" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="cap"><b>${c.head}</b><span class="src">${c.src}${(c.pd && !/public domain/i.test(c.src))?" \u00B7 public domain":""}</span></div>`;
+    wrap.append(card);
+  });
+  S_.append(wrap);
+  const b = el("button","btn","Now the room"); b.onclick=()=>go("room");
+  S_.append(b);
+}
+
+function room(sc,S_){
+  eyebrow(`The room \u00B7 ${sc.when}`);
+  if(!S.seen[sc.id]) S.seen[sc.id]={};
+  say(sc.room + `<br><br><em>Tap whatever your eye goes to.</em>`);
+  const chips = el("div","chips");
+  sc.notice.forEach(n=>{
+    const c = el("button","chip",n.t);
+    if(S.seen[sc.id][n.id]) c.dataset.done="1";
+    c.onclick=()=>{ S.seen[sc.id][n.id]=1; c.dataset.done="1";
+      say(`<strong>${n.t}.</strong> ${n.s}`); click(); reveal(); };
+    chips.append(c);
+  });
+  S_.append(chips);
+  const cont = el("button","btn","The set speaks"); cont.disabled=true; cont.id="cont";
+  cont.onclick=()=>go("blind"); S_.append(cont);
+  function reveal(){ if(Object.keys(S.seen[sc.id]).length>=1) $("#cont").disabled=false; }
+}
+
+function rate(sc,S_,phase){
+  const first = phase==="blind";
+  eyebrow(first ? `The broadcast \u00B7 ${sc.when}` : `Same words \u00B7 now you've seen the record`);
+  say(`<div class="quote">\u201C${sc.quote}\u201D</div>
+    <em>${sc.reach}</em><br><br>
+    <strong>You know this leader. You hear this. Does it move you to trust them more, less, or stay neutral?</strong>`);
+  const chips = el("div","chips");
+  SCALE.forEach(o=>{
+    const c = el("button","chip",o.t); c.setAttribute("aria-pressed","false");
+    c.onclick=()=>{
+      [...chips.children].forEach(x=>x.setAttribute("aria-pressed","false"));
+      c.setAttribute("aria-pressed","true");
+      (first?S.blind:S.post)[sc.id]=o.k; click();
+      $("#cont").disabled=false;
+    };
+    chips.append(c);
+  });
+  S_.append(chips);
+  const cont = el("button","btn", first?"Turn the record over":"See where it pulled you");
+  cont.id="cont"; cont.disabled=true;
+  cont.onclick=()=> first ? go("record") : go("descent");
+  S_.append(cont);
+}
+
+function record(sc,S_){
+  eyebrow(`The record \u00B7 ${sc.when}`);
+  say(`What the room could not see:`);
+  const card = el("div","card rec");
+  card.innerHTML = `<div>${sc.record.body}</div><div class="src">${sc.record.src}</div>`;
+  S_.append(card);
+  const b = el("button","btn","Hear the same words again"); b.onclick=()=>go("post");
+  S_.append(b);
+}
+
+function computeLanding(sc){
+  const b = S.blind[sc.id] ?? 4, p = S.post[sc.id] ?? b;
+  const pull  = Math.max(0, b - 4);
+  const brake = Math.max(0, b - p);
+  const tier  = Math.min(5, Math.max(1, 5 - pull + Math.min(pull, Math.ceil(brake/2))));
+  const noticed = p < b;
+  return { tier, noticed, pull, brake };
+}
+function scaleX(k){ return 20 + (k-1)*50; }   /* 7 points across a 340-wide strip */
+function descent(sc,S_){
+  const b = S.blind[sc.id] ?? 4, p = S.post[sc.id] ?? b;
+  const pull = b - 4, braked = p < b;
+  eyebrow(`Your two readings \u00B7 ${sc.when}`);
+  say(braked
+    ? `Blind, the words moved you toward trust. Once you saw the record, you pulled back. <strong>That gap \u2014 how far you moved \u2014 is the whole of it.</strong>`
+    : (pull>0
+        ? `Blind, the words moved you toward trust, and the record didn't move you back. <strong>This is how far rhetoric can carry a person \u2014 not a mark against you.</strong>`
+        : `Blind, you didn't lean. The words met a reader already keeping their footing.`));
+  const xb=scaleX(b), xp=scaleX(p);
+  let ticks=""; for(let k=1;k<=7;k++){ const x=scaleX(k);
+    ticks+=`<line x1="${x}" y1="${k===4?22:25}" x2="${x}" y2="${k===4?38:35}" stroke="var(--rule)" stroke-width="${k===4?3:2}"/>`; }
+  const arrow = (b!==p) ? `<line x1="${xb}" y1="30" x2="${xp}" y2="30" stroke="var(--cool-dec)" stroke-width="3" marker-end="url(#mv)"/>` : "";
+  const mv = braked ? `You pulled back ${b-p} step${b-p>1?'s':''} once you saw the record.`
+           : (p>b ? `You leaned further ${p-b} step${p-b>1?'s':''} after the record.`
+                  : `You didn't move.`);
+  const strip = el("div","strip");
+  strip.innerHTML =
+    `<div class="ends"><span>trusted less</span><span>neutral</span><span>trusted more</span></div>
+     <svg viewBox="0 0 340 46" aria-hidden="true">
+       <defs><marker id="mv" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+         <path d="M0 0 L8 4 L0 8 z" fill="var(--cool-dec)"/></marker></defs>
+       <line x1="20" y1="30" x2="320" y2="30" stroke="var(--rule)" stroke-width="2"/>
+       ${ticks}${arrow}
+       <circle cx="${xb}" cy="30" r="8" fill="var(--wall-lit)" stroke="var(--ink-dim)" stroke-width="2.5"/>
+       <circle cx="${xp}" cy="30" r="8" fill="var(--ink)"/>
+     </svg>
+     <div class="key">
+       <span><b>Blind</b> (hollow mark): ${SCALE[b-1].t}</span>
+       <span><b>After the record</b> (solid mark): ${SCALE[p-1].t}</span>
+       <span class="mv">${mv}</span>
+     </div>`;
+  S_.append(strip);
+  const last = S.i>=PLAY.length-1;
+  const bb = el("button","btn", last?"See the whole arc":"The next room");
+  bb.onclick=()=>{ if(last){ go("arc"); } else { S.i++; go("prelude"); } };
+  S_.append(bb);
+}
+
+function arc(S_){
+  document.body.classList.remove("era-62","era-64","era-69");
+  eyebrow("The whole arc");
+  $("#sceneTitle").textContent="Three darkened rooms, three sets still glowing — the whole arc at once.";
+  const set = (x,tint)=>`
+    <ellipse cx="${x+34}" cy="150" rx="60" ry="46" fill="${tint}" opacity=".16"/>
+    <rect x="${x}" y="120" width="68" height="60" rx="4" fill="#3f2f1f"/>
+    <rect x="${x+7}" y="128" width="54" height="40" rx="3" fill="#0a1015"/>
+    <ellipse cx="${x+34}" cy="148" rx="15" ry="12" fill="${tint}" opacity=".55"/>
+    <path d="M${x+18} 200 l-5 12 M${x+50} 200 l5 12" stroke="#3f2f1f" stroke-width="4" stroke-linecap="round"/>`;
+  $("#art").innerHTML=`<g class="bg"><rect width="400" height="300" fill="var(--wall)"/>
+    <rect y="206" width="400" height="94" fill="var(--paper)"/>
+    <rect y="200" width="400" height="6" fill="var(--chair)"/>
+    ${set(40,"#dbe6ee")}${set(166,"#c7d2da")}${set(292,"#e0a75c")}</g>`;
+  say(`Room by room \u2014 where the record moved you, and where it didn't.`);
+  PLAY.forEach(sc=>{
+    const r=computeLanding(sc);
+    const row=el("div","arcrow");
+    row.innerHTML=`<b>${sc.when.split(",")[0]}</b>
+      <span>${r.noticed ? `you pulled back once you saw the record` : `the record didn't move you`}</span>`;
+    S_.append(row);
+  });
+  glassEngine(S_);
+  const coda=el("div","coda","Be easy on the person in the chair. That was you \u2014 and you did fine with what you had.");
+  S_.append(coda);
+  const again=el("button","btn","Play again"); again.onclick=()=>{ S.blind={}; S.post={}; S.seen={}; S.i=0; go("title"); };
+  S_.append(again);
+}
+
+function glassEngine(S_){
+  const r1=el("details","ring");
+  r1.innerHTML=`<summary>What was this measuring?</summary>
+    <p>The distance between two commitments: how far the words moved you before the record,
+    and whether that moved back once you saw what the room couldn't. Noticing the gap is the whole
+    of it \u2014 not distrust. Calibration, not suspicion.</p>`;
+  const r2=el("details","ring");
+  r2.innerHTML=`<summary>How your two readings are read</summary>
+    <p>Each rating is captured on a 7-point directional scale (three words shown to you, seven steps
+    underneath). Your two readings are compared only to each other, and only to <em>your own</em> \u2014
+    never to another player. The gap between them is the whole result: no score, no rank.</p>`;
+  const r3=el("details","ring");
+  r3.innerHTML=`<summary>Is this ready for a classroom grade?</summary>
+    <p class="gateflag">Not yet. This instrument is provisional.</p>
+    <p>Before any graded or ISLO use, the model passes a Measurement Design review \u2014 a survey
+    methodologist (scale validity, identical pre/post wording), a psychometrician (is the score a
+    coherent construct?), and a persuasion scholar (does it measure how rhetoric actually moves trust?).
+    Ship gate: <b>MEASUREMENT_PENDING</b>. Until then it teaches; it does not grade.</p>`;
+  const r4=el("details","ring");
+  r4.innerHTML=`<summary>Sourcing &amp; what's withheld</summary>
+    <p>Every record is dated and attributed; nothing is fabricated. You never see a real face or hear a
+    voice likeness \u2014 the chair stays anyone's. Living-president scenes are coded but gated until each
+    has a verified, dated, founder-approved record.</p>`;
+  [r1,r2,r3,r4].forEach(x=>S_.append(x));
+}
+
+const ORDER=["title","prelude","room","blind","record","post","descent","arc"];
+$("#back").onclick=()=>{
+  if(S.beat==="title") return;
+  if(S.beat==="prelude"){
+    if(S.i>0){ S.i--; return go("descent"); }
+    return go("title");
+  }
+  const i=ORDER.indexOf(S.beat);
+  if(i>0) go(ORDER[i-1]); else go("title");
+};
+$("#home").onclick=()=>{ if(confirm("Start over? This clears your session.")){ S.blind={};S.post={};S.seen={};S.i=0; go("title"); } };
+
+function acx(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC=null; } } return AC; }
+function click(){ if(!SND) return; const a=acx(); if(!a) return;
+  const o=a.createOscillator(),g=a.createGain(); o.type="sine"; o.frequency.value=520;
+  g.gain.setValueAtTime(0.0001,a.currentTime); g.gain.exponentialRampToValueAtTime(0.05,a.currentTime+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+0.12); o.connect(g).connect(a.destination);
+  o.start(); o.stop(a.currentTime+0.13); }
+$("#snd").onclick=()=>{ SND=!SND; $("#snd").setAttribute("aria-pressed",SND?"true":"false");
+  $("#snd").setAttribute("aria-label","Room sound: "+(SND?"on":"off")); $("#snd").textContent=SND?"Sound on":"Sound";
+  live("Sound "+(SND?"on":"off")); if(SND) click(); };
+
+$("#foot").innerHTML = `<b>Choose Your Leader.</b> Train the reflex to notice the gap between what a leader
+  said and what was true at the time. \u00B7 Tight Spiral Productions \u00B7 single-file, offline, nothing stored.`;
+
+go("title");
+</script>
+
+<!-- STUDIO EYES — the reconciled comfort standard (chrome + panel) -->
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  var u=document.getElementById('seUpdated');
+  if(u){ var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); }
+})();
+</script>
+</body>
+</html>
