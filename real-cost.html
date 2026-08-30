@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Real Cost — the number they show you vs. the one they don't · Tight Spiral Productions</title>
+<meta name="description" content="A quantitative-reasoning game for MassBay students, built for the lives students actually lead — commuting, working, parenting, learning in a second language. Take a small number, guess, then watch it come apart into what it really is over time. You set every number; it only does the arithmetic you tell it. Single-file, offline, contrast-gated.">
+
+<!-- tsp:outcome       MassBay iSLO 2 — Quantitative Skills. Companion to Sticker Price, for the studio's
+                       actual students (part-time, commuter, working, parenting, first-gen, multilingual).
+     tsp:source        Method only — every headline is an EDITABLE EXAMPLE the student sets; the page just
+                       multiplies, divides, and adds what you tell it. No number is asserted as a market fact.
+                       Measured on AAC&U Quantitative Literacy VALUE (Interpretation · Calculation · Assumptions
+                       · Communication). No MassBay-normed QL rubric yet — criteria are suite-proposed.
+     tsp:last-verified 2026-07-30
+     tsp:dignity        Resources, time, and effort are ASSETS. Money/struggle never appears as a deficit on
+                        screen one. The NUMBER does the work in every reading — never "you." A starting point
+                        is never a verdict.
+     tsp:engine         cost-decomposition bar + predict-then-reveal, reused from sticker-price.html.
+     tsp:floor          single-file · offline · zero external hosts · contrast-gated 4.5:1 · no emoji · token-role law
+     THIS PAGE MAKES NO NETWORK CALLS. Everything you type stays in the page. Nothing is collected. -->
+
+<style>
+:root{
+  --paper:#fbfaf7; --paper-2:#f1eee6; --rule:#d8d2c4;
+  --ink:#14181d; --ink-2:#3d4652; --ink-3:#5c6675;
+  --brass-ink:#6a4d12; --brass-fill:#d9a441;
+  --cool-ink:#274063; --cool-fill:#c3d2e6;
+  --live-ink:#1d5c3f; --warn-ink:#8a2f22;
+  --slab:#12161b; --slab-ink:#f4f1e8;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+/* ══ TSP COMFORT KERNEL — Studio Eyes light ladder + comfort toggles (mounted 2026-08-02) ══ */
+:root{ --cool-line:#274063; --ink-line:#14181d; }
+html[data-light="dusk"]{
+  --paper:#e9ddc2; --paper-2:#ddceac; --rule:#c9b58a;
+  --ink:#171009; --ink-2:#352b1a; --ink-3:#4b4534;
+  --brass-ink:#5a3f0e; --cool-ink:#22384f; --cool-line:#22384f;
+  --live-ink:#184c33; --warn-ink:#7a281c; --ink-line:#2a2213;
+}
+html[data-light="night"]{ /* warm charcoal, never pure black */
+  --paper:#1b1814; --paper-2:#262019; --rule:#463f30;
+  --ink:#f3e7cb; --ink-2:#d9c9a2; --ink-3:#b8a887;
+  --brass-ink:#e0b25a; --cool-ink:#9fb6d0; --cool-line:#9fb6d0;
+  --cool-fill:#2c3f52; --brass-fill:#5c4514;
+  --live-ink:#7fc79e; --warn-ink:#e8967f; --ink-line:#5a4f3a;
+  --slab:#0f0d0a; --slab-ink:#f3e7cb;
+}
+:root{ --surface:var(--paper); --surface-2:var(--paper-2); --accent-strong:#1e3350; --on-accent:#ffffff; --focus:#8a3a1c; --tap:48px; }
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+html.se-contrast:not([data-light="night"]){ --paper:#ffffff; --paper-2:#f2ece0; --ink:#0e1114; --ink-2:#242c34; --ink-3:#3c434c; --rule:#b7ab92; }
+html.se-contrast[data-light="night"]{ --paper:#0c0b09; --paper-2:#17140f; --ink:#fff7e6; --ink-2:#ecdcb6; --ink-3:#cdbd97; }
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+/* ═══ RESERVED CHROME + STUDIO EYES ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--ink-line); position:sticky; top:0; z-index:100; }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap); padding:8px 12px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--cool-ink); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; color:var(--ink); }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap); padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-strong); color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 14px); z-index:101; width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink); border:2px solid var(--accent-strong); border-radius:10px; padding:15px; box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 8px; }
+.se-prow{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent-strong); color:var(--on-accent); border-color:var(--accent-strong); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px; min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent-strong); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--cool-ink); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sronly{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--rule); background:var(--surface); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased}
+.wrap{max-width:760px; margin:0 auto; padding:0 22px 90px}
+
+.topnav{position:sticky; top:0; z-index:50; background:var(--paper); border-bottom:1.5px solid var(--rule)}
+.topnav-in{max-width:760px; margin:0 auto; padding:9px 22px; display:flex; align-items:center; gap:10px}
+.topnav a{display:inline-flex; align-items:center; gap:.35em; text-decoration:none; font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); padding:.42em .8em; border:1.5px solid var(--rule); border-radius:999px; background:var(--paper-2); transition:border-color .12s,color .12s}
+.topnav a:hover{border-color:var(--cool-ink); color:var(--ink)}
+.topnav a:focus-visible{outline:3px solid var(--cool-ink); outline-offset:2px}
+.topnav-mark{margin-left:auto; font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+@media (max-width:520px){ .topnav-mark{display:none} }
+
+.stage{padding:44px 0 26px; border-bottom:2px solid var(--ink)}
+.mark{font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--brass-ink); font-weight:700; margin:0 0 16px}
+h1{font-family:var(--serif); font-size:clamp(30px,6vw,50px); line-height:1.06; margin:0 0 16px; letter-spacing:-.015em; font-weight:400}
+h1 em{font-style:italic; color:var(--cool-ink)}
+.lede{font-size:clamp(17px,2.4vw,20px); line-height:1.5; color:var(--ink-2); margin:0 0 12px}
+.lede b{color:var(--ink); font-weight:600}
+.tag{font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin:20px 0 0}
+.hero-mark{display:block; width:clamp(120px,30vw,180px); height:auto; color:var(--brass-ink); margin:22px 0 4px}
+
+.rail{display:flex; gap:8px; margin:26px 0 0; flex-wrap:wrap}
+.rail button{flex:1 1 150px; text-align:left; cursor:pointer; background:var(--paper-2); color:var(--ink-2); border:1.5px solid var(--rule); border-top-width:5px; border-radius:3px; padding:10px 12px 11px; font-family:var(--sans); transition:border-color .12s, color .12s}
+.rail button .rn{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-bottom:3px}
+.rail button .rt{display:block; font-family:var(--serif); font-size:15.5px; line-height:1.15; color:var(--ink)}
+.rail button:hover{border-color:var(--acc,var(--cool-ink))}
+.rail button:focus-visible{outline:3px solid var(--cool-ink); outline-offset:2px}
+.rail button[aria-current="true"]{border-color:var(--acc,var(--cool-ink)); color:var(--ink); background:var(--paper)}
+.rail button[data-done="1"] .rn::after{content:" · read"; color:var(--live-ink)}
+
+.case{padding:34px 0 0}
+.case[hidden]{display:none}
+.kicker{font-family:var(--mono); font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:var(--acc-ink,var(--brass-ink)); font-weight:700; margin:0 0 8px}
+.case h2{font-family:var(--serif); font-size:clamp(24px,4.2vw,32px); font-weight:400; line-height:1.12; margin:0 0 10px}
+.case .intro{font-size:16px; color:var(--ink-2); line-height:1.55; margin:0 0 22px; max-width:60ch}
+.case .intro b{color:var(--ink)}
+
+.headline{border:2px solid var(--acc,var(--rule)); border-radius:4px; background:var(--paper-2); padding:20px 22px; margin:0 0 22px; display:flex; gap:18px; align-items:center; justify-content:space-between}
+.headline .hl-txt{min-width:0}
+.hl-glyph{width:66px; height:66px; color:var(--acc-ink,var(--brass-ink)); flex:0 0 auto}
+@media (max-width:520px){ .hl-glyph{width:48px; height:48px} }
+.headline .hl-lab{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin:0 0 6px}
+.headline .hl-num{font-family:var(--serif); font-size:clamp(38px,10vw,68px); line-height:1; color:var(--ink); font-weight:400; letter-spacing:-.02em}
+.headline .hl-sub{font-size:14px; color:var(--ink-2); margin:10px 0 0; line-height:1.5}
+
+.ctl{margin:0 0 18px}
+.ctl-q{font-size:16px; color:var(--ink); font-weight:600; margin:0 0 3px}
+.ctl-w{font-size:14px; color:var(--ink-3); line-height:1.5; margin:0 0 10px; max-width:58ch}
+.row{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+input[type=range]{flex:1 1 220px; accent-color:var(--cool-ink); height:26px}
+.read{font-family:var(--mono); font-size:20px; font-weight:700; color:var(--ink); min-width:5ch}
+
+.predict{border-left:5px solid var(--brass-ink); background:var(--paper-2); border-radius:2px; padding:16px 18px; margin:6px 0 20px}
+.predict .pq{font-size:15.5px; color:var(--ink); font-weight:600; margin:0 0 10px}
+.predict .pq b{color:var(--brass-ink)}
+.numin{font-family:var(--mono); font-size:18px; padding:9px 12px; border:1.5px solid var(--rule); border-radius:2px; background:var(--paper); color:var(--ink); width:150px}
+.numin:focus-visible{outline:3px solid var(--cool-ink); outline-offset:1px; border-color:var(--ink)}
+.btn{font-family:var(--sans); font-size:16px; font-weight:600; padding:11px 20px; background:var(--slab); color:var(--slab-ink); border:0; border-radius:2px; cursor:pointer}
+.btn:hover{background:#232b35}
+.btn:focus-visible{outline:3px solid var(--cool-ink); outline-offset:3px}
+.btn.ghost{background:var(--paper); color:var(--ink); border:1.5px solid var(--rule)}
+.btn.ghost:hover{border-color:var(--ink); background:var(--paper-2)}
+
+.reveal[hidden]{display:none}
+.bar-lab{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin:20px 0 8px}
+.bar{display:flex; height:52px; border:1.5px solid var(--ink); border-radius:3px; overflow:hidden; background:var(--paper)}
+.seg{display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; transition:flex-basis .35s ease; min-width:0}
+.seg.s-base{background:var(--cool-fill)}
+.seg.s-extra{background:var(--brass-fill)}
+.seg.s-quiet{background:var(--paper-2); color:var(--ink-2)}
+.bar-key{display:flex; flex-wrap:wrap; gap:16px; margin:9px 0 0; font-size:13px; color:var(--ink-2)}
+.bar-key span{display:inline-flex; align-items:center; gap:7px}
+.sw{width:13px; height:13px; border-radius:2px; border:1px solid var(--ink)}
+.sw-base{background:var(--cool-fill)} .sw-extra{background:var(--brass-fill)} .sw-quiet{background:var(--paper-2)}
+
+.reading{border:2px solid var(--acc,var(--rule)); border-radius:4px; padding:18px 20px; margin:20px 0 0; background:var(--paper)}
+.reading .rh{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--acc-ink,var(--brass-ink)); font-weight:700; margin:0 0 8px}
+.reading .rb{font-size:17px; color:var(--ink); line-height:1.55; margin:0}
+.reading .rb b{color:var(--ink)} .reading .rb .big{font-family:var(--serif); font-size:21px}
+
+.hides{margin:16px 0 0; padding:15px 17px; border-left:5px solid var(--live-ink); background:var(--paper-2); border-radius:2px}
+.hides .hh{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--live-ink); font-weight:700; margin:0 0 6px}
+.hides p{margin:0; font-size:15px; color:var(--ink-2); line-height:1.55} .hides p b{color:var(--ink)}
+.say{margin:16px 0 0; padding:15px 17px; border:1.5px dashed var(--rule); border-radius:2px; background:var(--paper)}
+.say .sh{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--cool-ink); font-weight:700; margin:0 0 6px}
+.say p{margin:0; font-size:16px; color:var(--ink); line-height:1.5; font-style:italic; font-family:var(--serif)}
+.dim{margin:18px 0 0; font-family:var(--mono); font-size:11.5px; letter-spacing:.04em; color:var(--ink-3); line-height:1.6}
+.dim b{color:var(--brass-ink)}
+.nav-row{display:flex; justify-content:space-between; gap:12px; margin:30px 0 0; padding-top:20px; border-top:1.5px solid var(--rule)}
+
+.close{padding:34px 0 0}
+.close[hidden]{display:none}
+.close h2{font-family:var(--serif); font-size:clamp(24px,4.6vw,34px); font-weight:400; margin:0 0 12px}
+.close .lede{max-width:62ch}
+.summary{border:2px solid var(--rule); border-radius:4px; overflow:hidden; margin:22px 0 0}
+.sumrow{display:flex; gap:14px; padding:14px 18px; border-top:1.5px solid var(--rule); align-items:baseline}
+.sumrow:first-child{border-top:0}
+.sumrow .sn{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); flex:0 0 128px}
+.sumrow .sv{font-size:15.5px; color:var(--ink); line-height:1.5} .sumrow .sv b{font-family:var(--serif)}
+
+.slab{background:var(--slab); color:var(--slab-ink); margin:30px 0 0; padding:26px 22px; border-radius:4px}
+.slab h3{font-family:var(--mono); font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:var(--brass-fill); font-weight:700; margin:0 0 12px}
+.slab p{margin:0; font-size:15px; color:#cdd4dd; line-height:1.6} .slab b{color:var(--slab-ink)}
+
+.src{margin-top:34px; padding-top:18px; border-top:1.5px solid var(--rule); font-size:13px; color:var(--ink-3); line-height:1.6}
+.src b{color:var(--ink-2)}
+footer{margin-top:22px; font-size:14px; color:var(--ink-3)}
+footer a{color:var(--cool-ink); font-weight:600}
+
+.case[data-acc="1"], .rail button[data-acc="1"]{--acc:#2f4a5c; --acc-ink:#2f4a5c}
+.case[data-acc="2"], .rail button[data-acc="2"]{--acc:#5a3a6e; --acc-ink:#563369}
+.case[data-acc="3"], .rail button[data-acc="3"]{--acc:#274063; --acc-ink:#274063}
+.case[data-acc="4"], .rail button[data-acc="4"]{--acc:#6a4d12; --acc-ink:#6a4d12}
+
+@media (prefers-reduced-motion:reduce){*{transition:none}}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+/* night-accents restated (dark accents -> light on the night ground) */
+html[data-light="night"] .case[data-acc="1"], html[data-light="night"] .rail button[data-acc="1"]{--acc:#9fb6d0; --acc-ink:#9fb6d0}
+html[data-light="night"] .case[data-acc="2"], html[data-light="night"] .rail button[data-acc="2"]{--acc:#c3a0d8; --acc-ink:#c3a0d8}
+html[data-light="night"] .case[data-acc="3"], html[data-light="night"] .rail button[data-acc="3"]{--acc:#9fb6d0; --acc-ink:#9fb6d0}
+html[data-light="night"] .case[data-acc="4"], html[data-light="night"] .rail button[data-acc="4"]{--acc:#e0b25a; --acc-ink:#e0b25a}
+/* night: slab heading uses a fill token as text; force a bright brass ink on the always-dark slab */
+html[data-light="night"] .slab h3{ color:#e0b25a; }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes. Reserves its own row; never overlaps. -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.45rem .9rem 0;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v3 <span style="opacity:.75">d25ebb4</span></span> </span></p>
+
+<main class="wrap">
+
+<div class="stage">
+  <p class="mark">Tight Spiral Productions · MassBay iSLO 2 — Quantitative Skills</p>
+  <h1>Real cost — <em>the small number, at the size of a whole semester.</em></h1>
+  <p class="lede">A trip, an hour, a book, a bill. Each one looks small on the day. <b>Multiply it by a real
+    life</b> — commuting, working, parenting, learning in a second language — and it becomes something you can
+    actually plan around.</p>
+  <p class="lede"><b>You set every number.</b> The page only multiplies, divides, and adds what you tell it —
+    no claim about anyone's prices, and no verdict about you. Guess first, then watch it come apart.</p>
+  <p class="tag">Guess · Do the arithmetic · See what it hid · Say it plainly</p>
+
+  <svg class="hero-mark" viewBox="0 0 120 64" aria-hidden="true">
+    <line x1="12" y1="52" x2="108" y2="52" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+    <rect x="18" y="44" width="12" height="8" fill="none" stroke="currentColor" stroke-width="2.2"/>
+    <rect x="36" y="36" width="12" height="16" fill="none" stroke="currentColor" stroke-width="2.2"/>
+    <rect x="54" y="26" width="12" height="26" fill="none" stroke="currentColor" stroke-width="2.2"/>
+    <rect x="72" y="16" width="12" height="36" fill="currentColor"/>
+    <path d="M20 34 l16 -6 l18 -8 l18 -8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 4"/>
+    <circle cx="96" cy="18" r="3.5" fill="currentColor"/>
+  </svg>
+</div>
+
+<div class="rail" id="rail" role="tablist" aria-label="Four numbers">
+  <button data-acc="1" data-go="0" role="tab" aria-current="true"><span class="rn">One</span><span class="rt">The Commute</span></button>
+  <button data-acc="2" data-go="1" role="tab" aria-current="false"><span class="rn">Two</span><span class="rt">The Hours</span></button>
+  <button data-acc="3" data-go="2" role="tab" aria-current="false"><span class="rn">Three</span><span class="rt">The Book</span></button>
+  <button data-acc="4" data-go="3" role="tab" aria-current="false"><span class="rn">Four</span><span class="rt">The Whole Bill</span></button>
+</div>
+
+<!-- CASE 1 — THE COMMUTE -->
+<section class="case" data-acc="1" id="case-0">
+  <p class="kicker">Number one · showing up</p>
+  <h2>The Commute</h2>
+  <p class="intro">Getting to campus costs a little each day. That "little," times every time you show up, is
+    a number worth seeing whole — because it's the cost of <b>consistency</b>, and you're already paying it.</p>
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">One round trip to campus (your example)</p>
+      <div class="hl-num" id="c0-head">$8.00</div>
+      <p class="hl-sub">Gas + parking, or a transit fare — set it to yours.</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="28" width="34" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M44 32 h8 l6 8 v4 h-14 z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><circle cx="20" cy="46" r="4" fill="currentColor"/><circle cx="48" cy="46" r="4" fill="currentColor"/></svg>
+  </div>
+  <div class="ctl"><p class="ctl-q">Cost per round trip</p><div class="row"><input type="range" id="c0-trip" min="0" max="40" step="0.5" value="8" aria-label="Cost per round trip"><span class="read" id="c0-trip-r">$8.00</span></div></div>
+  <div class="ctl"><p class="ctl-q">Class meetings you travel to per week</p><div class="row"><input type="range" id="c0-meet" min="1" max="7" step="1" value="3" aria-label="Meetings per week"><span class="read" id="c0-meet-r">3</span></div></div>
+  <div class="ctl"><p class="ctl-q">Weeks you're counting</p><p class="ctl-w">15 is one semester. Slide to 60 to see a two-year degree.</p><div class="row"><input type="range" id="c0-wk" min="1" max="120" step="1" value="15" aria-label="Weeks"><span class="read" id="c0-wk-r">15</span></div></div>
+  <div class="predict">
+    <p class="pq">Before the arithmetic — <b>what does showing up add to over that time?</b></p>
+    <div class="row"><input class="numin" type="number" id="c0-guess" inputmode="decimal" min="0" placeholder="$ total" aria-label="Your guess"><button class="btn" id="c0-show">Show me the total</button></div>
+  </div>
+  <div class="reveal" id="c0-reveal" hidden>
+    <p class="bar-lab">One trip vs. every other trip you make</p>
+    <div class="bar" id="c0-bar"><div class="seg s-base" id="c0-b1">one trip</div><div class="seg s-extra" id="c0-b2">all the rest</div></div>
+    <div class="bar-key"><span><i class="sw sw-base"></i>The trip you see today</span><span><i class="sw sw-extra"></i>The trips the day doesn't show</span></div>
+    <div class="reading" id="c0-read"><p class="rh">The reading</p><p class="rb"></p></div>
+    <div class="hides"><p class="hh">What the day hid</p><p id="c0-hides"></p></div>
+    <div class="say"><p class="sh">Say it plainly</p><p id="c0-say"></p></div>
+    <p class="dim">Trains &mdash; <b>Calculation</b> (scale by frequency) &middot; <b>Assumptions</b> (the hidden variable is how often, not how much).</p>
+  </div>
+  <div class="nav-row"><span></span><button class="btn ghost" data-next="1">Next: the hours &rsaquo;</button></div>
+</section>
+
+<!-- CASE 2 — THE HOURS -->
+<section class="case" data-acc="2" id="case-1" hidden>
+  <p class="kicker">Number two · what you're already giving</p>
+  <h2>The Hours</h2>
+  <p class="intro">A course has a price in dollars. It also has a price in <b>hours</b> — most of them the
+    wrap-around no syllabus counts. Here's the whole investment you're already making, and what one hour of it
+    is worth against the credential.</p>
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">Hours one 3-credit course asks of a term (your example)</p>
+      <div class="hl-num" id="c1-head">135</div>
+      <p class="hl-sub">Seat, study, commute, childcare — the real total.</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="22" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 18 V32 L42 38" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="ctl"><p class="ctl-q">Seat + study hours per week</p><div class="row"><input type="range" id="c1-study" min="2" max="15" step="1" value="6" aria-label="Study hours"><span class="read" id="c1-study-r">6</span></div></div>
+  <div class="ctl"><p class="ctl-q">Commute + childcare hours per week</p><p class="ctl-w">The invisible wrap-around — the labor that gets you to the seat.</p><div class="row"><input type="range" id="c1-wrap" min="0" max="15" step="1" value="3" aria-label="Wrap-around hours"><span class="read" id="c1-wrap-r">3</span></div></div>
+  <div class="ctl"><p class="ctl-q">Weeks in the term</p><div class="row"><input type="range" id="c1-wk" min="1" max="20" step="1" value="15" aria-label="Weeks"><span class="read" id="c1-wk-r">15</span></div></div>
+  <div class="ctl"><p class="ctl-q">What finishing this course is worth to you</p><p class="ctl-w">Toward the degree, the job, the transfer — your number, not a market price.</p><div class="row"><input type="range" id="c1-val" min="500" max="20000" step="500" value="3500" aria-label="Value of finishing"><span class="read" id="c1-val-r">$3,500</span></div></div>
+  <div class="predict">
+    <p class="pq">Before the arithmetic — <b>how many total hours does the term ask?</b></p>
+    <div class="row"><input class="numin" type="number" id="c1-guess" inputmode="decimal" min="0" placeholder="hours" aria-label="Your guess"><button class="btn" id="c1-show">Show me the hours</button></div>
+  </div>
+  <div class="reveal" id="c1-reveal" hidden>
+    <p class="bar-lab">The hours, and the half nobody counts</p>
+    <div class="bar" id="c1-bar"><div class="seg s-base" id="c1-b1">seat + study</div><div class="seg s-quiet" id="c1-b2">commute + childcare</div></div>
+    <div class="bar-key"><span><i class="sw sw-base"></i>Hours the syllabus counts</span><span><i class="sw sw-quiet"></i>Wrap-around it never counts</span></div>
+    <div class="reading" id="c1-read"><p class="rh">The reading</p><p class="rb"></p></div>
+    <div class="hides"><p class="hh">What the dollar sticker hid</p><p id="c1-hides"></p></div>
+    <div class="say"><p class="sh">Say it plainly</p><p id="c1-say"></p></div>
+    <p class="dim">Trains &mdash; <b>Interpretation</b> (a course priced in hours) &middot; <b>Communication</b> (name the value of your own time).</p>
+  </div>
+  <div class="nav-row"><button class="btn ghost" data-next="0">&lsaquo; Back: the commute</button><button class="btn ghost" data-next="2">Next: the book &rsaquo;</button></div>
+</section>
+
+<!-- CASE 3 — THE BOOK -->
+<section class="case" data-acc="3" id="case-2" hidden>
+  <p class="kicker">Number three · cost per use</p>
+  <h2>The Book</h2>
+  <p class="intro">The sticker on a textbook is one number. What it actually costs you <b>each time it does its
+    job</b> is another — and the smart path you chose is a number the sticker never shows.</p>
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">A textbook's list price (your example)</p>
+      <div class="hl-num" id="c2-head">$220</div>
+      <p class="hl-sub">Set the sticker, then the path you actually took.</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 14 h26 a6 6 0 0 1 6 6 v30 h-26 a6 6 0 0 0 -6 6 z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/><line x1="20" y1="24" x2="40" y2="24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="20" y1="32" x2="38" y2="32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+  </div>
+  <div class="ctl"><p class="ctl-q">Sticker (new) price</p><div class="row"><input type="range" id="c2-stick" min="0" max="400" step="5" value="220" aria-label="Sticker price"><span class="read" id="c2-stick-r">$220</span></div></div>
+  <div class="ctl"><p class="ctl-q">What your path actually cost</p><p class="ctl-w">Used, rental, OER, or the library reserve — slide to $0 if it was free.</p><div class="row"><input type="range" id="c2-act" min="0" max="400" step="5" value="45" aria-label="Actual price"><span class="read" id="c2-act-r">$45</span></div></div>
+  <div class="ctl"><p class="ctl-q">Times you'll open it this term</p><div class="row"><input type="range" id="c2-open" min="1" max="200" step="1" value="40" aria-label="Times opened"><span class="read" id="c2-open-r">40</span></div></div>
+  <div class="predict">
+    <p class="pq">Before the arithmetic — <b>what does it cost each time you open it?</b></p>
+    <div class="row"><input class="numin" type="number" id="c2-guess" inputmode="decimal" min="0" placeholder="$ / use" aria-label="Your guess"><button class="btn" id="c2-show">Show me cost per use</button></div>
+  </div>
+  <div class="reveal" id="c2-reveal" hidden>
+    <p class="bar-lab">The sticker, and what your resourcefulness kept</p>
+    <div class="bar" id="c2-bar"><div class="seg s-base" id="c2-b1">you paid</div><div class="seg s-quiet" id="c2-b2">you kept</div></div>
+    <div class="bar-key"><span><i class="sw sw-base"></i>What the path actually cost</span><span><i class="sw sw-quiet"></i>What smart sourcing kept in your pocket</span></div>
+    <div class="reading" id="c2-read"><p class="rh">The reading</p><p class="rb"></p></div>
+    <div class="hides"><p class="hh">What the sticker hid</p><p id="c2-hides"></p></div>
+    <div class="say"><p class="sh">Say it plainly</p><p id="c2-say"></p></div>
+    <p class="dim">Trains &mdash; <b>Calculation</b> (cost per use) &middot; <b>Assumptions</b> (re-reading is thoroughness — more uses, lower cost each).</p>
+  </div>
+  <div class="nav-row"><button class="btn ghost" data-next="1">&lsaquo; Back: the hours</button><button class="btn ghost" data-next="3">Next: the whole bill &rsaquo;</button></div>
+</section>
+
+<!-- CASE 4 — THE WHOLE BILL -->
+<section class="case" data-acc="4" id="case-3" hidden>
+  <p class="kicker">Number four · the whole number</p>
+  <h2>The Whole Bill</h2>
+  <p class="intro">A tuition line is rarely the whole number. Fees and materials get added later; aid comes off.
+    Put every piece on screen at once and you see the real total <b>early enough to plan for it</b> — which is
+    the whole point.</p>
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">A course's tuition line (your example)</p>
+      <div class="hl-num" id="c3-head">$1,050</div>
+      <p class="hl-sub">Then the add-ons, then the aid.</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><rect x="16" y="10" width="32" height="44" rx="2" fill="none" stroke="currentColor" stroke-width="2.6"/><line x1="22" y1="20" x2="42" y2="20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="28" x2="42" y2="28" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="22" y1="36" x2="36" y2="36" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M22 46 l4 4 l8 -8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="ctl"><p class="ctl-q">Tuition line you were quoted</p><div class="row"><input type="range" id="c3-tui" min="0" max="5000" step="50" value="1050" aria-label="Tuition"><span class="read" id="c3-tui-r">$1,050</span></div></div>
+  <div class="ctl"><p class="ctl-q">Add-ons nobody names up front</p><p class="ctl-w">Lab fee, materials, course fee.</p><div class="row"><input type="range" id="c3-add" min="0" max="1000" step="10" value="180" aria-label="Add-ons"><span class="read" id="c3-add-r">$180</span></div></div>
+  <div class="ctl"><p class="ctl-q">Aid / scholarship applied to this course</p><div class="row"><input type="range" id="c3-aid" min="0" max="5000" step="50" value="600" aria-label="Aid"><span class="read" id="c3-aid-r">$600</span></div></div>
+  <div class="predict">
+    <p class="pq">Before the arithmetic — <b>what's the real total, before aid?</b></p>
+    <div class="row"><input class="numin" type="number" id="c3-guess" inputmode="decimal" min="0" placeholder="$ total" aria-label="Your guess"><button class="btn" id="c3-show">Show me the whole number</button></div>
+  </div>
+  <div class="reveal" id="c3-reveal" hidden>
+    <p class="bar-lab">The whole number — what you pay, and what aid already covers</p>
+    <div class="bar" id="c3-bar"><div class="seg s-base" id="c3-b1">you pay</div><div class="seg s-quiet" id="c3-b2">aid covers</div></div>
+    <div class="bar-key"><span><i class="sw sw-base"></i>The gap after aid</span><span><i class="sw sw-quiet"></i>Aid, already working for you</span></div>
+    <div class="reading" id="c3-read"><p class="rh">The reading</p><p class="rb"></p></div>
+    <div class="hides"><p class="hh">What the tuition line hid</p><p id="c3-hides"></p></div>
+    <div class="say"><p class="sh">Say it plainly</p><p id="c3-say"></p></div>
+    <p class="dim">Trains &mdash; <b>Assumptions</b> (aid's real denominator is the whole number, not tuition) &middot; <b>Communication</b> (name the total up front).</p>
+  </div>
+  <div class="nav-row"><button class="btn ghost" data-next="2">&lsaquo; Back: the book</button><button class="btn" data-finish="1">See what you read &rsaquo;</button></div>
+</section>
+
+<!-- CLOSE -->
+<section class="close" id="close" hidden>
+  <p class="kicker" style="color:var(--brass-ink)">Your real-cost reading</p>
+  <h2>Four small numbers, four real ones.</h2>
+  <p class="lede">Every one of these was already true about your life — the arithmetic just made it visible and
+    plannable. Change any control and it re-reads: the numbers follow you, not the other way around.</p>
+  <div class="summary" id="summary"></div>
+  <div class="slab">
+    <h3>The one move, four times</h3>
+    <p>Take the number they show you. Ask what it really is — <b>times how often, over how long, out of what
+      whole.</b> The answer is almost never the headline, and seeing it isn't bad news: it's the difference
+      between a surprise and a plan. Your time, your resourcefulness, and the aid already working for you are
+      assets on this ledger — name them, and the whole number stops being scary and starts being yours.</p>
+  </div>
+  <div class="src">
+    <p><b>Method, not market.</b> Every headline on this page is an editable example you set; the page only
+      multiplies, divides, and adds the numbers you give it — it asserts no prices about MassBay or anywhere.
+      <b>Source:</b> your own inputs and simple arithmetic. <b>Last-verified 2026-07-30.</b></p>
+    <p><b>Outcome.</b> Built for MassBay iSLO 2 (Quantitative Skills), for the lives MassBay students actually
+      lead. Measured on the AAC&amp;U Quantitative Literacy VALUE dimensions — Interpretation, Calculation,
+      Assumptions, Communication. No locally-normed MassBay QL rubric exists yet; these criteria are suite-proposed.</p>
+  </div>
+  <footer>
+    <p><a href="islo-hub.html">&lsaquo; the iSLO Suite</a> &nbsp;&middot;&nbsp;
+       <a href="sticker-price.html">Sticker Price</a> &nbsp;&middot;&nbsp;
+       <a href="index.html">studio front door</a> &nbsp;&middot;&nbsp; CC BY-NC-ND 4.0</p>
+  </footer>
+</section>
+
+</main>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <a href="islo-hub.html" aria-label="Back to the iSLO Suite">Back</a>
+  <a href="index.html" aria-label="Home — studio front door">Home</a>
+</nav>
+
+<script>
+/* Studio Eyes — light modes, text size, comfort toggles, computed last-updated */
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  var u=document.getElementById('seUpdated');
+  if(u){ var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); }
+})();
+</script>
+
+
+<script>
+(function(){
+  "use strict";
+  var $=function(id){return document.getElementById(id);};
+  var money=function(n){return "$"+Math.round(n).toLocaleString("en-US");};
+  var money2=function(n){return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});};
+  var num=function(n){return Math.round(n).toLocaleString("en-US");};
+  var last=[null,null,null,null];
+
+  var cases=[$("case-0"),$("case-1"),$("case-2"),$("case-3")];
+  var railBtns=Array.prototype.slice.call(document.querySelectorAll("#rail button"));
+  function show(i){
+    var isClose=(i==="close");
+    cases.forEach(function(c,k){ c.hidden = isClose ? true : (k!==i); });
+    $("close").hidden=!isClose;
+    railBtns.forEach(function(b){ var t=parseInt(b.getAttribute("data-go"),10); b.setAttribute("aria-current",(!isClose&&t===i)?"true":"false"); });
+    if(window.scrollTo) window.scrollTo(0,0);
+  }
+  railBtns.forEach(function(b){ b.addEventListener("click", function(){ show(parseInt(b.getAttribute("data-go"),10)); }); });
+  document.querySelectorAll("[data-next]").forEach(function(b){ b.addEventListener("click", function(){ show(parseInt(b.getAttribute("data-next"),10)); }); });
+  document.querySelectorAll("[data-finish]").forEach(function(b){ b.addEventListener("click", function(){ buildSummary(); show("close"); }); });
+  function markDone(i){ var rb=railBtns[i]; if(rb) rb.setAttribute("data-done","1"); }
+  function setBar(seg,basis){ seg.style.flexBasis=Math.max(0,Math.min(100,basis))+"%"; }
+
+  /* CASE 1 — commute */
+  (function(){
+    var trip=$("c0-trip"),meet=$("c0-meet"),wk=$("c0-wk");
+    function sync(){ $("c0-trip-r").textContent=money2(+trip.value); $("c0-meet-r").textContent=meet.value; $("c0-wk-r").textContent=wk.value; $("c0-head").textContent=money2(+trip.value); }
+    [trip,meet,wk].forEach(function(e){ e.addEventListener("input",sync); }); sync();
+    $("c0-show").addEventListener("click",function(){
+      var t=+trip.value,m=+meet.value,w=+wk.value,trips=m*w,total=t*trips;
+      setBar($("c0-b1"), total>0? t/total*100:0); setBar($("c0-b2"), total>0? (total-t)/total*100:100);
+      $("c0-b1").textContent=""; $("c0-b2").textContent="";
+      var g=parseFloat($("c0-guess").value);
+      var gl=(!isNaN(g)&&g>0)?("You guessed <b>"+money(g)+"</b>. It's <b class='big'>"+money(total)+"</b>. "):("It comes to <b class='big'>"+money(total)+"</b>. ");
+      $("c0-read").querySelector(".rb").innerHTML=gl+"At "+money2(t)+" a trip, showing up <b>"+m+"</b> times a week for <b>"+w+"</b> weeks is <b>"+num(trips)+"</b> trips — the cost of consistency.";
+      var mins=trips*50, hrs=mins/60;
+      $("c0-hides").innerHTML="The hidden variable is <b>how often, not how much</b>. "+money2(t)+" feels like nothing; the "+num(trips)+"-trip denominator is what makes it real. And there's a second cost the money never shows: at ~50 minutes a round trip, that's about <b>"+Math.round(hrs)+" hours</b> — time you've invested getting to the seat.";
+      $("c0-say").textContent="“It's not the "+money2(t)+" — it's the "+money2(t)+" times every time I show up.”";
+      last[0]="The commute: "+money2(t)+"/trip &times; "+num(trips)+" trips = <b>"+money(total)+"</b> (+~"+Math.round(hrs)+" hrs).";
+      $("c0-reveal").hidden=false; markDone(0); $("c0-reveal").scrollIntoView({behavior:"smooth",block:"nearest"});
+    });
+  })();
+
+  /* CASE 2 — hours */
+  (function(){
+    var st=$("c1-study"),wr=$("c1-wrap"),wk=$("c1-wk"),val=$("c1-val");
+    function sync(){ $("c1-study-r").textContent=st.value; $("c1-wrap-r").textContent=wr.value; $("c1-wk-r").textContent=wk.value; $("c1-val-r").textContent=money(+val.value); $("c1-head").textContent=num((+st.value + +wr.value)*+wk.value); }
+    [st,wr,wk,val].forEach(function(e){ e.addEventListener("input",sync); }); sync();
+    $("c1-show").addEventListener("click",function(){
+      var s=+st.value,w=+wr.value,wks=+wk.value,total=(s+w)*wks,studyH=s*wks,wrapH=w*wks;
+      var v=+val.value, perHr=total>0? v/total:0;
+      setBar($("c1-b1"), total>0? studyH/total*100:0); setBar($("c1-b2"), total>0? wrapH/total*100:0);
+      $("c1-b1").textContent=""; $("c1-b2").textContent="";
+      var g=parseFloat($("c1-guess").value);
+      var gl=(!isNaN(g)&&g>0)?("You guessed <b>"+num(g)+"</b>. It's <b class='big'>"+num(total)+" hours</b>. "):("It's <b class='big'>"+num(total)+" hours</b>. ");
+      $("c1-read").querySelector(".rb").innerHTML=gl+"This course runs on <b>"+(s+w)+"</b> hours a week across "+wks+" weeks. Measured against the <b>"+money(v)+"</b> finishing is worth to you, each hour carries about <b>"+money2(perHr)+"</b>.";
+      $("c1-hides").innerHTML="The dollar sticker hid the real denominator — <b>hours, and most of them unpaid</b>: "+num(wrapH)+" of these "+num(total)+" are commute and childcare no syllabus counts. The "+money2(perHr)+"/hour only lands when the course <b>finishes</b>, so the hidden variable is persistence, not the rate.";
+      $("c1-say").textContent="“I'm already putting in the hours — this just shows me what each one is worth.”";
+      last[1]="The hours: "+num(total)+" hrs ("+num(wrapH)+" uncounted) &middot; ~"+money2(perHr)+"/hr.";
+      $("c1-reveal").hidden=false; markDone(1); $("c1-reveal").scrollIntoView({behavior:"smooth",block:"nearest"});
+    });
+  })();
+
+  /* CASE 3 — book */
+  (function(){
+    var stk=$("c2-stick"),act=$("c2-act"),op=$("c2-open");
+    function sync(){ $("c2-stick-r").textContent=money(+stk.value); $("c2-act-r").textContent=money(+act.value); $("c2-open-r").textContent=op.value; $("c2-head").textContent=money(+stk.value); }
+    [stk,act,op].forEach(function(e){ e.addEventListener("input",sync); }); sync();
+    $("c2-show").addEventListener("click",function(){
+      var s=+stk.value,a=Math.min(+act.value,+stk.value),o=+op.value,kept=s-a,cpu=o>0? a/o:0,scpu=o>0? s/o:0;
+      setBar($("c2-b1"), s>0? a/s*100:0); setBar($("c2-b2"), s>0? kept/s*100:0);
+      $("c2-b1").textContent=""; $("c2-b2").textContent="";
+      var g=parseFloat($("c2-guess").value);
+      var gl=(!isNaN(g)&&g>=0)?("You guessed <b>"+money2(g)+"</b>. It's <b class='big'>"+money2(cpu)+"</b> a use. "):("It's <b class='big'>"+money2(cpu)+"</b> each time. ");
+      $("c2-read").querySelector(".rb").innerHTML=gl+"The path you chose cost <b>"+money(a)+"</b>; opened <b>"+o+"</b> times, that's "+money2(cpu)+" each — versus "+money2(scpu)+" at the "+money(s)+" sticker. The <b>"+money(kept)+"</b> difference is what smart sourcing kept.";
+      $("c2-hides").innerHTML="The sticker hid <b>cost per use</b> — the number that matters for a tool you reuse. And re-reading in a second language isn't slower, it's <b>thorough</b>: more opens push the cost-per-use <em>down</em>, so extra passes make each dollar work harder.";
+      $("c2-say").textContent="“I didn't pay "+money(s)+" — I paid about "+money2(cpu)+" each time I actually used it.”";
+      last[2]="The book: "+money(a)+" &divide; "+o+" uses = <b>"+money2(cpu)+"</b>/use ("+money(kept)+" kept).";
+      $("c2-reveal").hidden=false; markDone(2); $("c2-reveal").scrollIntoView({behavior:"smooth",block:"nearest"});
+    });
+  })();
+
+  /* CASE 4 — whole bill */
+  (function(){
+    var tui=$("c3-tui"),add=$("c3-add"),aid=$("c3-aid");
+    function sync(){ $("c3-tui-r").textContent=money(+tui.value); $("c3-add-r").textContent=money(+add.value); $("c3-aid-r").textContent=money(+aid.value); $("c3-head").textContent=money(+tui.value); }
+    [tui,add,aid].forEach(function(e){ e.addEventListener("input",sync); }); sync();
+    $("c3-show").addEventListener("click",function(){
+      var t=+tui.value,a=+add.value,d=+aid.value,whole=t+a,covered=Math.min(d,whole),gap=whole-covered,cov=whole>0? covered/whole*100:0;
+      setBar($("c3-b1"), whole>0? gap/whole*100:0); setBar($("c3-b2"), whole>0? covered/whole*100:0);
+      $("c3-b1").textContent=""; $("c3-b2").textContent="";
+      var g=parseFloat($("c3-guess").value);
+      var gl=(!isNaN(g)&&g>0)?("You guessed <b>"+money(g)+"</b>. The whole number is <b class='big'>"+money(whole)+"</b>. "):("The whole number is <b class='big'>"+money(whole)+"</b>. ");
+      $("c3-read").querySelector(".rb").innerHTML=gl+"The tuition line read "+money(t)+", but once fees and materials are named it's "+money(whole)+". Aid already covers <b>"+money(covered)+"</b> — about <b>"+Math.round(cov)+"%</b> — leaving a <b>"+money(gap)+"</b> gap you can now see in time to plan for.";
+      $("c3-hides").innerHTML="A tuition quote hid the <b>add-ons</b> ("+money(a)+") and the real denominator aid is measured against: aid covers "+Math.round(cov)+"% of the <b>whole number</b>, not of tuition alone. Naming every piece turns a later surprise into an early, plannable figure.";
+      $("c3-say").textContent="“Now I know the real total up front — not the half of it they printed first.”";
+      last[3]="The bill: "+money(whole)+" whole &minus; "+money(covered)+" aid = <b>"+money(gap)+"</b> gap.";
+      $("c3-reveal").hidden=false; markDone(3); $("c3-reveal").scrollIntoView({behavior:"smooth",block:"nearest"});
+    });
+  })();
+
+  function buildSummary(){
+    var labels=["The Commute","The Hours","The Book","The Whole Bill"], html="";
+    for(var i=0;i<4;i++){
+      var v=last[i]||"<span style='color:var(--ink-3)'>not read yet — go back and press the button</span>";
+      html+='<div class="sumrow"><span class="sn">'+labels[i]+'</span><span class="sv">'+v+'</span></div>';
+    }
+    $("summary").innerHTML=html;
+  }
+})();
+</script>
+</body>
+</html>
