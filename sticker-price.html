@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="utf-8">
+<meta name="tsp:surface" content="tool">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sticker Price — every number is a headline. Read the fine print. · Tight Spiral Productions</title>
+<meta name="description" content="A quantitative-reasoning game for MassBay students. Take a headline number — a loan, a tuition sticker, a statistic in an argument, a small monthly charge — and pull it apart into what it actually means over time. Guess first, then the arithmetic. Single-file, offline, contrast-gated.">
+
+<!-- tsp:outcome       MassBay iSLO 2 — Quantitative Skills. Build side of islo-hub.html.
+     Source:           MassBay iSLO 2 (Quantitative Skills) per islo-hub.html; AAC&U Quantitative Literacy
+                       VALUE dimensions. Figures are editable examples — method, not market data (nothing fabricated).
+     tsp:last-verified 2026-07-19 — formulas + the AAC&U QL framework checked against source on ship day.
+     tsp:engine        cost-decomposition bar reused from advantage-intake.html (The Tension Bar), pointed
+                       at numbers students actually meet. Dignity framing kept: the NUMBER asks — never "you are short."
+     tsp:measure       AAC&U Quantitative Literacy VALUE — Interpretation · Calculation · Assumptions · Communication.
+     tsp:floor         single-file · offline · zero external hosts · contrast-gated 4.5:1 · no emoji · token-role law
+     tsp:math          loan is a real amortization; net price is sticker minus aid; the statistic exposes its denominator;
+                       the small charge is multiplied out over time. All arithmetic runs in the page. No number is asserted
+                       as market fact — every headline is an editable EXAMPLE the student sets. Provenance names the METHOD.
+     THIS PAGE MAKES NO NETWORK CALLS. Nothing loads from anywhere. Nothing is collected. -->
+
+<style>
+:root{
+  --paper:#fbfaf7; --paper-2:#f1eee6; --rule:#d8d2c4;
+  --ink:#14181d; --ink-2:#3d4652; --ink-3:#5c6675;
+  --brass-ink:#6a4d12; --brass-fill:#d9a441; --brass-slab-ink:#d9a441;
+  --cool-ink:#274063; --cool-fill:#c3d2e6; --cool-line:#274063;
+  --ink-line:#14181d;
+  --live-ink:#1d5c3f; --warn-ink:#8a2f22;
+  --slab:#12161b; --slab-ink:#f4f1e8;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+/* ── STUDIO EYES — Light: Dusk / Warm-dark (token remaps; every text >=4.5:1) ── */
+html[data-light="dusk"]{
+  --paper:#e9ddc2; --paper-2:#ddceac; --rule:#c9b58a;
+  --ink:#171009; --ink-2:#352b1a; --ink-3:#4b4534;
+  --brass-ink:#5a3f0e; --cool-ink:#22384f; --cool-line:#22384f;
+  --live-ink:#184c33; --warn-ink:#7a281c; --ink-line:#2a2213;
+}
+html[data-light="night"]{ /* warm charcoal, never pure black */
+  --paper:#1b1814; --paper-2:#262019; --rule:#463f30;
+  --ink:#f3e7cb; --ink-2:#d9c9a2; --ink-3:#b8a887;
+  --brass-ink:#e0b25a; --cool-ink:#9fb6d0; --cool-line:#9fb6d0;
+  --cool-fill:#2c3f52; --brass-fill:#5c4514;
+  --live-ink:#7fc79e; --warn-ink:#e8967f; --ink-line:#5a4f3a;
+}
+/* per-case accents restated light for warm-dark (used as kicker/reading text) */
+html[data-light="night"] .case[data-acc="1"], html[data-light="night"] .rail button[data-acc="1"]{--acc:#9fb6d0; --acc-ink:#9fb6d0}
+html[data-light="night"] .case[data-acc="2"], html[data-light="night"] .rail button[data-acc="2"]{--acc:#7fc79e; --acc-ink:#7fc79e}
+html[data-light="night"] .case[data-acc="3"], html[data-light="night"] .rail button[data-acc="3"]{--acc:#e0a07f; --acc-ink:#e0a07f}
+html[data-light="night"] .case[data-acc="4"], html[data-light="night"] .rail button[data-acc="4"]{--acc:#c3a0d8; --acc-ink:#c3a0d8}
+/* kernel component tokens */
+:root{ --surface:var(--paper); --surface-2:var(--paper-2); --accent-strong:#1e3350; --on-accent:#ffffff; --focus:#8a3a1c; --tap:48px; }
+/* ── STUDIO EYES — text size + comfort toggles ── */
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+html.se-contrast:not([data-light="night"]){ --paper:#ffffff; --paper-2:#f2ece0; --ink:#0e1114; --ink-2:#242c34; --ink-3:#3c434c; --rule:#b7ab92; }
+html.se-contrast[data-light="night"]{ --paper:#0c0b09; --paper-2:#17140f; --ink:#fff7e6; --ink-2:#ecdcb6; --ink-3:#cdbd97; }
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased}
+.wrap{max-width:760px; margin:0 auto; padding:0 22px 90px}
+
+/* ── STANDING NAV ───────────────────────────────────────────────────────── */
+.topnav{position:sticky; top:0; z-index:50; background:var(--paper); border-bottom:1.5px solid var(--rule)}
+.topnav-in{max-width:760px; margin:0 auto; padding:9px 22px; display:flex; align-items:center; gap:10px}
+.topnav a{display:inline-flex; align-items:center; gap:.35em; text-decoration:none; font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2); min-height:44px; padding:.42em .8em; border:1.5px solid var(--rule); border-radius:999px; background:var(--paper-2); transition:border-color .12s,color .12s}
+.topnav a:hover{border-color:var(--cool-line); color:var(--ink)}
+.topnav a:focus-visible{outline:3px solid var(--cool-line); outline-offset:2px}
+.topnav-mark{margin-left:auto; font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+@media (max-width:520px){ .topnav-mark{display:none} }
+
+/* ── STAGE ─────────────────────────────────────────────────────────────── */
+.stage{padding:44px 0 26px; border-bottom:2px solid var(--ink-line)}
+.mark{font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--brass-ink); font-weight:700; margin:0 0 16px}
+h1{font-family:var(--serif); font-size:clamp(30px,6vw,50px); line-height:1.06; margin:0 0 16px; letter-spacing:-.015em; font-weight:400}
+h1 em{font-style:italic; color:var(--cool-ink)}
+.lede{font-size:clamp(17px,2.4vw,20px); line-height:1.5; color:var(--ink-2); margin:0 0 12px}
+.lede b{color:var(--ink); font-weight:600}
+.tag{font-family:var(--mono); font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin:20px 0 0}
+.hero-mark{display:block; width:clamp(120px,30vw,180px); height:auto; color:var(--brass-ink); margin:22px 0 4px}
+
+/* ── PROGRESS RAIL ─────────────────────────────────────────────────────── */
+.rail{display:flex; gap:8px; margin:26px 0 0; flex-wrap:wrap}
+.rail button{
+  flex:1 1 120px; text-align:left; cursor:pointer; background:var(--paper-2); color:var(--ink-2);
+  border:1.5px solid var(--rule); border-top-width:5px; border-radius:3px; padding:10px 12px 11px;
+  font-family:var(--sans); transition:border-color .12s, color .12s;
+}
+.rail button .rn{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-bottom:3px}
+.rail button .rt{display:block; font-family:var(--serif); font-size:16px; line-height:1.15; color:var(--ink)}
+.rail button:hover{border-color:var(--acc,var(--cool-line))}
+.rail button:focus-visible{outline:3px solid var(--cool-line); outline-offset:2px}
+.rail button[aria-current="true"]{border-color:var(--acc,var(--cool-line)); color:var(--ink); background:var(--paper)}
+.rail button[data-done="1"] .rn::after{content:" · read"; color:var(--live-ink)}
+
+/* ── CASE ──────────────────────────────────────────────────────────────── */
+.case{padding:34px 0 0}
+.case[hidden]{display:none}
+.kicker{font-family:var(--mono); font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:var(--acc-ink,var(--brass-ink)); font-weight:700; margin:0 0 8px}
+.case h2{font-family:var(--serif); font-size:clamp(24px,4.2vw,32px); font-weight:400; line-height:1.12; margin:0 0 10px}
+.case .intro{font-size:16px; color:var(--ink-2); line-height:1.55; margin:0 0 22px; max-width:60ch}
+.case .intro b{color:var(--ink)}
+
+/* headline number — the entry point is huge (C2) */
+.headline{border:2px solid var(--acc,var(--rule)); border-radius:4px; background:var(--paper-2); padding:20px 22px; margin:0 0 22px; display:flex; gap:18px; align-items:center; justify-content:space-between}
+.headline .hl-txt{min-width:0}
+.hl-glyph{width:66px; height:66px; color:var(--acc-ink,var(--brass-ink)); flex:0 0 auto}
+@media (max-width:520px){ .hl-glyph{width:48px; height:48px} }
+.headline .hl-lab{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin:0 0 6px}
+.headline .hl-num{font-family:var(--serif); font-size:clamp(40px,11vw,76px); line-height:1; color:var(--ink); font-weight:400; letter-spacing:-.02em}
+.headline .hl-sub{font-size:14.5px; color:var(--ink-2); margin:10px 0 0; line-height:1.5}
+
+/* controls */
+.ctl{margin:0 0 18px}
+.ctl-q{font-size:16px; color:var(--ink); font-weight:600; margin:0 0 3px}
+.ctl-w{font-size:14px; color:var(--ink-3); line-height:1.5; margin:0 0 10px; max-width:58ch}
+.row{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+input[type=range]{flex:1 1 220px; accent-color:var(--cool-ink); height:44px}
+.read{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--ink); min-width:5ch}
+.opts{display:flex; flex-wrap:wrap; gap:8px}
+.opt{font-family:var(--sans); font-size:15px; min-height:44px; padding:9px 14px; border:1.5px solid var(--rule); border-radius:2px; background:var(--paper); color:var(--ink-2); cursor:pointer; font-weight:500}
+.opt[aria-pressed="true"]{background:var(--slab); color:var(--slab-ink); border-color:var(--slab); font-weight:600}
+.opt:focus-visible{outline:3px solid var(--cool-line); outline-offset:2px}
+.numin{font-family:var(--mono); font-size:18px; min-height:44px; padding:9px 12px; border:1.5px solid var(--rule); border-radius:2px; background:var(--paper); color:var(--ink); width:150px}
+.numin:focus-visible{outline:3px solid var(--cool-line); outline-offset:1px; border-color:var(--ink-line)}
+
+/* predict gate */
+.predict{border-left:5px solid var(--brass-ink); background:var(--paper-2); border-radius:2px; padding:16px 18px; margin:6px 0 20px}
+.predict .pq{font-size:15.5px; color:var(--ink); font-weight:600; margin:0 0 10px}
+.predict .pq b{color:var(--brass-ink)}
+.btn{font-family:var(--sans); font-size:16px; font-weight:600; min-height:44px; padding:11px 20px; background:var(--slab); color:var(--slab-ink); border:0; border-radius:2px; cursor:pointer}
+.btn:hover{background:#232b35}
+.btn:focus-visible{outline:3px solid var(--cool-line); outline-offset:3px}
+.btn.ghost{background:var(--paper); color:var(--ink); border:1.5px solid var(--rule)}
+.btn.ghost:hover{border-color:var(--ink-line); background:var(--paper-2)}
+
+/* the decomposition bar */
+.reveal[hidden]{display:none}
+.bar-lab{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin:20px 0 8px}
+.bar{display:flex; height:52px; border:1.5px solid var(--ink-line); border-radius:3px; overflow:hidden; background:var(--paper)}
+.seg{display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; transition:flex-basis .35s ease; min-width:0}
+.seg.s-base{background:var(--cool-fill)}
+.seg.s-extra{background:var(--brass-fill)}
+.seg.s-quiet{background:var(--paper-2); color:var(--ink-2)}
+.bar-key{display:flex; flex-wrap:wrap; gap:16px; margin:9px 0 0; font-size:13px; color:var(--ink-2)}
+.bar-key span{display:inline-flex; align-items:center; gap:7px}
+.sw{width:13px; height:13px; border-radius:2px; border:1px solid var(--ink-line)}
+.sw-base{background:var(--cool-fill)} .sw-extra{background:var(--brass-fill)} .sw-quiet{background:var(--paper-2)}
+
+.reading{border:2px solid var(--acc,var(--rule)); border-radius:4px; padding:18px 20px; margin:20px 0 0; background:var(--paper)}
+.reading .rh{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--acc-ink,var(--brass-ink)); font-weight:700; margin:0 0 8px}
+.reading .rb{font-size:17px; color:var(--ink); line-height:1.55; margin:0}
+.reading .rb b{color:var(--ink)}
+.reading .rb .big{font-family:var(--serif); font-size:21px}
+
+.hides{margin:16px 0 0; padding:15px 17px; border-left:5px solid var(--warn-ink); background:var(--paper-2); border-radius:2px}
+.hides .hh{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--warn-ink); font-weight:700; margin:0 0 6px}
+.hides p{margin:0; font-size:15px; color:var(--ink-2); line-height:1.55}
+.hides p b{color:var(--ink)}
+
+.say{margin:16px 0 0; padding:15px 17px; border:1.5px dashed var(--rule); border-radius:2px; background:var(--paper)}
+.say .sh{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--cool-ink); font-weight:700; margin:0 0 6px}
+.say p{margin:0; font-size:16px; color:var(--ink); line-height:1.5; font-style:italic; font-family:var(--serif)}
+
+.dim{margin:18px 0 0; font-family:var(--mono); font-size:11.5px; letter-spacing:.04em; color:var(--ink-3); line-height:1.6}
+.dim b{color:var(--brass-ink)}
+
+.nav-row{display:flex; justify-content:space-between; gap:12px; margin:30px 0 0; padding-top:20px; border-top:1.5px solid var(--rule)}
+
+/* ── CLOSE ─────────────────────────────────────────────────────────────── */
+.close{padding:34px 0 0}
+.close[hidden]{display:none}
+.close h2{font-family:var(--serif); font-size:clamp(24px,4.6vw,34px); font-weight:400; margin:0 0 12px}
+.close .lede{max-width:62ch}
+.summary{border:2px solid var(--rule); border-radius:4px; overflow:hidden; margin:22px 0 0}
+.sumrow{display:flex; gap:14px; padding:14px 18px; border-top:1.5px solid var(--rule); align-items:baseline}
+.sumrow:first-child{border-top:0}
+.sumrow .sn{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); flex:0 0 92px}
+.sumrow .sv{font-size:15.5px; color:var(--ink); line-height:1.5}
+.sumrow .sv b{font-family:var(--serif)}
+
+.slab{background:var(--slab); color:var(--slab-ink); margin:30px 0 0; padding:26px 22px; border-radius:4px}
+.slab h3{font-family:var(--mono); font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:var(--brass-slab-ink); font-weight:700; margin:0 0 12px}
+.slab ul{margin:0; padding-left:20px}
+.slab li{font-size:15px; color:#cdd4dd; line-height:1.6; margin-bottom:8px}
+.slab li b{color:var(--slab-ink)}
+
+.src{margin-top:34px; padding-top:18px; border-top:1.5px solid var(--rule); font-size:13px; color:var(--ink-3); line-height:1.6}
+.src b{color:var(--ink-2)}
+footer{margin-top:26px; font-size:14px; color:var(--ink-3)}
+footer a{color:var(--cool-ink); font-weight:600}
+
+/* accent per case */
+.case[data-acc="1"], .rail button[data-acc="1"]{--acc:#274063; --acc-ink:#274063}
+.case[data-acc="2"], .rail button[data-acc="2"]{--acc:#1d5c3f; --acc-ink:#1d5c3f}
+.case[data-acc="3"], .rail button[data-acc="3"]{--acc:#8a3a1c; --acc-ink:#8a3a1c}
+.case[data-acc="4"], .rail button[data-acc="4"]{--acc:#5a3a6e; --acc-ink:#563369}
+
+@media (prefers-reduced-motion:reduce){*{transition:none}}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+/* ═══ RESERVED CHROME + STUDIO EYES ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--ink-line); position:sticky; top:0; z-index:100; }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap); padding:8px 12px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--cool-ink); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; color:var(--ink); }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap); padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-strong); color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 14px); z-index:101; width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink); border:2px solid var(--accent-strong); border-radius:10px; padding:15px; box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 8px; }
+.se-prow{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent-strong); color:var(--on-accent); border-color:var(--accent-strong); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px; min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent-strong); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--cool-ink); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sronly{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--rule); background:var(--surface); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--rule); border-radius:8px; background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes. Reserves its own row; never overlaps. -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.45rem .9rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><p class="tag" id="seUpdated" style="margin:8px 0 0">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v12 <span style="opacity:.75">654f0a6</span></span> </span> </p>
+<div class="stage">
+  <p class="mark">Tight Spiral Productions · MassBay iSLO 2 — Quantitative Skills</p>
+  <h1>Every number is a headline. <em>Read the fine print.</em></h1>
+  <p class="lede">A sticker price is the number someone wants you to see. The <b>real</b> price is
+    what it costs once you do the arithmetic — over time, after the asterisk, with the denominator
+    put back.</p>
+  <p class="lede">Four numbers below. For each one: <b>guess first</b>, then watch it come apart.
+    The gap between your guess and the arithmetic is the whole skill.</p>
+  <p class="tag">Guess · Calculate · Find what it hid · Say it plainly</p>
+   </span>
+
+  <svg class="hero-mark" viewBox="0 0 120 64" aria-hidden="true">
+    <path d="M60 8 H100 A5 5 0 0 1 105 13 V33 L74 58 A5 5 0 0 1 66 58 L44 36 A5 5 0 0 1 44 28 L55 10 A5 5 0 0 1 60 8 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/>
+    <circle cx="90" cy="20" r="4" fill="currentColor"/>
+    <circle cx="30" cy="34" r="16" fill="none" stroke="currentColor" stroke-width="2.4"/>
+    <line x1="41" y1="45" x2="52" y2="56" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M25 30 h10 M25 34 h10 M25 38 h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+
+  <div class="rail" id="rail" role="tablist" aria-label="Four numbers">
+    <button data-acc="1" data-go="0" role="tab" aria-current="true"><span class="rn">One</span><span class="rt">The Loan</span></button>
+    <button data-acc="2" data-go="1" role="tab" aria-current="false"><span class="rn">Two</span><span class="rt">The Sticker</span></button>
+    <button data-acc="3" data-go="2" role="tab" aria-current="false"><span class="rn">Three</span><span class="rt">The Statistic</span></button>
+    <button data-acc="4" data-go="3" role="tab" aria-current="false"><span class="rn">Four</span><span class="rt">The Small Charge</span></button>
+  </div>
+
+
+<main class="wrap">
+
+<!-- ═══ STAGE ═══ -->
+
+</div>
+
+<!-- ═══ CASE 1 — THE LOAN ═══ -->
+<section class="case" data-acc="1" id="case-0">
+  <p class="kicker">Number one · a real amortization</p>
+  <h2>The Loan</h2>
+  <p class="intro">You borrow a round number. The number you <b>borrow</b> is the sticker. The number
+    you <b>pay back</b> is the price — and it is bigger, because time and interest charge rent on
+    every dollar. Set the terms to yours; it is an example until you make it real.</p>
+
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">What you borrow — the sticker</p>
+      <div class="hl-num" id="l-borrow">$12,000</div>
+      <p class="hl-sub">Change any control below. Nothing here is your verdict — it is arithmetic you can steer.</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="36" cy="46" rx="19" ry="7" fill="var(--rule)"/><path d="M13 18 V42 A19 7 0 0 0 51 42 V18 Z" fill="currentColor"/><ellipse cx="32" cy="18" rx="19" ry="7" fill="currentColor"/><ellipse cx="32" cy="18" rx="11" ry="3.6" fill="var(--paper-2)"/><path d="M13 27 A19 7 0 0 0 51 27" fill="none" stroke="var(--paper-2)" stroke-width="2.4"/><path d="M13 34 A19 7 0 0 0 51 34" fill="none" stroke="var(--paper-2)" stroke-width="2.4"/></svg>
+  </div>
+
+  <div class="ctl">
+    <p class="ctl-q">How much do you borrow?</p>
+    <div class="row"><input type="range" id="l-amt" min="1000" max="40000" step="500" value="12000" aria-label="Amount borrowed"><span class="read" id="l-amt-r">$12,000</span></div>
+  </div>
+  <div class="ctl">
+    <p class="ctl-q">At what interest rate (APR)?</p>
+    <p class="ctl-w">Federal student loans run mid-single-digits; a credit card can run 3–4× that. The rate is the rent on the money.</p>
+    <div class="row"><input type="range" id="l-apr" min="0" max="24" step="0.5" value="6.5" aria-label="Annual interest rate, percent"><span class="read" id="l-apr-r">6.5%</span></div>
+  </div>
+  <div class="ctl">
+    <p class="ctl-q">Paid back over how long?</p>
+    <div class="opts" id="l-term" role="group" aria-label="Repayment term">
+      <button class="opt" data-v="3" aria-pressed="false">3 years</button>
+      <button class="opt" data-v="5" aria-pressed="false">5 years</button>
+      <button class="opt" data-v="10" aria-pressed="true">10 years</button>
+      <button class="opt" data-v="20" aria-pressed="false">20 years</button>
+    </div>
+  </div>
+
+  <div class="predict">
+    <p class="pq">Before the arithmetic — <b>what do you think you pay each month?</b></p>
+    <div class="row">
+      <input class="numin" type="number" id="l-guess" inputmode="decimal" min="0" placeholder="$ / month" aria-label="Your guess for the monthly payment">
+      <button class="btn" id="l-show">Show me the price</button>
+    </div>
+  </div>
+
+  <div class="reveal" id="l-reveal" hidden>
+    <p class="bar-lab">What you pay back, in two parts</p>
+    <div class="bar" id="l-bar" role="img" aria-labelledby="l-barlab">
+      <div class="seg s-base" id="l-seg-p">principal</div>
+      <div class="seg s-extra" id="l-seg-i">interest</div>
+    </div>
+    <p id="l-barlab" class="sr"></p>
+    <div class="bar-key">
+      <span><i class="sw sw-base"></i>The money you borrowed</span>
+      <span><i class="sw sw-extra"></i>Interest — rent on the money</span>
+    </div>
+    <div class="reading" id="l-read">
+      <p class="rh">The reading</p>
+      <p class="rb"></p>
+    </div>
+    <div class="hides">
+      <p class="hh">What the sticker hid</p>
+      <p id="l-hides"></p>
+    </div>
+    <div class="say">
+      <p class="sh">Say it to a friend</p>
+      <p id="l-say"></p>
+    </div>
+    <p class="dim">Trains &mdash; <b>Calculation</b> (run the amortization) &middot; <b>Interpretation</b> (the sticker is not the price).</p>
+  </div>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn ghost" data-next="1">Next: the sticker &rsaquo;</button>
+  </div>
+</section>
+
+<!-- ═══ CASE 2 — THE STICKER (net price) ═══ -->
+<section class="case" data-acc="2" id="case-1" hidden>
+  <p class="kicker">Number two · sticker vs. net price</p>
+  <h2>The Sticker</h2>
+  <p class="intro">Colleges publish a <b>sticker price</b>. Almost nobody pays it. Grants and
+    scholarships — money you do not repay — come off the top, and what is left is the <b>net price</b>:
+    the number that actually leaves your pocket. The published figure is a starting point, never a verdict.</p>
+
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">Published price — the sticker</p>
+      <div class="hl-num" id="s-sticker">$24,000</div>
+      <p class="hl-sub">A one-year example. Put your own program's published cost and your own aid in — it re-reads live.</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M34 12 H54 A4 4 0 0 1 58 16 V36 L37 57 A4 4 0 0 1 31 57 L14 40 A4 4 0 0 1 14 34 L34 12 Z" fill="var(--rule)"/><path d="M30 8 H50 A4 4 0 0 1 54 12 V32 L33 53 A4 4 0 0 1 27 53 L10 36 A4 4 0 0 1 10 30 L30 8 Z" fill="currentColor"/><circle cx="42" cy="20" r="5" fill="var(--paper-2)"/></svg>
+  </div>
+
+  <div class="ctl">
+    <p class="ctl-q">Published cost for the year</p>
+    <div class="row"><input type="range" id="s-amt" min="2000" max="60000" step="500" value="24000" aria-label="Published yearly cost"><span class="read" id="s-amt-r">$24,000</span></div>
+  </div>
+  <div class="ctl">
+    <p class="ctl-q">Grants &amp; scholarships you do <em>not</em> repay</p>
+    <p class="ctl-w">Pell, state aid, institutional scholarships, fee waivers. Gift aid, not loans.</p>
+    <div class="row"><input type="range" id="s-aid" min="0" max="60000" step="500" value="9000" aria-label="Grants and scholarships"><span class="read" id="s-aid-r">$9,000</span></div>
+  </div>
+
+  <div class="predict">
+    <p class="pq">Before the reveal — <b>what net price do you think is left?</b></p>
+    <div class="row">
+      <input class="numin" type="number" id="s-guess" inputmode="decimal" min="0" placeholder="$ / year" aria-label="Your guess for the net price">
+      <button class="btn" id="s-show">Show me the net</button>
+    </div>
+  </div>
+
+  <div class="reveal" id="s-reveal" hidden>
+    <p class="bar-lab">Where the sticker goes</p>
+    <div class="bar" id="s-bar" role="img" aria-labelledby="s-barlab">
+      <div class="seg s-base" id="s-seg-n">you pay</div>
+      <div class="seg s-quiet" id="s-seg-a">covered by aid</div>
+    </div>
+    <p id="s-barlab" class="sr"></p>
+    <div class="bar-key">
+      <span><i class="sw sw-base"></i>Net price — what you actually pay</span>
+      <span><i class="sw sw-quiet"></i>Gift aid — comes off the sticker</span>
+    </div>
+    <div class="reading" id="s-read"><p class="rh">The reading</p><p class="rb"></p></div>
+    <div class="hides">
+      <p class="hh">What the sticker hid</p>
+      <p id="s-hides"></p>
+    </div>
+    <div class="say"><p class="sh">Say it to a friend</p><p id="s-say"></p></div>
+    <p class="dim">Trains &mdash; <b>Interpretation</b> (net &ne; sticker) &middot; <b>Assumptions</b> (which costs and which aid are in the number?).</p>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn ghost" data-next="0">&lsaquo; Back: the loan</button>
+    <button class="btn ghost" data-next="2">Next: the statistic &rsaquo;</button>
+  </div>
+</section>
+
+<!-- ═══ CASE 3 — THE STATISTIC (denominator) ═══ -->
+<section class="case" data-acc="3" id="case-2" hidden>
+  <p class="kicker">Number three · a percentage with no denominator</p>
+  <h2>The Statistic</h2>
+  <p class="intro">A headline says a number <b>tripled</b>. Scary — until you ask <b>tripled from what?</b>
+    A percentage change hides the two counts underneath it. Put them back and the same true fact can read
+    as an alarm or a shrug. Neither is lying; the frame is the choice.</p>
+
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">The headline</p>
+      <div class="hl-num" id="p-pct">+200%</div>
+      <p class="hl-sub" id="p-claim">"Incidents are up 200% since last year."</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><g fill="var(--rule)"><rect x="17" y="35" width="10" height="21"/><rect x="31" y="25" width="10" height="31"/><rect x="45" y="15" width="10" height="41"/></g><g fill="currentColor"><rect x="13" y="31" width="10" height="21"/><rect x="27" y="21" width="10" height="31"/><rect x="41" y="11" width="10" height="41"/></g><rect x="9" y="52" width="46" height="4" fill="currentColor"/></svg>
+  </div>
+
+  <div class="ctl">
+    <p class="ctl-q">Last year — the actual count</p>
+    <div class="row"><input type="range" id="p-before" min="1" max="500" step="1" value="2" aria-label="Count last year"><span class="read" id="p-before-r">2</span></div>
+  </div>
+  <div class="ctl">
+    <p class="ctl-q">This year — the actual count</p>
+    <div class="row"><input type="range" id="p-after" min="0" max="500" step="1" value="6" aria-label="Count this year"><span class="read" id="p-after-r">6</span></div>
+  </div>
+  <div class="ctl">
+    <p class="ctl-q">Out of how many? (the denominator)</p>
+    <p class="ctl-w">The pool the count comes from — students, days, attempts. This is the number the headline drops.</p>
+    <div class="row"><input type="range" id="p-pool" min="10" max="20000" step="10" value="5000" aria-label="The total pool"><span class="read" id="p-pool-r">5,000</span></div>
+  </div>
+
+  <div class="predict">
+    <p class="pq">Before the reveal — does putting the counts back make this <b>bigger</b> or <b>smaller</b> than it sounded?</p>
+    <div class="opts" id="p-guess" role="group" aria-label="Your guess">
+      <button class="opt" data-v="big" aria-pressed="false">Still alarming</button>
+      <button class="opt" data-v="small" aria-pressed="false">Smaller than it sounded</button>
+    </div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="p-show">Put the counts back</button></div>
+  </div>
+
+  <div class="reveal" id="p-reveal" hidden>
+    <p class="bar-lab">The same fact, two ways to say it</p>
+    <div class="bar" id="p-bar" role="img" aria-labelledby="p-barlab">
+      <div class="seg s-extra" id="p-seg-c">the change</div>
+      <div class="seg s-quiet" id="p-seg-r">everything else in the pool</div>
+    </div>
+    <p id="p-barlab" class="sr"></p>
+    <div class="bar-key">
+      <span><i class="sw sw-extra"></i>The incidents in question</span>
+      <span><i class="sw sw-quiet"></i>The rest of the pool the headline ignored</span>
+    </div>
+    <div class="reading" id="p-read"><p class="rh">The reading</p><p class="rb"></p></div>
+    <div class="hides">
+      <p class="hh">What the percentage hid</p>
+      <p id="p-hides"></p>
+    </div>
+    <div class="say"><p class="sh">Say it to a friend</p><p id="p-say"></p></div>
+    <p class="dim">Trains &mdash; <b>Assumptions</b> (a percentage with no denominator is a rumour) &middot; <b>Communication</b> (choose the honest frame).</p>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn ghost" data-next="1">&lsaquo; Back: the sticker</button>
+    <button class="btn ghost" data-next="3">Next: the small charge &rsaquo;</button>
+  </div>
+</section>
+
+<!-- ═══ CASE 4 — THE SMALL CHARGE (scale over time) ═══ -->
+<section class="case" data-acc="4" id="case-3" hidden>
+  <p class="kicker">Number four · small times often is not small</p>
+  <h2>The Small Charge</h2>
+  <p class="intro">A monthly number is designed to feel like nothing. <b>Multiply it by time</b> and it
+    stops being nothing. This is the same trick as the loan, run in reverse: a little, forever, adds up
+    to a lot — and you get to decide if it is worth it, once you can see the real total.</p>
+
+  <div class="headline">
+    <div class="hl-txt">
+      <p class="hl-lab">The charge, as shown</p>
+      <div class="hl-num" id="m-month">$14.99<span style="font-family:var(--sans);font-size:.3em;color:var(--ink-3)"> /mo</span></div>
+      <p class="hl-sub">A subscription, a fee, a "just" — set it to one of yours.</p>
+    </div>
+    <svg class="hl-glyph" viewBox="0 0 64 64" aria-hidden="true"><circle cx="36" cy="38" r="22" fill="var(--rule)"/><circle cx="32" cy="34" r="22" fill="currentColor"/><circle cx="32" cy="34" r="15" fill="var(--paper-2)"/><path d="M32 34 V23 M32 34 L40 38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="32" cy="34" r="2.4" fill="currentColor"/></svg>
+  </div>
+
+  <div class="ctl">
+    <p class="ctl-q">How much a month?</p>
+    <div class="row"><input type="range" id="m-amt" min="0.99" max="199" step="1" value="14.99" aria-label="Monthly charge"><span class="read" id="m-amt-r">$14.99</span></div>
+  </div>
+  <div class="ctl">
+    <p class="ctl-q">Kept for how long?</p>
+    <div class="opts" id="m-span" role="group" aria-label="How long">
+      <button class="opt" data-v="1" aria-pressed="false">1 year</button>
+      <button class="opt" data-v="4" aria-pressed="true">4 years (a degree)</button>
+      <button class="opt" data-v="10" aria-pressed="false">10 years</button>
+    </div>
+  </div>
+
+  <div class="predict">
+    <p class="pq">Before the reveal — <b>what does it total</b> over that time?</p>
+    <div class="row">
+      <input class="numin" type="number" id="m-guess" inputmode="decimal" min="0" placeholder="$ total" aria-label="Your guess for the total">
+      <button class="btn" id="m-show">Multiply it out</button>
+    </div>
+  </div>
+
+  <div class="reveal" id="m-reveal" hidden>
+    <p class="bar-lab">One month vs. the whole run</p>
+    <div class="bar" id="m-bar" role="img" aria-labelledby="m-barlab">
+      <div class="seg s-base" id="m-seg-1">one month</div>
+      <div class="seg s-extra" id="m-seg-r">all the other months</div>
+    </div>
+    <p id="m-barlab" class="sr"></p>
+    <div class="bar-key">
+      <span><i class="sw sw-base"></i>The number they showed you</span>
+      <span><i class="sw sw-extra"></i>The number they did not</span>
+    </div>
+    <div class="reading" id="m-read"><p class="rh">The reading</p><p class="rb"></p></div>
+    <div class="hides">
+      <p class="hh">What the /mo hid</p>
+      <p id="m-hides"></p>
+    </div>
+    <div class="say"><p class="sh">Say it to a friend</p><p id="m-say"></p></div>
+    <p class="dim">Trains &mdash; <b>Calculation</b> (scale by time) &middot; <b>Communication</b> (name the real total out loud).</p>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn ghost" data-next="2">&lsaquo; Back: the statistic</button>
+    <button class="btn" data-finish="1">See what you read &rsaquo;</button>
+  </div>
+</section>
+
+<!-- ═══ CLOSE ═══ -->
+<section class="close" id="close" hidden>
+  <p class="kicker" style="color:var(--brass-ink)">The fine-print reading</p>
+  <h2>Four headlines, four real numbers.</h2>
+  <p class="lede">Here is what each sticker actually said once you did the arithmetic. Change any control
+    and come back — the reading follows the numbers, not the other way around.</p>
+
+  <div class="summary" id="summary"><!-- filled by JS --></div>
+
+  <div class="slab">
+    <h3>The one move, four times</h3>
+    <ul>
+      <li><b>Interpretation</b> — the number you are shown is a claim, not a fact. Ask what it is the number <em>of</em>.</li>
+      <li><b>Calculation</b> — do the arithmetic yourself. A loan, a total over time, a rate — the tools are simple; the discipline is using them before you decide.</li>
+      <li><b>Assumptions</b> — find what the number left out. The denominator, the aid, the asterisk, the time.</li>
+      <li><b>Communication</b> — say the real number plainly, to yourself and to someone else. That sentence is the deliverable.</li>
+    </ul>
+  </div>
+
+  <div class="src">
+    <p><b>How the arithmetic works, and where it comes from.</b> The loan uses the standard fixed-rate
+      amortization formula (monthly payment M = P&middot;r &divide; (1 &minus; (1+r)<sup>&minus;n</sup>),
+      r the monthly rate, n the number of months) — the same formula every lender uses. <b>Net price</b>
+      (published cost minus gift aid) is the federal definition institutions must publish; see the U.S.
+      Department of Education College Scorecard and the College Board's <i>Trends in College Pricing</i>.
+      The <b>statistic</b> case is the base-rate / denominator problem from quantitative-literacy pedagogy.
+      Every headline on this page is an <b>editable example</b>, not a claim about any real program or market —
+      the numbers are yours to set. Method, not market. <b>Source:</b> methods per the U.S. Department of Education College Scorecard, the College Board&rsquo;s <i>Trends in College Pricing</i>, and AAC&amp;U Quantitative Literacy VALUE; competency per MassBay iSLO&nbsp;2 (Graduation Competencies). Formulas and sources last-verified 2026-07-19.</p>
+    <p><b>Outcome.</b> Built for MassBay iSLO 2 (Quantitative Skills): <i>use a variety of mathematical
+      tools and quantitative reasoning to solve problems and analyze complex challenges.</i> Measured on the
+      AAC&amp;U Quantitative Literacy VALUE dimensions — Interpretation, Calculation, Assumptions, Communication.</p>
+  </div>
+  <footer>
+    <p><a href="islo-hub.html">&lsaquo; Back to the iSLO Suite</a> &nbsp;&middot;&nbsp;
+       <a href="index.html">The studio front door</a> &nbsp;&middot;&nbsp; CC BY-NC-ND 4.0</p>
+  </footer>
+</section>
+
+</main>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <a href="islo-hub.html" aria-label="Back to the iSLO Suite">Back</a>
+  <a href="index.html" aria-label="Home — studio front door">Home</a>
+</nav>
+
+<script>
+/* Studio Eyes — light modes, text size, comfort toggles, computed last-updated */
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  var u=document.getElementById('seUpdated');
+  if(u){ var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); }
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var money = function(n){ return "$" + Math.round(n).toLocaleString("en-US"); };
+  var money2 = function(n){ return "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var num = function(n){ return Math.round(n).toLocaleString("en-US"); };
+  var $ = function(id){ return document.getElementById(id); };
+  var done = [false,false,false,false];
+  var last = [null,null,null,null];
+
+  /* ---- case navigation ---- */
+  var cases = [ $("case-0"), $("case-1"), $("case-2"), $("case-3") ];
+  var railBtns = Array.prototype.slice.call(document.querySelectorAll("#rail button"));
+  function show(i){
+    var isClose = (i === "close");
+    cases.forEach(function(c,k){ c.hidden = isClose ? true : (k !== i); });
+    $("close").hidden = !isClose;
+    railBtns.forEach(function(b){
+      var t = parseInt(b.getAttribute("data-go"),10);
+      b.setAttribute("aria-current", (!isClose && t === i) ? "true" : "false");
+    });
+    if(window.scrollTo) window.scrollTo(0,0);
+  }
+  railBtns.forEach(function(b){ b.addEventListener("click", function(){ show(parseInt(b.getAttribute("data-go"),10)); }); });
+  document.querySelectorAll("[data-next]").forEach(function(b){ b.addEventListener("click", function(){ show(parseInt(b.getAttribute("data-next"),10)); }); });
+  document.querySelectorAll("[data-finish]").forEach(function(b){ b.addEventListener("click", function(){ buildSummary(); show("close"); }); });
+
+  function markDone(i){
+    done[i] = true;
+    var rb = railBtns[i]; if(rb) rb.setAttribute("data-done","1");
+  }
+
+  /* helper: single-select opt groups; returns a getter */
+  function optGroup(id, onChange){
+    var g = $(id);
+    g.addEventListener("click", function(e){
+      var b = e.target.closest(".opt"); if(!b) return;
+      g.querySelectorAll(".opt").forEach(function(k){ k.setAttribute("aria-pressed","false"); });
+      b.setAttribute("aria-pressed","true");
+      if(onChange) onChange(b.getAttribute("data-v"));
+    });
+    return function(){ var s = g.querySelector('.opt[aria-pressed="true"]'); return s ? s.getAttribute("data-v") : null; };
+  }
+  function setBar(seg, basis){ seg.style.flexBasis = Math.max(0,Math.min(100,basis)) + "%"; }
+
+  /* ============ CASE 1 — THE LOAN ============ */
+  (function(){
+    var amt=$("l-amt"), apr=$("l-apr");
+    var getTerm = optGroup("l-term");
+    function sync(){
+      $("l-amt-r").textContent = money(+amt.value);
+      $("l-apr-r").textContent = (+apr.value).toFixed(1).replace(/\.0$/,"") + "%";
+      $("l-borrow").textContent = money(+amt.value);
+    }
+    amt.addEventListener("input", sync); apr.addEventListener("input", sync);
+    sync();
+    $("l-show").addEventListener("click", function(){
+      var P=+amt.value, A=+apr.value, yrs=+getTerm(), n=yrs*12, r=A/100/12;
+      var M = (r===0) ? P/n : P*r/(1-Math.pow(1+r,-n));
+      var total=M*n, interest=total-P;
+      setBar($("l-seg-p"), P/total*100); setBar($("l-seg-i"), interest/total*100);
+      $("l-seg-p").textContent = interest/total > 0.12 ? "principal" : "";
+      $("l-seg-i").textContent = interest/total > 0.12 ? "interest" : "";
+      var guess = parseFloat($("l-guess").value);
+      var guessLine = (!isNaN(guess) && guess>0)
+        ? "You guessed <b>"+money(guess)+"</b> a month. The arithmetic says <b class='big'>"+money(M)+"</b>. "
+        : "The payment is <b class='big'>"+money(M)+"</b> a month. ";
+      $("l-read").querySelector(".rb").innerHTML =
+        guessLine + "Over "+yrs+" years the "+money(P)+" you borrowed asks for <b>"+money(total)+
+        "</b> back — <b>"+money(interest)+"</b> of that is interest.";
+      var mult = total/P;
+      $("l-hides").innerHTML = "The sticker was "+money(P)+". The price is "+money(total)+" — <b>"+
+        mult.toFixed(2)+"&times;</b> the sticker. Every extra year and every extra point of rate makes that "+
+        "multiplier grow. Interest is rent on money, and it never stops while the balance is alive.";
+      $("l-say").textContent = "“It's not a "+money(P)+" loan. It's "+money(M)+" a month for "+
+        (n)+" months — "+money(total)+" by the end.”";
+      $("l-reveal").hidden = false;
+      last[0] = "A "+money(P)+" loan at "+(+apr.value)+"% costs <b>"+money(total)+"</b> ("+money(M)+"/mo &times; "+n+").";
+      markDone(0);
+      $("l-reveal").scrollIntoView({behavior:"smooth", block:"nearest"});
+    });
+  })();
+
+  /* ============ CASE 2 — THE STICKER ============ */
+  (function(){
+    var amt=$("s-amt"), aid=$("s-aid");
+    function sync(){
+      $("s-amt-r").textContent = money(+amt.value);
+      $("s-aid-r").textContent = money(+aid.value);
+      $("s-sticker").textContent = money(+amt.value);
+    }
+    amt.addEventListener("input", sync); aid.addEventListener("input", sync);
+    sync();
+    $("s-show").addEventListener("click", function(){
+      var sticker=+amt.value, gift=Math.min(+aid.value, sticker), net=sticker-gift;
+      setBar($("s-seg-n"), sticker>0? net/sticker*100:0);
+      setBar($("s-seg-a"), sticker>0? gift/sticker*100:0);
+      $("s-seg-n").textContent = net/sticker > 0.14 ? "you pay" : "";
+      $("s-seg-a").textContent = gift/sticker > 0.14 ? "covered by aid" : "";
+      var guess=parseFloat($("s-guess").value);
+      var pctOff = sticker>0 ? gift/sticker*100 : 0;
+      var guessLine = (!isNaN(guess) && guess>=0)
+        ? "You guessed a net of <b>"+money(guess)+"</b>. It is <b class='big'>"+money(net)+"</b>. "
+        : "The net price is <b class='big'>"+money(net)+"</b>. ";
+      $("s-read").querySelector(".rb").innerHTML =
+        guessLine + "Gift aid took <b>"+money(gift)+"</b> — about <b>"+Math.round(pctOff)+"%</b> — off the "+
+        money(sticker)+" sticker.";
+      $("s-hides").innerHTML = "The published price counted money you would never pay. It also may not count "+
+        "money you <b>will</b> — books, transport, housing, fees. <b>Net tuition is not the same as the cost of "+
+        "attending.</b> Ask which costs are in the sticker, and which aid is a grant versus a loan you repay later.";
+      $("s-say").textContent = "“The sticker says "+money(sticker)+", but after grants my net price is "+money(net)+" — and I still need to budget for the rest.”";
+      $("s-reveal").hidden=false;
+      last[1] = "A "+money(sticker)+" sticker with "+money(gift)+" in grants nets to <b>"+money(net)+"</b>.";
+      markDone(1);
+      $("s-reveal").scrollIntoView({behavior:"smooth", block:"nearest"});
+    });
+  })();
+
+  /* ============ CASE 3 — THE STATISTIC ============ */
+  (function(){
+    var before=$("p-before"), after=$("p-after"), pool=$("p-pool");
+    var getGuess = optGroup("p-guess");
+    function pct(b,a){ if(b===0) return a>0? Infinity : 0; return (a-b)/b*100; }
+    function sync(){
+      // a count can never exceed the pool it is drawn from — keep the model coherent
+      var Nn=+pool.value;
+      if(+after.value > Nn) after.value = Nn;
+      if(+before.value > Nn) before.value = Nn;
+      $("p-before-r").textContent = num(+before.value);
+      $("p-after-r").textContent = num(+after.value);
+      $("p-pool-r").textContent = num(+pool.value);
+      var p = pct(+before.value, +after.value);
+      var label = p===Infinity ? "new" : (p>=0? "+"+Math.round(p)+"%" : Math.round(p)+"%");
+      $("p-pct").textContent = label;
+      $("p-claim").textContent = "“Incidents are "+(p===Infinity? "up from zero" : (p>=0? "up "+Math.round(p)+"%" : "down "+Math.round(-p)+"%"))+" since last year.”";
+    }
+    before.addEventListener("input", sync); after.addEventListener("input", sync); pool.addEventListener("input", sync);
+    sync();
+    $("p-show").addEventListener("click", function(){
+      var b=+before.value, a=+after.value, N=+pool.value;
+      var rateB=b/N*100, rateA=a/N*100, p=(b===0? (a>0?Infinity:0):(a-b)/b*100);
+      setBar($("p-seg-c"), Math.max(2, a/N*100));
+      setBar($("p-seg-r"), Math.max(0, 100 - Math.max(2, a/N*100)));
+      $("p-seg-c").textContent=""; $("p-seg-r").textContent="";
+      var pctTxt = p===Infinity ? "a rise from zero" : (p>=0? "up "+Math.round(p)+"%" : "down "+Math.round(-p)+"%");
+      var g = getGuess();
+      var gLine = g ? ("You guessed it would look <b>"+(g==="big"?"still alarming":"smaller")+"</b>. ") : "";
+      $("p-read").querySelector(".rb").innerHTML = gLine +
+        "Both sentences are true: incidents went from <b>"+num(b)+"</b> to <b>"+num(a)+"</b> ("+pctTxt+") — and that is <b>"+
+        num(a)+" out of "+num(N)+"</b>, or <b class='big'>"+rateA.toFixed(2)+"%</b> of the pool, "+(rateA>=rateB?"up from ":"down from ")+rateB.toFixed(2)+"%.";
+      $("p-hides").innerHTML = "The percentage change hid the <b>counts</b> ("+num(b)+" &rarr; "+num(a)+") and the "+
+        "<b>denominator</b> ("+num(N)+"). A big percentage on a tiny base is still a tiny thing; a small percentage on a "+
+        "huge base can be enormous. <b>A percentage with no denominator is a rumour.</b>";
+      $("p-say").textContent = "“Yes, it "+pctTxt+" — but that's "+num(a)+" out of "+num(N)+". Here's the base rate before we panic.”";
+      $("p-reveal").hidden=false;
+      last[2] = num(b)+" &rarr; "+num(a)+" reads as “"+pctTxt+"” but is "+rateA.toFixed(2)+"% of "+num(N)+".";
+      markDone(2);
+      $("p-reveal").scrollIntoView({behavior:"smooth", block:"nearest"});
+    });
+  })();
+
+  /* ============ CASE 4 — THE SMALL CHARGE ============ */
+  (function(){
+    var amt=$("m-amt");
+    var getSpan = optGroup("m-span");
+    function sync(){
+      var v=+amt.value;
+      $("m-amt-r").textContent = money2(v);
+      $("m-month").innerHTML = money2(v) + "<span style=\"font-family:var(--sans);font-size:.3em;color:var(--ink-3)\"> /mo</span>";
+    }
+    amt.addEventListener("input", sync);
+    sync();
+    $("m-show").addEventListener("click", function(){
+      var v=+amt.value, yrs=+getSpan(), months=yrs*12, total=v*months, perYear=v*12;
+      setBar($("m-seg-1"), Math.max(2, 1/months*100));
+      setBar($("m-seg-r"), 100 - Math.max(2, 1/months*100));
+      $("m-seg-1").textContent=""; $("m-seg-r").textContent="";
+      var guess=parseFloat($("m-guess").value);
+      var gLine = (!isNaN(guess)&&guess>0) ? ("You guessed <b>"+money(guess)+"</b>. It totals <b class='big'>"+money(total)+"</b>. ")
+                                           : ("It totals <b class='big'>"+money(total)+"</b>. ");
+      $("m-read").querySelector(".rb").innerHTML = gLine +
+        money2(v)+" a month is <b>"+money(perYear)+"</b> a year, and over "+yrs+" year"+(yrs>1?"s":"")+" that's <b>"+
+        money(total)+"</b> across "+months+" charges.";
+      $("m-hides").innerHTML = "The <b>/mo</b> is the small number they show; the <b>total</b> is the big one they "+
+        "don't. Same trick as the loan, reversed — a little, often, becomes a lot. Worth it or not is your call; "+
+        "now you're making it against the real number.";
+      $("m-say").textContent = "“It's not "+money2(v)+". Over "+yrs+" year"+(yrs>1?"s":"")+" it's "+money(total)+". Is it worth that?”";
+      $("m-reveal").hidden=false;
+      last[3] = money2(v)+"/mo is <b>"+money(total)+"</b> over "+yrs+" year"+(yrs>1?"s":"")+".";
+      markDone(3);
+      $("m-reveal").scrollIntoView({behavior:"smooth", block:"nearest"});
+    });
+  })();
+
+  /* ---- CLOSE summary ---- */
+  function buildSummary(){
+    var labels=["The Loan","The Sticker","The Statistic","The Small Charge"];
+    var html="";
+    for(var i=0;i<4;i++){
+      var v = last[i] || "<span style='color:var(--ink-3)'>not read yet — go back and press the button</span>";
+      html += '<div class="sumrow"><span class="sn">'+labels[i]+'</span><span class="sv">'+v+'</span></div>';
+    }
+    $("summary").innerHTML = html;
+  }
+})();
+</script>
+</body>
+</html>
