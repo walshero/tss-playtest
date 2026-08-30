@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warriors Fantasy Arcade — Tight Spiral Productions</title>
+<!--
+  WARRIORS FANTASY ARCADE v1 (MVP — mechanic prototype, allowed to look plain, built to be FUN)
+  Tight Spiral Productions · walshero@gmail.com · Play. Notice. Design.
+  Matt vs. Evan. $100 auction. 14-team-league rules baked in. Single-file, offline, in-memory.
+  PRACTICE POOL: player values are game values for calibration training, not real rankings.
+  Update the pool before the real draft. Yahoo live sync = v2 (needs a backend; stubbed).
+  TSP-META at end of file.
+-->
+<style>
+:root{
+/* LIGHT: default (day) */
+--paper:#faf5ec;--paper-ink:#faf5ec;--ink:#211d18;--ink-fill:#211d18;--card:#fffdf7;--edge:#d8cfbe;
+--gold-ink:#7f5c10;--gold-fill:#a8791f;
+--green:#2e6b46;--red:#8a4030;--blue:#1f5fa8;--dim:#5a5348;
+/* Studio Eyes chrome tokens */
+--surface:#fffdf7;--surface-2:#efe4c8;--ink-2:#463b22;--line:#d8cfbe;
+--accent:#1f5fa8;--accent-strong:#22415a;--on-accent:#ffffff;--focus:#8f3f00;
+--tap:48px;--r:10px;
+--mono:ui-monospace,"SF Mono",Menlo,monospace;
+--sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+--serif:"Iowan Old Style",Palatino,Georgia,serif;
+}
+/* LIGHT: dusk */
+html[data-light="dusk"]{
+--paper:#e2d9c4;--paper-ink:#e2d9c4;--ink:#2c2721;--ink-fill:#2c2721;--card:#faf4e6;--edge:#d3c8b2;
+--surface:#faf4e6;--surface-2:#dcd0b6;--ink-2:#4a3a1e;--line:#cdbf9f;
+}
+/* WARM-DARK: night (warm charcoal, never pure black) */
+html[data-light="night"]{
+--paper:#26221c;--paper-ink:#26221c;--ink:#ecc57a;--ink-fill:#ecc57a;--card:#2f2a22;--edge:#4a4234;--dim:#c9a967;
+--green:#8fce9f;--red:#e09a7c;--gold-ink:#e0b45c;--gold-fill:#e0b45c;--blue:#7fb4e8;
+--surface:#2f2a22;--surface-2:#3a342a;--ink-2:#d8c59a;--line:#4a4234;
+--accent:#8aa0b8;--accent-strong:#a9bcd0;--on-accent:#141109;--focus:#f0c357;
+}
+/* TOGGLE: high contrast */
+html.se-contrast:not([data-light="night"]){--paper:#fffefb;--paper-ink:#fffefb;--card:#fffefb;--surface:#fffefb;--surface-2:#f0ece2;--ink:#141109;--ink-fill:#141109;--ink-2:#2c2517;--line:#b9a06a;}
+html.se-contrast[data-light="night"]{--paper:#0e0d0b;--paper-ink:#0e0d0b;--card:#161410;--surface:#161410;--surface-2:#22201a;--ink:#fff7e6;--ink-fill:#fff7e6;--ink-2:#efe0bc;}
+/* TOGGLE: text size */
+html{font-size:100%}
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+/* TOGGLE: reduce motion */
+html.se-reduce *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+/* TOGGLE: colorblind cues */
+html.se-cb a{text-decoration:underline;text-underline-offset:2px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:"Iowan Old Style",Palatino,Georgia,serif;
+font-size:1.125rem;line-height:1.5;min-height:100vh}
+.wrap{max-width:600px;margin:0 auto;padding:14px 14px 50px}
+h1{font-size:1.7rem;line-height:1.15}h2{font-size:1.3rem}
+h1:focus,h2:focus{outline:none}
+button{font-family:inherit;font-size:1rem;color:var(--ink);background:var(--card);
+border:2px solid var(--ink-fill);border-radius:10px;min-height:48px;padding:10px 14px;cursor:pointer}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+button.primary{background:var(--ink-fill);color:var(--paper-ink);font-weight:700}
+html[data-light="night"] button.primary{background:var(--gold-fill);color:#26221c;border-color:var(--gold-fill)}
+button.ghost{border-color:var(--edge);color:var(--dim);background:transparent;min-height:44px}
+button:disabled{opacity:.4;cursor:default}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.bar .money{font-weight:700}
+.podium{background:var(--card);border:2px solid var(--edge);border-radius:14px;padding:14px;margin:10px 0;text-align:center}
+.pname{font-size:1.5rem;font-weight:700}
+.ppos{color:var(--dim);margin-bottom:4px}
+.sleeper{display:inline-block;border:2px solid var(--gold-fill);color:var(--gold-ink);border-radius:6px;
+padding:1px 8px;font-size:.8rem;font-weight:700;letter-spacing:.06em}
+.scout{font-style:italic;color:var(--dim);margin:8px 0;font-size:.95rem}
+.bid{font-size:2.2rem;font-weight:700;margin:6px 0}
+.bidwho{color:var(--dim);font-size:.95rem;margin-bottom:10px}
+.bidrow{display:flex;gap:10px;justify-content:center}
+.bidrow button{flex:1;max-width:130px;font-weight:700}
+.turnline{background:var(--card);border-left:5px solid var(--gold-fill);padding:8px 12px;
+border-radius:0 10px 10px 0;margin:10px 0;font-weight:700}
+.board{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.pcard{background:var(--card);border:2px solid var(--edge);border-radius:10px;padding:8px 10px;
+text-align:left;min-height:56px;font-size:.92rem;line-height:1.3}
+.pcard b{display:block}
+.pcard.gone{opacity:.35;text-decoration:line-through}
+.rosters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.ros{background:var(--card);border:2px solid var(--edge);border-radius:10px;padding:8px 10px;font-size:.88rem}
+.ros h3{font-size:1rem;border-bottom:2px solid var(--edge);padding-bottom:4px;margin-bottom:4px}
+.ros li{list-style:none;display:flex;justify-content:space-between}
+.chatbar{margin:12px 0}
+.chatline{background:var(--card);border:2px dashed var(--edge);border-radius:10px;padding:8px 12px;
+min-height:40px;font-style:italic;margin-bottom:6px}
+.chatbtns{display:flex;gap:8px;flex-wrap:wrap}
+.chatbtns button{flex:1;min-width:120px;font-size:.85rem;min-height:44px}
+.screen{display:none}.screen.on{display:block}
+.grade{background:var(--card);border:2px solid var(--edge);border-radius:12px;padding:12px 14px;margin:10px 0}
+.super{font-weight:700;color:var(--gold-ink)}
+.winner{font-size:1.5rem;font-weight:700;text-align:center;margin:14px 0;color:var(--green)}
+.burst{position:relative;height:60px;overflow:hidden}
+.burst span{position:absolute;width:12px;height:18px;border-radius:2px;opacity:0}
+.burst.go span{animation:fall 1.4s ease-out forwards}
+@keyframes fall{0%{opacity:1;transform:translateY(-30px) rotate(0)}100%{opacity:0;transform:translateY(56px) rotate(200deg)}}
+@media(prefers-reduced-motion:reduce){.burst.go span{animation:none;opacity:.7;transform:none}}
+.foot{font-size:.8rem;color:var(--dim);margin-top:26px;line-height:1.5}
+details{margin:14px 0;border:2px solid var(--edge);border-radius:10px;background:var(--card)}
+summary{padding:10px 14px;cursor:pointer;font-weight:700;min-height:48px;display:flex;align-items:center}
+details .inner{padding:0 14px 12px;font-size:.9rem}
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+  padding:9px 14px;background:var(--surface);border-bottom:2px solid var(--ink);
+  position:sticky;top:0;z-index:100}
+.se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+  padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface-2);
+  color:var(--ink);font-family:var(--mono);font-weight:700;font-size:13px;text-decoration:none}
+.se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--ink)}
+.se-brand svg{width:34px;height:20px;color:var(--accent-strong);flex:0 0 auto}
+.se-brand .wm{font-family:var(--serif);font-size:16px;letter-spacing:.01em;white-space:nowrap}
+.se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+  padding:8px 13px;border:2px solid transparent;border-radius:8px;background:var(--accent-strong);
+  color:var(--on-accent);font-family:var(--mono);font-weight:700;font-size:13px;cursor:pointer}
+.se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+@media (max-width:560px){.se-brand .wm{display:none}}
+/* ═══ STUDIO EYES panel ═══ */
+.se-panel{position:fixed;right:12px;top:calc(var(--tap) + 14px);z-index:101;
+  width:min(320px,calc(100vw - 24px));background:var(--surface);color:var(--ink);
+  border:2px solid var(--accent-strong);border-radius:var(--r);padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28);display:none}
+.se-panel[data-open="1"]{display:block}
+.se-panel h2{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin:0 0 8px;border:none}
+.se-row{display:flex;gap:6px;margin-bottom:14px}
+.se-btn{flex:1;min-height:var(--tap);padding:8px 4px;border:1.5px solid var(--line);border-radius:8px;
+  background:var(--surface-2);color:var(--ink);font-family:var(--mono);font-weight:700;font-size:12.5px;cursor:pointer}
+.se-btn[aria-pressed="true"]{background:var(--accent-strong);color:var(--on-accent);border-color:var(--accent-strong)}
+.se-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+  min-height:var(--tap);padding:8px 11px;margin-bottom:6px;border:1.5px solid var(--line);border-radius:8px;
+  background:var(--surface-2);color:var(--ink);font-family:var(--sans);font-weight:600;font-size:14px;cursor:pointer;text-align:left}
+.se-tog[aria-pressed="true"]{border-color:var(--accent-strong)}
+.se-tog .st{font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.se-tog[aria-pressed="true"] .st{color:var(--accent-strong);font-weight:700}
+.se-tog:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{display:flex;gap:10px;justify-content:center;padding:20px;border-top:2px solid var(--line)}
+.se-rail a,.se-rail button{min-height:var(--tap);padding:10px 18px;border:1.5px solid var(--line);border-radius:8px;
+  background:var(--surface-2);color:var(--ink);font-family:var(--mono);font-weight:700;font-size:13px;text-decoration:none;cursor:pointer}
+.se-rail a:focus-visible,.se-rail button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+<style>
+/* LAB STATUS BAND - founder ruling 2026-08-27, "put in lab not as done game."
+   New builds carry a .tsp-lab chip inside the h1, beside the version chip. This is
+   a RETROFIT across 19 shipped games whose heading structures have nothing in
+   common: some carry four h1 elements, one builds its title from a JS template, and
+   three have no h1 at all. Rewriting the title markup of nineteen shipped games to
+   add a label is a large blast radius for a label, so the status mounts as its own
+   band instead. Colours are fixed rather than tokenised, because these files do not
+   share a palette and a status that inherits an unknown token can arrive invisible.
+   #f6efe0 on #241a11 is 13.4:1, which clears the studio floor of 7:1 with room. */
+.tsp-labband{
+  display:block; box-sizing:border-box; width:100%;
+  background:#241a11; color:#f6efe0;
+  border-bottom:3px solid #b98c39;
+  padding:9px 16px; margin:0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:18px; line-height:1.35; font-weight:700; letter-spacing:.02em;
+}
+.tsp-labband b{
+  display:inline-block; color:#f3c675;
+  border:2px dashed #f3c675; border-radius:3px;
+  padding:.06em .38em; margin-right:.5em; letter-spacing:.09em;
+}
+@media print{ .tsp-labband{background:#fff; color:#000; border-bottom:2px solid #000;} }
+</style>
+</head>
+<body>
+<p class="tsp-labband"><b>LAB</b>An experiment on the bench, not a finished game.</p>
+
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.4rem 0 1rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v13 <span style="opacity:.75">75e938c</span></span></span></p>
+<script>(function(){var u=document.getElementById('seUpdated');if(!u)return;var d=new Date(document.lastModified);u.textContent=isNaN(d.getTime())?'Last updated recently':'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});})();</script>
+
+
+<div class="wrap">
+
+<section class="screen on" id="draft" aria-label="Auction draft room">
+  <div class="bar">
+    <span><b>Matt</b> <span class="money" id="mBank">$100</span></span>
+    <span><b>Evan</b> <span class="money" id="eBank">$100</span></span>
+  </div>
+
+  <div class="turnline" id="turnLine">Matt nominates first. Tap a player below to put them on the block.</div>
+
+  <div class="podium" id="podium" hidden>
+    <p class="ppos" id="pdPos"></p>
+    <p class="pname" id="pdName"></p>
+    <p id="pdFlag"></p>
+    <p class="scout" id="pdScout"></p>
+    <p class="bid">$<span id="pdBid">1</span></p>
+    <p class="bidwho" id="pdWho"></p>
+    <div class="bidrow">
+      <button id="bid1">+ $1</button>
+      <button id="bid5">+ $5</button>
+      <button class="primary" id="passBtn">Pass</button>
+    </div>
+  </div>
+
+  <div class="chatbar">
+    <div class="chatline" id="chatLine">The room is quiet. Too quiet.</div>
+    <div class="chatbtns">
+      <button id="talk1">Talk: Nice pick</button>
+      <button id="talk2">Talk: Bold move</button>
+      <button id="talk3">Talk: Enjoy that</button>
+    </div>
+  </div>
+
+  <h2 id="boardHead">The Big Board</h2>
+  <div class="board" id="board"></div>
+
+  <div class="rosters">
+    <div class="ros"><h3>Matt's Warriors</h3><ul id="mRos"></ul></div>
+    <div class="ros"><h3>Evan's Warriors</h3><ul id="eRos"></ul></div>
+  </div>
+</section>
+
+<section class="screen" id="end" aria-label="Draft grades">
+  <div class="burst" id="burst" aria-hidden="true"></div>
+  <p class="winner" id="winLine"></p>
+  <h1 tabindex="-1">Draft Grades</h1>
+  <div class="grade" id="grades"></div>
+  <button class="primary" id="replay" style="width:100%">Run it back</button>
+  <details><summary>How this was made</summary><div class="inner">
+    <p>Practice pool — the dollar values are game values for calibration training, not real rankings. Update the pool before your real draft. Sleeper tags hide extra value: the game teaches you to smell the bargain.</p>
+    <p>League rules baked in: $100 cap, and you can never bid more than your budget minus a dollar for every empty roster slot — the same math that saves you on draft night. Yahoo live sync is v2 and needs a backend; this file is fully offline. Built by Claude through the Tight Spiral pipeline; founder and Evan playtest is the open gate.</p>
+  </div></details>
+  <div class="foot">Tight Spiral Productions · walshero@gmail.com · Play. Notice. Design. — <b>Warriors Fantasy Arcade</b> v1. Two players, one phone, one hundred dollars. No audio is recorded anywhere in this game.</div>
+</section>
+
+</div>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<!-- STUDIO EYES — reading comfort control -->
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+})();
+</script>
+
+<script>
+(function(){
+"use strict";
+/* PRACTICE POOL — update before the real draft. val=list price feel; tv=hidden true value (drives grades). */
+var POOL=[
+ {n:"Patrick Mahomes",p:"QB",val:38,tv:38,s:0,note:"The market knows. The market always knows."},
+ {n:"Josh Allen",p:"QB",val:36,tv:37,s:0,note:"Throws it far. Sometimes to his own team."},
+ {n:"Jalen Hurts",p:"QB",val:30,tv:31,s:0,note:"The push nobody can stop, including the rules committee."},
+ {n:"Christian McCaffrey",p:"RB",val:44,tv:36,s:0,note:"Priced like a certainty. Nothing is a certainty."},
+ {n:"Bijan Robinson",p:"RB",val:40,tv:42,s:0,note:"Runs like the cart is chasing him."},
+ {n:"Saquon Barkley",p:"RB",val:38,tv:38,s:0,note:"Hurdles men for a living."},
+ {n:"Jahmyr Gibbs",p:"RB",val:34,tv:37,s:0,note:"Fast in a way that feels rude."},
+ {n:"Breece Hall",p:"RB",val:26,tv:29,s:0,note:"The offense may or may not show up with him."},
+ {n:"De'Von Achane",p:"RB",val:24,tv:30,s:1,note:"Track star in shoulder pads. Blink tax applies."},
+ {n:"Kyren Williams",p:"RB",val:20,tv:23,s:0,note:"Boring the way rent checks are boring."},
+ {n:"Rookie RB (upside swing)",p:"RB",val:8,tv:19,s:1,note:"Nobody's heard of him. That's the point."},
+ {n:"Veteran RB (the fall guy)",p:"RB",val:12,tv:7,s:0,note:"Name brand. Check the expiration date."},
+ {n:"Justin Jefferson",p:"WR",val:44,tv:44,s:0,note:"Pay the man. Everyone else does."},
+ {n:"CeeDee Lamb",p:"WR",val:40,tv:39,s:0,note:"Catches everything, including blame in January."},
+ {n:"Ja'Marr Chase",p:"WR",val:40,tv:42,s:0,note:"When he's on, change the channel, it's over."},
+ {n:"Amon-Ra St. Brown",p:"WR",val:34,tv:35,s:0,note:"Runs routes like he's settling a grudge."},
+ {n:"Puka Nacua",p:"WR",val:28,tv:32,s:1,note:"Late-round legend energy, early-round bill."},
+ {n:"Nico Collins",p:"WR",val:22,tv:27,s:1,note:"The quiet kind of enormous."},
+ {n:"Slot WR (target vacuum)",p:"WR",val:10,tv:17,s:1,note:"Eight catches a game and nobody claps."},
+ {n:"Deep-threat WR (boom/bust)",p:"WR",val:9,tv:6,s:0,note:"Two weeks of glory, twelve of silence."},
+ {n:"Travis Kelce",p:"TE",val:22,tv:18,s:0,note:"Still famous. Check the tread."},
+ {n:"Sam LaPorta",p:"TE",val:18,tv:20,s:0,note:"A tight end who is actually open."},
+ {n:"Breakout TE (the leap year)",p:"TE",val:7,tv:14,s:1,note:"Year three. It's always year three."},
+ {n:"Steady TE (the floor)",p:"TE",val:5,tv:8,s:0,note:"Six points every week, for chrissake, like clockwork."}
+];
+var SLOTS=["QB","RB","RB","WR","WR","FLEX"]; // 6 per side, 12 nominations total
+var TALK={
+ talk1:["Nice pick. Genuinely. This hurts.","Fine. FINE.","Okay, that one stung a little."],
+ talk2:["Bold. The kind of bold they write about. Briefly.","A gutsy call. Guts are refundable, right?","Wow. Committing to the bit."],
+ talk3:["Enjoy that contract in week eight.","Enjoy your kicker money on one guy.","Enjoy explaining that one at Thanksgiving."]
+};
+var st;
+function fresh(){ st={bank:{M:100,E:100},ros:{M:[],E:[]},nomTurn:"M",phase:"nominate",
+ onBlock:null,bid:1,leader:null,bidTurn:null,gone:{},log:[]}; }
+function $(id){return document.getElementById(id);}
+function nm(k){return k==="M"?"Matt":"Evan";}
+function slotsLeft(k){return SLOTS.length-st.ros[k].length;}
+function maxBid(k){return st.bank[k]-(slotsLeft(k)-1);} // league math: $1 per remaining slot
+function canSlot(k,pos){ // rules validation: does this player fit an open slot?
+  var need=SLOTS.slice(); st.ros[k].forEach(function(r){
+    var i=need.indexOf(r.p); if(i<0)i=need.indexOf("FLEX"); if(i>=0)need.splice(i,1);});
+  return need.indexOf(pos)>=0 || (need.indexOf("FLEX")>=0 && (pos==="RB"||pos==="WR"||pos==="TE"));
+}
+function money(){ $("mBank").textContent="$"+st.bank.M; $("eBank").textContent="$"+st.bank.E; }
+function rosters(){
+  ["M","E"].forEach(function(k){
+    var ul=$(k==="M"?"mRos":"eRos"); ul.innerHTML="";
+    st.ros[k].forEach(function(r){ var li=document.createElement("li");
+      li.innerHTML="<span>"+r.p+" · "+r.n+"</span><b>$"+r.paid+"</b>"; ul.appendChild(li); });
+    for(var i=st.ros[k].length;i<SLOTS.length;i++){ var li2=document.createElement("li");
+      li2.innerHTML="<span style='color:var(--dim)'>"+SLOTS[i]+" · open</span><b></b>"; ul.appendChild(li2); }
+  });
+}
+function board(){
+  var b=$("board"); b.innerHTML="";
+  POOL.forEach(function(pl,idx){
+    var c=document.createElement("button"); c.className="pcard"+(st.gone[idx]?" gone":"");
+    c.disabled=!!st.gone[idx]||st.phase!=="nominate";
+    c.innerHTML="<b>"+pl.n+"</b>"+pl.p+" · $"+pl.val+(pl.s?' · <span class="sleeper">SLEEPER</span>':"");
+    c.addEventListener("click",function(){nominate(idx);});
+    b.appendChild(c);
+  });
+}
+function say(t){ $("chatLine").textContent=t; }
+function turnline(t){ $("turnLine").textContent=t; }
+function nominate(idx){
+  if(st.phase!=="nominate")return;
+  var pl=POOL[idx], who=st.nomTurn;
+  if(!canSlot(who,pl.p)){ say("The league office clears its throat: "+nm(who)+" has no slot for a "+pl.p+"."); return; }
+  st.onBlock=idx; st.bid=1; st.leader=who; st.bidTurn=(who==="M"?"E":"M"); st.phase="bid";
+  $("podium").hidden=false;
+  $("pdPos").textContent=pl.p+" · list price $"+pl.val;
+  $("pdName").textContent=pl.n;
+  $("pdFlag").innerHTML=pl.s?'<span class="sleeper">SLEEPER</span>':"";
+  $("pdScout").textContent='"'+pl.note+'"';
+  paint();
+  board();
+}
+function paint(){
+  var pl=POOL[st.onBlock];
+  $("pdBid").textContent=st.bid;
+  $("pdWho").textContent=nm(st.leader)+" leads. "+nm(st.bidTurn)+" to act.";
+  turnline(nm(st.bidTurn)+": raise or pass on "+pl.n+".");
+  var mb=maxBid(st.bidTurn), lockOut=!canSlot(st.bidTurn,pl.p);
+  $("bid1").disabled = st.bid+1>mb || lockOut;
+  $("bid5").disabled = st.bid+5>mb || lockOut;
+  if(lockOut) say("No open slot for "+nm(st.bidTurn)+" here — pass is the only move.");
+}
+function raise(amt){
+  var who=st.bidTurn;
+  st.bid+=amt; st.leader=who; st.bidTurn=(who==="M"?"E":"M");
+  if(amt===5) say(nm(who)+" jumps five. The gavel flinches.");
+  paint();
+}
+function pass(){
+  var win=st.leader, pl=POOL[st.onBlock];
+  st.bank[win]-=st.bid; st.gone[st.onBlock]=true;
+  st.ros[win].push({n:pl.n,p:pl.p,paid:st.bid,tv:pl.tv,val:pl.val,s:pl.s});
+  st.log.push({win:win,pl:pl,paid:st.bid});
+  say("SOLD. "+pl.n+" to "+nm(win)+" for $"+st.bid+".");
+  $("podium").hidden=true; st.phase="nominate"; st.onBlock=null;
+  st.nomTurn=(st.nomTurn==="M"?"E":"M");
+  money(); rosters(); board();
+  if(st.ros.M.length===SLOTS.length && st.ros.E.length===SLOTS.length){ finish(); return; }
+  if(st.ros[st.nomTurn].length===SLOTS.length) st.nomTurn=(st.nomTurn==="M"?"E":"M");
+  turnline(nm(st.nomTurn)+" nominates. Tap a player on the Big Board.");
+}
+$("bid1").addEventListener("click",function(){raise(1);});
+$("bid5").addEventListener("click",function(){raise(5);});
+$("passBtn").addEventListener("click",pass);
+Object.keys(TALK).forEach(function(id){
+  $(id).addEventListener("click",function(){ var arr=TALK[id]; say(arr[Math.floor(Math.random()*arr.length)]); });
+});
+document.addEventListener("keydown",function(e){
+  if(st.phase!=="bid")return;
+  if(e.key==="1"&&!$("bid1").disabled){e.preventDefault();raise(1);}
+  if(e.key==="5"&&!$("bid5").disabled){e.preventDefault();raise(5);}
+  if(e.key==="p"||e.key==="P"){e.preventDefault();pass();}
+});
+function grade(k){
+  var v=0,paid=0; st.ros[k].forEach(function(r){v+=r.tv;paid+=r.paid;});
+  return {v:v,paid:paid,eff:v-paid};
+}
+function finish(){
+  var gM=grade("M"),gE=grade("E");
+  var win = gM.v===gE.v ? null : (gM.v>gE.v?"M":"E");
+  $("winLine").textContent = win ? nm(win)+" takes the room — "+ (win==="M"?gM.v:gE.v)+" points of true value." : "A dead tie. The league demands a rematch.";
+  var g=$("grades"),html="";
+  ["M","E"].forEach(function(k){
+    var gg=grade(k);
+    html+="<p><b>"+nm(k)+":</b> $"+gg.paid+" spent, "+gg.v+" true value, efficiency "+(gg.eff>=0?"+":"")+gg.eff+"</p>";
+  });
+  var best=null,worst=null,sleep=null;
+  st.log.forEach(function(e){ var d=e.pl.tv-e.paid;
+    if(!best||d>best.d)best={d:d,e:e}; if(!worst||d<worst.d)worst={d:d,e:e};
+    if(e.pl.s&&(!sleep||d>sleep.d))sleep={d:d,e:e}; });
+  if(best)html+='<p><span class="super">Biggest Steal:</span> '+best.e.pl.n+" to "+nm(best.e.win)+" ($"+best.e.paid+", worth "+best.e.pl.tv+")</p>";
+  if(worst)html+='<p><span class="super">The Overpay:</span> '+worst.e.pl.n+" to "+nm(worst.e.win)+" ($"+worst.e.paid+", worth "+worst.e.pl.tv+")</p>";
+  if(sleep)html+='<p><span class="super">Sleeper of the Night:</span> '+sleep.e.pl.n+" — the tag told the truth</p>";
+  html+="<p>The lesson lives in the gap between the list price and the true value. That gap is the whole game — on this screen and on draft night.</p>";
+  g.innerHTML=html;
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on");});
+  $("end").classList.add("on"); window.scrollTo(0,0);
+  var burst=$("burst"),cols=["#a8791f","#2e6b46","#1f5fa8","#8a4030"];
+  burst.innerHTML=""; for(var i=0;i<14;i++){var sp=document.createElement("span");
+    sp.style.left=(4+i*7)+"%"; sp.style.background=cols[i%4]; sp.style.animationDelay=(i*0.06)+"s"; burst.appendChild(sp);}
+  requestAnimationFrame(function(){burst.classList.add("go");});
+  $("end").querySelector("h1").focus({preventScroll:true});
+}
+$("replay").addEventListener("click",function(){
+  fresh(); money(); rosters(); board();
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on");});
+  $("draft").classList.add("on"); window.scrollTo(0,0);
+  turnline("Matt nominates first. Tap a player below to put them on the block.");
+  say("The room is quiet. Too quiet.");
+});
+fresh(); money(); rosters(); board();
+})();
+</script>
+<!--
+TSP-META
+{ "file":"warriors-fantasy-arcade.html",
+  "role":"Matt-vs-Evan hotseat auction draft trainer; joy-first two-player game; recovered spec from chat 6dfb870e",
+  "spine":"Feel the gap between list price and true value — the calibration skill that wins a real auction.",
+  "wireframe_novelty":"the sleeper tag is honest — hidden true value rewards the nose for bargains; league budget math (bank minus a dollar per open slot) is a live rule, not a tip",
+  "construct":"price calibration; evidence = efficiency score (true value minus spend), computed per pick",
+  "task_spine":"Roles: two GMs at a real auction; Freedoms: fail (overpay teaches), experiment (jump bids), identity (your Warriors), replay free",
+  "medium_gate":"MVP mechanic prototype — plain by pipeline law (stage 4); Lane A craft pass = stage 6 after Matt+Evan playtest",
+  "joy":"deadpan auctioneer copy, trash-talk bar (canned lines, funny both directions), gavel-flinch lines, cut-paper confetti burst with reduced-motion fallback",
+  "league_rules_baked":"$100 cap; 14-team auction context; max-bid = bank - (open slots - 1); positional slot validation on nomination and bidding; keepers +$5 = v2 (needs keeper list)",
+  "hitl_NEEDED":["Matt+Evan playtest (the hinge)","real player pool update before draft night (values are practice values, labeled)","keeper list + Yahoo rules export","Yahoo live sync = v2, needs backend, STUBBED","multi-source rankings import = v2"],
+  "legal_floors":"MA two-party consent: NO audio capture anywhere in this game; FERPA n/a",
+  "floor_states_verified":["single-file offline in-memory","comfort knob in corner (never a wall), 3 stops","44px+ targets","keyboard: 1/5 raise, P pass","visible focus rings","no emoji","reduced-motion honored","scene-first: opens in the draft room, first action is a nomination"],
+  "founder_open":["playtest with Evan","confirm roster shape (6 slots MVP vs full 14-team roster)","decide one-player mode (AI bidders vs solo prep) for v2"] }
+-->
+
+<!-- TSP shared mobile nav + device adaptation -->
+<script>window.TSP_MOBILE = { home:"index.html", nav:false };</script>
+<!-- TSP-MOBILE (inlined from tsp-mobile.js — single-file-offline law) -->
+<script>
+/* Tight Spiral Studios — shared mobile controls + Home/Back nav.
+   Source & docs: tsp-mobile.js. Edit there, then re-inline. */
+(function () {
+  "use strict";
+
+  var d = document, root = d.documentElement, cfg = window.TSP_MOBILE || {};
+
+  /* ---- Device detection --------------------------------------------------- */
+  var hasTouch = ("ontouchstart" in window) ||
+                 (navigator.maxTouchPoints > 0) ||
+                 (navigator.msMaxTouchPoints > 0);
+  var coarse   = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  var narrow   = Math.min(screen.width || 9999, screen.height || 9999) < 820;
+  var isMobile = hasTouch && (coarse || narrow);
+
+  root.classList.add(hasTouch ? "tsp-touch" : "tsp-no-touch");
+  if (isMobile) root.classList.add("tsp-mobile");
+
+  /* ---- Synthetic keyboard dispatch --------------------------------------- */
+  // Games listen on window (or document) for keydown/keyup and read e.key.
+  var evTarget = (cfg.target === "document") ? d : window;
+
+  function dispatchKey(type, key) {
+    var ev;
+    try {
+      ev = new KeyboardEvent(type, {
+        key: key, code: codeFor(key),
+        bubbles: true, cancelable: true, view: window
+      });
+    } catch (e) {
+      // Legacy fallback
+      ev = d.createEvent("Event");
+      ev.initEvent(type, true, true);
+      try { ev.key = key; } catch (_) {}
+    }
+    evTarget.dispatchEvent(ev);
+  }
+
+  function codeFor(key) {
+    switch (key) {
+      case "ArrowLeft":  return "ArrowLeft";
+      case "ArrowRight": return "ArrowRight";
+      case "ArrowUp":    return "ArrowUp";
+      case "ArrowDown":  return "ArrowDown";
+      case " ":          return "Space";
+      case "Enter":      return "Enter";
+      case "Shift":      return "ShiftLeft";
+      default:
+        if (key && key.length === 1) return "Key" + key.toUpperCase();
+        return "";
+    }
+  }
+
+  /* ---- Styles (injected once) -------------------------------------------- */
+  function injectStyles() {
+    if (d.getElementById("tsp-mobile-style")) return;
+    var css = [
+      /* Navigation chip — always available, subtle on desktop */
+      ".tsp-nav{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));",
+        "z-index:2147483000;display:flex;gap:8px;font-family:'Helvetica Neue',Arial,sans-serif}",
+      ".tsp-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.4em;text-decoration:none;",
+        "padding:.5em .85em;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.04em;",
+        "color:#f4f1e8;background:rgba(20,18,15,.66);border:1px solid rgba(255,207,90,.45);",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1;",
+        "box-shadow:0 4px 14px rgba(0,0,0,.35);transition:background .15s,border-color .15s,transform .08s}",
+      ".tsp-nav a:hover,.tsp-nav a:focus-visible{background:rgba(40,34,24,.9);border-color:#ffcf5a;outline:none}",
+      ".tsp-nav a:active{transform:translateY(1px)}",
+      "@media (min-width:900px) and (pointer:fine){.tsp-nav{opacity:.55}.tsp-nav:hover{opacity:1}}",
+
+      /* Nav integrated into the studio's shared .topbar (no overlap) */
+      ".tsp-barnav{display:inline-flex;align-items:center;gap:.35rem;margin-right:.25rem;flex:none}",
+      ".tsp-barnav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.3em;text-decoration:none;color:inherit;",
+        "font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.02em;line-height:1;",
+        "padding:.4em .7em;border-radius:999px;border:1px solid currentColor;opacity:.85;",
+        "background:transparent;white-space:nowrap;transition:opacity .12s,background .12s}",
+      ".tsp-barnav a:hover,.tsp-barnav a:focus-visible{opacity:1;background:rgba(127,127,127,.18);outline:none}",
+      ".tsp-barnav a:active{transform:translateY(1px)}",
+      /* Keep the shared bar on one row once Home/Back are added: title ellipsizes */
+      ".tsp-touch .topbar{gap:.4rem}",
+      ".tsp-touch .topbar .wm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto}",
+
+      /* Gamepad — only rendered on touch devices */
+      ".tsp-pad{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;",
+        "display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;",
+        "padding:0 max(14px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));",
+        "font-family:'Helvetica Neue',Arial,sans-serif;touch-action:none}",
+      ".tsp-cluster{display:flex;gap:12px;pointer-events:none;align-items:flex-end;flex-wrap:wrap;max-width:46vw}",
+      ".tsp-cluster.right{justify-content:flex-end}",
+      ".tsp-btn{pointer-events:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;",
+        "touch-action:none;min-width:62px;min-height:62px;padding:0 14px;border-radius:16px;",
+        "display:flex;align-items:center;justify-content:center;text-align:center;",
+        "font-size:15px;font-weight:700;letter-spacing:.03em;color:#f4f1e8;",
+        "background:rgba(24,20,15,.6);border:1.5px solid rgba(255,207,90,.5);",
+        "-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);",
+        "box-shadow:0 6px 18px rgba(0,0,0,.4);transition:background .06s,transform .06s;cursor:pointer}",
+      ".tsp-btn.big{min-width:82px;min-height:82px;font-size:16px}",
+      ".tsp-btn:active,.tsp-btn.on{background:rgba(255,207,90,.9);color:#1a0d09;transform:scale(.94)}",
+      /* Hide gamepad on non-touch so desktop keeps keyboard feel */
+      ".tsp-no-touch .tsp-pad{display:none}",
+
+      /* Rotate-for-more-room hint — canvas games only, portrait phones only */
+      ".tsp-rot{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top));",
+        "z-index:2147482500;display:none;align-items:center;gap:.55em;padding:.5em .55em .5em .9em;",
+        "border-radius:999px;background:rgba(24,20,15,.86);color:#f4f1e8;",
+        "border:1px solid rgba(255,207,90,.5);white-space:nowrap;",
+        "font:600 12px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.4)}",
+      ".tsp-rot .rk{font-size:14px;color:#ffcf5a}",
+      ".tsp-rot button{background:none;border:none;color:inherit;font-size:16px;line-height:1;",
+        "padding:0 .15em;margin:0;cursor:pointer;opacity:.65}",
+      ".tsp-rot button:active{opacity:1}",
+      "@media (orientation:portrait){.tsp-touch .tsp-rot{display:inline-flex}}",
+      ".tsp-rot-dismissed .tsp-rot{display:none!important}"
+    ].join("");
+    var s = d.createElement("style");
+    s.id = "tsp-mobile-style";
+    s.textContent = css;
+    d.head.appendChild(s);
+  }
+
+  /* ---- Navigation (Home / Back) ------------------------------------------ */
+  function makeLink(href, label, aria) {
+    var a = d.createElement("a");
+    a.href = href; a.innerHTML = label;
+    a.setAttribute("aria-label", aria);
+    return a;
+  }
+
+  function buildNav() {
+    if (cfg.nav === false) return;
+    if (d.querySelector(".tsp-nav, .tsp-barnav")) return;
+
+    var home = cfg.home === undefined ? "index.html" : cfg.home;
+    var links = [];
+    if (cfg.back) links.push(makeLink(cfg.back, "‹ Back", "Back"));
+    if (home)     links.push(makeLink(home, "⌂ Home", "Home"));
+    if (!links.length) return;
+
+    // Prefer integrating into the studio's shared sticky header if present —
+    // avoids overlapping page titles and matches each page's palette.
+    var bar = cfg.floatNav ? null : d.querySelector(".topbar");
+    if (bar) {
+      var wrap = d.createElement("span");
+      wrap.className = "tsp-barnav";
+      links.forEach(function (l) { wrap.appendChild(l); });
+      bar.insertBefore(wrap, bar.firstChild);
+      return;
+    }
+
+    // Otherwise: floating chip, and reserve top space on scrollable pages so
+    // it never covers the header/title.
+    var nav = d.createElement("nav");
+    nav.className = "tsp-nav";
+    nav.setAttribute("aria-label", "Site navigation");
+    links.forEach(function (l) { nav.appendChild(l); });
+    d.body.appendChild(nav);
+    reserveTopSpace();
+  }
+
+  function reserveTopSpace() {
+    if (!hasTouch) return;                 // desktop keeps its exact layout
+    // Skip full-viewport apps (canvas games, fixed overlays) — the chip sits
+    // in their letterbox margin and body padding would distort them.
+    var cs = getComputedStyle(d.body);
+    if (cs.overflowY === "hidden" || cs.overflowX === "hidden") return;
+    var scrolls = root.scrollHeight > (window.innerHeight + 4);
+    if (!scrolls) return;
+    var pad = parseFloat(cs.paddingTop) || 0;
+    d.body.style.paddingTop = (pad + 58) + "px";
+  }
+
+  /* ---- Gamepad ------------------------------------------------------------ */
+  function buildPad() {
+    if (!hasTouch) return;                       // keyboard devices skip it
+    if (!cfg.controls || !cfg.controls.length) return;
+    if (d.querySelector(".tsp-pad")) return;
+
+    var pad = d.createElement("div");
+    pad.className = "tsp-pad";
+    var left  = d.createElement("div"); left.className  = "tsp-cluster left";
+    var right = d.createElement("div"); right.className = "tsp-cluster right";
+    pad.appendChild(left); pad.appendChild(right);
+
+    cfg.controls.forEach(function (c) {
+      var btn = d.createElement("button");
+      btn.type = "button";
+      btn.className = "tsp-btn" + (c.big ? " big" : "");
+      btn.innerHTML = c.label || "";
+      btn.setAttribute("aria-label", c.aria || c.label || c.key);
+      bindButton(btn, c);
+      (c.side === "left" ? left : right).appendChild(btn);
+    });
+
+    d.body.appendChild(pad);
+  }
+
+  function bindButton(btn, c) {
+    var key = c.key, held = false;
+
+    function press(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (c.hold) {
+        if (held) return;
+        held = true;
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+      } else {
+        // tap: quick down/up so edge-triggered actions (fire/rotate/drop) fire once
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+        setTimeout(function () { dispatchKey("keyup", key); }, 24);
+        setTimeout(function () { btn.classList.remove("on"); }, 90);
+      }
+    }
+    function release(e) {
+      if (e) e.preventDefault();
+      if (c.hold && held) {
+        held = false;
+        btn.classList.remove("on");
+        dispatchKey("keyup", key);
+      }
+    }
+
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", function (e) {
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+        press(e);
+      });
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointercancel", release);
+      btn.addEventListener("lostpointercapture", release);
+    } else {
+      btn.addEventListener("touchstart", press, { passive: false });
+      btn.addEventListener("touchend", release);
+      btn.addEventListener("touchcancel", release);
+      btn.addEventListener("mousedown", press);
+      btn.addEventListener("mouseup", release);
+      btn.addEventListener("mouseleave", release);
+    }
+    // Safety: releasing a held key if the page loses focus
+    window.addEventListener("blur", release);
+  }
+
+  /* ---- Rotate hint -------------------------------------------------------- */
+  function buildRotateHint() {
+    if (!hasTouch) return;
+    if (cfg.rotateHint === false) return;
+    if (!cfg.controls || !cfg.controls.length) return;   // canvas games only
+    if (d.querySelector(".tsp-rot")) return;
+    var hint = d.createElement("div");
+    hint.className = "tsp-rot";
+    hint.setAttribute("role", "note");
+    hint.innerHTML = '<span class="rk">↻</span>' +
+      '<span>Turn sideways for more room</span>' +
+      '<button type="button" aria-label="Dismiss">×</button>';
+    hint.querySelector("button").addEventListener("click", function () {
+      root.classList.add("tsp-rot-dismissed");
+    });
+    d.body.appendChild(hint);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    injectStyles();
+    buildNav();
+    buildPad();
+    buildRotateHint();
+  }
+
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose a tiny API for pages that want to toggle the pad (e.g. hide on menus)
+  window.TSPMobile = {
+    isTouch: hasTouch,
+    isMobile: isMobile,
+    press: function (key) { dispatchKey("keydown", key); dispatchKey("keyup", key); },
+    showPad: function (v) {
+      var p = d.querySelector(".tsp-pad");
+      if (p) p.style.display = v === false ? "none" : "";
+    }
+  };
+})();
+</script>
+</body>
+</html>
