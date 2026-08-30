@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Two fireground calibration cases in one trainer: Under Load (structural collapse) and Reading the Smoke (fire behavior). Commit a read under uncertainty, then meet the record. Calibration, not certification. Offline, private, single file, with a facilitator mode for crew debrief.">
+<title>Reading the Fireground — collapse &amp; smoke calibration cases</title>
+<meta name="tsp:surface" content="tool">
+<style>
+  :root{
+    --paper:#f7f4ee; --ink:#0f0d0a; --ink2:#2a2620;
+    --card:#fffdf9; --rule:#cdc5b6; --shade:#ece6da;
+    --band:#12100b; --band-ink:#f7f4ee;
+    --dusk:#7a3d00; --field:#124a44; --pick:#0a3a86;
+    --focus:#0a4fd0; --alarm:#8c2f39; --leaf:#2f5a1f;
+    /* TOKEN_ROLE split: *-fill = decoration (bg/border/shadow), base = text; same hex */
+    --ink-fill:#0f0d0a; --paper-ink:#f7f4ee; --dusk-fill:#7a3d00; --field-fill:#124a44; --alarm-fill:#8c2f39;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink2);font:400 19px/1.62 "Iowan Old Style","Palatino Linotype",Georgia,serif;-webkit-text-size-adjust:100%}
+  .skip{position:absolute;left:-9999px;display:inline-flex;align-items:center;min-height:44px;background:var(--ink-fill);color:var(--paper-ink)}
+  .skip:focus{left:12px;top:12px;position:fixed;z-index:20;background:var(--ink-fill);color:var(--paper-ink);padding:10px 14px;border-radius:8px}
+  /* ═══ STUDIO EYES — light ladder remaps on this page's OWN tokens ═══ */
+  html[data-light="dusk"]{
+    --paper:#efe3cc; --card:#f7efd9; --shade:#e6d9bd; --rule:#c9ba97;
+  }
+  /* WARM-DARK (night): cool near-white ink on WARM charcoal (never pure black).
+     Values carried over from the collapse case's RP-verified dark palette. */
+  html[data-light="night"]{
+    --paper:#151210; --ink:#eef0f3; --ink2:#d6dae0; --card:#211b15; --rule:#483d2d; --shade:#2a2217;
+    --band:#0c0a07; --band-ink:#eef0f3; --dusk:#c9d2db; --field:#7fd3c8; --pick:#9db8ee;
+    --alarm:#f0a3ab; --leaf:#a9c98f; --ink-fill:#eef0f3; --paper-ink:#151210;
+    --dusk-fill:#c9d2db; --field-fill:#7fd3c8; --alarm-fill:#f0a3ab; --focus:#f0c357;
+  }
+  html[data-light="night"] .choice[aria-pressed="true"]{background:#31281b;border-color:#9db8ee}
+  html[data-light="night"] .art{filter:brightness(.86) saturate(.92)}
+  /* toggles */
+  html.se-contrast:not([data-light="night"]){--paper:#fbfaf7;--card:#ffffff;--shade:#f0ece2;--ink:#0b0906;--ink2:#211a10;--rule:#b9a06a}
+  html.se-contrast[data-light="night"]{--paper:#0c0a07;--card:#161410;--ink:#fff7e6;--ink2:#efe0bc}
+  html.se-a1{ zoom:1.15; }
+  html.se-a2{ zoom:1.3; }
+  html.se-reduce *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  html.se-cb a{text-decoration:underline;text-underline-offset:2px}
+
+  /* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+  .se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:9px 14px;background:var(--card);border-bottom:2px solid var(--ink-fill);position:sticky;top:0;z-index:30}
+  .se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;border:2px solid var(--rule);border-radius:9px;background:var(--shade);color:var(--ink);font:700 14px/1 ui-monospace,Menlo,Consolas,monospace;text-decoration:none}
+  .se-home:hover{border-color:var(--ink-fill)}
+  .se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--ink)}
+  .se-brand svg{width:34px;height:20px;color:var(--field);flex:0 0 auto}
+  .se-brand .wm{font:400 16px/1 "Iowan Old Style","Palatino Linotype",Georgia,serif;white-space:nowrap;color:var(--ink)}
+  .se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;border:2px solid var(--ink-fill);border-radius:9px;background:var(--ink-fill);color:var(--paper-ink);font:700 14px/1 ui-monospace,Menlo,Consolas,monospace;cursor:pointer}
+  .se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  @media (max-width:560px){.se-brand .wm{display:none}}
+
+  /* ═══ STUDIO EYES panel ═══ */
+  .se-panel{position:fixed;right:12px;top:62px;z-index:31;width:min(320px,calc(100vw - 24px));background:var(--card);color:var(--ink);border:2px solid var(--ink-fill);border-radius:12px;padding:15px;box-shadow:0 10px 34px rgba(0,0,0,.34);display:none}
+  .se-panel[data-open="1"]{display:block}
+  .se-panel h2{font:700 10.5px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
+  .se-row{display:flex;gap:6px;margin-bottom:14px}
+  .se-btn{flex:1;min-height:44px;padding:8px 4px;border:2px solid var(--rule);border-radius:8px;background:var(--shade);color:var(--ink);font:700 12.5px/1.1 ui-monospace,Menlo,Consolas,monospace;cursor:pointer}
+  .se-btn[aria-pressed="true"]{background:var(--ink-fill);color:var(--paper-ink);border-color:var(--ink-fill)}
+  .se-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:8px 11px;margin-bottom:6px;border:2px solid var(--rule);border-radius:8px;background:var(--shade);color:var(--ink);font:600 14px/1.2 inherit;font-family:inherit;cursor:pointer;text-align:left}
+  .se-tog[aria-pressed="true"]{border-color:var(--pick)}
+  .se-tog .st{font:700 11px/1 ui-monospace,Menlo,Consolas,monospace;color:var(--ink2)}
+  .se-tog[aria-pressed="true"] .st{color:var(--pick)}
+  .se-tog:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:20px;border-top:2px solid var(--rule);background:var(--paper)}
+  .se-rail button,.se-rail a{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border:2px solid var(--rule);border-radius:9px;background:var(--shade);color:var(--ink);font:700 14px/1 ui-monospace,Menlo,Consolas,monospace;text-decoration:none;cursor:pointer}
+  .se-rail button:hover,.se-rail a:hover{border-color:var(--ink-fill)}
+  .se-rail button:focus-visible,.se-rail a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .se-rail button[aria-disabled="true"]{opacity:.4;cursor:default}
+  .se-rail button[aria-disabled="true"]:hover{border-color:var(--rule)}
+  .se-stamp{text-align:center;padding:0 20px 26px;background:var(--paper)}
+  .se-stamp span{font:400 13px/1.4 ui-monospace,Menlo,Consolas,monospace;color:var(--ink2)}
+  .wrap{max-width:820px;margin:0 auto;padding:0 20px 120px}
+  .stage{min-height:100vh;display:none;flex-direction:column;justify-content:center;padding:74px 0 40px}
+  .stage.on{display:flex}
+  .kicker{font:700 13px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dusk);margin:0 0 14px}
+  h1{font-weight:700;font-size:clamp(30px,7vw,50px);line-height:1.06;margin:0 0 10px;color:var(--ink);letter-spacing:-.01em}
+  h2{font-weight:700;font-size:clamp(23px,5vw,33px);line-height:1.12;margin:0 0 16px;color:var(--ink)}
+  .sub{font-size:20px;color:var(--ink2);margin:0 0 28px;max-width:62ch}
+  .art{display:block;width:100%;max-width:600px;margin:0 auto 24px;border:2px solid var(--rule);border-radius:12px;overflow:hidden;background:var(--card);aspect-ratio:8/5}
+  .art svg{display:block;width:100%;height:100%}
+  .prompt{font-weight:700;color:var(--ink);font-size:21px;margin:0 0 8px;max-width:60ch}
+  .known{background:var(--card);border:2px solid var(--rule);border-left:6px solid var(--field-fill);border-radius:10px;padding:15px 18px;margin:0 0 18px}
+  .known h3{margin:0 0 8px;font:700 12px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--field)}
+  .known ul{margin:0;padding:0 0 0 20px}
+  .known li{font-size:17px;color:var(--ink);margin:0 0 6px;line-height:1.45}
+  .known .tag{font:700 10px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;color:var(--dusk);border:1px solid var(--dusk-fill);border-radius:4px;padding:2px 5px;margin-left:6px;white-space:nowrap;text-transform:uppercase}
+  .known .tag.pend{color:var(--alarm);border-color:var(--alarm-fill)}
+  .choices{display:flex;flex-direction:column;gap:12px;margin:0 0 8px}
+  .choice{display:block;width:100%;text-align:left;cursor:pointer;background:var(--card);border:2px solid var(--rule);border-radius:11px;padding:15px 18px;font:inherit;font-size:18px;color:var(--ink);line-height:1.42;min-height:44px}
+  .choice:hover{border-color:var(--ink-fill)}
+  .choice:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .choice[aria-pressed="true"]{border-color:var(--pick);border-width:3px;background:var(--shade)}
+  .conf{margin:16px 0 6px;padding:15px 18px;background:var(--shade);border:2px solid var(--rule);border-radius:10px}
+  .conf h3{margin:0 0 4px;font-size:17px;color:var(--ink)}
+  .conf p{margin:0 0 12px;font-size:15px;color:var(--ink2)}
+  .conf .row{display:flex;gap:10px;flex-wrap:wrap}
+  .conf button{flex:1;min-width:120px;min-height:48px;cursor:pointer;font:700 15px/1.2 inherit;font-family:inherit;padding:12px 10px;border-radius:9px;border:2px solid var(--rule);background:var(--card);color:var(--ink)}
+  .conf button:hover{border-color:var(--ink-fill)}
+  .conf button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .conf button[aria-pressed="true"]{border-color:var(--pick);border-width:3px;background:var(--paper)}
+  .reveal{margin:20px 0 0;padding:18px 20px;border-radius:10px;background:var(--shade);border-left:6px solid var(--pick);color:var(--ink);font-size:18px}
+  .reveal.hidden{display:none}
+  .reveal h3{margin:0 0 8px;font-size:19px;color:var(--ink)}
+  .reveal b{color:var(--ink)}
+  .reveal .hidden-var{border-left:4px solid var(--dusk-fill);padding:6px 0 6px 14px;margin:12px 0}
+  .reveal .score{margin:14px 0 0;padding:12px 14px;border-radius:8px;background:var(--card);border:2px solid var(--rule);font-size:17px}
+  .reveal .score b{color:var(--field)}
+  .reveal .score.miss b{color:var(--alarm)}
+  .review{margin:18px 0 0;padding:16px 18px;background:var(--card);border:2px dashed var(--rule);border-radius:11px}
+  .review h3{margin:0 0 4px;font-size:16px;color:var(--ink)}
+  .review p{margin:0 0 12px;font-size:14px;color:var(--ink2)}
+  .review .verds{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+  .review .verds button{cursor:pointer;font:700 13px/1.2 ui-monospace,Menlo,Consolas,monospace;padding:9px 12px;border-radius:8px;border:2px solid var(--rule);background:var(--paper);color:var(--ink);min-height:42px}
+  .review .verds button:hover{border-color:var(--ink-fill)}
+  .review .verds button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .review .verds button[aria-pressed="true"]{border-width:3px;background:var(--shade)}
+  .review .verds button.v-good[aria-pressed="true"]{border-color:var(--field-fill)}
+  .review .verds button.v-bad[aria-pressed="true"]{border-color:var(--alarm-fill)}
+  .review textarea{width:100%;min-height:72px;font:inherit;font-size:16px;padding:12px 14px;border:2px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink);resize:vertical}
+  .review textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .review .seat-hint{font-size:13px;color:var(--ink2);margin:8px 0 0;font-style:italic}
+  .disclaimer{background:var(--shade);border:2px dashed var(--rule);border-radius:10px;padding:14px 16px;margin:0 0 22px;font-size:16px;color:var(--ink);font-weight:700}
+  .disclaimer .word{color:var(--alarm)}
+  .btn{display:inline-block;text-decoration:none;cursor:pointer;font:700 17px/1 inherit;font-family:inherit;padding:14px 20px;border-radius:10px;border:2px solid var(--ink-fill);background:var(--ink-fill);color:var(--paper-ink);margin:6px 8px 6px 0;min-height:44px}
+  .btn.ghost{background:var(--card);color:var(--ink)}
+  .btn:hover{opacity:.9}
+  .btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .btn[disabled]{opacity:.45;cursor:default}
+  .btnrow{margin:20px 0 0}
+  .prog{font:700 13px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.1em;color:var(--dusk);margin:0 0 12px}
+  .credit{margin:14px 0 0;font-size:15px;color:var(--ink2);font-style:italic}
+  .docphoto{margin:18px 0}
+  .docphoto img{max-width:100%;height:auto;border:2px solid var(--line);border-radius:6px;display:block}
+  .docphoto figcaption{margin-top:8px;font-size:15px;color:var(--ink2);font-style:italic}
+  .export{background:var(--card);border:2px dashed var(--rule);border-radius:12px;padding:20px 22px;margin:22px 0 0}
+  .export h3{margin:0 0 8px;font-size:18px;color:var(--ink)}
+  .export p{margin:0 0 14px;font-size:16px;color:var(--ink2)}
+  .export textarea{width:100%;min-height:180px;font:inherit;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.5;padding:14px;border:2px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink);resize:vertical}
+  .export .note{font-size:14px;color:var(--ink2);margin:12px 0 0}
+  /* facilitator hub (officer face) */
+  .hubintro{background:var(--shade);border:2px dashed var(--rule);border-radius:10px;padding:14px 16px;margin:0 0 22px;font-size:16px;color:var(--ink)}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+  .seg button{cursor:pointer;font:700 14px/1.2 ui-monospace,Menlo,Consolas,monospace;padding:11px 14px;border-radius:9px;border:2px solid var(--rule);background:var(--card);color:var(--ink);min-height:44px}
+  .seg button:hover{border-color:var(--ink-fill)}
+  .seg button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .seg button[aria-pressed="true"]{border-color:var(--pick);border-width:3px;background:var(--shade)}
+  .field{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}
+  .field label{font:700 13px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--field)}
+  .field input,.field select{font:inherit;font-size:17px;padding:11px 13px;border:2px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink);min-height:44px}
+  .field input:focus-visible,.field select:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .matrix{width:100%;border-collapse:collapse;margin:6px 0 4px;font-size:15px}
+  .matrix caption{caption-side:top;text-align:left;font:700 12px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--field);margin:0 0 8px}
+  .matrix th,.matrix td{border:2px solid var(--rule);padding:10px 12px;text-align:center;color:var(--ink);vertical-align:top}
+  .matrix th{background:var(--shade);font:700 13px/1.2 ui-monospace,Menlo,Consolas,monospace}
+  .matrix td .n{font:700 22px/1 inherit;display:block;color:var(--ink)}
+  .matrix td .who{font-size:13px;color:var(--ink2);margin-top:4px;line-height:1.35}
+  .matrix td.sound{background:color-mix(in srgb,var(--field-fill) 12%,var(--card))}
+  .matrix td.killcell{background:color-mix(in srgb,var(--alarm-fill) 16%,var(--card));border-color:var(--alarm-fill);border-width:3px}
+  .killnote{font-size:14px;color:var(--ink);margin:4px 0 18px}
+  .killnote b{color:var(--alarm)}
+  .readlist{list-style:none;margin:0 0 10px;padding:0}
+  .readlist li{font-size:15px;color:var(--ink);padding:8px 0;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .readlist .off{color:var(--alarm);font-weight:700}
+  .readlist .snd{color:var(--field);font-weight:700}
+  footer{margin-top:34px;padding-top:18px;border-top:2px solid var(--rule);font-size:15px;color:var(--ink2)}
+  footer b{color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  @media (max-width:560px){.conf button{flex-basis:100%}.matrix th,.matrix td{padding:8px 6px;font-size:13px}}
+  /* --- look & feel polish: best-practice smoothing, motion-guarded, gate-neutral --- */
+  body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .choice,.btn,.conf button,.nav button,.comfort button,.review .verds button,.seg button,.matrix td{transition:border-color .16s ease,transform .12s ease,box-shadow .16s ease,opacity .16s ease}
+  .btn:hover,.choice:hover{transform:translateY(-1px)}
+  .btn:active,.choice:active{transform:translateY(0)}
+  .art{box-shadow:0 10px 34px rgba(10,8,5,.20)}
+  .reveal{scroll-margin-top:76px}
+  .stage.on{animation:tsp-in .34s cubic-bezier(.22,.61,.36,1) both}
+  .reveal:not(.hidden){animation:tsp-in .3s cubic-bezier(.22,.61,.36,1) both}
+  @keyframes tsp-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.stage.on,.reveal:not(.hidden){animation:none}.choice,.btn,.conf button,.seg button{transition:none}.btn:hover,.choice:hover,.btn:active,.choice:active{transform:none}}
+  /* --- case-select screen --- */
+  .select-grid{display:flex;flex-direction:column;gap:16px;margin:6px 0 0}
+  .casecard{display:flex;gap:16px;align-items:flex-start;text-align:left;width:100%;cursor:pointer;background:var(--card);border:2px solid var(--rule);border-radius:14px;padding:20px 22px;font:inherit;color:var(--ink);transition:border-color .16s ease,transform .12s ease,box-shadow .16s ease}
+  .casecard:hover{border-color:var(--ink-fill);transform:translateY(-1px)}
+  .casecard:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .casecard .cg{flex:0 0 auto;width:54px;height:54px;color:var(--dusk)}
+  .casecard .cg svg{width:100%;height:100%;display:block}
+  .casecard .ctext{display:flex;flex-direction:column}
+  .casecard .ch3{font-weight:700;font-size:23px;color:var(--ink);margin:0 0 6px;line-height:1.15}
+  .casecard .cp{font-size:17px;color:var(--ink2);line-height:1.45}
+  .casecard .cmeta{font:700 12px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--field);margin:10px 0 0}
+  @media (prefers-reduced-motion:reduce){.casecard:hover{transform:none}}
+</style>
+<style>
+/* LAB STATUS BAND - founder ruling 2026-08-27, "put in lab not as done game."
+   New builds carry a .tsp-lab chip inside the h1, beside the version chip. This is
+   a RETROFIT across 19 shipped games whose heading structures have nothing in
+   common: some carry four h1 elements, one builds its title from a JS template, and
+   three have no h1 at all. Rewriting the title markup of nineteen shipped games to
+   add a label is a large blast radius for a label, so the status mounts as its own
+   band instead. Colours are fixed rather than tokenised, because these files do not
+   share a palette and a status that inherits an unknown token can arrive invisible.
+   #f6efe0 on #241a11 is 13.4:1, which clears the studio floor of 7:1 with room. */
+.tsp-labband{
+  display:block; box-sizing:border-box; width:100%;
+  background:#241a11; color:#f6efe0;
+  border-bottom:3px solid #b98c39;
+  padding:9px 16px; margin:0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:18px; line-height:1.35; font-weight:700; letter-spacing:.02em;
+}
+.tsp-labband b{
+  display:inline-block; color:#f3c675;
+  border:2px dashed #f3c675; border-radius:3px;
+  padding:.06em .38em; margin-right:.5em; letter-spacing:.09em;
+}
+@media print{ .tsp-labband{background:#fff; color:#000; border-bottom:2px solid #000;} }
+</style>
+</head>
+<body>
+<p class="tsp-labband"><b>LAB</b>An experiment on the bench, not a finished game.</p>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.45rem .9rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v13 <span style="opacity:.75">d701f4e</span></span> </span> </span> </p>
+<main id="main" class="wrap">
+  <div id="screens"></div>
+</main>
+<nav class="se-rail" aria-label="Page navigation">
+  <button id="backBtn" type="button" aria-label="Back one screen" aria-disabled="true">Back</button>
+  <button id="homeBtn" type="button" aria-label="Case list">Cases</button>
+  <a href="index.html" aria-label="Home — studio index">Home</a>
+</nav>
+<div class="se-stamp"> </span></div>
+<script>
+const SEATS={feel:{seat:"THE HAND",hint:"routes to the Hand — the texture of the call"},fact:{seat:"THE ENGINEER",hint:"routes to the Engineer — a physics / fire-behavior or number problem"},frame:{seat:"THE COORDINATOR",hint:"routes to the Coordinator — the operational frame / sequence"},source:{seat:"THE REGISTRAR",hint:"routes to the Registrar — a provenance / citation gap"},score:{seat:"THE CALIBRATOR",hint:"routes to the Calibrator — the scoring / calibration logic"},access:{seat:"THE STRANGER",hint:"routes to the Stranger — a readability / access problem"},works:{seat:"—",hint:"logged as working, no seat owes a fix"}};
+
+const VIG='<radialGradient id="vg" cx="44%" cy="52%" r="62%"><stop offset="50%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.72"/></radialGradient>';
+
+const CHAMPLAIN={slug:"champlain-2021",title:"Under Load",subtitle:"Surfside, Florida. 1:22 a.m., June 24, 2021. A residential tower has partially collapsed. You are early on scene, in the dark, and the standing half of the building is above your team.",kicker:"A collapse-decision case",reviewer:"Ben Urwin — Montreal firefighter & lieutenant",sourceNote:"Scenario framing drawn from the public record of the Champlain Towers South collapse and the NIST NCST investigation. Every operational figure below is tagged HISTORICAL-FACT or PENDING. Nothing is invented.",openArt:{label:"A tall apartment building at night, its right half standing and its left half fallen into a dark mound of rubble, seen through the soft dark ring of RP vision.",svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#151210"/><rect x="60" y="360" width="680" height="140" fill="#20180f"/><rect x="430" y="70" width="230" height="300" fill="#2b2419"/><g fill="#4a3d29"><rect x="450" y="95" width="35" height="45"/><rect x="500" y="95" width="35" height="45"/><rect x="550" y="95" width="35" height="45"/><rect x="600" y="95" width="35" height="45"/><rect x="450" y="160" width="35" height="45"/><rect x="500" y="160" width="35" height="45"/><rect x="550" y="160" width="35" height="45"/><rect x="600" y="160" width="35" height="45"/><rect x="450" y="225" width="35" height="45"/><rect x="500" y="225" width="35" height="45"/><rect x="550" y="225" width="35" height="45"/><rect x="600" y="225" width="35" height="45"/><rect x="450" y="290" width="35" height="45"/><rect x="500" y="290" width="35" height="45"/><rect x="550" y="290" width="35" height="45"/><rect x="600" y="290" width="35" height="45"/></g><rect x="550" y="160" width="35" height="45" fill="#c98a2e"/><path d="M60 360 L120 250 L200 300 L270 230 L340 300 L410 260 L430 360 Z" fill="#241d13"/><path d="M90 360 L160 290 L230 330 L300 280 L370 330 L420 310 L430 360 Z" fill="#2e2617"/><g fill="#3a3020"><rect x="140" y="315" width="60" height="18" transform="rotate(-12 170 324)"/><rect x="250" y="300" width="70" height="16" transform="rotate(8 285 308)"/><rect x="330" y="322" width="55" height="15" transform="rotate(-6 357 329)"/></g><rect x="60" y="230" width="380" height="140" fill="#6b5a3f" opacity="0.14"/><rect x="0" y="0" width="800" height="500" fill="url(#vig)"/><radialGradient id="vig" cx="46%" cy="55%" r="62%"><stop offset="52%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.72"/></radialGradient></svg>`},turns:[{id:"t1",prog:"Decision 1 of 3",art:{label:"A dark rubble pile with a jagged standing wall leaning over it, a single flashlight beam crossing the debris.",svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#171309"/><path d="M0 380 L120 300 L240 350 L360 290 L500 350 L640 300 L800 360 L800 500 L0 500 Z" fill="#241d12"/><path d="M80 380 L200 330 L320 360 L460 320 L600 360 L800 340 L800 500 L80 500 Z" fill="#2d2415"/><path d="M520 90 L610 100 L640 360 L560 360 Z" fill="#37301f"/><path d="M520 90 L610 100 L616 150 L524 140 Z" fill="#453a24"/><path d="M120 140 L360 300 L300 340 L90 170 Z" fill="#e8c877" opacity="0.16"/><rect x="0" y="0" width="800" height="500" fill="url(#v1)"/><radialGradient id="v1" cx="42%" cy="52%" r="60%"><stop offset="50%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.74"/></radialGradient></svg>`},prompt:"Voices are coming from the rubble near the base of the standing wall. Your crew wants to go straight to them. What is your first move?",known:{title:"What you can see right now",items:[{t:"The near half of the building has collapsed; the far half is standing.",tag:"HISTORICAL-FACT"},{t:"A section of exterior wall above the rubble is still upright and out of plumb.",tag:"HISTORICAL-FACT"},{t:"Live voices are audible in the debris close to that wall.",tag:"HISTORICAL-FACT"},{t:"Secondary-collapse probability for a leaning unsupported wall over the work area:",tag:"PENDING-ENGINEER"}]},choices:[{id:"a",t:"Send the crew straight in to the voices — every second counts."},{id:"b",t:"Hold the crew back, establish a collapse-zone perimeter around the leaning wall, and get eyes on the standing structure before anyone works beneath it.",best:true},{id:"c",t:"Order the crew in but tell them to move fast and stay alert.",trap:true},{id:"d",t:"This is beyond my read — get a Structures Specialist to the standing wall before I commit the crew.",limit:true}],reveal:{heading:"What the moment actually held",hidden:"The upright wall over the rescue area is the single most dangerous object on the scene. A leaning, unsupported wall section can come down on the people working the pile below it — and the pull toward audible voices is exactly what draws a crew under it. The sound of survivors is a magnet, and the magnet points at the hazard.",bestSays:"Holding the crew and marking a collapse zone is the sound first move — you protect the rescuers so there are rescuers left to rescue. Calling the Structures Specialist (D) is also right and often the same decision; naming your limit is not a failure, it is the discipline.",trapSays:"\"Move fast and stay alert\" feels like a compromise. It isn't. Speed under an unsupported leaning wall doesn't reduce the load — it just puts more people under it sooner.",note:"PENDING-ENGINEER: the actual secondary-collapse probability for this wall geometry is a figure a licensed structural engineer must author. This case does not invent it — and neither should any trainer."},calib:{soundIds:["b","d"],highConfWrong:"You were very sure of a call that puts the crew under the wall. In this domain, high confidence in the wrong direction is the specific thing that gets rescuers killed. The score isn't punishing you for being wrong — it's flagging that your certainty outran what you could actually see.",lowConfRight:"You made the sound call but weren't sure of it. That's honest — the scene genuinely didn't give you enough to be certain, and you didn't pretend it did.",highConfRight:"Sound call, and you were sure of it — earned here, because the leaning-wall hazard is one of the few things a size-up can read with confidence.",lowConfWrong:"Wrong call, but you held it loosely. The doubt is the right instinct — follow it next time toward holding the crew."}},{id:"t2",prog:"Decision 2 of 3",art:{label:"A void space in collapsed concrete, dark, with slabs stacked at angles and a small opening a person might reach into.",svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#141009"/><path d="M100 200 L520 170 L540 250 L120 280 Z" fill="#332b1b"/><path d="M120 280 L540 250 L560 340 L140 370 Z" fill="#28211490"/><path d="M140 370 L560 340 L580 430 L160 460 Z" fill="#2c2416"/><path d="M300 285 L430 275 L440 335 L310 345 Z" fill="#0a0805"/><ellipse cx="370" cy="312" rx="52" ry="26" fill="#000"/><path d="M600 200 L440 300 L450 330 L620 230 Z" fill="#e8c877" opacity="0.13"/><rect x="0" y="0" width="800" height="500" fill="url(#v2)"/><radialGradient id="v2" cx="46%" cy="60%" r="58%"><stop offset="48%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.76"/></radialGradient></svg>`},prompt:"You have a marked collapse zone and a reachable void where a survivor is trapped under stacked slabs. The slabs above the void are resting on debris, not on anything engineered. Reaching the survivor means working under them. What now?",known:{title:"What you can see right now",items:[{t:"A survivor is confirmed alive in a void beneath stacked concrete slabs.",tag:"HISTORICAL-FACT"},{t:"The slabs above the void are debris-supported, not on a stable bearing point.",tag:"HISTORICAL-FACT"},{t:"Shoring the void before entry requires cutting and placing rated shores.",tag:"HISTORICAL-FACT"},{t:"Rated capacity of a field-built shore for this span / this load:",tag:"PENDING-ENGINEER"},{t:"Time-to-shore vs. survivor's viable window:",tag:"PENDING-ENGINEER"}]},choices:[{id:"a",t:"Go in now and pull the survivor — shoring costs time the survivor may not have."},{id:"b",t:"Shore the void to a rated capacity before anyone enters, even though it costs time.",best:true},{id:"c",t:"Send one person in light and fast while the others watch the slabs for movement.",trap:true},{id:"d",t:"I can't rate these shores or this load — a Structures Specialist sizes the shoring before entry.",limit:true}],reveal:{heading:"What the moment actually held",hidden:"Debris-supported slabs have no known capacity — they are held up by chance stacking, not by anything you can trust. Entering an unshored void under them is the classic secondary-collapse kill: the rescuer becomes the next victim, and now the original survivor is trapped under two people instead of one. Shoring first is slower and it is the only version where everyone can come out.",bestSays:"Shore first (B) or hand the shoring sizing to the Structures Specialist (D) — both are sound. The instinct to save time by skipping the shore is the exact instinct the discipline exists to override.",trapSays:"\"One person, light and fast\" feels like it splits the difference. It doesn't reduce the load on the slabs — it just decides which single rescuer is under them when they move.",note:"PENDING-ENGINEER: both the shore's rated capacity and the shore-time-vs-survival-window tradeoff are figures a licensed engineer and the incident's medical picture must author. The case renders the slots; it does not fill them."},calib:{soundIds:["b","d"],highConfWrong:"You were sure about entering under debris-supported slabs. That certainty is the dangerous kind — the slabs give no signal you can read, so confidence here is confidence in nothing.",lowConfRight:"You shored first but weren't certain — right, because you genuinely couldn't rate the load. The doubt matched the evidence.",highConfRight:"Sound and sure. Debris-supported-means-no-capacity is one of the few things you can be certain of here, and you were.",lowConfWrong:"Wrong call held loosely — let that doubt pull you toward shoring next time."}},{id:"t3",prog:"Decision 3 of 3",art:{label:"A wide night scene of the whole collapsed site with multiple crews, seen from a command position, the standing tower dark against the sky.",svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#12100b"/><rect x="0" y="380" width="800" height="120" fill="#1e1810"/><rect x="560" y="90" width="180" height="300" fill="#262016"/><path d="M0 400 L150 340 L320 380 L480 330 L640 390 L800 360 L800 500 L0 500 Z" fill="#241d12"/><g fill="#c98a2e"><rect x="180" y="360" width="14" height="34" rx="6"/><rect x="240" y="352" width="14" height="34" rx="6"/><rect x="360" y="366" width="14" height="34" rx="6"/></g><path d="M80 120 L80 500" stroke="#e8c877" stroke-width="3" opacity="0.25"/><circle cx="80" cy="120" r="16" fill="#f0c974" opacity="0.5"/><rect x="0" y="0" width="800" height="500" fill="url(#v3)"/><radialGradient id="v3" cx="40%" cy="48%" r="64%"><stop offset="54%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.7"/></radialGradient></svg>`},prompt:"Hours in. More crews have arrived and are working multiple voids across the pile. Nobody has one picture of who is where, what's been marked, and which structures are cleared. A second crew starts into a void you haven't assessed. What do you do?",known:{title:"What you can see right now",items:[{t:"Multiple crews are now working the pile independently.",tag:"HISTORICAL-FACT"},{t:"There is no single shared record of markings, cleared zones, or crew positions.",tag:"HISTORICAL-FACT"},{t:"INSARAG worksite-marking and coordination methodology exists for exactly this.",tag:"HISTORICAL-FACT"},{t:"Current INSARAG marking specifics (verify against the published guideline):",tag:"PENDING-COORDINATOR"}]},choices:[{id:"a",t:"Let the crews keep working — stopping now costs rescue time."},{id:"b",t:"Establish worksite coordination: a shared marking system and a single picture of crews, cleared zones, and hazards before more voids are entered.",best:true},{id:"c",t:"Tell each crew leader to just communicate directly with each other as they go.",trap:true},{id:"d",t:"This has outgrown my span of control — request INSARAG-style coordination structure and a Structures Specialist across the site.",limit:true}],reveal:{heading:"What the moment actually held",hidden:"Uncoordinated crews on one pile is its own hazard class: two crews can undermine each other's voids, re-enter a zone someone already cleared as unsafe, or work under a structure another crew is destabilizing. The reason INSARAG marking and worksite coordination exists is that on a large collapse, the absence of a shared picture kills people even when every individual crew is competent. Coordination isn't bureaucracy that slows the rescue — it's the thing that keeps the rescue from becoming the next collapse.",bestSays:"Standing up coordination (B) or requesting the INSARAG structure and Structures Specialist across the site (D) is the sound call. The pull to 'not stop the rescue' is real and it is exactly how uncoordinated sites hurt their own rescuers.",trapSays:"\"Just have them talk to each other\" feels lighter than imposing structure. On a chaotic pile at night, informal cross-talk is how two crews each assume the other checked the wall nobody checked.",note:"PENDING-COORDINATOR: the exact current INSARAG marking specifics must be verified against the published guideline, not rendered from memory. This case names the frame and routes the detail to the source."},calib:{soundIds:["b","d"],highConfWrong:"You were sure that letting crews run uncoordinated was fine. That confidence is the trap — a chaotic site feels like it's working right up until two crews collide on the same slab.",lowConfRight:"You called for coordination but felt the cost of the time it takes. That tension is real and you resolved it the sound way.",highConfRight:"Sound and sure — the need for a shared picture on a multi-crew pile is one of the clearest lessons in the domain.",lowConfWrong:"Wrong call, loosely held — the doubt is right; next time let it pull toward the shared picture."}}],closing:{heading:"What this case can and can't teach you",body:"You just reasoned through three collapse decisions in the fog — the same fog the responders were in. What this case taught is the shape of the reasoning: protect the rescuers, trust nothing debris-supported, and coordinate before the pile becomes its own hazard. What it did NOT teach is the hand skill — cutting and setting a shore, feeling a wall move, judging a load by eye. No screen can. And it is not certification.",ceiling:"The most protective habit in this whole domain is the one answer that kept appearing: knowing when a call is above your training and handing it to the Structures Specialist. A game that rewards you for naming your limit is teaching the thing that keeps you alive."}};
+
+const SMOKE={
+  slug:"nist-compartment-2026",
+  title:"Reading the Smoke",
+  subtitle:"A two-story house, 2:40 a.m. Smoke is showing before you are off the rig. What the smoke is doing tells you what the fire is about to do — if you read the smoke instead of the flame.",
+  kicker:"A smoke-read calibration case",
+  reviewer:"Ben Urwin — Montreal firefighter & lieutenant",
+  sourceNote:"Smoke-behavior framing drawn from published fire-dynamics doctrine (NIST full-scale compartment-fire research; FSRI flow-path and ventilation coursework used as design reference only, never reused imagery). Every fire-behavior figure below is OBSERVED or PENDING. Nothing is invented.",
+  imageNote:"NIST-SOURCE-PENDING: the scene art here is authored placeholder in the NIST public-domain idiom. Replace with actual NIST public-domain compartment-burn stills (ignition-to-flashover series; Madrzykowski/NIST credit line). Ben's cleared department photos are the streetside-realism upgrade path. A real NIST field-investigation photo now runs as documentary credit on the closing screen (see closing.photo); the open/scene-art stills gap above stays pending.",
+  openArt:{label:"A two-story house at night, dark against the sky, thick pale smoke pushing out along the whole eave line, and a single first-floor window glowing amber — seen through the soft dark ring of RP vision.",
+    svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#12100b"/><rect x="0" y="410" width="800" height="90" fill="#1c160f"/><path d="M250 410 L250 190 L400 120 L550 190 L550 410 Z" fill="#241d13"/><path d="M235 196 L400 112 L565 196 L550 208 L400 132 L250 208 Z" fill="#2e2617"/><rect x="300" y="250" width="52" height="60" fill="#2a2216"/><rect x="448" y="250" width="52" height="60" fill="#d98a2e"/><rect x="448" y="250" width="52" height="60" fill="#f0c060" opacity="0.4"/><rect x="360" y="320" width="80" height="90" fill="#241c12"/><g fill="#b7b1a6"><ellipse cx="330" cy="185" rx="120" ry="42" opacity="0.34"/><ellipse cx="470" cy="170" rx="150" ry="50" opacity="0.4"/><ellipse cx="400" cy="140" rx="180" ry="55" opacity="0.3"/><ellipse cx="540" cy="120" rx="130" ry="46" opacity="0.24"/><ellipse cx="270" cy="150" rx="95" ry="38" opacity="0.22"/></g><g fill="#8a8479"><ellipse cx="450" cy="195" rx="90" ry="26" opacity="0.5"/><ellipse cx="330" cy="205" rx="80" ry="22" opacity="0.42"/></g><rect x="0" y="0" width="800" height="500" fill="url(#vg)"/>${VIG}</svg>`},
+  turns:[
+    {id:"t1",prog:"Read 1 of 3",
+      art:{label:"Close on the eave line of a dark house: thick, fast, dark smoke pushing out under pressure the length of the roof, and one bright amber window low and to the right pulling the eye.",
+        svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#141009"/><rect x="0" y="300" width="800" height="200" fill="#20180f"/><rect x="60" y="150" width="680" height="150" fill="#241d13"/><rect x="70" y="150" width="660" height="20" fill="#181209"/><g fill="#9a948a"><ellipse cx="180" cy="120" rx="150" ry="48" opacity="0.42"/><ellipse cx="400" cy="95" rx="200" ry="56" opacity="0.5"/><ellipse cx="620" cy="120" rx="160" ry="50" opacity="0.44"/><ellipse cx="300" cy="70" rx="150" ry="44" opacity="0.34"/><ellipse cx="560" cy="60" rx="150" ry="42" opacity="0.3"/></g><g fill="#6f695f"><ellipse cx="360" cy="140" rx="150" ry="26" opacity="0.55"/><ellipse cx="600" cy="150" rx="120" ry="22" opacity="0.5"/></g><rect x="600" y="200" width="70" height="80" fill="#d98a2e"/><rect x="600" y="200" width="70" height="80" fill="#f4c866" opacity="0.45"/><path d="M600 200 L670 200 L690 180 L620 175 Z" fill="#e59a34" opacity="0.5"/><rect x="0" y="0" width="800" height="500" fill="url(#vg)"/>${VIG}</svg>`},
+      prompt:"Fire is visible at the first-floor window on the right — your eye keeps going to it. But the whole eave line is pushing thick, fast, dark smoke under pressure. What is your first read?",
+      known:{title:"What the smoke is doing (VVDC)",items:[
+        {t:"Volume: heavy — the entire eave line is pushing smoke, not one vent.",tag:"OBSERVED"},
+        {t:"Velocity: fast and turbulent, pushing under pressure — angry smoke.",tag:"OBSERVED"},
+        {t:"Density: thick and optically black; you cannot see into it.",tag:"OBSERVED"},
+        {t:"Color: dark brown-to-black — hot products of incomplete combustion.",tag:"OBSERVED"},
+        {t:"Visible flame at one first-floor window.",tag:"OBSERVED"},
+        {t:"Time-to-flashover for these smoke conditions:",tag:"PENDING-ENGINEER"}]},
+      choices:[
+        {id:"a",t:"Put the eye and the attack on the room with visible fire — that is where the fire is.",trap:true},
+        {id:"b",t:"Read the smoke, not the flame: heavy, fast, dense, dark smoke pushing the whole eave line is a ventilation-limited fire heading for flashover. Call it and set up to control the flow path before anyone enters.",best:true},
+        {id:"c",t:"Fast interior push to the visible fire before it spreads.",trap:true},
+        {id:"d",t:"I cannot call the flashover timing from the street — 360 size-up and a fire-behavior read before I commit the crew.",limit:true}],
+      reveal:{heading:"What the smoke was telling you",
+        hidden:"The flame at the window is the light, and it pulls every eye on the crew. But the flame is not the predictor — the smoke is. Heavy, fast, dense, dark smoke pushing the whole eave line under pressure is a fire that has run out of air and is loading toward flashover. Read the smoke's velocity and density and you see the fire the single flame is hiding.",
+        bestSays:"Reading the smoke over the flame (B), or naming your limit and getting the 360 plus a fire-behavior read (D), is the sound call. The pull to the one visible flame is exactly the reflex that walks a crew into the flow path of a compartment about to flash.",
+        trapSays:"Going to the visible fire feels obvious — it is the thing you can see. That is the trap. The flame at one window tells you where fire vented; the smoke pushing the whole eave line tells you the whole structure is loading toward flashover. The light is the distraction; the smoke is the warning.",
+        note:"PENDING-ENGINEER: the actual time-to-flashover for these conditions is a fire-dynamics figure a fire-behavior authority (NIST/FSRI research) must author. The case names the read; it does not invent the clock."},
+      calib:{soundIds:["b","d"],
+        highConfWrong:"You were very sure of a read that sends the crew toward the light and into the flow path. In this domain high confidence in the wrong direction is the specific thing that flashes over on a crew. The score is not punishing the miss — it is flagging that your certainty outran what the smoke actually showed.",
+        lowConfRight:"You read the smoke over the flame but were not sure of it. That is honest — the street did not hand you certainty, and you did not pretend it did.",
+        highConfRight:"Sound read, and sure of it — earned, because heavy fast dark smoke pushing a whole eave line is one of the clearest flashover warnings a size-up can give.",
+        lowConfWrong:"Wrong read, held loosely. The doubt is the right instinct — follow it next time toward the smoke, away from the light."}},
+    {id:"t2",prog:"Read 2 of 3",
+      art:{label:"A doorway at night with dark smoke pushing out of the top and drawing back in, the neutral plane low near the floor, a faint orange glow deep inside.",
+        svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#130f08"/><rect x="270" y="70" width="260" height="410" fill="#0c0a06"/><rect x="270" y="70" width="260" height="410" fill="none" stroke="#2c2416" stroke-width="10"/><g fill="#8f897e"><ellipse cx="400" cy="130" rx="150" ry="42" opacity="0.5"/><ellipse cx="340" cy="110" rx="110" ry="34" opacity="0.4"/><ellipse cx="470" cy="115" rx="120" ry="36" opacity="0.38"/></g><g fill="#5f594f"><ellipse cx="400" cy="175" rx="130" ry="26" opacity="0.6"/></g><rect x="290" y="350" width="220" height="120" fill="#1a1109"/><path d="M330 470 L400 300 L470 470 Z" fill="#c46a1f" opacity="0.4"/><path d="M360 470 L400 350 L440 470 Z" fill="#e59a34" opacity="0.45"/><rect x="0" y="0" width="800" height="500" fill="url(#vg)"/>${VIG}</svg>`},
+      prompt:"You are at the door. Smoke pushing out the top pulses — out, then draws back in — and the neutral plane is dropping fast toward the floor. Command asks: is it tenable to enter? What is your read?",
+      known:{title:"What the smoke is doing (VVDC)",items:[
+        {t:"The smoke at the opening is pulsing — pushing out, then drawing back in.",tag:"OBSERVED"},
+        {t:"The neutral plane is dropping fast toward the floor.",tag:"OBSERVED"},
+        {t:"Velocity is increasing and the smoke is darkening.",tag:"OBSERVED"},
+        {t:"Air is being pulled inward at the base of the door — a strong air track.",tag:"OBSERVED"},
+        {t:"Exact flashover window for this compartment:",tag:"PENDING-ENGINEER"}]},
+      choices:[
+        {id:"a",t:"Enter now and get water on it before it flashes — speed beats the fire.",trap:true},
+        {id:"b",t:"Do not enter the flow path. Pulsing smoke plus a dropping neutral plane is a ventilation-limited fire at or near flashover; cool from outside and coordinate ventilation before anyone enters.",best:true},
+        {id:"c",t:"Send one firefighter in low and fast to search while it is still readable.",trap:true},
+        {id:"d",t:"This is a flashover-imminent read above a safe entry call — hold the door, get fire-behavior eyes and a coordinated vent before committing the crew.",limit:true}],
+      reveal:{heading:"What the smoke was telling you",
+        hidden:"Smoke that breathes — pushing out then drawing back — is a fire pulling for air it does not have. With the neutral plane dropping and velocity rising, the compartment is at or near flashover. Making entry opens the flow path, and that inrush of air can be the exact input that flashes it — with the crew standing inside the path.",
+        bestSays:"Holding out of the flow path and cooling / coordinating ventilation first (B), or naming the flashover-imminent read and holding for fire-behavior eyes (D), is the sound call. The urge to beat the fire by entering is the urge that puts a crew in the path when it lights.",
+        trapSays:"Entering to 'get water on it first' feels aggressive and correct. It is the trap. You cannot out-run a flashover you are standing inside of; opening that door can be what triggers it. Water goes in first from outside the path, not by putting bodies in it.",
+        note:"PENDING-ENGINEER: the exact flashover window for this compartment is a fire-dynamics figure the research authority must author. The case renders the read, not the number."},
+      calib:{soundIds:["b","d"],
+        highConfWrong:"You were sure it was tenable to enter a compartment that is breathing and dropping its neutral plane. That certainty is the dangerous kind — those signs mean the room can flash on the air you let in, and confidence does not change the physics.",
+        lowConfRight:"You held the crew but were not certain — right, because the exact flashover moment genuinely was not knowable from the door. Your doubt matched the evidence.",
+        highConfRight:"Sound and sure. Pulsing smoke with a dropping neutral plane is one of the few pre-flashover reads you are allowed to be certain about.",
+        lowConfWrong:"Wrong call, loosely held — let the doubt pull you out of the flow path next time."}},
+    {id:"t3",prog:"Read 3 of 3",
+      art:{label:"A room interior after ventilation: the visible fire knocked down, the lower air clearer, but a fast dark band of smoke still banked hard along the ceiling.",
+        svg:`<svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="800" height="500" fill="#171207"/><rect x="0" y="0" width="800" height="180" fill="#0b0906"/><g fill="#514b41"><ellipse cx="400" cy="120" rx="360" ry="70" opacity="0.7"/><ellipse cx="250" cy="150" rx="200" ry="46" opacity="0.5"/><ellipse cx="600" cy="145" rx="220" ry="48" opacity="0.5"/></g><g fill="#7d776c"><ellipse cx="430" cy="90" rx="180" ry="34" opacity="0.4"/></g><rect x="0" y="360" width="800" height="140" fill="#241a10"/><rect x="120" y="300" width="140" height="70" fill="#2a2013"/><rect x="540" y="290" width="150" height="80" fill="#2a2013"/><path d="M330 360 L370 315 L410 360 Z" fill="#b85f1c" opacity="0.35"/><rect x="0" y="0" width="800" height="500" fill="url(#vg)"/>${VIG}</svg>`},
+      prompt:"Ventilation is done, the visible fire knocked down, and the smoke lifts enough to see the room. It looks better and the crew wants to advance. But the smoke at the ceiling is still fast and dark. What now?",
+      known:{title:"What the smoke is doing (VVDC)",items:[
+        {t:"Visible flame knocked down after ventilation.",tag:"OBSERVED"},
+        {t:"Smoke at the ceiling is still fast, dark, and banked hard.",tag:"OBSERVED"},
+        {t:"Interior temperature still high; the upper layer has not been cooled.",tag:"OBSERVED"},
+        {t:"Reignition / flashover potential after a knockdown:",tag:"PENDING-ENGINEER"}]},
+      choices:[
+        {id:"a",t:"The fire is knocked down and you can see now — advance the crew in.",trap:true},
+        {id:"b",t:"The visible fire being out does not clear the read: fast dark smoke still banked at the ceiling means heat and unburned fuel are still up there. Cool the upper layer and keep reading the smoke before advancing.",best:true},
+        {id:"c",t:"Advance, but keep a hoseline ready in case it lights up again.",trap:true},
+        {id:"d",t:"Hold — I want a thermal read of the upper layer before I put the crew under it.",limit:true}],
+      reveal:{heading:"What the smoke was telling you",
+        hidden:"Knocking down the visible fire turns off the light, and the absence of flame reads as safety. But the smoke is still talking: fast, dark, banked smoke at the ceiling is a hot, fuel-rich upper layer that can flash or reignite the moment it gets a little more air or heat. The flame went out; the danger did not.",
+        bestSays:"Cooling the upper layer and continuing to read the smoke (B), or holding for a thermal read before advancing under it (D), is the sound call. 'The fire is out, we can see' is the same look-away-from-the-light reflex wearing a calmer face.",
+        trapSays:"Advancing because the visible fire is down feels like progress you earned. It is the trap in its quietest form: the flame is the light, and its absence is not the same as the smoke being safe. The banked dark smoke overhead is the read, and it still says danger.",
+        note:"PENDING-ENGINEER: the post-knockdown reignition / flashover potential for these conditions is a fire-dynamics figure the research authority must author. The case names the read, not the number."},
+      calib:{soundIds:["b","d"],
+        highConfWrong:"You were sure it was safe to advance because the flame was down. That is the exact certainty the look-away reflex produces — the eye trusts the absent light and ignores the banked smoke that can still flash.",
+        lowConfRight:"You held or cooled first but were not fully sure — right, because a knockdown genuinely does not guarantee the upper layer is safe. The doubt was well placed.",
+        highConfRight:"Sound and sure. A hot banked smoke layer overhead is a read you can trust even after the flame is knocked down.",
+        lowConfWrong:"Wrong call, loosely held — let the doubt keep your eye on the smoke, not the missing flame."}}],
+  closing:{heading:"What this case can and cannot teach you",
+    body:"You just read smoke through three moments where the flame lied and the smoke told the truth. The lesson is the reflex: look away from the light. Volume, velocity, density, color — the smoke predicts the fire's next move, and the visible flame is the distraction that pulls your eye off the read. What this case cannot teach is the fireground itself — heat on your neck, air management, the feel of a floor under load. No screen can, and this is not certification.",
+    ceiling:"The read that keeps you alive is the humble one: when the smoke says a compartment is about to flash and part of you wants to push anyway, calling it — holding, cooling, coordinating the vent — is not slow. It is the whole skill.",photo:{src:"fireground-assets/nist-charleston-researcher-2007.jpg",alt:"A NIST researcher in a hard hat and NIST-lettered jacket walks the burned-out wreckage of a collapsed structure during a post-fire field investigation, timber and roofing scattered across the site.",caption:"NIST field investigation, 2007. Credit: NIST Engineering Laboratory, public domain (17 USC 105), nist.gov image 17933. Documentary context for the fire-dynamics research this case draws on. Not the case's own scene art, which stays authored placeholder pending real ignition-to-flashover stills."}}};
+
+const CASES={"champlain-2021":CHAMPLAIN,"nist-compartment-2026":SMOKE};
+let C=null;const answers={};const notes={};let order=[];let idx=0;
+const CONFLABEL={low:"Not sure",med:"Fairly sure",high:"Very sure"};
+const screens=document.getElementById('screens');
+function el(html){const d=document.createElement('div');d.innerHTML=html.trim();return d.firstElementChild;}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function initials(name){const p=String(name||'').trim().split(/\s+/).filter(Boolean);if(!p.length)return '—';return (p[0][0]+(p.length>1?p[p.length-1][0]:'')).toUpperCase();}
+function knownBlock(k){return`<div class="known"><h3>${k.title}</h3><ul>${k.items.map(i=>`<li>${i.t}<span class="tag ${i.tag.indexOf('PENDING')===0?'pend':''}">${i.tag}</span></li>`).join('')}</ul></div>`;}
+function photoBlock(p){return`<figure class="docphoto"><img src="${p.src}" alt="${esc(p.alt)}" loading="lazy"><figcaption>${p.caption}</figcaption></figure>`;}
+function reviewBlock(screenKey){return`<div class="review" data-review="${screenKey}"><h3>Reviewer note (optional)</h3><p>One quick verdict, then anything you would tell me. Your note routes to the seat that owns it.</p>
+      <div class="verds" role="group" aria-label="Verdict for this screen"><button class="v-good" data-v="works" aria-pressed="false">Works</button><button class="v-bad" data-v="feel" aria-pressed="false">Does not feel real</button><button class="v-bad" data-v="fact" aria-pressed="false">Wrong fact</button><button class="v-bad" data-v="frame" aria-pressed="false">Frame off</button><button class="v-bad" data-v="source" aria-pressed="false">Needs a source</button><button class="v-bad" data-v="score" aria-pressed="false">Scoring off</button><button class="v-bad" data-v="access" aria-pressed="false">Hard to read</button></div><label class="skip" for="rv-${screenKey}">Your note</label><textarea id="rv-${screenKey}" placeholder="Type here — plain language. What would a firefighter say?"></textarea><p class="seat-hint" data-hint="${screenKey}"></p></div>`;}
+function screenHome(){return`<section class="stage on" id="s0" aria-labelledby="s0h"><div class="art" role="img" aria-label="${C.openArt.label}">${C.openArt.svg}</div><p class="kicker">${C.kicker}</p><h1 id="s0h">${C.title}</h1><p class="sub">${C.subtitle}</p><div class="disclaimer">This is a <span class="word">calibration</span> exercise, not certification. It trains how to read smoke and reason under uncertainty — it cannot teach the hand skills of the fireground, and it does not qualify anyone to do this work.</div><div class="btnrow"><button class="btn" data-go="first">Begin the case</button><button class="btn ghost" data-go="hub">Facilitator mode</button></div><p class="credit">Private and offline. Nothing you enter leaves this page unless you export it. Reviewer: ${C.reviewer}.</p></section>`;}
+function screenTurn(turn){return`<section class="stage" id="${turn.id}" aria-labelledby="${turn.id}h"><p class="prog">${turn.prog}</p><div class="art" role="img" aria-label="${turn.art.label}">${turn.art.svg}</div><p class="prompt" id="${turn.id}h">${turn.prompt}</p>${knownBlock(turn.known)}<div class="choices" role="group" aria-label="Your read">${turn.choices.map(c=>`<button class="choice" data-choice="${c.id}" aria-pressed="false">${c.t}</button>`).join('')}</div><div class="conf" data-conf hidden><h3>How sure are you?</h3><p>Before you see the record — how confident is this read?</p><div class="row" role="group" aria-label="Confidence"><button data-cf="low" aria-pressed="false">Not sure</button><button data-cf="med" aria-pressed="false">Fairly sure</button><button data-cf="high" aria-pressed="false">Very sure</button></div></div><div class="btnrow"><button class="btn" data-commit="${turn.id}" disabled>Commit and meet the record</button></div><div class="reveal hidden" data-reveal="${turn.id}"></div></section>`;}
+function screenClose(){return`<section class="stage" id="close" aria-labelledby="closeh"><p class="prog">The record</p><h2 id="closeh">${C.closing.heading}</h2><p class="sub">${C.closing.body}</p><div class="known"><h3>The habit that keeps you alive</h3><ul><li>${C.closing.ceiling}</li></ul></div>${C.closing.photo?photoBlock(C.closing.photo):''}${reviewBlock('closing')}<div class="export"><h3>Export your review</h3><p>This gathers every verdict and note you left, routed to the right panel seat, into one block. Copy it and paste it back into the project — it becomes the Hand seat's record.</p><textarea id="exportBox" readonly aria-label="Your exportable review block"></textarea><div class="btnrow"><button class="btn" id="buildExport">Build my review block</button><button class="btn ghost" id="copyExport">Copy to clipboard</button><button class="btn ghost" data-go="hub">Facilitator mode</button></div><p class="note" id="copyNote"></p></div><footer><b>Reading the Smoke</b> — smoke-read calibration case, engine v1. Studio Eyes gated: arithmetic contrast floor + the Pile Panel. Fire-behavior figures tagged, never invented. Scene art authored in the NIST public-domain idiom, tagged for replacement with real NIST stills. Reviewer: ${C.reviewer}.</footer></section>`;}
+
+/* ---- FACILITATOR HUB (officer face): Confluence structure, calibration swapped for ISLOs ---- */
+const crewReads=[];let hubDecision=null;let hubPickCall=null,hubPickConf=null;
+function screenHub(){return`<section class="stage" id="hub" aria-labelledby="hubh"><p class="prog">Facilitator mode</p><h2 id="hubh">The crew's calibration</h2><div class="hubintro">Run the case on the screen with your crew, then record each firefighter's read here. The hub plots the crew's calibration — confidence against correctness — so the debrief is the conversation: who was confidently wrong, where the crew's blind spot is. <b>No accounts, no roster stored, nothing leaves this page.</b> Reads are held in memory for this session only and clear when you close the page. Export a session summary to keep.</div>
+    <div class="field"><label id="whichlab">Which read are you debriefing?</label><div class="seg" role="group" aria-labelledby="whichlab" id="hubSeg">${C.turns.map(t=>`<button data-dec="${t.id}" aria-pressed="${t.id===hubDecision}">${t.prog}</button>`).join('')}</div></div>
+    <div class="field"><label for="hubName">Firefighter (name or initials)</label><input id="hubName" type="text" autocomplete="off" placeholder="e.g. Rodriguez"></div>
+    <div class="field"><label id="calllab">Their read</label><div class="seg" role="group" aria-labelledby="calllab" id="hubCalls"></div></div>
+    <div class="field"><label id="conflab">Their confidence</label><div class="seg" role="group" aria-labelledby="conflab" id="hubConf"><button data-cf="low" aria-pressed="false">Not sure</button><button data-cf="med" aria-pressed="false">Fairly sure</button><button data-cf="high" aria-pressed="false">Very sure</button></div></div>
+    <div class="btnrow"><button class="btn" id="hubAdd" disabled>Add this read</button></div>
+    <div id="hubMatrix"></div>
+    <div class="export"><h3>Session summary</h3><p>Every read you entered, the calibration spread per decision, and the overconfident-wrong flags — one block Ben keeps and pastes back into the project. Each becomes Hand-seat growth.</p><textarea id="hubExport" readonly aria-label="Session summary block"></textarea><div class="btnrow"><button class="btn" id="hubBuild">Build session summary</button><button class="btn ghost" id="hubCopy">Copy to clipboard</button></div><p class="note" id="hubNote"></p></div>
+    <footer><b>Facilitator mode</b> is the officer face — Confluence's assessment structure with calibration as the outcome. This is instrument A (in-room, no data plumbing); the persistent longitudinal hub (B) is a later bolt-on that reads these exported sessions. No score, no streak, no leaderboard — the calibration mirror is the only number, by design.</footer></section>`;}
+function turnById(id){return C.turns.find(t=>t.id===id);}
+function isSound(decId,call){const t=turnById(decId);return t.calib.soundIds.indexOf(call)>=0;}
+function renderHubCalls(){const box=document.getElementById('hubCalls');if(!box)return;const t=turnById(hubDecision);box.innerHTML=t.choices.map(c=>`<button data-call="${c.id}" aria-pressed="${c.id===hubPickCall}">${c.id.toUpperCase()}</button>`).join('');box.querySelectorAll('[data-call]').forEach(b=>b.addEventListener('click',()=>{hubPickCall=b.dataset.call;box.querySelectorAll('[data-call]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.call===hubPickCall));refreshAddBtn();}));}
+function refreshAddBtn(){const btn=document.getElementById('hubAdd');const name=(document.getElementById('hubName')||{}).value;btn.disabled=!(name&&name.trim()&&hubPickCall&&hubPickConf);}
+function renderMatrix(){const wrap=document.getElementById('hubMatrix');if(!wrap)return;const rows=crewReads.filter(r=>r.decision===hubDecision);const cols=['low','med','high'];const cell=(sound,conf)=>rows.filter(r=>r.sound===sound&&r.conf===conf);
+    const td=(sound,conf)=>{const list=cell(sound,conf);const kill=(!sound&&conf==='high');const cls=(sound?'sound':'')+(kill?' killcell':'');const who=list.length?`<span class="who">${list.map(r=>esc(initials(r.name))).join(' · ')}</span>`:'';return `<td class="${cls.trim()}"><span class="n">${list.length}</span>${who}</td>`;};
+    const t=turnById(hubDecision);const total=rows.length;const killCount=cell(false,'high').length;
+    wrap.innerHTML=`<table class="matrix"><caption>${t.prog} — ${total} read${total===1?'':'s'} recorded</caption><thead><tr><th></th><th>Not sure</th><th>Fairly sure</th><th>Very sure</th></tr></thead><tbody><tr><th>Sound read</th>${td(true,'low')}${td(true,'med')}${td(true,'high')}</tr><tr><th>Off read</th>${td(false,'low')}${td(false,'med')}${td(false,'high')}</tr></tbody></table><p class="killnote"><b>The kill cell</b> is off-read × very-sure — the read that gets a firefighter killed. ${killCount?`<b>${killCount} here.</b> That is the debrief: why were they sure of a read the smoke did not support?`:`None here this time — but it is the cell to watch, not a score to zero out.`}</p>${rows.length?`<ul class="readlist">${rows.map(r=>`<li><span>${esc(r.name)} — read ${r.call.toUpperCase()}, ${CONFLABEL[r.conf]}</span><span class="${r.sound?'snd':'off'}">${r.sound?'sound':'off'}</span></li>`).join('')}</ul>`:''}`;}
+function wireHub(){const seg=document.getElementById('hubSeg');if(seg)seg.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click',()=>{hubDecision=b.dataset.dec;hubPickCall=null;seg.querySelectorAll('[data-dec]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.dec===hubDecision));renderHubCalls();renderMatrix();refreshAddBtn();}));
+    const conf=document.getElementById('hubConf');if(conf)conf.querySelectorAll('[data-cf]').forEach(b=>b.addEventListener('click',()=>{hubPickConf=b.dataset.cf;conf.querySelectorAll('[data-cf]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.cf===hubPickConf));refreshAddBtn();}));
+    const name=document.getElementById('hubName');if(name)name.addEventListener('input',refreshAddBtn);
+    renderHubCalls();renderMatrix();
+    const add=document.getElementById('hubAdd');if(add)add.addEventListener('click',()=>{const nm=name.value.trim();if(!nm||!hubPickCall||!hubPickConf)return;crewReads.push({name:nm,decision:hubDecision,call:hubPickCall,conf:hubPickConf,sound:isSound(hubDecision,hubPickCall)});name.value='';hubPickCall=null;hubPickConf=null;document.querySelectorAll('#hubConf [data-cf]').forEach(x=>x.setAttribute('aria-pressed','false'));renderHubCalls();renderMatrix();refreshAddBtn();name.focus();});
+    const build=document.getElementById('hubBuild');if(build)build.addEventListener('click',buildHubExport);
+    const copy=document.getElementById('hubCopy');if(copy)copy.addEventListener('click',()=>copyFrom('hubExport','hubNote',buildHubExport));}
+function buildHubExport(){const L=[];L.push('=== TSP SMOKE-READ CASE — CREW SESSION SUMMARY ===');L.push('case: '+C.slug);L.push('facilitator instrument: A (in-room, no stored data)');L.push('date: (fill in)');L.push('reads recorded: '+crewReads.length);L.push('');
+    C.turns.forEach(t=>{const rows=crewReads.filter(r=>r.decision===t.id);L.push('--- '+t.prog+' ---');if(!rows.length){L.push('  (no reads recorded)');L.push('');return;}const sound=rows.filter(r=>r.sound).length;const kill=rows.filter(r=>!r.sound&&r.conf==='high').length;L.push('  reads: '+rows.length+' | sound: '+sound+' | off: '+(rows.length-sound)+' | KILL-CELL (off + very sure): '+kill);rows.forEach(r=>{L.push('    '+r.name+': read '+r.call.toUpperCase()+', '+CONFLABEL[r.conf]+' -> '+(r.sound?'sound':'OFF')+(!r.sound&&r.conf==='high'?'  <-- kill cell':''));});L.push('');});
+    L.push('--- FOR THE STUDIO ---');L.push('Paste back into the Claude project. The kill-cell entries are the priority debrief and');L.push('the Hand-seat growth record. This is instrument A; the persistent hub (B) will one day');L.push('chart these sessions over time to show each firefighter getting less overconfident.');
+    document.getElementById('hubExport').value=L.join('\n');document.getElementById('hubNote').textContent='Built. Copy it, then paste into the project.';}
+
+/* ---- shared engine (inherited from the collapse case) ---- */
+function screenSelect(){return`<section class="stage on" id="select" aria-labelledby="selh"><p class="kicker">Fireground calibration</p><h1 id="selh">Reading the Fireground</h1><p class="sub">Two cases, one discipline: you see what the responders saw, commit under uncertainty, then meet the record. Calibration, not certification. Choose a case.</p><div class="select-grid"><button class="casecard" data-case="champlain-2021"><span class="cg" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 40 L17 17 L25 29 L31 13 L41 40 Z"/></g><g stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><path d="M14 40 v-6 M20 40 v-9 M27 40 v-6 M34 40 v-8"/><path d="M11 34 h26"/></g><circle cx="17" cy="17" r="1.8" fill="currentColor"/><circle cx="31" cy="13" r="1.8" fill="currentColor"/></svg></span><span class="ctext"><span class="ch3">Under Load</span><span class="cp">A partial building collapse in the dark. Protect the rescuers, trust nothing debris-supported, coordinate before the pile becomes its own hazard.</span><span class="cmeta">Structural collapse &middot; 3 decisions</span></span></button><button class="casecard" data-case="nist-compartment-2026"><span class="cg" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><g stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 42 Q13 34 19 29 Q25 24 20 17 Q16 12 22 6"/></g><g stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><path d="M28 42 Q24 35 29 31 Q34 27 30 21"/><path d="M12 42 Q9 38 13 34"/></g><circle cx="22" cy="6" r="1.8" fill="currentColor"/><circle cx="18" cy="42" r="1.6" fill="currentColor"/></svg></span><span class="ctext"><span class="ch3">Reading the Smoke</span><span class="cp">A house fire before flashover. Look away from the light &mdash; read what the fire is about to do from what the smoke is doing.</span><span class="cmeta">Fire behavior &middot; 3 decisions</span></span></button></div><p class="credit">Private and offline. Nothing you enter leaves this page unless you export it. Reviewer: Ben Urwin &mdash; Montreal firefighter &amp; lieutenant.</p></section>`;}
+function wireSelect(){document.querySelectorAll('#select [data-case]').forEach(b=>b.addEventListener('click',()=>loadCase(b.dataset.case)));}
+function clearState(){for(const k in answers)delete answers[k];for(const k in notes)delete notes[k];crewReads.length=0;hubDecision=C.turns[0].id;hubPickCall=null;hubPickConf=null;}
+function loadCase(id){C=CASES[id];clearState();document.querySelectorAll('#screens .stage').forEach(s=>{if(s.id!=='select')s.remove();});screens.appendChild(el(screenHome()));C.turns.forEach(t=>screens.appendChild(el(screenTurn(t))));screens.appendChild(el(screenClose()));screens.appendChild(el(screenHub()));order=['select','s0'].concat(C.turns.map(t=>t.id)).concat(['close','hub']);wire();wireHub();goto('s0');}
+function build(){screens.innerHTML='';screens.appendChild(el(screenSelect()));wireSelect();order=['select'];idx=0;show(0);}
+const backBtn=document.getElementById('backBtn'),homeBtn=document.getElementById('homeBtn');
+function show(i){idx=Math.max(0,Math.min(i,order.length-1));document.querySelectorAll('.stage').forEach(s=>s.classList.remove('on'));const cur=document.getElementById(order[idx]);if(cur)cur.classList.add('on');backBtn.setAttribute('aria-disabled',idx===0?'true':'false');window.scrollTo(0,0);}
+function goto(id){const i=order.indexOf(id);if(i>=0)show(i);}
+backBtn.addEventListener('click',()=>{if(idx>0)show(idx-1);});homeBtn.addEventListener('click',()=>goto('select'));
+function wire(){screens.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{const g=b.dataset.go;goto(g==='first'?C.turns[0].id:g);}));C.turns.forEach(turn=>{const sec=document.getElementById(turn.id);const conf=sec.querySelector('[data-conf]');const commit=sec.querySelector('[data-commit]');let pickC=null,pickCf=null;sec.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click',()=>{sec.querySelectorAll('.choice').forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');pickC=btn.dataset.choice;conf.hidden=false;commit.disabled=!(pickC&&pickCf);}));conf.querySelectorAll('[data-cf]').forEach(btn=>btn.addEventListener('click',()=>{conf.querySelectorAll('[data-cf]').forEach(x=>x.setAttribute('aria-pressed','false'));btn.setAttribute('aria-pressed','true');pickCf=btn.dataset.cf;commit.disabled=!(pickC&&pickCf);}));commit.addEventListener('click',()=>{answers[turn.id]={choiceId:pickC,confidence:pickCf};renderReveal(turn,pickC,pickCf);commit.disabled=true;});});wireReview(document.querySelector('[data-review="closing"]'),'closing');const buildBtn=document.getElementById('buildExport');const copyBtn=document.getElementById('copyExport');if(buildBtn)buildBtn.addEventListener('click',buildExport);if(copyBtn)copyBtn.addEventListener('click',()=>copyFrom('exportBox','copyNote',buildExport));}
+function renderReveal(turn,choiceId,cf){const box=document.querySelector(`[data-reveal="${turn.id}"]`);const chosen=turn.choices.find(c=>c.id===choiceId);const sound=turn.calib.soundIds.indexOf(choiceId)>=0;let scoreMsg,miss=!sound;if(sound&&cf==='high')scoreMsg=turn.calib.highConfRight;else if(sound)scoreMsg=turn.calib.lowConfRight;else if(!sound&&cf==='high')scoreMsg=turn.calib.highConfWrong;else scoreMsg=turn.calib.lowConfWrong;box.innerHTML=`<h3>${turn.reveal.heading}</h3><div class="hidden-var"><b>What you could not see:</b> ${turn.reveal.hidden}</div><p>${chosen&&chosen.trap?turn.reveal.trapSays:turn.reveal.bestSays}</p><div class="score ${miss?'miss':''}"><b>Calibration:</b> ${scoreMsg}</div><p style="font-size:15px;color:var(--ink2);margin-top:12px">${turn.reveal.note}</p>${reviewBlock(turn.id)}<div class="btnrow"><button class="btn" data-next="${turn.id}">Continue</button></div>`;box.classList.remove('hidden');wireReview(box.querySelector(`[data-review="${turn.id}"]`),turn.id);const nx=box.querySelector('[data-next]');nx.addEventListener('click',()=>{const i=C.turns.findIndex(t=>t.id===turn.id);if(i<C.turns.length-1)goto(C.turns[i+1].id);else goto('close');});box.scrollIntoView({behavior:'smooth',block:'start'});}
+function wireReview(node,key){if(!node)return;const hint=node.querySelector('[data-hint]');const ta=node.querySelector('textarea');node.querySelectorAll('.verds button').forEach(b=>b.addEventListener('click',()=>{node.querySelectorAll('.verds button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');const v=b.dataset.v;notes[key]=Object.assign({},notes[key]||{},{verdict:v,text:ta.value});if(hint)hint.textContent=SEATS[v]?SEATS[v].hint:'';}));ta.addEventListener('input',()=>{notes[key]=Object.assign({},notes[key]||{},{text:ta.value});});}
+function buildExport(){const lines=[];lines.push('=== TSP SMOKE-READ CASE — REVIEWER FEEDBACK ===');lines.push('case: '+C.slug);lines.push('reviewer: '+C.reviewer);lines.push('date: (fill in)');lines.push('');lines.push('--- READS ---');C.turns.forEach((t,i)=>{const a=answers[t.id];if(a){const ch=t.choices.find(c=>c.id===a.choiceId);const sound=t.calib.soundIds.indexOf(a.choiceId)>=0?'sound':'off';lines.push('R'+(i+1)+': chose "'+(ch?ch.t.slice(0,60):a.choiceId)+'..." | confidence='+a.confidence+' | read='+sound);}else{lines.push('R'+(i+1)+': (not answered)');}});lines.push('');lines.push('--- NOTES, ROUTED TO SEATS ---');const keys=Object.keys(notes);if(!keys.length){lines.push('(no notes left)');}keys.forEach(k=>{const n=notes[k];if(!n)return;const seat=n.verdict&&SEATS[n.verdict]?SEATS[n.verdict].seat:'(no verdict)';const txt=(n.text||'').trim();if(n.verdict||txt){lines.push('['+k+'] -> '+seat+' | verdict='+(n.verdict||'—'));if(txt)lines.push('    note: '+txt);}});lines.push('');lines.push('--- FOR THE STUDIO ---');lines.push('Paste this block back into the Claude project. Each note becomes an attributed');lines.push('heuristic for its seat (Studio Eyes Layer 2 growth). PENDING figures still owed');lines.push('before any trainee ship.');document.getElementById('exportBox').value=lines.join('\n');document.getElementById('copyNote').textContent='Built. Copy it, then paste into the project.';}
+function copyFrom(boxId,noteId,builder){const box=document.getElementById(boxId);if(!box.value){builder();}box.select();try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(box.value).then(function(){document.getElementById(noteId).textContent='Copied. Paste it into the project.';},function(){document.execCommand('copy');document.getElementById(noteId).textContent='Selected and copied — paste into the project.';});}else{document.execCommand('copy');document.getElementById(noteId).textContent='Selected and copied — paste into the project.';}}catch(e){document.getElementById(noteId).textContent='Select the text above and copy it manually.';}}
+build();
+</script>
+<script>
+/* ═══ STUDIO EYES controller — light ladder, text size, comfort toggles ═══ */
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+</body>
+</html>
