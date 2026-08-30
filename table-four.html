@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day" data-type="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Table Four</title>
+<style>
+:root{
+  --paper:#F4EFE6;
+  --paper2:#EBE4D8;
+  --white:#FBF8F2;
+  --red:#B31B14;
+  --inkdeep:#171310;
+  --ink:#14100C;
+  --ink2:#4A423A;
+  --redink:#8E1610;
+  --chalk:#FBF7F0;
+  --t:20px;
+  --tap:48px;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  /* TOKEN-ROLE split: decoration-only aliases (same hex, resolved per theme) */
+  --ink-line:var(--ink);
+  --redink-line:var(--redink);
+}
+/* ---- STUDIO EYES · LIGHT: DUSK (warm amber, still light) ---- */
+html[data-light="dusk"]{
+  --paper:#ECDFC9;
+  --paper2:#E0D0B2;
+  --white:#F5ECD9;
+  --red:#A5160F;
+  --ink:#1A140C;
+  --ink2:#463A26;
+  --redink:#84130D;
+  --chalk:#FBF7F0;
+}
+/* ---- STUDIO EYES · LIGHT: WARM-DARK / night (warm charcoal, never pure black) ---- */
+html[data-light="night"]{
+  --paper:#14120E;
+  --paper2:#221E18;
+  --white:#1B1813;
+  --red:#7E120C;
+  --ink:#F2ECE1;
+  --ink2:#CFC5B6;
+  --redink:#F2A08D;
+  --chalk:#FBF7F0;
+}
+/* ---- STUDIO EYES · high-contrast floor ---- */
+html.se-contrast:not([data-light="night"]){--paper:#FBFAF7;--paper2:#F0ECE2;--white:#FFFFFF;--ink:#0F0B07;--ink2:#2C2517}
+html.se-contrast[data-light="night"]{--paper:#0C0B08;--paper2:#171410;--white:#141109;--ink:#FFF7E6;--ink2:#EFE0BC}
+/* ---- STUDIO EYES · text size ---- */
+html[data-type="2"]{--t:23px}
+html[data-type="3"]{--t:27px}
+/* ---- STUDIO EYES · reduce motion / colorblind cues ---- */
+html.se-reduce *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+html.se-cb a{text-decoration:underline;text-underline-offset:2px}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font:var(--t)/1.45 ui-serif,Georgia,"Iowan Old Style",serif;
+  min-height:100%;
+  transition:background .18s ease,color .18s ease;
+}
+
+/* ---------- reserved chrome : Home · brand · Studio Eyes ---------- */
+.se-chrome{
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+  padding:8px 12px;background:var(--paper2);
+  border-bottom:3px solid var(--ink-line);
+  position:sticky;top:0;z-index:50;
+}
+.se-home{
+  justify-self:start;display:inline-flex;align-items:center;min-height:var(--tap);
+  padding:10px 14px;border:2px solid var(--ink-line);border-radius:3px;
+  background:var(--white);color:var(--ink);
+  font:700 15px/1 var(--mono);letter-spacing:.04em;text-decoration:none;
+}
+.se-brand{justify-self:center;display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+.se-brand svg{width:34px;height:20px;color:var(--ink);flex:0 0 auto}
+.se-brand .wm{font:400 16px/1 ui-serif,Georgia,serif;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.se-eyes{
+  justify-self:end;display:inline-flex;align-items:center;min-height:var(--tap);
+  padding:10px 14px;border:2px solid var(--ink-line);border-radius:3px;
+  background:var(--red);color:var(--chalk);
+  font:700 15px/1 var(--mono);letter-spacing:.04em;cursor:pointer;
+}
+.se-home:focus-visible,.se-eyes:focus-visible{outline:4px solid var(--redink-line);outline-offset:2px}
+@media (max-width:560px){.se-brand .wm{display:none}}
+
+/* ---------- Studio Eyes panel ---------- */
+.se-panel{
+  position:fixed;right:12px;top:calc(var(--tap) + 18px);z-index:60;
+  width:min(320px,calc(100vw - 24px));background:var(--paper2);color:var(--ink);
+  border:3px solid var(--red);border-radius:4px;padding:14px;
+  box-shadow:0 10px 34px rgba(0,0,0,.32);display:none;
+}
+.se-panel[data-open="1"]{display:block}
+.se-panel h2{font:700 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
+.se-row{display:flex;gap:6px;margin-bottom:14px}
+.se-btn{
+  flex:1;min-height:var(--tap);padding:8px 4px;border:2px solid var(--ink-line);border-radius:3px;
+  background:var(--white);color:var(--ink);font:700 14px/1 var(--mono);cursor:pointer;
+}
+.se-btn[aria-pressed="true"]{background:var(--red);color:var(--chalk);border-color:var(--ink-line)}
+.se-btn:focus-visible{outline:4px solid var(--redink-line);outline-offset:2px}
+.se-tog{
+  display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+  min-height:var(--tap);padding:8px 11px;margin-bottom:6px;border:2px solid var(--ink-line);border-radius:3px;
+  background:var(--white);color:var(--ink);font:600 16px/1.2 ui-serif,Georgia,serif;cursor:pointer;text-align:left;
+}
+.se-tog .st{font:700 12px/1 var(--mono);color:var(--ink2)}
+.se-tog[aria-pressed="true"] .st{color:var(--redink)}
+.se-tog:focus-visible{outline:4px solid var(--redink-line);outline-offset:2px}
+.se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- bottom nav rail : Back + Home ---------- */
+.se-rail{display:flex;gap:10px;justify-content:center;padding:18px 12px;border-top:3px solid var(--ink-line);background:var(--paper2)}
+.se-rail a,.se-rail button{
+  min-height:var(--tap);padding:11px 18px;border:2px solid var(--ink-line);border-radius:3px;
+  background:var(--white);color:var(--ink);font:700 15px/1 var(--mono);letter-spacing:.04em;
+  text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;
+}
+.se-rail a:focus-visible,.se-rail button:focus-visible{outline:4px solid var(--redink-line);outline-offset:2px}
+.updated{font:600 13px/1.3 var(--mono);color:var(--ink2);text-align:center;padding:12px 12px 26px;margin:0}
+.pagetitle{font-size:var(--t);margin:8px 0 0;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink)}
+.gamenav{display:flex;gap:8px;margin:14px 0 0}
+.gamenav button{font:700 14px/1 var(--mono);min-height:var(--tap);flex:1}
+
+button{
+  font:600 18px/1 ui-serif,Georgia,serif;
+  min-height:46px;padding:11px 14px;
+  background:var(--white);color:var(--ink);
+  border:2px solid var(--ink-line);border-radius:3px;
+  cursor:pointer;
+}
+button:active{background:var(--paper2)}
+button[disabled]{opacity:.4;cursor:default}
+
+/* ---------- stage : scene fills the viewport, art carries the first paint ---------- */
+.scene{
+  flex:1 1 auto;min-height:0;
+  display:flex;flex-direction:column;
+  padding:0 12px;max-width:820px;width:100%;margin:0 auto;
+}
+.scene.hidden{display:none}
+.hidden{display:none}
+/* the panel holds prose + choices; it scrolls, the scene above it does not */
+.panel{flex:1 1 auto;min-height:0;overflow-y:auto;padding:0 0 26px;-webkit-overflow-scrolling:touch}
+
+/* room art carries the screen */
+.rm-surf{fill:var(--white)}
+.rm-line{color:var(--ink);stroke:currentColor;fill:none;stroke-width:.9}
+.rm-edge{color:var(--ink);stroke:currentColor;fill:none;stroke-width:1.8}
+.rm-lab{color:var(--ink);fill:currentColor;font-family:Georgia,serif}
+.rm-tbl{fill:var(--white);color:var(--ink);stroke:currentColor;stroke-width:.9}
+.rm-tbl.seen{fill:var(--paper2)}
+.rm-tbl.now{stroke-width:2.4}
+.rm-num{color:var(--ink);fill:currentColor;font-family:Georgia,serif}
+.rm-pip{fill:var(--red)}
+.rm-grain{fill:var(--red)}
+.nd{fill:var(--white);color:var(--ink);stroke:currentColor;stroke-width:.9}
+.nd.on{fill:var(--red)}
+.nd-num{color:var(--ink);fill:currentColor;font-family:Georgia,serif}
+.nd-num.on{color:var(--chalk)}
+.nd-link{color:var(--ink);stroke:currentColor;stroke-width:.9}
+a.skip{position:absolute;left:-9999px;display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;color:var(--ink)}
+a.skip:focus{left:12px;top:8px;background:var(--paper2);color:var(--ink);z-index:20}
+:focus-visible{outline:4px solid var(--redink-line);outline-offset:2px}
+.room{
+  flex:0 0 auto;
+  width:100%;display:block;height:58vh;
+  background:var(--white);
+  border:3px solid var(--ink-line);
+  border-radius:4px;
+  margin:10px 0;
+}
+.beat{
+  background:var(--red);color:var(--chalk);
+  border:3px solid var(--ink-line);border-radius:4px;
+  padding:12px 14px;margin:0 0 12px;
+}
+.beat .n{
+  font-size:18px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--chalk);margin-bottom:4px;
+}
+.beat p{margin:0;color:var(--chalk)}
+.acts{display:flex;flex-direction:column;gap:9px}
+.acts button{text-align:left;line-height:1.35;padding:13px 14px}
+.k{
+  font-size:18px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--redink);display:block;margin-bottom:2px;
+}
+.note{color:var(--ink2);font-size:18px;margin:10px 0 0}
+.banked{
+  background:var(--paper2);border-left:6px solid var(--red);
+  padding:10px 12px;margin:12px 0 0;
+}
+.banked p{margin:0 0 4px;font-size:18px;color:var(--ink)}
+.banked p:last-child{margin:0}
+
+/* reveal */
+h2{font-size:var(--t);margin:16px 0 6px;letter-spacing:.05em;text-transform:uppercase}
+.chain{list-style:none;padding:0;margin:8px 0 0}
+.chain li{
+  border-left:6px solid var(--paper2);
+  padding:8px 12px;margin:0 0 6px;color:var(--ink2);font-size:18px;
+}
+.chain li.lit{border-left-color:var(--red);color:var(--ink);background:var(--paper2)}
+.tally{background:var(--paper2);border:3px solid var(--ink-line);padding:12px 14px;margin:14px 0 0}
+.tally p{margin:0 0 7px}
+.tally p:last-child{margin:0}
+.big{font-size:var(--t);font-weight:700}
+.src{color:var(--ink2);font-size:18px;border-top:2px solid var(--paper2);margin-top:18px;padding-top:10px}
+.src b{color:var(--ink)}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to the room</a>
+
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.45rem .9rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><p class="updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v12 <span style="opacity:.75">a3cda75</span></span>  </p>
+
+
+<!-- ============ THE ROOM ============ -->
+<section class="scene" id="play">
+
+  <h1 class="pagetitle">Table Four</h1>
+
+  <svg class="room" id="art" viewBox="0 0 100 72" role="img"
+       aria-label="Floor plan of a sixty-five seat cafe: kitchen pass along the top, bar down the left, door at the lower left, tables four and five in the back room, tables one two and three across the front.">
+    <rect class="rm-surf" x="0" y="0" width="100" height="72"/>
+    <rect class="rm-line" x="6" y="3" width="88" height="9"/>
+    <text class="rm-lab" x="50" y="9.8" font-size="6" text-anchor="middle">KITCHEN</text>
+    <rect class="rm-line" x="6" y="16" width="11" height="32" rx="1"/>
+    <text class="rm-lab" x="11.5" y="32" font-size="6" text-anchor="middle" transform="rotate(-90 11.5 32)">BAR</text>
+    <rect class="rm-line" x="6" y="53" width="18" height="9" rx="1"/>
+    <text class="rm-lab" x="15" y="59.4" font-size="6" text-anchor="middle">DOOR</text>
+    <rect class="rm-edge" x="0.9" y="0.9" width="98.2" height="70.2"/>
+    <g id="tables"></g>
+    <g id="spill"></g>
+  </svg>
+
+  <div class="panel">
+    <div class="beat" id="main">
+      <div class="n" id="beatNo">Service &mdash; beat 1 of 8</div>
+      <p id="beatLine">Friday. Sixty-five seats, five of them yours.</p>
+    </div>
+
+    <div class="acts" id="acts"></div>
+    <p class="note" id="note">One action per beat. Serving clears the thing that is shouting. Noticing does not.</p>
+    <div class="banked hidden" id="bankBox"></div>
+    <div class="gamenav">
+      <button type="button" id="beatBack" onclick="goBack()">Back a beat</button>
+      <button type="button" onclick="goHome()">Start over</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVEAL ============ -->
+<section class="scene hidden" id="out">
+  <svg class="room" id="outArt" viewBox="0 0 100 40" role="img"
+       aria-label="Diagram of the cascade: eight linked nodes running from a missed plate at the corner table to a couple leaving the empty door.">
+    <rect class="rm-surf" x="0" y="0" width="100" height="40"/>
+    <rect class="rm-edge" x="0.9" y="0.9" width="98.2" height="38.2"/>
+    <g id="chainArt"></g>
+  </svg>
+  <div class="panel">
+    <h2>What you set in motion</h2>
+    <ul class="chain" id="chainList"></ul>
+    <div class="tally" id="tally"></div>
+    <div class="acts" style="margin-top:14px">
+      <button onclick="goHome()"><span class="k">Again</span>Work the same Friday differently</button>
+    </div>
+    <p class="src">Adapted with permission from <b>Choreographed Chaos: Every Table in the Restaurant Counts</b> by Steve &amp; Karen Waller (Damianos Publishing, 2026). The cascade is the book&rsquo;s own &ldquo;Everything&rsquo;s Connected.&rdquo; The scoring is the book&rsquo;s own Carol Index &mdash; a sense of humor and a sense of perspective, the sixth and seventh senses. Tight Spiral Productions vertical slice.</p>
+  </div>
+</section>
+
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+</span>
+
+<script>
+/* ---------------- the room ---------------- */
+var TABLES = [
+  {id:"T1", x:28, y:38, w:18, h:16, label:"1",
+   who:"Two-top by the window",
+   look:["First night out since they moved in up the street.",
+         "They keep glancing at the door for someone to notice them.",
+         "He has the menu closed. She has not opened hers."]},
+  {id:"T2", x:50, y:38, w:18, h:16, label:"2",
+   who:"The wall table",
+   look:["Their entrees are twenty minutes late and nobody has said so.",
+         "Water glasses empty. Bread basket empty.",
+         "One of them has started checking the time on the phone."]},
+  {id:"T3", x:72, y:38, w:18, h:16, label:"3",
+   who:"Four-top, working dinner",
+   look:["Laptops half open. They are eating, not dining.",
+         "They want the check before dessert is offered.",
+         "One of them asked for the wifi twice."]},
+  {id:"T4", x:28, y:16, w:20, h:17, label:"4",
+   who:"The family &mdash; two children, two and four",
+   look:["They have been in before. Many times.",
+         "The four-year-old is out of the chair already. Crayons would land.",
+         "Bread first, and a glass of wine each, without asking."]},
+  {id:"T5", x:68, y:16, w:20, h:17, label:"5",
+   who:"The corner table",
+   look:["A plate for this table is sitting under the heat lamp, unclaimed.",
+         "They have not complained. They are still waiting.",
+         "Their server thinks somebody else picked it up."]}
+];
+
+/* eight authored beats. each unserved demand forges one link. */
+var BEATS = [
+  {dem:"T5", line:"A plate for the corner table never left the pass. It is still under the lamp.",
+   serve:"Run the corner plate before it dies under the lamp",
+   link:"The missed plate at the corner table went out cold, so the kitchen cooked it twice."},
+  {dem:"T2", line:"The wall table wants to know how long. Nobody has told them anything.",
+   serve:"Go to the wall table and give them a real number",
+   link:"The wall table waited on food that got pushed behind a re-cook."},
+  {dem:"T2", line:"Done waiting, the wall table orders a round instead.",
+   serve:"Take the round to the bar yourself, right now",
+   link:"Impatient, the wall table ordered drinks the bar was not staffed for."},
+  {dem:"BAR", line:"The bar is out of the bottle that round needs. It lives in the cellar.",
+   serve:"Get the bottle from the cellar so the bartender stays behind the bar",
+   link:"The bartender went downstairs for a bottle and left the bar unattended."},
+  {dem:"T3", line:"The four-top has closed their laptops. They want the check, not dessert.",
+   serve:"Drop the check on the four-top before they have to ask twice",
+   link:"The working four-top had to ask twice and sat on a table someone was waiting for."},
+  {dem:"T4", line:"Table four is seated. The four-year-old is already out of the chair.",
+   serve:"Get to table four",
+   link:"Table four was handled only after they asked, like anybody else."},
+  {dem:"HOST", line:"Two people are standing at the door. The stand is empty &mdash; the manager is behind the bar.",
+   serve:"Cover the door yourself and seat them",
+   link:"A couple stood at an empty host stand long enough to leave."},
+  {dem:"T1", line:"The window two-top is finished, and still has not been spoken to by name.",
+   serve:"Stop at the window table and learn who they are",
+   link:"The new neighbours ate a whole meal as table one and left as strangers."}
+];
+
+var S;
+function fresh(){
+  S = {beat:0, forged:[], banked:{}, moment:null, done:false, hist:[]};
+  TABLES.forEach(function(t){S.banked[t.id]=0;});
+}
+
+/* ---------------- art ---------------- */
+function drawRoom(){
+  var g="";
+  TABLES.forEach(function(t){
+    var demanding = !S.done && S.beat<BEATS.length && BEATS[S.beat].dem===t.id;
+    var cls = "rm-tbl" + (S.banked[t.id]?" seen":"") + (demanding?" now":"");
+    g += '<rect class="'+cls+'" x="'+t.x+'" y="'+t.y+'" width="'+t.w+'" height="'+t.h+'" rx="1.4"/>';
+    g += '<text class="rm-num" x="'+(t.x+t.w/2)+'" y="'+(t.y+t.h/2+3.1)+'" font-size="9" text-anchor="middle">'+t.label+'</text>';
+    if(demanding){
+      g += '<circle class="rm-pip" cx="'+(t.x+t.w-3.6)+'" cy="'+(t.y+3.8)+'" r="3"/>';
+    }
+  });
+  /* mark bar / host demands on the fixtures */
+  if(!S.done && S.beat<BEATS.length){
+    var d=BEATS[S.beat].dem;
+    if(d==="BAR") g+='<circle class="rm-pip" cx="11.5" cy="20" r="3"/>';
+    if(d==="HOST") g+='<circle class="rm-pip" cx="20.5" cy="57.5" r="3"/>';
+  }
+  document.getElementById("tables").innerHTML=g;
+
+  /* salt spill: one grain per forged link, trailing from the corner table */
+  var sp="", n=S.forged.length, seed=7;
+  for(var i=0;i<n*9;i++){
+    seed=(seed*1103515245+12345)&0x7fffffff;
+    var f=i/(n*9||1);
+    var cx=94 - f*66 + ((seed>>7)%80)/22 - 1.8;
+    var cy=65.4 + ((seed>>13)%80)/16 - 2.5;
+    sp+='<circle class="rm-grain" cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="'+(0.4+((seed>>3)%5)/9).toFixed(2)+'"/>';
+  }
+  document.getElementById("spill").innerHTML=sp;
+}
+
+/* ---------------- turn loop ---------------- */
+function render(){
+  var b=BEATS[S.beat];
+  document.getElementById("beatNo").textContent="Service \u2014 beat "+(S.beat+1)+" of "+BEATS.length;
+  document.getElementById("beatLine").innerHTML=b.line;
+
+  var html="";
+  html+='<button onclick="serve()"><span class="k">Serve</span>'+b.serve+'</button>';
+  TABLES.forEach(function(t){
+    if(S.banked[t.id]>=t.look.length) return;
+    html+='<button onclick="notice(\''+t.id+'\')"><span class="k">Notice table '+t.label+'</span>'+t.who+'</button>';
+  });
+  if(S.beat===5 && S.banked.T4>=2 && S.moment===null){
+    html+='<button onclick="takeMoment()"><span class="k">The recurring moment</span>'+
+          'Crayons down, bread out, a glass of wine each &mdash; before anyone asks'+'</button>';
+  }
+  document.getElementById("acts").innerHTML=html;
+
+  var bank="", any=false;
+  TABLES.forEach(function(t){
+    for(var i=0;i<S.banked[t.id];i++){any=true;bank+='<p>Table '+t.label+' &mdash; '+t.look[i]+'</p>';}
+  });
+  var box=document.getElementById("bankBox");
+  box.innerHTML=bank; box.className=any?"banked":"banked hidden";
+  drawRoom();
+}
+
+function advance(served){
+  if(!served) S.forged.push(S.beat);
+  S.beat++;
+  if(S.beat>=BEATS.length) finish(); else render();
+}
+function serve(){ S.hist.push("served"); advance(true); }
+function notice(id){
+  var t=TABLES.filter(function(x){return x.id===id;})[0];
+  if(S.banked[id]<t.look.length) S.banked[id]++;
+  S.hist.push("noticed:"+id);
+  advance(false);
+}
+function takeMoment(){ S.moment=true; S.hist.push("moment"); advance(false); }
+
+/* ---------------- reveal ---------------- */
+function finish(){
+  S.done=true;
+  if(S.moment===null) S.moment=false;
+
+  var li="", art="", lit=0;
+  BEATS.forEach(function(b,i){
+    var on=S.forged.indexOf(i)>-1;
+    if(on) lit++;
+    li+='<li class="'+(on?'lit':'')+'">'+(on?b.link:'Prevented: '+b.link.replace(/\.$/,''))+'</li>';
+    var x=4+i*11.8;
+    art+='<rect class="nd'+(on?' on':'')+'" x="'+x+'" y="13" width="10" height="14" rx="1.2"/>';
+    art+='<text class="nd-num'+(on?' on':'')+'" x="'+(x+5)+'" y="23.1" font-size="6" text-anchor="middle">'+(i+1)+'</text>';
+    if(i<BEATS.length-1) art+='<line class="nd-link" x1="'+(x+10)+'" y1="20" x2="'+(x+11.8)+'" y2="20"/>';
+  });
+  document.getElementById("chainList").innerHTML=li;
+  document.getElementById("chainArt").innerHTML=art;
+
+  var looked=0, details=0;
+  TABLES.forEach(function(t){ if(S.banked[t.id]>0) looked++; details+=S.banked[t.id]; });
+  var quiet=0;
+  TABLES.forEach(function(t){
+    var shouted=BEATS.some(function(b){return b.dem===t.id;});
+    if(S.banked[t.id]>0 && !shouted) quiet++;
+  });
+  var regulars=[];
+  if(S.moment) regulars.push("Table four");
+  if(S.banked.T1>0 && S.forged.indexOf(7)===-1) regulars.push("The window two-top");
+
+  var t="";
+  t+='<p class="big">'+lit+' of '+BEATS.length+' links forged.</p>';
+  t+='<p>Perspective &mdash; you looked at '+looked+' of 5 tables, '+details+
+     ' detail'+(details===1?'':'s')+' banked'+(quiet?', '+quiet+' of them at a table that was not shouting':'')+'.</p>';
+  t+='<p>Humour &mdash; the recurring moment was '+(S.moment?'taken':'not taken')+
+     (S.moment?', and it cost you the beat.':S.banked.T4>=2?'. You had what you needed to see it.':'. You never learned enough about table four to see it.')+'</p>';
+  t+='<p>'+(regulars.length
+        ? 'Left as regulars: '+regulars.join(' and ')+'.'
+        : 'Everyone left as a table number. Tonight you were table four to them, too.')+'</p>';
+  t+='<p>Every plate went out. That was never the game.</p>';
+  document.getElementById("tally").innerHTML=t;
+
+  document.getElementById("play").className="scene hidden";
+  document.getElementById("out").className="scene";
+  window.scrollTo(0,0);
+}
+
+/* ---------------- nav / comfort ---------------- */
+function goHome(){
+  fresh();
+  document.getElementById("out").className="scene hidden";
+  document.getElementById("play").className="scene";
+  render(); window.scrollTo(0,0);
+}
+function goBack(){
+  if(S.done){ goHome(); return; }
+  if(S.beat===0) return;
+  S.beat--;
+  var i=S.forged.indexOf(S.beat); if(i>-1) S.forged.splice(i,1);
+  var last=S.hist.pop()||"";
+  if(last.indexOf("noticed:")===0){
+    var id=last.split(":")[1];
+    if(S.banked[id]>0) S.banked[id]--;
+  }
+  if(last==="moment") S.moment=null;
+  render(); window.scrollTo(0,0);
+}
+/* ---------------- Studio Eyes ---------------- */
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  var u=document.getElementById('seUpdated');
+  if(u){ var d=new Date(document.lastModified);
+    u.textContent=isNaN(d.getTime())?'Last updated recently'
+      :'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); }
+  [].forEach.call(document.querySelectorAll('[data-typeset]'),function(b){ b.addEventListener('click',function(){
+    root.setAttribute('data-type', b.getAttribute('data-typeset'));
+    [].forEach.call(document.querySelectorAll('[data-typeset]'),function(x){ x.setAttribute('aria-pressed',String(x===b)); });
+    if(sr) sr.textContent='Text size '+b.textContent.trim();
+  });});
+})();
+
+fresh(); render();
+</script>
+</body>
+</html>
