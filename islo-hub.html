@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The iSLO Suite — games that build the skill, and the instrument that measures it · Tight Spiral Productions</title>
+<meta name="description" content="A hub for MassBay students. One station for each of the college's seven Graduation Competencies (iSLOs). Each station holds the games that BUILD the skill and the rubric that MEASURES it — same skill, two instruments. Single-file, offline, contrast-gated.">
+<meta name="tsp:surface" content="hub"><!-- a hub, not a game: the image-floor is a GAME floor (see studio-eyes) -->
+
+<!-- tsp:source        MassBay Graduation Competencies (ISLO #5 workshop deck, Spring 2026, verbatim);
+                       AAC&U Written Communication VALUE rubric modified for MassBay (ISLO #1, verbatim);
+                       MassBay ISLO #5 Rubric (verbatim); ISLO #6 Critical Thinking rubric (in development).
+     tsp:last-verified 2026-07-19 — outcomes + rubrics checked against the named source decks on ship day.
+     tsp:built-on      index.html token palette (shipped + gate-passed 2026-07-14) — reused, not re-invented.
+     tsp:floor         single-file · offline · zero external hosts · contrast-gated 4.5:1 · no emoji · token-role law
+     tsp:thesis         The rubric is the measurement. The game is the practice. This hub shows both, per outcome,
+                        and it shows the DRY CELLS — the outcomes the college measures that the suite does not yet build.
+     THIS PAGE MAKES NO NETWORK CALLS. Nothing loads from anywhere. Nothing is collected. -->
+
+<style>
+:root{
+  /* GROUND */
+  --paper:      #fbfaf7;   /* never pure white — it blooms on an RP retina */
+  --paper-2:    #f1eee6;
+  --rule:       #d8d2c4;
+
+  /* INK — text tokens only. Token-role law: these appear as color: and nowhere else. */
+  --ink:        #14181d;   /* 15.9:1 on paper */
+  --ink-2:      #3d4652;   /*  8.1:1 on paper */
+  --ink-3:      #5c6675;   /*  5.3:1 on paper — floor for body text */
+
+  /* ACCENT — INK form is TEXT-safe on paper; FILL form is a GROUND, never text. */
+  --brass-ink:  #6a4d12;   /*  6.2:1 on paper  — TEXT */
+  --brass-fill: #d9a441;   /*                  — GROUND ONLY */
+  --cool-ink:   #274063;   /*  9.3:1 on paper  — TEXT */
+  --cool-fill:  #c3d2e6;   /*                  — GROUND ONLY */
+  --live-ink:   #1d5c3f;   /*  6.7:1 on paper  — TEXT (coverage: built) */
+  --warn-ink:   #8a2f22;   /*  6.9:1 on paper  — TEXT (coverage: dry cell) */
+  /* LINE twins — token-role law: same hues as the *-ink text tokens, but these
+     appear ONLY in borders/outlines/fills (decoration), never as color:. */
+  --brass-line: #6a4d12;
+  --cool-line:  #274063;
+  --live-line:  #1d5c3f;
+  --warn-line:  #8a2f22;
+  --slab:       #12161b;   /* dark ground */
+  --slab-ink:   #f4f1e8;   /* 16.4:1 on slab   — TEXT */
+
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+  /* STUDIO EYES chrome tokens (adapt to this page's palette) */
+  --se-accent:#274063; --se-on-accent:#fbfaf7; --se-focus:#8f3f00; --se-tap:48px;
+}
+
+/* ═══ STUDIO EYES — light modes, adapting this page's own tokens ═══ */
+/* DUSK — warm, still light; ink stays dark, contrast preserved */
+html[data-light="dusk"]{
+  --paper:#f4ecda; --paper-2:#eaddc2; --rule:#cdbb95;
+  --ink:#181206; --ink-2:#3a3320; --ink-3:#514a38;
+  --brass-ink:#5f440f; --cool-ink:#243a5c; --live-ink:#1a5238; --warn-ink:#7d2a1f;
+}
+/* WARM-DARK (night) — warm charcoal, never pure black; ink goes light */
+html[data-light="night"]{
+  --paper:#1c1a16; --paper-2:#26231d; --rule:#463f30;
+  --ink:#f2e3bf; --ink-2:#d8c59a; --ink-3:#b7a982;
+  --brass-ink:#d9a441; --cool-ink:#9db8d4; --live-ink:#7bb899; --warn-ink:#e59a86;
+  --brass-line:#d9a441; --cool-line:#9db8d4; --live-line:#7bb899; --warn-line:#e59a86;
+  --se-accent:#8aa0b8; --se-on-accent:#141109;
+}
+/* night: station accents go light so numbers and marks stay legible on charcoal */
+html[data-light="night"] .station:nth-of-type(1){--acc:#d9a441; --acc-ink:#d9a441}
+html[data-light="night"] .station:nth-of-type(2){--acc:#9db8d4; --acc-ink:#9db8d4}
+html[data-light="night"] .station:nth-of-type(3){--acc:#c3a0d6; --acc-ink:#c3a0d6}
+html[data-light="night"] .station:nth-of-type(4){--acc:#9db6c6; --acc-ink:#9db6c6}
+html[data-light="night"] .station:nth-of-type(5){--acc:#e0a07f; --acc-ink:#e0a07f}
+html[data-light="night"] .station:nth-of-type(6){--acc:#a6abe0; --acc-ink:#a6abe0}
+html[data-light="night"] .station:nth-of-type(7){--acc:#e0a35c; --acc-ink:#e0a35c}
+/* toggles */
+html.se-contrast:not([data-light="night"]){ --paper:#fbfaf7; --paper-2:#f0ece2; --rule:#b9a06a; --ink:#141109; --ink-2:#2c2517; }
+html.se-contrast[data-light="night"]{ --paper:#0e0d0b; --paper-2:#161410; --ink:#fff7e6; --ink-2:#efe0bc; }
+html{ font-size:100%; }
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+@media (prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1060px; margin:0 auto; padding:0 22px 90px}
+main a{color:var(--cool-ink)}
+
+/* ── STANDING NAV ───────────────────────────────────────────────────────── */
+.topnav{position:sticky; top:0; z-index:50; background:var(--paper); border-bottom:1.5px solid var(--rule)}
+.topnav-in{max-width:1060px; margin:0 auto; padding:9px 22px; display:flex; align-items:center; gap:10px}
+.topnav a{
+  display:inline-flex; align-items:center; gap:.35em; text-decoration:none;
+  font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--ink-2); min-height:44px; padding:.42em .8em; border:1.5px solid var(--rule); border-radius:999px; background:var(--paper-2);
+  transition:border-color .12s, color .12s;
+}
+.topnav a:hover{border-color:var(--cool-line); color:var(--ink)}
+.topnav a:focus-visible{outline:3px solid var(--cool-line); outline-offset:2px}
+.topnav-mark{margin-left:auto; font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+@media (max-width:560px){ .topnav-mark{display:none} }
+
+/* ── STAGE ─────────────────────────────────────────────────────────────── */
+.stage{padding:70px 0 40px; border-bottom:2px solid var(--ink)}
+.mark{font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--brass-ink); font-weight:700; margin:0 0 20px}
+h1{font-family:var(--serif); font-size:clamp(32px,6vw,56px); line-height:1.07; margin:0 0 22px; letter-spacing:-.015em; font-weight:400; max-width:17ch}
+h1 em{font-style:italic; color:var(--cool-ink)}
+.lede{font-size:clamp(18px,2.5vw,21px); line-height:1.5; color:var(--ink-2); max-width:60ch; margin:0 0 14px}
+.lede b{color:var(--ink); font-weight:600}
+.tag{font-family:var(--mono); font-size:12.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin:26px 0 0}
+
+.stage-row{display:flex; align-items:flex-start; gap:clamp(20px,4vw,44px); justify-content:space-between}
+.stage-copy{flex:1 1 auto; min-width:0}
+.hero-mark{width:clamp(120px,20vw,168px); height:auto; color:var(--brass-ink); flex:0 0 auto}
+@media (max-width:640px){ .hero-mark{display:none} }
+
+.count{display:flex; flex-wrap:wrap; gap:0; margin:34px 0 0; border:1.5px solid var(--rule); border-radius:2px; overflow:hidden}
+.count div{flex:1 1 130px; padding:14px 16px; border-right:1.5px solid var(--rule); background:var(--paper-2)}
+.count div:last-child{border-right:0}
+.count b{display:block; font-family:var(--mono); font-size:23px; color:var(--ink); font-weight:700; line-height:1.2}
+.count span{display:block; font-family:var(--mono); font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); margin-top:3px}
+
+/* ── THE ANCHOR — the measure/build claim, stated once ─────────────────── */
+.anchor{margin:30px 0 0; padding:16px 18px; border-left:5px solid var(--cool-ink); background:var(--paper-2); border-radius:2px}
+.anchor p{margin:0; font-size:16px; color:var(--ink-2); line-height:1.55; max-width:70ch}
+.anchor p b{color:var(--ink)}
+.anchor p + p{margin-top:9px}
+
+/* ── LEGEND ─────────────────────────────────────────────────────────────── */
+.legend{display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 0}
+.leg{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-2)}
+.dot{width:11px; height:11px; border-radius:2px; border:1.5px solid}
+.dot.built{border-color:var(--live-line); background:var(--paper)}
+.dot.thin{border-color:var(--brass-line); background:var(--paper)}
+.dot.dry{border-color:var(--warn-line); background:var(--paper)}
+
+/* ── STATIONS ───────────────────────────────────────────────────────────── */
+section{padding:52px 0 0}
+.h2{font-family:var(--mono); font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--brass-ink); font-weight:700; margin:0 0 6px}
+.sub{font-size:16px; color:var(--ink-2); margin:0 0 6px; max-width:66ch}
+.sub b{color:var(--ink); font-weight:600}
+
+.station{
+  border:2px solid var(--rule); border-top-width:7px; border-radius:3px;
+  background:var(--paper-2); margin-top:20px; padding:0; overflow:hidden;
+  border-top-color:var(--acc,var(--rule));
+}
+.st-head{padding:22px 24px 18px; display:flex; gap:18px; align-items:flex-start; border-bottom:1.5px solid var(--rule)}
+.st-num{
+  flex:0 0 auto; width:52px; height:52px; border-radius:3px; background:var(--paper);
+  border:2px solid var(--acc,var(--rule)); display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:22px; font-weight:700; color:var(--acc-ink,var(--ink));
+}
+.st-titles{flex:1 1 auto; min-width:0}
+.st-kicker{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin:0 0 4px}
+.st-head h3{font-family:var(--serif); font-size:clamp(22px,3.4vw,27px); font-weight:400; margin:0 0 8px; line-height:1.15; color:var(--ink)}
+.st-def{font-size:15px; color:var(--ink-2); line-height:1.5; margin:0; max-width:74ch}
+.st-def em{font-style:italic; color:var(--ink-3)}
+.cover{
+  flex:0 0 auto; align-self:flex-start; font-family:var(--mono); font-size:10px; font-weight:700;
+  letter-spacing:.09em; text-transform:uppercase; padding:4px 9px; border-radius:2px; border:1.5px solid; background:var(--paper);
+}
+.cover.built{color:var(--live-ink); border-color:var(--live-line)}
+.cover.thin{color:var(--brass-ink); border-color:var(--brass-line)}
+.cover.dry{color:var(--warn-ink); border-color:var(--warn-line)}
+
+.st-body{display:grid; grid-template-columns:1fr; gap:0}
+@media (min-width:760px){ .st-body{grid-template-columns:1.35fr 1fr} }
+.col{padding:20px 24px}
+.col + .col{border-top:1.5px solid var(--rule)}
+@media (min-width:760px){ .col + .col{border-top:0; border-left:1.5px solid var(--rule)} }
+.col-h{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass-ink); font-weight:700; margin:0 0 14px; display:flex; align-items:center; gap:8px}
+.col-h .ico{width:16px; height:16px; color:var(--brass-ink); flex:0 0 auto}
+
+/* build-game rows */
+.games{display:flex; flex-direction:column; gap:9px}
+.g{
+  display:flex; gap:12px; align-items:flex-start; padding:11px 13px; border:1.5px solid var(--rule);
+  border-radius:2px; background:var(--paper); text-decoration:none; color:var(--ink);
+  transition:border-color .12s, transform .1s;
+}
+a.g:hover{border-color:var(--acc,var(--cool-line)); transform:translateY(-1px)}
+a.g:focus-visible{outline:3px solid var(--cool-line); outline-offset:2px}
+.g .gmark{width:26px; height:26px; color:var(--acc-ink,var(--brass-ink)); flex:0 0 auto; margin-top:1px}
+/* gmark color stays TEXT-role (acc-ink/brass-ink); the ::before below uses LINE twins */
+.g .gt{flex:1 1 auto; min-width:0}
+.g .gn{font-family:var(--serif); font-size:17px; line-height:1.2; margin:0 0 2px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.g .gd{margin:0; font-size:13.5px; color:var(--ink-3); line-height:1.45}
+.g.proposed{border-style:dashed; background:var(--paper-2)}
+.pill{font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 6px; border-radius:2px; border:1px solid; white-space:nowrap}
+.pill.live{color:var(--live-ink); border-color:var(--live-line)}
+.pill.build{color:var(--brass-ink); border-color:var(--brass-line)}
+.pill.design{color:var(--warn-ink); border-color:var(--warn-line)}
+.pill.client{color:var(--cool-ink); border-color:var(--cool-line)}
+
+/* measure block */
+.measure{font-size:14.5px; color:var(--ink-2); line-height:1.5}
+.measure .mname{font-family:var(--serif); font-size:17px; color:var(--ink); margin:0 0 4px; display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+.mstatus{font-family:var(--mono); font-size:9.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 6px; border-radius:2px; border:1px solid}
+.mstatus.live{color:var(--live-ink); border-color:var(--live-line)}
+.mstatus.dev{color:var(--brass-ink); border-color:var(--brass-line)}
+.mstatus.none{color:var(--warn-ink); border-color:var(--warn-line)}
+.dims{margin:12px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px}
+.dims li{font-size:13.5px; color:var(--ink-2); line-height:1.4; padding-left:16px; position:relative}
+.dims li::before{content:""; position:absolute; left:0; top:8px; width:7px; height:7px; border:1.5px solid var(--acc,var(--brass-line)); border-radius:2px}
+.scale{margin:11px 0 0; font-family:var(--mono); font-size:11px; letter-spacing:.03em; color:var(--ink-3); line-height:1.5}
+.prov{margin:12px 0 0; padding-top:11px; border-top:1px solid var(--rule); font-size:12.5px; color:var(--ink-3); line-height:1.45}
+.prov b{color:var(--ink-2)}
+
+/* accent map — green-free per render-proof rule; each station a distinct hue */
+.station:nth-of-type(1){--acc:#6a4d12; --acc-ink:#6a4d12}   /* brass  */
+.station:nth-of-type(2){--acc:#274063; --acc-ink:#274063}   /* cool   */
+.station:nth-of-type(3){--acc:#5a3a6e; --acc-ink:#563369}   /* plum   */
+.station:nth-of-type(4){--acc:#2f4a5c; --acc-ink:#2f4a5c}   /* steel  */
+.station:nth-of-type(5){--acc:#8a3a1c; --acc-ink:#8a3a1c}   /* clay   */
+.station:nth-of-type(6){--acc:#343a86; --acc-ink:#343a86}   /* indigo */
+.station:nth-of-type(7){--acc:#8f4a08; --acc-ink:#8f4a08}   /* burnt  */
+
+/* ── SLAB: how the suite is scored ─────────────────────────────────────── */
+.slab{background:var(--slab); color:var(--slab-ink); margin:56px -22px 0; padding:44px 22px 42px; border-radius:3px}
+.slab .in{max-width:1016px; margin:0 auto}
+.slab .h2{color:var(--brass-fill)}
+.slab .sub{color:#cdd4dd}
+.slab .sub b{color:var(--slab-ink)}
+.principles{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-top:20px}
+.pr{padding:16px 17px; border:1.5px solid #333c48; border-radius:2px; background:#1a1f27}
+.pr b{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:var(--brass-fill); margin-bottom:7px}
+.pr p{margin:0; font-size:14px; color:#c3cad4; line-height:1.5}
+
+/* ── FOOTER ─────────────────────────────────────────────────────────────── */
+footer{margin-top:60px; padding-top:24px; border-top:1.5px solid var(--rule); font-size:14px; color:var(--ink-3)}
+footer a{color:var(--cool-ink); font-weight:600}
+footer p{margin:0 0 8px; max-width:80ch; line-height:1.55}
+footer .fine{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); margin-top:12px}
+
+@media (max-width:640px){
+  .stage{padding:44px 0 30px}
+  .st-head{flex-wrap:wrap}
+  .slab{margin:44px -22px 0; padding:34px 22px}
+}
+
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 14px; background:var(--paper); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; z-index:100}
+.se-home{justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--se-tap);
+  padding:8px 12px; border:1.5px solid var(--rule); border-radius:8px; background:var(--paper-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none}
+.se-brand{justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink)}
+.se-brand svg{width:34px; height:20px; color:var(--cool-ink); flex:0 0 auto}
+.se-brand .wm{font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; color:var(--ink)}
+.se-eyes{justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--se-tap);
+  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--se-accent);
+  color:var(--se-on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer}
+.se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--se-focus); outline-offset:2px}
+@media (max-width:560px){ .se-brand .wm{display:none} }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+.se-panel{position:fixed; right:12px; top:calc(var(--se-tap) + 14px); z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--paper); color:var(--ink);
+  border:2px solid var(--se-accent); border-radius:10px; padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28); display:none}
+.se-panel[data-open="1"]{display:block}
+.se-panel h2{font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 8px}
+.se-row{display:flex; gap:6px; margin-bottom:14px}
+.se-btn{flex:1; min-height:var(--se-tap); padding:8px 4px; border:1.5px solid var(--rule); border-radius:8px;
+  background:var(--paper-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer}
+.se-btn[aria-pressed="true"]{background:var(--se-accent); color:var(--se-on-accent); border-color:var(--se-accent)}
+.se-btn:focus-visible{outline:3px solid var(--se-focus); outline-offset:2px}
+.se-tog{display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--se-tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--rule); border-radius:8px;
+  background:var(--paper-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left}
+.se-tog[aria-pressed="true"]{border-color:var(--se-accent)}
+.se-tog .st{font-family:var(--mono); font-size:11px; color:var(--ink-2)}
+.se-tog[aria-pressed="true"] .st{color:var(--cool-ink); font-weight:700}
+.se-tog:focus-visible{outline:3px solid var(--se-focus); outline-offset:2px}
+.se-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+
+/* last-updated stamp — computed from document.lastModified */
+.se-updated{font-family:var(--mono); font-size:12px; color:var(--ink-2); margin:14px 0 0; display:flex; align-items:center; gap:7px}
+.se-updated::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--cool-ink); flex:0 0 auto}
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--rule); background:var(--paper)}
+.se-rail a,.se-rail button{min-height:var(--se-tap); padding:10px 18px; border:1.5px solid var(--rule); border-radius:8px;
+  background:var(--paper-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer}
+.se-rail a:focus-visible,.se-rail button:focus-visible{outline:3px solid var(--se-focus); outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes. Reserves its own row,
+     never overlaps content (TSP Comfort Kernel v2). Static + offline. -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+
+
+<main class="wrap">
+<p class="se-updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v22 <span style="opacity:.75">1342569</span></span> </span> </span> </span> </span>
+
+<!-- ═══ STAGE ═══ -->
+<div class="stage">
+<div class="stage-row"><div class="stage-copy">
+  <p class="mark">Tight Spiral Productions &nbsp;&middot;&nbsp; for MassBay Community College</p>
+  <h1>The iSLO Suite. Games that build the skill — and <em>the instrument that measures it.</em></h1>
+  <p class="lede">MassBay asks every graduate to become proficient in <b>seven competencies</b>.
+    This is one station for each. Every station holds the games that <b>build</b> the skill by
+    playing it, and the rubric that <b>measures</b> it against the college's own language.</p>
+  <p class="lede">Same skill, two instruments. <b>All seven outcomes now have a build</b> — the last dry
+    cells (Natural World and DEI) were filled this pass. Where the <em>measure</em> side is still a rubric
+    the college hasn't normed yet, this page says so out loud, marked, not hidden.</p>
+  <p class="tag">Play &nbsp;&middot;&nbsp; Notice &nbsp;&middot;&nbsp; Be measured on your own growth</p>
+  </div>
+<svg class="hero-mark" viewBox="0 0 200 200" aria-hidden="true">
+  <circle cx="100" cy="100" r="88" fill="none" stroke="currentColor" stroke-width="2"/>
+  <circle cx="100" cy="100" r="66" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="1 7"/>
+  <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+    <line x1="100" y1="16" x2="100" y2="30"/><line x1="184" y1="100" x2="170" y2="100"/>
+    <line x1="100" y1="184" x2="100" y2="170"/><line x1="16" y1="100" x2="30" y2="100"/>
+    <line x1="159" y1="41" x2="150" y2="50"/><line x1="159" y1="159" x2="150" y2="150"/>
+    <line x1="41" y1="159" x2="50" y2="150"/><line x1="41" y1="41" x2="50" y2="50"/>
+  </g>
+  <!-- seven spokes: one per outcome -->
+  <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+    <line x1="100" y1="100" x2="100" y2="46"/>
+    <line x1="100" y1="100" x2="143" y2="66"/>
+    <line x1="100" y1="100" x2="151" y2="118"/>
+    <line x1="100" y1="100" x2="121" y2="149"/>
+    <line x1="100" y1="100" x2="79" y2="149"/>
+    <line x1="100" y1="100" x2="49" y2="118"/>
+    <line x1="100" y1="100" x2="57" y2="66"/>
+  </g>
+  <circle cx="100" cy="100" r="7" fill="currentColor"/>
+</svg>
+</div>
+
+<div class="count">
+  <div><b>7</b><span>outcomes</span></div>
+  <div><b>23</b><span>games mapped</span></div>
+  <div><b>0</b><span>dry cells to build</span></div>
+  <div><b>2</b><span>live rubrics</span></div>
+  <div><b>4.5:1</b><span>contrast floor, gated</span></div>
+</div>
+</div>
+
+<!-- ═══ THE SEVEN STATIONS ═══ -->
+<section>
+  <p class="h2">The seven stations</p>
+  <p class="sub">MassBay's Graduation Competencies, in the college's own order. Definitions are
+    <b>verbatim</b> from the Institutional Student Learning Objectives.</p>
+
+  <!-- ── 1 · WRITTEN & ORAL COMMUNICATION ─────────────────────────────── -->
+  <div class="station">
+    <div class="st-head">
+      <div class="st-num">1</div>
+      <div class="st-titles">
+        <p class="st-kicker">Graduation Competency 1</p>
+        <h3>Written &amp; Oral Communication</h3>
+        <p class="st-def">Graduates will <em>explain, persuade, advocate, and argue effectively</em>
+          when engaged with a variety of audiences.</p>
+      </div>
+      <span class="cover built">Built</span>
+    </div>
+    <div class="st-body">
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h11M4 18h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Build it — play these</p>
+        <div class="games">
+          <a class="g" href="the-tell.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="20" r="11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><line x1="28" y1="28" x2="40" y2="40" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="20" r="2" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">The Tell <span class="pill live">Live</span></span><span class="gd">Read the moment a text gives itself away. Ten craft moves, and the reader-test for each.</span></span></a>
+          <a class="g" href="sandbags.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M16 16 Q16 12 24 12 Q32 12 32 16 L34 36 L14 36 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="22" x2="38" y2="22" stroke-dasharray="3 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="gt"><span class="gn">Sandbags <span class="pill live">Live</span></span><span class="gd">Cut the weight a sentence is carrying and see what it was hiding.</span></span></a>
+          <a class="g" href="cliche-cowpaths.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40 Q16 24 24 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M40 40 Q30 24 24 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="24" cy="8" r="2.4" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">Cliché Cowpaths <span class="pill live">Live</span></span><span class="gd">Worn language nobody chose and everybody walks. Three rooms: the city, the field, the line.</span></span></a>
+          <a class="g" href="flash-ballast.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 20 L36 20 L32 34 L16 34 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="24" y1="20" x2="24" y2="12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="gt"><span class="gn">Flash Ballast <span class="pill live">Live</span></span><span class="gd">What a very short story can and cannot carry.</span></span></a>
+          <a class="g" href="workshop-wall.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="11" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="27" y="11" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="9" y="27" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="27" y="27" width="12" height="12" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">The Workshop Wall <span class="pill live">Live</span></span><span class="gd">Peer review as a public act — the oral half of the outcome. What you say about a draft is a draft too.</span></span></a>
+          <a class="g" href="en195-hub.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="4" fill="currentColor"/><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="24" y1="20" x2="24" y2="11"/><line x1="24" y1="28" x2="24" y2="37"/><line x1="20" y1="24" x2="11" y2="24"/><line x1="28" y1="24" x2="37" y2="24"/></g></svg>
+            <span class="gt"><span class="gn">EN195 Course Hub <span class="pill live">Live</span></span><span class="gd">The whole writing course, six rooms, where these moves are taught in sequence.</span></span></a>
+          <a class="g" href="score-the-room.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 18 h6 l10 -7 v26 l-10 -7 h-6 z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M36 18 q5 6 0 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="gt"><span class="gn">Score the Room <span class="pill live">Live</span></span><span class="gd">The <b>oral</b> half at last: read a described delivery — the words plus how they were said — and score it on the AAC&amp;U Oral Communication rubric. Never captures audio; never judges accent or dialect.</span></span></a>
+          <a class="g" href="whose-draft.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 40 L14 12 a3 3 0 0 1 3 -3 h13 l7 7 v24 a3 3 0 0 1 -3 3 z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M30 9 v7 h7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="34" cy="34" r="7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.5 3"/></svg>
+            <span class="gt"><span class="gn">Whose Draft <span class="pill live">Live</span></span><span class="gd">Writing with AI, honestly. Walk one essay, decide at each step how much to hand to AI, and watch what stays yours and what a reader or rubric would catch. Ends with a disclosure statement you can actually use. Grounded in the English dept's own findings. <b>iSLO 1 &amp; 3.</b></span></span></a>
+        </div>
+      </div>
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 8l6-5 6 5M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Measure it</p>
+        <div class="measure">
+          <p class="mname">Written Communication VALUE <span class="mstatus live">Live rubric</span></p>
+          <p>The AAC&amp;U Written Communication VALUE rubric, modified for MassBay's Written
+            Communication Graduation Competency. Five dimensions:</p>
+          <ul class="dims">
+            <li>Context of &amp; Purpose for Writing</li>
+            <li>Content Development</li>
+            <li>Genre &amp; Disciplinary Conventions</li>
+            <li>Sources &amp; Evidence</li>
+            <li>Control of Syntax &amp; Mechanics</li>
+          </ul>
+          <p class="scale">Scale · 4 Capstone → 3–2 Milestone → 1 Benchmark → 0 → NA</p>
+          <p class="prov"><b>Source:</b> AAC&amp;U VALUE (© 2017), modified for MassBay — reproduced verbatim
+            in the studio's assessment instrument, <a href="confluence-TRUNK.html">Confluence</a>.</p>
+          <p class="prov"><b>For faculty:</b> <a href="scorer-norming.html">The Norming Table</a> (practice
+            scoring to this rubric) &middot; <a href="close-the-loop.html">Close the Loop</a> (turn the results into a report).</p>
+          <p class="prov"><b>Oral half:</b> AAC&amp;U Oral Communication VALUE (Organization · Language · Delivery ·
+            Supporting Material · Central Message) — practiced in <a href="score-the-room.html">Score the Room</a>; not yet MassBay-normed.</p>
+          <p class="prov"><b>GenAI &amp; integrity:</b> <a href="ai-resilient-assignment.html">AI-Resilient Assignment</a> — audit an
+            assignment for AI-resilience and draft a syllabus GenAI policy; students walk the same line in <a href="whose-draft.html">Whose Draft</a>.
+            Grounded in the English dept's AY24-25 assessment findings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2 · QUANTITATIVE SKILLS ──────────────────────────────────────── -->
+  <div class="station">
+    <div class="st-head">
+      <div class="st-num">2</div>
+      <div class="st-titles">
+        <p class="st-kicker">Graduation Competency 2</p>
+        <h3>Quantitative Skills</h3>
+        <p class="st-def">Graduates will use a variety of <em>mathematical tools and quantitative
+          reasoning</em> to solve problems and analyze complex challenges.</p>
+      </div>
+      <span class="cover built">Built</span>
+    </div>
+    <div class="st-body">
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Build it — play these</p>
+        <div class="games">
+          <a class="g" href="advantage-intake.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="9" y1="24" x2="39" y2="24" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><line x1="9" y1="20" x2="9" y2="28" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><line x1="39" y1="20" x2="39" y2="28" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><rect x="26" y="18" width="5" height="12" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">The Tension Bar <span class="pill client">Client engine</span></span><span class="gd">Decomposes a headline price into what it actually costs — a doorman is about $18,400 a year. The quantitative-reasoning engine the student build reuses.</span></span></a>
+          <a class="g" href="warriors-fantasy-arcade.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="12" width="30" height="24" fill="none" stroke="currentColor" stroke-width="2.4"/><line x1="9" y1="24" x2="39" y2="24" stroke="currentColor" stroke-width="2.4"/><rect x="10" y="13" width="8" height="10" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">Warriors Fantasy Arcade <span class="pill live">Live</span></span><span class="gd">The draft board as a numbers exercise — what the stat line shows, and what it leaves out.</span></span></a>
+          <a class="g" href="sticker-price.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 34 L38 34 M14 34 V22 M22 34 V14 M30 34 V26 M38 34 V10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="gt"><span class="gn">Sticker Price <span class="pill live">Live</span></span><span class="gd">Four headline numbers — a loan, a tuition sticker, a statistic in an argument, a small monthly charge — pulled apart into what they really cost over time. Guess first, then the arithmetic. Real amortization; net-price and denominator built in.</span></span></a>
+          <a class="g" href="real-cost.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="8" y1="40" x2="40" y2="40" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><rect x="12" y="30" width="7" height="10" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="22" y="22" width="7" height="18" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="32" y="12" width="7" height="28" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">Real Cost <span class="pill live">Live</span></span><span class="gd">The same engine, for the lives students actually lead — the commute, the hours, the book, the whole bill. A small number multiplied by a real week. Dignity-first: your time and resourcefulness are assets on the ledger, and you set every number.</span></span></a>
+        </div>
+      </div>
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 8l6-5 6 5M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Measure it</p>
+        <div class="measure">
+          <p class="mname">Quantitative Literacy VALUE <span class="mstatus none">Not yet normed</span></p>
+          <p>The AAC&amp;U Quantitative Literacy VALUE rubric is the field standard, but MassBay has
+            not yet normed a local version. Proposed dimensions for the suite:</p>
+          <ul class="dims">
+            <li>Interpretation — read a number in its context</li>
+            <li>Calculation — apply the right tool correctly</li>
+            <li>Assumptions — surface what the number hides</li>
+            <li>Communication — say what it means to a reader</li>
+          </ul>
+          <p class="prov"><b>Status:</b> the build side now ships (<a href="sticker-price.html">Sticker Price</a>, <a href="real-cost.html">Real Cost</a>);
+            the measure side is still open. Norming a local QL rubric is a faculty task the suite can now support with real work samples.</p>
+          <p class="prov"><b>Draft one to norm:</b> <a href="rubric-forge.html">Rubric Forge</a> — start from the AAC&amp;U QL scaffold and localize.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3 · TECH / INFORMATION SCIENCE FACILITY ──────────────────────── -->
+  <div class="station">
+    <div class="st-head">
+      <div class="st-num">3</div>
+      <div class="st-titles">
+        <p class="st-kicker">Graduation Competency 3</p>
+        <h3>Technological, Computer &amp; Information-Science Facility</h3>
+        <p class="st-def">Graduates will <em>understand and use appropriately</em> a variety of
+          technological tools.</p>
+      </div>
+      <span class="cover built">Built</span>
+    </div>
+    <div class="st-body">
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Build it — play these</p>
+        <div class="games">
+          <a class="g" href="the-console.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="12" y1="12" x2="12" y2="38" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16" r="3.2" fill="currentColor"/><line x1="24" y1="10" x2="24" y2="38" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="24" cy="22" r="3.2" fill="currentColor"/><line x1="36" y1="14" x2="36" y2="38" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="36" cy="30" r="3.2" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">Flok <span class="pill live">Live</span></span><span class="gd">Take a growth job and pull the levers yourself — the streak, the batch, the feed. Then the machine shows you your own telemetry.</span></span></a>
+          <a class="g" href="funny-boneys-factory.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="19" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="19" cy="24" r="2.4" fill="currentColor"/><circle cx="33" cy="30" r="5.5" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>
+            <span class="gt"><span class="gn">Funny Boney's Factory <span class="pill build">In build</span></span><span class="gd">Build the machine that makes the jokes — tools that build tools, and code that farms. Systems literacy by construction.</span></span></a>
+          <a class="g" href="whose-draft.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 40 L14 12 a3 3 0 0 1 3 -3 h13 l7 7 v24 a3 3 0 0 1 -3 3 z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M30 9 v7 h7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="34" cy="34" r="7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.5 3"/></svg>
+            <span class="gt"><span class="gn">Whose Draft <span class="pill live">Live</span></span><span class="gd">The ethics half, applied to the tool of the moment: using AI on your writing <b>appropriately and honestly</b>. Decide what to hand off at each step, see the trade, and leave with a disclosure statement. Cross-listed with iSLO 1.</span></span></a>
+        </div>
+        <p class="scale" style="margin-top:14px">Behind these tools: <a href="how-an-idea-travels.html" style="color:var(--cool-ink);font-weight:600">How an Idea Travels</a> — a guided read, not a game. One idea followed from the back of a napkin through the studio&rsquo;s gates to a machine a stranger can play. How the tools on this shelf get made, and why most ideas don&rsquo;t ship.</p>
+      </div>
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 8l6-5 6 5M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Measure it</p>
+        <div class="measure">
+          <p class="mname">Tool-use &amp; systems insight <span class="mstatus none">Suite-proposed</span></p>
+          <p>No standalone MassBay rubric is normed for this outcome. The suite proposes a criterion set
+            that fits what these games actually exercise:</p>
+          <ul class="dims">
+            <li>Fluency — operate the tool to reach a goal</li>
+            <li>Systems insight — explain how it works on you</li>
+            <li>Appropriate use — choose the right tool, and the ethics of it</li>
+          </ul>
+          <p class="prov"><b>Note:</b> <em>Flok</em> is deliberately a dark-patterns game. Reading the
+            manipulation <em>is</em> the appropriate-use criterion — you cannot use a tool well until you can see what it is doing.</p>
+          <p class="prov"><b>Draft one to norm:</b> <a href="rubric-forge.html">Rubric Forge</a> — start from the AAC&amp;U Information Literacy scaffold.</p>
+          <p class="prov"><b>GenAI, appropriately used:</b> the appropriate-use criterion now has a live pair —
+            students in <a href="whose-draft.html">Whose Draft</a>, faculty in <a href="ai-resilient-assignment.html">AI-Resilient Assignment</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4 · NATURAL WORLD ────────────────────────────────────────────── -->
+  <div class="station">
+    <div class="st-head">
+      <div class="st-num">4</div>
+      <div class="st-titles">
+        <p class="st-kicker">Graduation Competency 4</p>
+        <h3>Knowledge About the Natural World</h3>
+        <p class="st-def">Graduates will use <em>scientific knowledge and methodology</em> to test,
+          validate, and update their knowledge about the natural world.</p>
+      </div>
+      <span class="cover built">Built</span>
+    </div>
+    <div class="st-body">
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Build it — play this</p>
+        <div class="games">
+          <a class="g" href="update-the-model.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M24 10 A14 14 0 0 1 34 34" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M34 27 l1 7 l-7 -1" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="gt"><span class="gn">Update the Model <span class="pill live">Live</span></span><span class="gd">Hold a belief about the natural world, name in advance what would prove you wrong, meet real cited evidence, and update. Three beliefs (falling objects, the 10% brain, the full moon). The tight-spiral loop — hypothesis, test, revision — made playable.</span></span></a>
+        </div>
+        <p class="scale" style="margin-top:14px">Companion: <a href="the-viscosity.html" style="color:var(--cool-ink);font-weight:600">The Viscosity</a> models a scientific framework (Maslow) as a space — same reveal pattern, a different corner of the natural-world outcome.</p>
+      </div>
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 8l6-5 6 5M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Measure it</p>
+        <div class="measure">
+          <p class="mname">Scientific reasoning <span class="mstatus none">Not yet normed</span></p>
+          <p>MassBay has not normed a local rubric here. AAC&amp;U's Inquiry &amp; Analysis and Scientific
+            Reasoning frameworks map cleanly onto the proposed mechanic:</p>
+          <ul class="dims">
+            <li>Hypothesis — state a claim that could be wrong</li>
+            <li>Evidence — weigh what the data actually shows</li>
+            <li>Revision — update the belief, and say why</li>
+          </ul>
+          <p class="prov"><b>Status:</b> the build side now ships (<a href="update-the-model.html">Update the Model</a>);
+            the measure side is open — no locally-normed MassBay rubric exists yet, so the game's criteria are suite-proposed.</p>
+          <p class="prov"><b>Draft one to norm:</b> <a href="rubric-forge.html">Rubric Forge</a> — start from the AAC&amp;U Scientific Reasoning scaffold.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5 · DIVERSITY, EQUITY & INCLUSION ────────────────────────────── -->
+  <div class="station">
+    <div class="st-head">
+      <div class="st-num">5</div>
+      <div class="st-titles">
+        <p class="st-kicker">Graduation Competency 5</p>
+        <h3>Diversity, Equity &amp; Inclusion</h3>
+        <p class="st-def">Graduates will analyze historical, organizational, institutional, political, and
+          global <em>systems of power</em> and the complex ways that <em>group and individual interactions</em>
+          impact self, community, and society; and identify skills and strategies for <em>promoting equity,
+          inclusion, and cultural sensitivity</em>.</p>
+      </div>
+      <span class="cover built">Built</span>
+    </div>
+    <div class="st-body">
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="7" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2 20c0-3 2.5-5 5-5s5 2 5 5M12 20c0-3 2.5-5 5-5s5 2 5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Build it — play these</p>
+        <div class="games">
+          <a class="g" href="choose-your-leader-v6.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40 L24 26 M24 26 L12 12 M24 26 L36 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="10" r="3.6" fill="currentColor"/><circle cx="36" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>
+            <span class="gt"><span class="gn">Choose Your Leader <span class="pill live">Live</span></span><span class="gd">Who holds the chair, what the country is not told, and what a decision made in the fog does to people who never sat in the room. Systems of power, made playable.</span></span></a>
+          <a class="g" href="choose-your-leader-v5.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40 L24 26 M24 26 L12 12 M24 26 L36 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="10" r="3.6" fill="currentColor"/><circle cx="36" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>
+            <span class="gt"><span class="gn">Choose Your Leader — The Receiver&rsquo;s Game <span class="pill live">Live</span></span><span class="gd">The companion piece: three broadcasts (1962 · 1964 · 1969) reach you in a lit room. Rate how far the words move you, then the record turns and you see what the room wasn&rsquo;t shown.</span></span></a>
+          <a class="g" href="who-holds-the-room.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="12" width="32" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="17" cy="24" r="3" fill="currentColor"/><circle cx="27" cy="24" r="3" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="35" cy="24" r="2.4" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>
+            <span class="gt"><span class="gn">Who Holds the Room <span class="pill live">Live</span></span><span class="gd">One ordinary campus scene, read three ways — who holds power in it, how the same moment lands on four different students, and what a real advocacy move looks like — each scored on the college's live ISLO&nbsp;#5 rubric, shown verbatim. Dignity-first: a starting point is never a verdict.</span></span></a>
+        </div>
+      </div>
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 8l6-5 6 5M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Measure it</p>
+        <div class="measure">
+          <p class="mname">MassBay ISLO&nbsp;#5 Rubric <span class="mstatus live">Live rubric</span></p>
+          <p>The college's own DEI rubric, normed by faculty. Three dimensions, scored 0–4:</p>
+          <ul class="dims">
+            <li>Systems of Power — analyze who holds power and privilege, and your position in it</li>
+            <li>Group / Individual Interactions — how those dynamics land on self, community, society</li>
+            <li>Advocacy — communicate to promote equity, inclusion, cultural sensitivity</li>
+          </ul>
+          <p class="scale">Scale · 4 Advanced → 3 → 2 → 1 → 0 Not addressed</p>
+          <p class="prov"><b>Source:</b> MassBay ISLO&nbsp;#5 Rubric (verbatim), from the Spring 2026 DEI
+            Graduation-Competency workshop. Reproduced in <a href="confluence-TRUNK.html">Confluence</a>.</p>
+          <p class="prov"><b>For faculty:</b> <a href="scorer-norming.html">The Norming Table</a> (practice
+            scoring to this rubric) &middot; <a href="close-the-loop.html">Close the Loop</a> (turn the results into a report).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6 · CRITICAL THINKING ────────────────────────────────────────── -->
+  <div class="station">
+    <div class="st-head">
+      <div class="st-num">6</div>
+      <div class="st-titles">
+        <p class="st-kicker">Graduation Competency 6</p>
+        <h3>Critical Thinking &amp; Informed Decision-Making</h3>
+        <p class="st-def">Graduates will engage in <em>ethical reasoning, integrative/systems thinking,
+          and creative thinking</em> to analyze and solve problems from multiple perspectives.</p>
+      </div>
+      <span class="cover built">Built</span>
+    </div>
+    <div class="st-body">
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 20h6M10 22h4M12 16v-3M12 13l-2-2M12 13l2-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg> Build it — play these</p>
+        <div class="games">
+          <a class="g" href="choose-your-leader-v6.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40 L24 26 M24 26 L12 12 M24 26 L36 12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="10" r="3.6" fill="currentColor"/><circle cx="36" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>
+            <span class="gt"><span class="gn">Choose Your Leader <span class="pill live">Live</span></span><span class="gd">Judgment under uncertainty. Decide in the fog, then meet the historical record — the gap is the lesson.</span></span></a>
+          <a class="g" href="the-console.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="12" y1="12" x2="12" y2="38" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16" r="3.2" fill="currentColor"/><line x1="24" y1="10" x2="24" y2="38" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="24" cy="22" r="3.2" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">Flok <span class="pill live">Live</span></span><span class="gd">Notice the manipulation while it works on you — the ethics dimension, felt rather than lectured.</span></span></a>
+          <a class="g" href="the-viscosity.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="10" y1="12" x2="38" y2="12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="26" x2="35" y2="26" stroke-dasharray="2 4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M24 40 L24 12 M20 16 L24 12 L28 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="gt"><span class="gn">The Viscosity <span class="pill live">Live</span></span><span class="gd">Maslow's hierarchy as a space you climb — systems thinking you feel in the thickening air.</span></span></a>
+          <a class="g" href="the-compound-capstone.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="24" r="8.5" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="24" cy="24" r="3" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">The Compound Capstone <span class="pill live">Live</span></span><span class="gd">Integrative thinking, long-form. It expects you to have played the rest and pulls the threads together.</span></span></a>
+          <a class="g" href="warriors-fantasy-arcade.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="12" width="30" height="24" fill="none" stroke="currentColor" stroke-width="2.4"/><line x1="9" y1="24" x2="39" y2="24" stroke="currentColor" stroke-width="2.4"/><rect x="10" y="13" width="8" height="10" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">Warriors Fantasy Arcade <span class="pill live">Live</span></span><span class="gd">What you are allowed to see shapes who you pick. Framing and bias, made visible.</span></span></a>
+        </div>
+      </div>
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 8l6-5 6 5M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Measure it</p>
+        <div class="measure">
+          <p class="mname">MassBay Critical Thinking Rubric <span class="mstatus dev">In development</span></p>
+          <p>Named as a graduation competency, but no standalone analytic rubric is normed yet. Criteria
+            below are drawn verbatim from the argument rows of existing MassBay essay rubrics:</p>
+          <ul class="dims">
+            <li>Evidence-Based Analysis — ideas explored and supported, not asserted</li>
+            <li>Reasoning from Multiple Perspectives — integrate more than one view, warranted</li>
+          </ul>
+          <p class="prov"><b>Status:</b> the honest case — the deepest game lane sits over a rubric the college
+            is still building. The switcher demo shows the same spine holding an outcome mid-construction.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7 · PERSONAL, SOCIAL & CIVIC RESPONSIBILITY ──────────────────── -->
+  <div class="station">
+    <div class="st-head">
+      <div class="st-num">7</div>
+      <div class="st-titles">
+        <p class="st-kicker">Graduation Competency 7</p>
+        <h3>Personal, Social &amp; Civic Responsibility</h3>
+        <p class="st-def">Graduates will <em>take responsibility for their actions, self-assess,
+          self-advocate, collaborate</em>, and develop community and civic awareness.</p>
+      </div>
+      <span class="cover built">Built</span>
+    </div>
+    <div class="st-body">
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.35-7-9a4 4 0 0 1 7-2.5A4 4 0 0 1 19 12c0 4.65-7 9-7 9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> Build it — play these</p>
+        <div class="games">
+          <a class="g" href="play-the-semester.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="12" cy="34" r="3" fill="currentColor"/><circle cx="22" cy="20" r="3" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="36" cy="14" r="3" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 34 L22 20 L36 14" stroke-dasharray="2 3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span class="gt"><span class="gn">Play the Semester <span class="pill live">Live</span></span><span class="gd">The whole term as a board you can see — taking responsibility for where your own time and effort go.</span></span></a>
+          <a class="g" href="course-river.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 16 Q18 22 16 28 T24 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M14 14 Q26 20 24 28 T34 38" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="26" r="3" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">The Course River <span class="pill live">Live</span></span><span class="gd">Where you are in the current, what fed in, what is downstream. Self-assessment as a map.</span></span></a>
+          <a class="g" href="workshop-wall.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="11" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="27" y="11" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"/><rect x="27" y="27" width="12" height="12" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">The Workshop Wall <span class="pill live">Live</span></span><span class="gd">Collaboration made accountable — your response to a peer is public, and it is yours.</span></span></a>
+          <a class="g" href="fys_fys-treasure-trove.html">
+            <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 22 L10 38 L38 38 L38 22 M8 22 Q24 12 40 22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="1.8" fill="currentColor"/></svg>
+            <span class="gt"><span class="gn">FYS Treasure Trove <span class="pill live">Live</span></span><span class="gd">First-year seminar — orienting to college life, community, and what is worth looking at twice.</span></span></a>
+        </div>
+      </div>
+      <div class="col">
+        <p class="col-h"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 8l6-5 6 5M5 21h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Measure it</p>
+        <div class="measure">
+          <p class="mname">Responsibility &amp; self-assessment <span class="mstatus none">Suite-proposed</span></p>
+          <p>No normed MassBay rubric. Because this outcome is largely self-reported, the suite proposes
+            a reflective, ipsative instrument rather than a scored artifact:</p>
+          <ul class="dims">
+            <li>Responsibility — own the choice and its result</li>
+            <li>Self-assessment — locate yourself honestly</li>
+            <li>Collaboration — contribute to, and credit, the group</li>
+            <li>Civic awareness — see past the self to the community</li>
+          </ul>
+          <p class="prov"><b>Fit:</b> these games already produce the reflection; the measure is a rubric for
+            reading it back, not a test. Dignity-first: a starting point is never a verdict.</p>
+          <p class="prov"><b>Draft one to norm:</b> <a href="rubric-forge.html">Rubric Forge</a> — start from the AAC&amp;U Civic Engagement scaffold.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="anchor">
+  <p><b>How to read a station.</b> On the left: the games. You build the skill by running into it —
+    no tutorial, no account. On the right: the measure — the actual MassBay or AAC&amp;U rubric,
+    reproduced verbatim, the same instrument faculty use to score the graduation portfolio.</p>
+  <p><b>The rubric is ipsative by design.</b> A starting point is never a verdict. It measures where
+    a piece of work sits against the college's levels — and, played again, against your own earlier draft.
+    It is not a ranking against your classmates.</p>
+</div>
+
+<div class="legend" aria-label="Coverage key">
+  <span class="leg"><span class="dot built" aria-hidden="true"></span> Built — games ship now</span>
+  <span class="leg"><span class="dot thin" aria-hidden="true"></span> Thin — one game, a build proposed</span>
+  <span class="leg"><span class="dot dry" aria-hidden="true"></span> Dry cell — measured, not yet built</span>
+</div>
+
+<!-- ═══ HOW THE SUITE IS SCORED ═══ -->
+<div class="slab">
+  <div class="in">
+    <p class="h2">How the suite is scored</p>
+    <p class="sub">The measure is not bolted on afterward. It is the same instrument the college already
+      uses on the graduation portfolio — and it obeys the studio's floor.</p>
+    <div class="principles">
+      <div class="pr"><b>Verbatim rubrics</b><p>Where MassBay has a normed rubric — Written Communication, ISLO&nbsp;#5 — it is reproduced word for word, attributed and dated. A criterion nobody can trace is a rumour.</p></div>
+      <div class="pr"><b>Ipsative, not ranked</b><p>You are measured against the college's levels and your own earlier draft, never against a classmate. Criterion-based grading is what keeps minoritized students in the room.</p></div>
+      <div class="pr"><b>The gaps are named</b><p>All seven outcomes now have a build. What's still open is on the <em>measure</em> side — five outcomes have no locally-normed MassBay rubric yet. The page marks that instead of papering over it.</p></div>
+      <div class="pr"><b>One engine, seven faces</b><p>Every station is the same move — make the invisible constraint visible, let the student find it. The rubric names what was found. The game is the practice; the rubric is the mirror.</p></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p><b>Tight Spiral Productions.</b> A one-person studio building instruments for MassBay Community College
+    and its students. Everything here is single-file, offline, and refused by a contrast gate if any text drops below 4.5:1.</p>
+  <p><a href="index.html">The studio front door</a> &nbsp;&middot;&nbsp;
+     <a href="arcade.html">The full arcade</a> &nbsp;&middot;&nbsp;
+     <a href="confluence-TRUNK.html">Confluence — the assessment instrument</a> &nbsp;&middot;&nbsp;
+     <a href="mailto:walshero@gmail.com">walshero@gmail.com</a></p>
+  <p class="fine">Sources · MassBay Graduation Competencies / Institutional Student Learning Objectives (Spring 2026
+    ISLO&nbsp;#5 workshop deck, verbatim) · AAC&amp;U Written Communication VALUE rubric © 2017, modified for MassBay
+    (verbatim) · MassBay ISLO&nbsp;#5 Rubric (verbatim) · ISLO&nbsp;#6 Critical Thinking criteria from existing MassBay
+    essay rubrics (rubric in development). Definitions quoted; not remembered. · Last-verified 2026-07-19 · CC BY-NC-ND 4.0</p>
+</footer>
+
+</main>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home — studio front door">Home</a>
+</nav>
+
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  // last-updated: computed, not typed
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+</body>
+</html>
