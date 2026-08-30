@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="tsp:surface" content="tool">
+<title>TSP Opportunity Bridge</title>
+<style>
+  :root{
+    /* FILL forms — background / border / stroke only, never text */
+    --paper:#faf7f1; --ink:#0f0d0a; --line:#c9c2b4;
+    --card:#fffdf8; --band:#efe9dd;
+    --hot:#8a2b1a;      /* deadline-close accent FILL, used on dark chips only */
+    --go:#1f4d2e;       /* ready accent FILL */
+    --wait:#5a4a12;     /* not-ready accent FILL */
+    /* INK forms — color: only. Same hue as the fill, split by token-role law. */
+    --ink-fill:#0f0d0a; /* --ink as decoration (tab fill, dot border) */
+    --paper-ink:#faf7f1;/* --paper as text (selected-tab label) */
+    --hot-ink:#8a2b1a; --go-ink:#1f4d2e; --wait-ink:#5a4a12;
+    --hotink:#ffe3d8;
+    --goink:#dcefe0;
+    --waitink:#f3ecca;
+    --link:#1a3d6e;
+    --shadow:0 2px 0 rgba(0,0,0,.08);
+    /* ── STUDIO EYES chrome tokens (Comfort Kernel v2) ── */
+    --se-surface:#efe9dd; --se-surface2:#e2dbc7; --se-ink2:#463b22;
+    --se-accent:#3f5f78; --se-accent-strong:#2c4658; --se-on-accent:#ffffff;
+    --se-focus:#8a3f00; --se-tap:48px; --se-r:10px;
+    --se-mono:ui-monospace,'SF Mono',Menlo,monospace;
+    --se-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --se-serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  }
+  /* ── LIGHT: DUSK ── */
+  html[data-light="dusk"]{
+    --paper:#e7dcc4; --ink:#171310; --line:#bcae90;
+    --card:#f0e7d3; --band:#ddd0b2;
+    --link:#173257;
+    --shadow:0 2px 0 rgba(0,0,0,.12);
+    --se-surface:#ddd0b2; --se-surface2:#d0c199; --se-ink2:#40361f;
+    --se-accent:#37536a; --se-accent-strong:#24384a; --se-on-accent:#ffffff;
+    --se-focus:#9c4000;
+  }
+  /* ── LIGHT: WARM-DARK (night) — warm charcoal, never pure black ── */
+  html[data-light="night"]{
+    --paper:#141210; --ink:#f4ede2; --line:#3a352d;
+    --card:#1e1b17; --band:#26221c;
+    --hot:#ffb59e; --hotink:#2a0f08;
+    --go:#a6dcb4; --goink:#0e2416;
+    --wait:#e6d68a; --waitink:#241d06;
+    --ink-fill:#f4ede2; --paper-ink:#141210;
+    --hot-ink:#ffb59e; --go-ink:#a6dcb4; --wait-ink:#e6d68a;
+    --link:#a9c4ec;
+    --shadow:0 2px 0 rgba(0,0,0,.4);
+    --se-surface:#242019; --se-surface2:#33302a; --se-ink2:#d8c59a;
+    --se-accent:#8aa0b8; --se-accent-strong:#a9bcd0; --se-on-accent:#141109;
+    --se-focus:#f0c357;
+  }
+  /* ── STUDIO EYES toggles ── */
+  html.se-contrast:not([data-light="night"]){ --paper:#fbfaf7; --card:#fbfaf7; --band:#eee9dd; --ink:#141109; --line:#b9a06a; }
+  html.se-contrast[data-light="night"]{ --paper:#0e0d0b; --card:#161410; --band:#201d18; --ink:#fff7e6; --line:#4a4234; }
+  html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+  html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+  html.se-a1{ zoom:1.15; }
+  html.se-a2{ zoom:1.3; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font:400 19px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:0; -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:0 18px}
+  /* ═══ RESERVED CHROME (Comfort Kernel v2) — grid header, reserves its own row ═══ */
+  .se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--se-surface);border-bottom:2px solid var(--ink);
+    position:sticky;top:0;z-index:100}
+  .se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:var(--se-tap);
+    padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--se-surface2);
+    color:var(--ink);font-family:var(--se-mono);font-weight:700;font-size:13px;text-decoration:none}
+  .se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--ink)}
+  .se-brand svg{width:34px;height:20px;color:var(--se-accent-strong);flex:0 0 auto}
+  .se-brand .wm{font-family:var(--se-serif);font-size:16px;letter-spacing:.01em;white-space:nowrap}
+  .se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:var(--se-tap);
+    padding:8px 13px;border:2px solid transparent;border-radius:8px;background:var(--se-accent-strong);
+    color:var(--se-on-accent);font-family:var(--se-mono);font-weight:700;font-size:13px;cursor:pointer}
+  .se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px}
+  @media (max-width:560px){.se-brand .wm{display:none}}
+  /* ═══ STUDIO EYES panel ═══ */
+  .se-panel{position:fixed;right:12px;top:calc(var(--se-tap) + 16px);z-index:101;
+    width:min(320px,calc(100vw - 24px));background:var(--se-surface);color:var(--ink);
+    border:2px solid var(--se-accent-strong);border-radius:var(--se-r);padding:15px;
+    box-shadow:0 10px 34px rgba(0,0,0,.28);display:none}
+  .se-panel[data-open="1"]{display:block}
+  .se-panel h2{font-family:var(--se-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--se-ink2);margin:0 0 8px}
+  .se-prow{display:flex;gap:6px;margin-bottom:14px}
+  .se-btn{flex:1;min-height:var(--se-tap);padding:8px 4px;border:1.5px solid var(--line);border-radius:8px;
+    background:var(--se-surface2);color:var(--ink);font-family:var(--se-mono);font-weight:700;font-size:12.5px;cursor:pointer}
+  .se-btn[aria-pressed="true"]{background:var(--se-accent-strong);color:var(--se-on-accent);border-color:var(--se-accent-strong)}
+  .se-btn:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px}
+  .se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    min-height:var(--se-tap);padding:8px 11px;margin-bottom:6px;border:1.5px solid var(--line);border-radius:8px;
+    background:var(--se-surface2);color:var(--ink);font-family:var(--se-sans);font-weight:600;font-size:14px;cursor:pointer;text-align:left}
+  .se-tog[aria-pressed="true"]{border-color:var(--se-accent-strong)}
+  .se-tog .st{font-family:var(--se-mono);font-size:11px;color:var(--se-ink2)}
+  .se-tog[aria-pressed="true"] .st{color:var(--se-accent-strong);font-weight:700}
+  .se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .updated{font-family:var(--se-mono);font-size:14px;color:var(--se-ink2);margin:14px 0 2px;display:flex;align-items:center;gap:7px}
+  .updated::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--se-accent);flex:0 0 auto}
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{display:flex;gap:10px;justify-content:center;padding:20px;border-top:2px solid var(--line);margin-top:30px}
+  .se-rail a,.se-rail button{min-height:var(--se-tap);padding:10px 18px;border:1.5px solid var(--line);border-radius:8px;
+    background:var(--se-surface2);color:var(--ink);font-family:var(--se-mono);font-weight:700;font-size:13px;text-decoration:none;cursor:pointer}
+  .se-rail a:focus-visible,.se-rail button:focus-visible{outline:3px solid var(--se-focus);outline-offset:2px}
+  header{padding:26px 0 6px 0}
+  h1{font-size:30px;line-height:1.15;margin:0 0 4px 0;letter-spacing:-.4px}
+  .sub{font-size:17px;margin:0 0 2px 0}
+  .stamp{font-size:15px;margin:10px 0 0 0;padding:10px 12px;background:var(--band);border-radius:10px}
+  /* image band — cut-paper SVG, keeps screen >50% visual on first paint */
+  .hero{margin:16px 0 10px 0;border-radius:14px;overflow:hidden;border:2px solid var(--line);box-shadow:var(--shadow)}
+  .hero svg{display:block;width:100%;height:auto}
+  nav.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px 0;position:sticky;top:66px;background:var(--paper);padding:8px 0;z-index:30}
+  nav.tabs button{
+    min-height:44px;padding:0 16px;font-size:17px;font-weight:600;
+    background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:10px;cursor:pointer
+  }
+  nav.tabs button[aria-selected="true"]{background:var(--ink-fill);color:var(--paper-ink);border-color:var(--ink-fill)}
+  nav.tabs button:focus{outline:3px solid var(--link);outline-offset:2px}
+  section[hidden]{display:none}
+  .lane-note{font-size:16px;margin:6px 0 14px 0;padding:10px 12px;background:var(--band);border-radius:10px}
+  .row{
+    background:var(--card);border:2px solid var(--line);border-radius:14px;
+    padding:16px 16px 14px 16px;margin:0 0 16px 0;box-shadow:var(--shadow)
+  }
+  .row h3{font-size:21px;line-height:1.2;margin:0 0 2px 0}
+  .who{font-size:15px;margin:0 0 10px 0;opacity:.9}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px 0}
+  .chip{font-size:14px;font-weight:700;padding:5px 11px;border-radius:20px;white-space:nowrap}
+  .chip.due{background:var(--hot);color:var(--hotink)}
+  .chip.amt{background:var(--band);color:var(--ink);border:1px solid var(--line)}
+  .chip.ready{background:var(--go);color:var(--goink)}
+  .chip.wait{background:var(--wait);color:var(--waitink)}
+  .fit{font-size:17px;margin:0 0 10px 0}
+  .fit b{font-weight:700}
+  .next{font-size:17px;margin:0;padding:11px 13px;background:var(--band);border-radius:10px}
+  .next b{font-weight:700}
+  .flag{font-size:15px;margin:10px 0 0 0;padding:9px 12px;border:2px dashed var(--line);border-radius:10px}
+  /* source references — plain, offline-safe text (URL shown, not a live external link) */
+  .src{display:inline-block;color:var(--ink);font-weight:600;opacity:.85;word-break:break-word}
+  .foot{font-size:15px;margin:26px 0 0 0;padding-top:14px;border-top:2px solid var(--line);opacity:.92}
+  .verdict{font-size:16px;font-weight:700;margin:2px 0 0 0}
+
+  /* ── LANE GLYPHS + STATUS MARKERS. Decision-surface signal. ── */
+  .lane-head{display:flex;align-items:center;gap:12px;margin:6px 0 14px 0}
+  .lane-glyph{width:40px;height:40px;flex:0 0 auto;color:var(--ink)}
+  .lane-glyph svg{display:block;width:100%;height:100%}
+  .lane-note{margin:0;flex:1 1 auto}
+  /* status dot: sits on the card, reads state at a glance */
+  .row{position:relative}
+  .status{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;
+    font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .status .dot{width:13px;height:13px;border-radius:50%;flex:0 0 auto;border:2px solid var(--ink-fill)}
+  .status.go .dot{background:var(--go);border-color:var(--go)}
+  .status.go{color:var(--go-ink)}
+  .status.hold .dot{background:transparent;border-color:var(--wait)}
+  .status.hold{color:var(--wait-ink)}   /* text form: --wait is a chip FILL; token-role law */
+  .status.block .dot{background:transparent;border-color:var(--hot);
+    background-image:linear-gradient(45deg,transparent 44%,var(--hot) 44%,var(--hot) 56%,transparent 56%)}
+  .status.block{color:var(--hot-ink)}
+  .row h3{padding-right:96px}   /* clear space for the status marker */
+  /* sample-B per-opportunity mark */
+  .opp-mark{width:30px;height:30px;float:left;margin:2px 12px 4px 0;color:var(--ink);opacity:.85}
+  .opp-mark svg{display:block;width:100%;height:100%}
+
+</style>
+</head>
+<body>
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+
+
+<div class="wrap">
+<header>
+  <h1>TSP Opportunity Bridge</h1>
+  <p class="sub">What the world is offering &mdash; joined to what Tight Spiral has built.</p>
+  <p class="updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v9 <span style="opacity:.75">75e938c</span></span> </span>
+</header>
+
+<div class="hero" role="img" aria-label="A bridge of cut paper joining two shores: on the left, stacked coins and a lecture podium; on the right, small game screens.">
+<svg viewBox="0 0 820 260" xmlns="http://www.w3.org/2000/svg">
+  <rect width="820" height="260" fill="#e7ddc8"/>
+  <rect y="150" width="820" height="110" fill="#cdbf9f"/>
+  <!-- left shore: money + podium -->
+  <rect x="34" y="128" width="150" height="90" fill="#b79a5e"/>
+  <circle cx="70" cy="120" r="20" fill="#c9a94e"/><circle cx="104" cy="120" r="20" fill="#c9a94e"/><circle cx="138" cy="120" r="20" fill="#c9a94e"/>
+  <rect x="66" y="150" width="10" height="40" fill="#7d6a3a"/>
+  <rect x="52" y="150" width="40" height="8" fill="#7d6a3a"/>
+  <rect x="120" y="86" width="34" height="64" fill="#8a6d3a"/>
+  <!-- bridge -->
+  <path d="M184 150 Q410 70 636 150" fill="none" stroke="#6f5b34" stroke-width="14"/>
+  <rect x="184" y="150" width="452" height="10" fill="#6f5b34"/>
+  <rect x="250" y="112" width="8" height="42" fill="#6f5b34"/>
+  <rect x="330" y="98" width="8" height="56" fill="#6f5b34"/>
+  <rect x="410" y="92" width="8" height="62" fill="#6f5b34"/>
+  <rect x="490" y="98" width="8" height="56" fill="#6f5b34"/>
+  <rect x="570" y="112" width="8" height="42" fill="#6f5b34"/>
+  <!-- right shore: game screens -->
+  <rect x="636" y="128" width="150" height="90" fill="#5f7d6a"/>
+  <rect x="654" y="96" width="52" height="40" rx="4" fill="#7fae94"/><rect x="662" y="106" width="36" height="6" fill="#31503f"/><rect x="662" y="118" width="24" height="6" fill="#31503f"/>
+  <rect x="716" y="104" width="52" height="40" rx="4" fill="#7fae94"/><rect x="724" y="114" width="36" height="6" fill="#31503f"/><rect x="724" y="126" width="24" height="6" fill="#31503f"/>
+  <circle cx="410" cy="52" r="24" fill="#d8b23e"/>
+</svg>
+</div>
+
+<p class="stamp"><b>How to read this.</b> Each card = one real opportunity, joined to a TSP asset, a readiness gate, and one next action. It is a decision surface, not a live feed &mdash; say <b>&ldquo;refresh grants&rdquo;</b> or <b>&ldquo;refresh conferences&rdquo;</b> and the dates get re-pulled from the open web. Deadlines below were pulled 16 Jul 2026; always confirm on the source before you act.</p>
+
+<nav class="tabs" role="tablist" aria-label="Opportunity lanes">
+  <button role="tab" id="t-conf" aria-selected="true"  aria-controls="p-conf" onclick="pick('conf')">Conferences</button>
+  <button role="tab" id="t-grant" aria-selected="false" aria-controls="p-grant" onclick="pick('grant')">Grants</button>
+  <button role="tab" id="t-ip" aria-selected="false" aria-controls="p-ip" onclick="pick('ip')">IP</button>
+  <button role="tab" id="t-biz" aria-selected="false" aria-controls="p-biz" onclick="pick('biz')">Business</button>
+  <button role="tab" id="t-comm" aria-selected="false" aria-controls="p-comm" onclick="pick('comm')">Commissions</button>
+</nav>
+
+<!-- ============ CONFERENCES ============ -->
+<section id="p-conf" role="tabpanel" aria-labelledby="t-conf">
+  <div class="lane-head"><div class="lane-glyph"><svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="12" width="15" height="12" rx="1.5" stroke-width="3"/><path d="M26 30 V16 l7 -4 V30" stroke-width="3"/><g stroke-width="1.4"><line x1="9" y1="17" x2="18" y2="17"/><line x1="9" y1="21" x2="14" y2="21"/><line x1="24" y1="30" x2="35" y2="30"/></g></g><circle cx="30" cy="9" r="1.7" fill="currentColor"/></svg></div><p class="lane-note"><b>Deep lane.</b> Venues where a finished TSP game gets played, judged, and seen by the serious-games field.</p></div>
+
+  <div class="row"><div class="status block"><span class="dot"></span>Blocked</div>
+    <div class="opp-mark"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M10 6 h10 v5 a5 5 0 0 1 -10 0 z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 8 h-3 a3 3 0 0 0 3 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 8 h3 a3 3 0 0 1 -3 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="16" x2="15" y2="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="11" y="20" width="8" height="4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>GALA Serious Games Competition 2026</h3>
+    <p class="who">Games and Learning Alliance &middot; L&rsquo;Aquila, Italy</p>
+    <div class="meta">
+      <span class="chip due">Submit by Aug 2, 2026</span>
+      <span class="chip amt">No fee</span>
+      <span class="chip ready">Asset ready: Flok</span>
+    </div>
+    <p class="fit"><b>The join.</b> Flok is a finished, shipped dark-patterns game &mdash; the closest thing in the roster to a competition-ready serious game. GALA is the one catchable deadline this cycle.</p>
+    <p class="next"><b>Next action &rarr;</b> Real workback is <b>before Jul 20</b> (you&rsquo;re in Canada Jul 20&ndash;Aug 4). Clear Flok&rsquo;s Post&rarr;Boost verb fix so the gate passes, then submit via EasyChair. Requires attendance to compete.</p>
+    <p class="flag">Standing blocker: the coherence gate HALTs Flok until the verb fix lands.</p>
+    <p><span class="src">Confirm on GALA / EasyChair before submitting &middot; www.grants.gov</span></p>
+  </div>
+
+  <div class="row"><div class="status hold"><span class="dot"></span>Waiting</div>
+    <h3>ECGBL 2026 &mdash; European Conference on Game-Based Learning</h3>
+    <p class="who">Academic Conferences International &middot; Darmstadt, Germany</p>
+    <div class="meta">
+      <span class="chip amt">Abstract still open</span>
+      <span class="chip wait">Asset: CYL / Writerly Moves</span>
+    </div>
+    <p class="fit"><b>The join.</b> ECGBL takes research papers and short game demos &mdash; a fit for the pipeline paper or a CYL methodology writeup, not just a finished build.</p>
+    <p class="next"><b>Next action &rarr;</b> Email <b>Pauline@academic-conferences.org</b> with a one-paragraph abstract to confirm the current submission window. Lower-stakes than GALA; a paper lane, not a competition lane.</p>
+  </div>
+</section>
+
+<!-- ============ GRANTS ============ -->
+<section id="p-grant" role="tabpanel" aria-labelledby="t-grant" hidden>
+  <div class="lane-head"><div class="lane-glyph"><svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="6" width="19" height="26" rx="1.5" stroke-width="3"/><g stroke-width="1.4"><line x1="13" y1="13" x2="24" y2="13"/><line x1="13" y1="18" x2="24" y2="18"/><line x1="13" y1="23" x2="20" y2="23"/></g><circle cx="27" cy="28" r="5" stroke-width="3"/></g><circle cx="27" cy="28" r="1.6" fill="currentColor"/></svg></div><p class="lane-note"><b>Deep lane.</b> Money you are genuinely eligible for as MassBay faculty. <b>One caution across the whole federal tier:</b> a May 2026 court ruling restored ~1,400 terminated NEH grants, but FY26 humanities budgets are cut and unstable &mdash; treat federal awards as real but at risk of mid-cycle disruption.</p></div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <div class="opp-mark"><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="9" y="8" width="12" height="3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="8" y="22" width="14" height="3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="11" x2="12" y2="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="11" x2="15" y2="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="18" y1="11" x2="18" y2="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>NEH Digital Projects for the Public</h3>
+    <p class="who">National Endowment for the Humanities &middot; federal</p>
+    <div class="meta">
+      <span class="chip due">Next deadline Sep 1, 2026</span>
+      <span class="chip amt">$30K &ndash; $400K</span>
+      <span class="chip ready">Best fit in the roster</span>
+    </div>
+    <p class="fit"><b>The join.</b> This program funds humanities <b>games, simulations, and interactive tools</b> by name. CYL (presidential-decision history) and the EN195 noticing games are exactly its target: humanities content, scholar-involved, public audience. Discovery grants ($30K) are the low-risk entry tier.</p>
+    <p class="next"><b>Next action &rarr;</b> MassBay applies as the 501(c)(3)/accredited institution &mdash; you are the PI, not TSP. Confirm MassBay&rsquo;s SAM.gov + Grants.gov registration is current (4&ndash;6 wks if not). Email ODH a brief project description for a fit read before writing.</p>
+    <p><span class="src">neh.gov &mdash; Digital Projects for the Public &middot; www.neh.gov/grants/public/digital-projects-the-public</span></p>
+  </div>
+
+  <div class="row"><div class="status block"><span class="dot"></span>Blocked</div>
+    <h3>NEH Digital Humanities Advancement Grants (DHAG)</h3>
+    <p class="who">NEH Office of Digital Humanities &middot; federal &middot; partnered with IMLS</p>
+    <div class="meta">
+      <span class="chip due">~Jun 2026 cycle (confirm)</span>
+      <span class="chip amt">Up to $350K (+$100K match)</span>
+      <span class="chip wait">Asset: the pipeline itself</span>
+    </div>
+    <p class="fit"><b>The join.</b> DHAG funds <b>experimental, reusable, open-source</b> digital methods &mdash; which is precisely what the TSP humanist-in-the-loop pipeline is. The Borges paper is the scholarly articulation of exactly the &ldquo;critical infrastructure&rdquo; DHAG names. This is the grant for the <i>method</i>, not a single game.</p>
+    <p class="next"><b>Next action &rarr;</b> Deadlines cycle roughly twice a year; the last posted was mid-2026. Refresh this row before building. NEH explicitly rewards open-source &mdash; TSP&rsquo;s single-file offline builds are a selling point.</p>
+    <p class="flag">Verify the current deadline live &mdash; DHAG dates shift each cycle and one source listed Jun 25, 2026.</p>
+    <p><span class="src">neh.gov &mdash; DHAG &middot; www.neh.gov/grants/odh/digital-humanities-advancement-grants</span></p>
+  </div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <div class="opp-mark"><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="8" r="2.4" fill="currentColor"/><line x1="15" y1="11" x2="15" y2="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="14" x2="21" y2="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="19" x2="11" y2="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="19" x2="19" y2="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>Teach Access Faculty Grants</h3>
+    <p class="who">Teach Access &middot; national &middot; accessibility-in-curriculum</p>
+    <div class="meta">
+      <span class="chip wait">Paused 2025 &mdash; watch for reopen</span>
+      <span class="chip amt">Direct faculty award</span>
+      <span class="chip ready">You ARE the profile</span>
+    </div>
+    <p class="fit"><b>The join.</b> Funds faculty who build <b>accessibility into existing courses</b> &mdash; and explicitly encourages <b>community-college</b> applicants. Your RP-driven accessible-first design isn&rsquo;t a compliance checkbox, it&rsquo;s the pedagogy. Strongest identity-fit grant on this board.</p>
+    <p class="next"><b>Next action &rarr;</b> Program is on pause for its new strategic plan. Sign up for the Teach Access newsletter so the reopen doesn&rsquo;t pass silently. When it returns: one EN195 accessibility module = a clean, small, winnable application.</p>
+    <p><span class="src">teachaccess.org &mdash; Grants &middot; www.teachaccess.org/initiatives/grants</span></p>
+  </div>
+
+  <div class="row"><div class="status hold"><span class="dot"></span>Waiting</div>
+    <h3>Mass Humanities Project Grants</h3>
+    <p class="who">Mass Humanities &middot; Massachusetts state council (NEH pass-through)</p>
+    <div class="meta">
+      <span class="chip due">Larger projects resume Fall 2026</span>
+      <span class="chip amt">Up to $10K</span>
+      <span class="chip wait">Reduced budget 2026</span>
+    </div>
+    <p class="fit"><b>The join.</b> State-council money is smaller but far less competitive and locally winnable. A public-facing humanities game &mdash; CYL as civic-history, or a Lum&iuml;ere-adjacent literary project &mdash; fits the &ldquo;Crisis, Community &amp; Civic Culture&rdquo; theme. Massachusetts base = home-field advantage.</p>
+    <p class="next"><b>Next action &rarr;</b> Their main Expand Mass Stories grant is paused until fall 2026 on a cut budget. Watch for the fall reopen; in the meantime the Reading Frederick Douglass Together micro-grant (final deadline Apr 17, 2026) is a low-effort relationship-builder if it recurs.</p>
+    <p><span class="src">masshumanities.org &mdash; Grants &middot; masshumanities.org/grants</span></p>
+  </div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <h3>Mass Cultural Council &mdash; Project / Local Cultural Council</h3>
+    <p class="who">Mass Cultural Council &middot; state + 329 local councils</p>
+    <div class="meta">
+      <span class="chip due">Project grants: opens Mar 3, due Apr 30, 2026</span>
+      <span class="chip amt">$2.5K &ndash; $10K</span>
+      <span class="chip ready">Schools eligible</span>
+    </div>
+    <p class="fit"><b>The join.</b> Grants to organizations <b>including schools</b> for arts/humanities/sciences projects. Smallest lift on the board; the Local Cultural Council route (avg ~$500&ndash;$750, ~Oct deadline) is a near-guaranteed first win that builds a funding track record.</p>
+    <p class="next"><b>Next action &rarr;</b> Note Apr 30, 2026 for the Project Grant. For LCCs, apply through Newton&rsquo;s local council (reimbursement-based). Use a small win here to seed the bigger NEH narrative.</p>
+    <p><span class="src">massculturalcouncil.org &mdash; Programs at a glance &middot; massculturalcouncil.org/programs-at-a-glance</span></p>
+  </div>
+</section>
+
+<!-- ============ IP (scaffold) ============ -->
+<section id="p-ip" role="tabpanel" aria-labelledby="t-ip" hidden>
+  <div class="lane-head"><div class="lane-glyph"><svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="16" r="9" stroke-width="3"/><circle cx="16" cy="16" r="4" stroke-width="1.4"/><line x1="23" y1="23" x2="33" y2="33" stroke-width="3"/></g><circle cx="16" cy="16" r="1.5" fill="currentColor"/></svg></div><p class="lane-note"><b>Scaffold lane.</b> Not mined this pass &mdash; the shape only, so nothing falls through. Say <b>&ldquo;deepen IP&rdquo;</b> when you want real research here.</p></div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <h3>The pipeline as protectable method</h3>
+    <p class="who">Tight Spiral Productions &middot; internal</p>
+    <div class="meta"><span class="chip wait">Scaffold</span><span class="chip ready">Asset: Borges paper</span></div>
+    <p class="fit"><b>The join.</b> The humanist-in-the-loop pipeline is the crown-jewel IP. The Borges paper is its public articulation; publishing it establishes prior art and authorship without patent cost.</p>
+    <p class="next"><b>Next action &rarr;</b> Decide the protection posture: trade-secret (keep pipeline docs private) vs. published-method (paper as timestamped authorship). Open question, not yet resolved.</p>
+  </div>
+
+  <div class="row"><div class="status hold"><span class="dot"></span>Waiting</div>
+    <h3>Writerly Moves as licensable product</h3>
+    <p class="who">TSP &middot; internal</p>
+    <div class="meta"><span class="chip wait">Scaffold &mdash; parked</span></div>
+    <p class="fit"><b>The join.</b> Writerly Moves is the origin engine and the most pedagogically distinct asset. Its DIAGNOSE mode is genuinely novel. Licensing to a courseware or writing-center market is a real path &mdash; but the two-taxonomy question is unresolved and the build is parked.</p>
+    <p class="next"><b>Next action &rarr;</b> Resolve the taxonomy question in a founder review session before any external conversation. Do not license a product with an unsettled core.</p>
+  </div>
+
+  <div class="row"><div class="status hold"><span class="dot"></span>Waiting</div>
+    <h3>&ldquo;Tight Spiral&rdquo; / &ldquo;Confluence&rdquo; naming</h3>
+    <p class="who">TSP &middot; internal</p>
+    <div class="meta"><span class="chip wait">Scaffold</span></div>
+    <p class="fit"><b>The join.</b> Studio and product names have market value once anything ships commercially. Trademark is cheap relative to rebrand-after-traction.</p>
+    <p class="next"><b>Next action &rarr;</b> Low priority until a revenue path is real. Flag for a 30-minute check with a clinic or the MassBay/SBDC small-business resource when Funny Boney&rsquo;s or Leeder monetizes.</p>
+  </div>
+</section>
+
+<!-- ============ BUSINESS (scaffold) ============ -->
+<section id="p-biz" role="tabpanel" aria-labelledby="t-biz" hidden>
+  <div class="lane-head"><div class="lane-glyph"><svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="32" x2="34" y2="32" stroke-width="3"/><rect x="10" y="23" width="5" height="9" stroke-width="3"/><rect x="18" y="17" width="5" height="15" stroke-width="3"/><rect x="26" y="10" width="5" height="22" stroke-width="3"/><path d="M9 20 L16 16 L24 12 L31 6" stroke-width="1.4"/></g><circle cx="31" cy="6" r="1.6" fill="currentColor"/></svg></div><p class="lane-note"><b>Scaffold lane.</b> Shape only. Say <b>&ldquo;deepen business&rdquo;</b> for real research on publishing venues and revenue paths.</p></div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <h3>Borges paper &mdash; 14-venue submission plan</h3>
+    <p class="who">TSP &middot; written, sitting</p>
+    <div class="meta"><span class="chip ready">Asset ready</span><span class="chip wait">Not sent</span></div>
+    <p class="fit"><b>The join.</b> The paper is finished (~2,100 words, Chronicle-shaped) with a tiered 14-venue plan already written. It is the single highest-leverage un-shipped asset: it feeds the IP lane, the DHAG grant narrative, and TSP&rsquo;s public credibility at once.</p>
+    <p class="next"><b>Next action &rarr;</b> Send Tier 1 (Chronicle of Higher Ed) this month. It has been sitting in a folder. One email moves three lanes.</p>
+  </div>
+
+  <div class="row"><div class="status hold"><span class="dot"></span>Waiting</div>
+    <h3>FableVision / Funny Boney&rsquo;s</h3>
+    <p class="who">TSP &times; FableVision (Reynolds / Goldberger)</p>
+    <div class="meta"><span class="chip wait">Scaffold</span><span class="chip wait">Gated by Cleese letter</span></div>
+    <p class="fit"><b>The join.</b> A real studio relationship and a real commercial lane. Funny Boney&rsquo;s must be shippable-to-Peter before the Cleese letter sends &mdash; the whole chain is sequenced.</p>
+    <p class="next"><b>Next action &rarr;</b> Get Funny Boney&rsquo;s to a standard you consider shippable. That unlocks both the letter and the FableVision conversation.</p>
+  </div>
+
+  <div class="row"><div class="status hold"><span class="dot"></span>Waiting</div>
+    <h3>Leeder Management lane</h3>
+    <p class="who">TSP services &middot; Howard Leeder</p>
+    <div class="meta"><span class="chip wait">Scaffold</span><span class="chip amt">Flat-fee model</span></div>
+    <p class="fit"><b>The join.</b> Near-term revenue that funds the studio. Intake shipped; three sub-lanes (website rebuild, parcel showcase, trades app). Trades app = August.</p>
+    <p class="next"><b>Next action &rarr;</b> Clear the Osterweil footer line before sending to Howard. Parcel showcase parked. Confirm flat-fee terms with a MA RE attorney before any sale-linked comp.</p>
+  </div>
+</section>
+
+<section id="p-comm" role="tabpanel" aria-labelledby="t-comm" hidden>
+  <div class="lane-head"><div class="lane-glyph"><svg viewBox="0 0 40 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"><line x1="6" y1="15" x2="30" y2="15"/><path d="M25 10 L31 15 L25 20"/><line x1="34" y1="25" x2="10" y2="25"/><path d="M15 20 L9 25 L15 30"/></g><circle cx="20" cy="15" r="1.4" fill="currentColor"/><circle cx="20" cy="25" r="1.4" fill="currentColor"/></svg></div><p class="lane-note"><b>New deep lane.</b> Where a solo studio actually lands paid game work &mdash; not government bid portals (wrong fit: they want registered vendors, insurance, past-performance, a bids team). The real pattern: an institution wins a grant that <i>requires</i> public outreach, then puts out an RFP to known game makers. Your job is to be known before the RFP exists.</p></div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <h3>The mechanism (read this first)</h3>
+    <p class="who">How learning games actually get commissioned</p>
+    <div class="meta"><span class="chip ready">Strategy, not a deadline</span></div>
+    <p class="fit"><b>The join.</b> Per the field&rsquo;s own account (Schell Games, GameDeveloper): institutions get grants with an outreach requirement, then invite <b>known</b> studios to bid. You don&rsquo;t win by scanning portals &mdash; you win by being the name a grant-holding professor or museum thinks of. TSP&rsquo;s shipped, playable, accessible builds ARE the portfolio that makes you known.</p>
+    <p class="next"><b>Next action &rarr;</b> Make TSP discoverable: a one-page &ldquo;commission a game&rdquo; capabilities sheet + the public arcade. Then seed three local relationships (see below). Contract work comes months after people learn what you do.</p>
+  </div>
+
+  <div class="row"><div class="status block"><span class="dot"></span>Blocked</div>
+    <h3>Games for Change &mdash; Awards + Festival network</h3>
+    <p class="who">G4C &middot; the leading serious-games nonprofit &middot; NYC</p>
+    <div class="meta">
+      <span class="chip due">Festival Jul 21&ndash;22, 2026 NYC</span>
+      <span class="chip amt">Awards + partner RFPs</span>
+      <span class="chip ready">Your native field</span>
+    </div>
+    <p class="fit"><b>The join.</b> G4C is the exact genre TSP builds &mdash; games for civic, educational, social change. Their Awards (submissions ~Feb) put finished games in front of the whole field&rsquo;s funders and studios; sponsors (Roblox, GM, Take-Two) run cash challenges through them ($10K&ndash;$15K). The Festival is where the &ldquo;known studio&rdquo; relationships get made.</p>
+    <p class="next"><b>Next action &rarr;</b> Get on the G4C newsletter now so the next Awards window and partner challenges don&rsquo;t pass silently. Submit a finished game (Flok is a fit) to the 2027 Awards cycle. The Festival is the single best room to become a known name.</p>
+    <p class="flag">The Student Challenge is ages 10&ndash;25 &mdash; not you, but a natural fit for your <b>EN195 students</b>, and running a school team makes YOU visible to G4C.</p>
+    <p><span class="src">gamesforchange.org &middot; www.gamesforchange.org</span></p>
+  </div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <h3>The grant-holder RFP (your real bid lane)</h3>
+    <p class="who">Universities, museums, libraries, foundations with an outreach mandate</p>
+    <div class="meta">
+      <span class="chip amt">$5K &ndash; $30K typical</span>
+      <span class="chip ready">Delivery = your strength</span>
+    </div>
+    <p class="fit"><b>The join.</b> Real examples pulled this week: a UK Serious Fraud Office educational-game scoping contract (&pound;25K), a tribal education dept RFP for a game co-design workshop, misinformation-game RFPs from policy nonprofits. These want a <b>finished playable artifact</b>, which is exactly what TSP ships &mdash; not a proposal that competes on price.</p>
+    <p class="next"><b>Next action &rarr;</b> Set a standing watch (I refresh on command) on: Games for Change job/RFP board, Idealist (&ldquo;interactive&rdquo; + &ldquo;educational&rdquo;), and UK Find-a-Tender CPV <b>37524100 Educational games</b>. Cherry-pick 1&ndash;2 that fit; ignore the rest. Do NOT chase SAM.gov / procurement portals &mdash; wrong fit for a solo maker.</p>
+  </div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <h3>FableVision &mdash; the door already open</h3>
+    <p class="who">TSP &times; FableVision (Reynolds / Goldberger) &middot; Boston</p>
+    <div class="meta">
+      <span class="chip ready">Highest-probability path</span>
+      <span class="chip wait">Gated by Funny Boney&rsquo;s ship</span>
+    </div>
+    <p class="fit"><b>The join.</b> Every source says the same thing: commission work comes from <b>known relationships</b>, not cold portals. You already have the strongest possible one &mdash; a Boston educational-media studio that knows your work is coming. One warm relationship beats fifty portal bids.</p>
+    <p class="next"><b>Next action &rarr;</b> Ship Funny Boney&rsquo;s to a standard you&rsquo;d put in front of Peter. That single move converts a relationship into a commission pipeline. This is the highest-ROI action on the entire board.</p>
+  </div>
+
+  <div class="row"><div class="status go"><span class="dot"></span>Ready</div>
+    <h3>Local overflow &mdash; the Boston indie network</h3>
+    <p class="who">Boston Indie Game Collective &middot; MIT / Ed Arcade lineage &middot; MassBay</p>
+    <div class="meta"><span class="chip amt">Overflow contracts</span><span class="chip ready">Osterweil connection live</span></div>
+    <p class="fit"><b>The join.</b> The field&rsquo;s advice verbatim: get involved with your local community, let people know what you do, and overflow jobs get passed to you months later. You have an unusually strong local graph &mdash; Osterweil, the MIT Education Arcade / Learning Games Network lineage, a physical campus.</p>
+    <p class="next"><b>Next action &rarr;</b> Tell your existing network, concretely, that TSP takes commissioned educational-game work. Osterweil&rsquo;s network alone is a warmer lead than any RFP portal.</p>
+  </div>
+</section>
+<div class="foot">
+  <p class="verdict">The one move this month, across all four lanes: send the Borges paper to the Chronicle, and clear Flok&rsquo;s verb fix before Jul 20 for GALA.</p>
+  <p>Tight Spiral Productions &middot; Play. Notice. Design. &middot; Bridge pulled 16 Jul 2026 &middot; confirm every deadline on its source before acting.</p>
+</div>
+</div>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+  function pick(id){
+    var lanes=['conf','grant','ip','biz','comm'];
+    lanes.forEach(function(l){
+      var tab=document.getElementById('t-'+l);
+      var pan=document.getElementById('p-'+l);
+      var on=(l===id);
+      tab.setAttribute('aria-selected', on?'true':'false');
+      pan.hidden=!on;
+    });
+    window.scrollTo({top:0,behavior:'instant'});
+  }
+  (function(){
+    var root=document.documentElement, sr=document.getElementById('seSr');
+    (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+      var d=new Date(document.lastModified);
+      u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+        : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+    })();
+  })();
+</script>
+</body>
+</html>
