@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Your RP World — a noticing game about living with retinitis pigmentosa. Learn what RP is, map your own world, and see what's being studied. Offline, private, no data leaves this page unless you choose to send it.">
+<meta name="tsp:surface" content="tool">
+<title>Your RP World — a noticing game</title>
+<!-- TIGHT SPIRAL PRODUCTIONS · Stage 1 vertical slice.
+     RP-literacy + lived-experience intake + research-landscape layer.
+     OFFLINE. No storage, no network, no external hosts. Nothing leaves this page
+     unless the player taps a Send button (their own mailto). "Unknown" is a full,
+     dignified path (up to ~40% of RP is genetically undiagnosed). The treatments
+     layer TEACHES what is being studied and routes to real registries — it is
+     education, never medical advice; the disclaimer line is a floor on that layer.
+     Grounded in the RP patient-reported-outcome literature: night vision, light
+     adaptation, contrast, peripheral field; navigation + screen use most impacted.
+     RP contrast floor: ink #0f0d0a on paper #f7f4ee ~= 17.6:1. No token is
+     atmosphere AND text. No emoji. Panel: Jane McGonigal (games-for-health form),
+     Kelly McGonigal (dignity/reframe tone floor), Mass Eye and Ear (research anchor).
+     COMFORT: migrated to TSP Comfort Kernel v2 — Studio Eyes in reserved chrome
+     (Light: Default/Dusk/Warm-dark via html[data-light]; text A/A+/A++; high
+     contrast / reduce motion / colorblind cues), Back+Home rail. Every token
+     remapped so all text stays >=4.5:1 in all three light modes. -->
+<style>
+  :root{
+    --paper:#f7f4ee; --ink:#0f0d0a; --ink2:#2a2620;
+    --ink-fill:#0f0d0a; --paper-ink:#f7f4ee;  /* TOKEN_ROLE split: fill=deco, ink=text; same hex */
+    --card:#fffdf9; --rule:#cdc5b6; --shade:#ece6da;
+    --band:#12100b; --band-ink:#f7f4ee;
+    --dusk:#7a3d00;      /* warm accent — text-legal on card/paper */
+    --field:#124a44;     /* deep teal — text-legal on card */
+    --pick:#0a3a86;      /* choice accent — 8:1 on card */
+    --pick-fill:#0a3a86; /* TOKEN_ROLE split: deco use of --pick */
+    --focus:#0a4fd0;
+    --leaf:#2f5a1f;      /* fill only */
+    --tap:48px;
+    --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  /* ── STUDIO EYES light ladder — Default(day above) · Dusk · Warm-dark(night) ── */
+  html[data-light="dusk"]{
+    --paper:#efe2c8; --ink:#0f0d0a; --ink2:#2c2519;
+    --ink-fill:#0f0d0a; --paper-ink:#f6ecd5;
+    --card:#f6ecd5; --rule:#cdb488; --shade:#e3d4b4;
+    --band:#12100b; --band-ink:#f6ecda;
+    --dusk:#7a3d00; --field:#124a44; --pick:#0a3a86; --pick-fill:#0a3a86;
+    --focus:#0a4fd0; --leaf:#2f5a1f;
+  }
+  html[data-light="night"]{           /* warm charcoal — never pure black */
+    --paper:#151210; --ink:#f6ecda; --ink2:#e4d8c2;
+    --ink-fill:#f6ecda; --paper-ink:#151210;
+    --card:#211b15; --rule:#483d2d; --shade:#2a2217;
+    --band:#0c0a07; --band-ink:#f6ecda;
+    --dusk:#f0b877; --field:#7fd3c8; --pick:#9db8ee; --pick-fill:#9db8ee;
+    --focus:#f0c357; --leaf:#a9c98f;
+    background:#151210;               /* RENDER-PROOF: literal opaque dark ground */
+  }
+  /* ── TEXT SIZE (Studio Eyes: A / A+ / A++) ── */
+  html{ font-size:100%; }
+  html.se-a1{ zoom:1.15; }
+  html.se-a2{ zoom:1.3; }
+  /* ── HIGH CONTRAST ── */
+  html.se-contrast:not([data-light="night"]){ --paper:#fbfaf7; --card:#ffffff; --shade:#eee9df; --rule:#b39a5f; --ink:#0a0805; --ink2:#1c1813; }
+  html.se-contrast[data-light="night"]{ --paper:#0c0b09; --card:#161310; --ink:#fff7e6; --ink2:#efe0bc; --rule:#5a4f3a; }
+  /* ── COLORBLIND CUES ── */
+  html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+  /* ── REDUCE MOTION ── */
+  html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink2);
+    font:400 1.1875rem/1.62 "Iowan Old Style","Palatino Linotype",Georgia,serif;
+    -webkit-text-size-adjust:100%;
+    transition:background .18s ease,color .18s ease}
+  .skip{position:absolute;left:-9999px;display:inline-flex;align-items:center;
+    min-height:44px;background:var(--ink-fill);color:var(--paper-ink)}
+  .skip:focus{left:12px;top:12px;position:fixed;z-index:200;background:var(--ink-fill);
+    color:var(--paper-ink);padding:10px 14px;border-radius:8px}
+
+  /* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+  .se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--card);border-bottom:2px solid var(--ink-fill);
+    position:sticky;top:0;z-index:100}
+  .se-home{justify-self:start;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+    padding:8px 12px;border:1.5px solid var(--rule);border-radius:8px;background:var(--shade);
+    color:var(--ink);font:700 13px/1 var(--mono);text-decoration:none}
+  .se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--ink)}
+  .se-brand svg{width:34px;height:20px;color:var(--ink);flex:0 0 auto}
+  .se-brand .wm{font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;font-size:16px;white-space:nowrap;color:var(--ink)}
+  .se-eyes{justify-self:end;display:inline-flex;align-items:center;gap:7px;min-height:var(--tap);
+    padding:8px 13px;border:2px solid var(--ink-fill);border-radius:8px;background:var(--ink-fill);
+    color:var(--paper-ink);font:700 13px/1 var(--mono);cursor:pointer}
+  .se-home:hover{background:var(--ink-fill);color:var(--paper-ink)}
+  .se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  @media (max-width:560px){.se-brand .wm{display:none}}
+
+  /* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+  .se-panel{position:fixed;right:12px;top:calc(var(--tap) + 16px);z-index:101;
+    width:min(320px,calc(100vw - 24px));background:var(--card);color:var(--ink);
+    border:2px solid var(--ink-fill);border-radius:12px;padding:15px;
+    box-shadow:0 10px 34px rgba(0,0,0,.34);display:none}
+  .se-panel[data-open="1"]{display:block}
+  .se-panel h2{font:700 10.5px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink2);margin:0 0 8px}
+  .se-row{display:flex;gap:6px;margin-bottom:14px}
+  .se-btn{flex:1;min-height:var(--tap);padding:8px 4px;border:1.5px solid var(--rule);border-radius:8px;
+    background:var(--shade);color:var(--ink);font:700 12.5px/1 var(--mono);cursor:pointer}
+  .se-btn[aria-pressed="true"]{background:var(--ink-fill);color:var(--paper-ink);border-color:var(--ink-fill)}
+  .se-btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    min-height:var(--tap);padding:8px 11px;margin-bottom:6px;border:1.5px solid var(--rule);border-radius:8px;
+    background:var(--shade);color:var(--ink);font:600 14px/1.3 inherit;cursor:pointer;text-align:left}
+  .se-tog[aria-pressed="true"]{border-color:var(--ink-fill)}
+  .se-tog .st{font:700 11px/1 var(--mono);color:var(--ink2)}
+  .se-tog:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px 120px}
+  .stage{min-height:calc(100vh - 66px);display:none;flex-direction:column;justify-content:center;
+    padding:40px 0 44px}
+  .stage.on{display:flex}
+  .kicker{font:700 13px/1.2 var(--mono);letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dusk);margin:0 0 14px}
+  h1{font-weight:700;font-size:clamp(30px,7vw,50px);line-height:1.06;margin:0 0 10px;
+    color:var(--ink);letter-spacing:-.01em}
+  h2{font-weight:700;font-size:clamp(23px,5vw,33px);line-height:1.12;margin:0 0 16px;color:var(--ink)}
+  .sub{font-size:1.25rem;color:var(--ink2);margin:0 0 28px;max-width:60ch}
+
+  /* cut-paper scene art — flat inline SVG, >50% of each screen. */
+  .art{display:block;width:100%;max-width:580px;margin:0 auto 26px;
+    border:2px solid var(--rule);border-radius:12px;overflow:hidden;
+    background:var(--card);aspect-ratio:8/5}
+  .art svg{display:block;width:100%;height:100%}
+  html[data-light="night"] .art{filter:brightness(.86) saturate(.92)}
+
+  .prompt{font-weight:700;color:var(--ink);font-size:1.25rem;margin:0 0 16px;max-width:58ch}
+  .choices{display:flex;flex-direction:column;gap:12px;margin:0 0 8px}
+  .choice{display:block;width:100%;text-align:left;cursor:pointer;
+    background:var(--card);border:2px solid var(--rule);border-radius:11px;
+    padding:15px 18px;font:inherit;font-size:1.125rem;color:var(--ink);line-height:1.4;min-height:44px}
+  .choice:hover{border-color:var(--ink-fill)}
+  .choice:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .choice[aria-pressed="true"]{border-color:var(--pick-fill);border-width:3px;background:var(--shade)}
+  .choice .tag{display:block;font:700 12px/1.3 var(--mono);
+    letter-spacing:.08em;text-transform:uppercase;color:var(--dusk);margin:6px 0 0}
+
+  .reveal{margin:22px 0 0;padding:18px 20px;border-radius:10px;
+    background:var(--shade);border-left:6px solid var(--pick-fill);color:var(--ink);font-size:1.125rem}
+  .reveal.hidden{display:none}
+  .reveal b{color:var(--ink)}
+
+  .card{background:var(--card);border:2px solid var(--rule);border-left:6px solid var(--dusk);
+    border-radius:10px;padding:18px 20px;margin:0 0 20px;font-size:1.125rem;color:var(--ink)}
+  .card.teal{border-left-color:var(--field)}
+  .card h3{margin:0 0 8px;font-size:1.1875rem;color:var(--ink)}
+  .card p{margin:0 0 10px}
+  .card a{color:var(--pick);font-weight:700}
+  .card a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+  .disclaimer{background:var(--shade);border:2px dashed var(--rule);border-radius:10px;
+    padding:14px 16px;margin:0 0 22px;font-size:1rem;color:var(--ink);font-weight:700}
+
+  .btn{display:inline-block;text-decoration:none;cursor:pointer;font:700 1.0625rem/1 inherit;
+    font-family:inherit;padding:14px 20px;border-radius:10px;border:2px solid var(--ink-fill);
+    background:var(--ink-fill);color:var(--paper-ink);margin:6px 8px 6px 0;min-height:44px}
+  .btn.ghost{background:var(--card);color:var(--ink)}
+  .btn:hover{opacity:.9}
+  .btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .btnrow{margin:20px 0 0}
+
+  .prog{font:700 13px/1 var(--mono);letter-spacing:.1em;
+    color:var(--dusk);margin:0 0 12px}
+  .credit{margin:14px 0 0;font-size:.9375rem;color:var(--ink2);font-style:italic}
+
+  .send{background:var(--card);border:2px dashed var(--rule);border-radius:12px;
+    padding:20px 22px;margin:22px 0 0}
+  .send h3{margin:0 0 8px;font-size:1.125rem;color:var(--ink)}
+  .send p{margin:0 0 14px;font-size:1rem;color:var(--ink2)}
+  .send .note{font-size:.875rem;color:var(--ink2);margin:12px 0 0}
+
+  footer{margin-top:34px;padding-top:18px;border-top:2px solid var(--rule);
+    font-size:.9375rem;color:var(--ink2)}
+
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{display:flex;gap:10px;justify-content:center;padding:20px;border-top:2px solid var(--rule);
+    background:var(--paper)}
+  .se-rail a,.se-rail button{min-height:var(--tap);min-width:44px;padding:10px 18px;
+    border:1.5px solid var(--rule);border-radius:8px;background:var(--shade);color:var(--ink);
+    font:700 13px/1 var(--mono);text-decoration:none;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center}
+  .se-rail a:hover,.se-rail button:hover{background:var(--ink-fill);color:var(--paper-ink)}
+  .se-rail a:focus-visible,.se-rail button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.4rem 0 1rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v12 <span style="opacity:.75">d701f4e</span></span> </span> </span></span></p>
+<script>(function(){var u=document.getElementById('seUpdated');if(!u)return;var d=new Date(document.lastModified);u.textContent=isNaN(d.getTime())?'Last updated recently':'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});})();</script>
+
+
+<main id="main" class="wrap">
+
+  <!-- ── SCREEN 0 — HOME / SCENE FIRST ────────────────────────────── -->
+  <section class="stage on" id="s0" aria-labelledby="s0h">
+    <div class="art" role="img" aria-label="A doorway of light opening into a dim room, seen the way many people with RP see it — a bright center ringed by soft dark.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#1a1712"/>
+        <rect x="150" y="70" width="500" height="360" rx="10" fill="#2b2419"/>
+        <rect x="250" y="130" width="300" height="300" rx="6" fill="#c98a2e"/>
+        <rect x="290" y="170" width="220" height="260" rx="4" fill="#f0c974"/>
+        <rect x="330" y="210" width="140" height="220" fill="#fbe7b4"/>
+        <circle cx="400" cy="290" r="340" fill="#0f0d0a" opacity="0.55"/>
+        <circle cx="400" cy="290" r="250" fill="#0f0d0a" opacity="0.35"/>
+        <rect x="0" y="0" width="800" height="500" fill="url(#vig)"/>
+        <radialGradient id="vig" cx="50%" cy="55%" r="60%">
+          <stop offset="55%" stop-color="#000" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#000" stop-opacity="0.7"/>
+        </radialGradient>
+      </svg>
+    </div>
+    <p class="kicker">A noticing game</p>
+    <h1 id="s0h">Your RP World</h1>
+    <p class="sub">Retinitis pigmentosa doesn't look the same to any two people. This is a short, private game about your world — what you notice, what's changed, what still works. Along the way you'll learn what RP actually is, and what's being studied right now.</p>
+    <div class="btnrow">
+      <button class="btn" data-go="s1">Begin</button>
+      <button class="btn ghost" data-go="s_about">What is this?</button>
+    </div>
+    <p class="credit">Private and offline. Nothing you enter leaves this page unless you choose to send it.</p>
+  </section>
+
+  <!-- ── ABOUT ─────────────────────────────────────────────────────── -->
+  <section class="stage" id="s_about" aria-labelledby="sah">
+    <div class="art" role="img" aria-label="Two overlapping eye shapes made of cut paper, one bright and one shadowed, side by side.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#efe7d7"/>
+        <ellipse cx="300" cy="250" rx="210" ry="130" fill="#d7c9ad"/>
+        <ellipse cx="300" cy="250" rx="120" ry="120" fill="#7a3d00"/>
+        <ellipse cx="300" cy="250" rx="60" ry="60" fill="#2b2419"/>
+        <ellipse cx="520" cy="250" rx="210" ry="130" fill="#c2b393"/>
+        <ellipse cx="520" cy="250" rx="120" ry="120" fill="#124a44"/>
+        <ellipse cx="520" cy="250" rx="60" ry="60" fill="#0f0d0a"/>
+        <circle cx="520" cy="250" r="240" fill="#0f0d0a" opacity="0.28"/>
+      </svg>
+    </div>
+    <p class="kicker">What this is</p>
+    <h2>Made by someone who lives it</h2>
+    <p class="sub">This game is built by a teacher with retinitis pigmentosa. It has three parts: it <b>maps your world</b> (a few questions, no wrong answers), it <b>reflects it back</b> so you can see it named, and it <b>shows what's being studied</b> — with real links to find a trial. Your answers stay on this page. If you'd like to share them — to help design better tools — there's a button at the end that opens your own email. Nothing is sent without you.</p>
+    <div class="btnrow"><button class="btn" data-go="s1">Start mapping</button></div>
+  </section>
+
+  <!-- ── SCREEN 1 — TYPE (Unknown is a full path) ──────────────── -->
+  <section class="stage" id="s1" aria-labelledby="s1h">
+    <p class="prog">Part 1 of 3 · your world · 1/5</p>
+    <div class="art" role="img" aria-label="A single card being drawn from a deck, most of the deck still face-down in shadow.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#20191f"/>
+        <g transform="rotate(-6 400 250)">
+          <rect x="180" y="120" width="180" height="260" rx="12" fill="#3a3040"/>
+          <rect x="210" y="120" width="180" height="260" rx="12" fill="#4a3f52"/>
+          <rect x="240" y="120" width="180" height="260" rx="12" fill="#5c4f66"/>
+        </g>
+        <rect x="430" y="90" width="200" height="290" rx="14" fill="#f0c974"/>
+        <rect x="460" y="130" width="140" height="70" rx="6" fill="#7a3d00"/>
+        <rect x="460" y="220" width="140" height="14" rx="7" fill="#2b2419"/>
+        <rect x="460" y="250" width="110" height="14" rx="7" fill="#2b2419"/>
+        <rect x="460" y="280" width="130" height="14" rx="7" fill="#2b2419"/>
+        <circle cx="400" cy="250" r="300" fill="#0f0d0a" opacity="0.4"/>
+      </svg>
+    </div>
+    <h2 id="s1h">Do you know your type?</h2>
+    <p class="prompt">RP comes from many different genetic causes. Many people — by some estimates up to two in five — never get a genetic diagnosis at all. That's not a gap in you. It's a gap in the science, and it's exactly what researchers want to understand better.</p>
+    <div class="choices" role="group" aria-label="Do you know your RP type?">
+      <button class="choice" data-q="type" data-v="known">Yes, I know my type or gene<span class="tag">e.g. RPGR, USH2A, RHO…</span></button>
+      <button class="choice" data-q="type" data-v="suspected">I have a diagnosis, but not the specific gene</button>
+      <button class="choice" data-q="type" data-v="unknown">No — it's undiagnosed or unknown<span class="tag">A full, valid answer</span></button>
+      <button class="choice" data-q="type" data-v="family">I don't have RP — I'm here for family or research</button>
+    </div>
+    <div class="reveal hidden" id="r1"></div>
+    <div class="btnrow next" id="n1" style="display:none"><button class="btn" data-go="s2">Next</button></div>
+  </section>
+
+  <!-- ── SCREEN 2 — ONSET ───────────────────────────────────────── -->
+  <section class="stage" id="s2" aria-labelledby="s2h">
+    <p class="prog">Part 1 of 3 · your world · 2/5</p>
+    <div class="art" role="img" aria-label="A row of small lamps along a path, the nearest bright and the farthest fading into dark.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#14110c"/>
+        <rect y="360" width="800" height="140" fill="#241d14"/>
+        <g>
+          <circle cx="140" cy="330" r="46" fill="#fbe7b4"/><rect x="134" y="330" width="12" height="90" fill="#4a3f2e"/>
+          <circle cx="330" cy="330" r="34" fill="#f0c974"/><rect x="325" y="330" width="10" height="80" fill="#3a3226"/>
+          <circle cx="500" cy="330" r="24" fill="#c98a2e"/><rect x="496" y="330" width="8" height="70" fill="#2f281d"/>
+          <circle cx="640" cy="330" r="15" fill="#7a3d00"/><rect x="637" y="330" width="6" height="60" fill="#221c14"/>
+        </g>
+        <rect x="0" y="0" width="800" height="500" fill="url(#vg2)"/>
+        <radialGradient id="vg2" cx="18%" cy="66%" r="70%"><stop offset="40%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.72"/></radialGradient>
+      </svg>
+    </div>
+    <h2 id="s2h">When did you first notice something?</h2>
+    <p class="prompt">Not when a doctor named it — when <em>you</em> first noticed. Trouble at dusk, bumping things at the edges, a night that got harder than it used to be.</p>
+    <div class="choices" role="group" aria-label="Age of first noticing">
+      <button class="choice" data-q="onset" data-v="child">As a child</button>
+      <button class="choice" data-q="onset" data-v="teen">Teens or twenties</button>
+      <button class="choice" data-q="onset" data-v="adult">Thirties or forties</button>
+      <button class="choice" data-q="onset" data-v="later">Later than that</button>
+      <button class="choice" data-q="onset" data-v="na">Not sure / doesn't apply</button>
+    </div>
+    <div class="reveal hidden" id="r2"></div>
+    <div class="btnrow next" id="n2" style="display:none"><button class="btn" data-go="s3">Next</button></div>
+  </section>
+
+  <!-- ── SCREEN 3 — FIRST LOSS ──────────────────────────────────── -->
+  <section class="stage" id="s3" aria-labelledby="s3h">
+    <p class="prog">Part 1 of 3 · your world · 3/5</p>
+    <div class="art" role="img" aria-label="A window scene where the edges are curtained in dark and only the middle stays clear.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#1a2a2a"/>
+        <rect x="220" y="90" width="360" height="320" rx="8" fill="#8fd0c6"/>
+        <rect x="250" y="120" width="300" height="120" fill="#cdeee8"/>
+        <rect x="250" y="260" width="300" height="120" fill="#b6e2da"/>
+        <rect x="392" y="90" width="16" height="320" fill="#124a44"/>
+        <rect x="220" y="242" width="360" height="16" fill="#124a44"/>
+        <path d="M0 0 H800 V500 H0 Z M400 250 m-140 0 a140 140 0 1 0 280 0 a140 140 0 1 0 -280 0" fill="#0f1a1a" opacity="0.82" fill-rule="evenodd"/>
+      </svg>
+    </div>
+    <h2 id="s3h">What went first?</h2>
+    <p class="prompt">Most people with RP lose one thing before the others. In the research, nearly everyone names one of these. Which came first for you?</p>
+    <div class="choices" role="group" aria-label="What was affected first">
+      <button class="choice" data-q="loss" data-v="night">Night vision — the dark got harder<span class="tag">the most common first sign</span></button>
+      <button class="choice" data-q="loss" data-v="periph">The edges — bumping things I didn't see</button>
+      <button class="choice" data-q="loss" data-v="adapt">Adjusting — moving between bright and dark</button>
+      <button class="choice" data-q="loss" data-v="contrast">Low contrast — faces, steps, curbs</button>
+      <button class="choice" data-q="loss" data-v="central">Central detail — reading, small print</button>
+    </div>
+    <div class="reveal hidden" id="r3"></div>
+    <div class="btnrow next" id="n3" style="display:none"><button class="btn" data-go="s4">Next</button></div>
+  </section>
+
+  <!-- ── SCREEN 4 — WHAT'S HARDEST (navigation + screens) ──────── -->
+  <section class="stage" id="s4" aria-labelledby="s4h">
+    <p class="prog">Part 1 of 3 · your world · 4/5</p>
+    <div class="art" role="img" aria-label="A phone screen and a flight of stairs side by side, both half-swallowed in shadow.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#181510"/>
+        <rect x="90" y="110" width="200" height="300" rx="24" fill="#2c2519"/>
+        <rect x="112" y="140" width="156" height="230" rx="6" fill="#f0c974"/>
+        <rect x="128" y="160" width="124" height="14" rx="7" fill="#2b2419"/>
+        <rect x="128" y="186" width="96" height="14" rx="7" fill="#2b2419"/>
+        <rect x="128" y="212" width="120" height="14" rx="7" fill="#2b2419"/>
+        <g fill="#c98a2e">
+          <rect x="440" y="360" width="260" height="40"/>
+          <rect x="470" y="310" width="230" height="40"/>
+          <rect x="500" y="260" width="200" height="40"/>
+          <rect x="530" y="210" width="170" height="40"/>
+        </g>
+        <rect x="0" y="0" width="800" height="500" fill="url(#vg4)"/>
+        <radialGradient id="vg4" cx="50%" cy="50%" r="62%"><stop offset="45%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.7"/></radialGradient>
+      </svg>
+    </div>
+    <h2 id="s4h">What's hardest in your day?</h2>
+    <p class="prompt">In the studies, two things get named more than anything else: getting around, and using screens. Which is heaviest for you right now?</p>
+    <div class="choices" role="group" aria-label="What is hardest day to day">
+      <button class="choice" data-q="hard" data-v="nav">Getting around — new places, crowds, steps</button>
+      <button class="choice" data-q="hard" data-v="screens">Screens — phones, small text, glare</button>
+      <button class="choice" data-q="hard" data-v="social">People — missing a face, a wave, a hand</button>
+      <button class="choice" data-q="hard" data-v="work">Work or school tasks</button>
+      <button class="choice" data-q="hard" data-v="other">Something else</button>
+    </div>
+    <div class="reveal hidden" id="r4"></div>
+    <div class="btnrow next" id="n4" style="display:none"><button class="btn" data-go="s5">Next</button></div>
+  </section>
+
+  <!-- ── SCREEN 5 — WHAT STILL WORKS ───────────────────────────── -->
+  <section class="stage" id="s5" aria-labelledby="s5h">
+    <p class="prog">Part 1 of 3 · your world · 5/5</p>
+    <div class="art" role="img" aria-label="A warm lamp lighting a small clear circle on a desk — the part of the world that still works.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#14110c"/>
+        <ellipse cx="400" cy="300" rx="280" ry="150" fill="#f0c974"/>
+        <ellipse cx="400" cy="300" rx="180" ry="96" fill="#fbe7b4"/>
+        <rect x="330" y="250" width="140" height="90" rx="6" fill="#7a3d00"/>
+        <rect x="352" y="270" width="96" height="10" rx="5" fill="#fbe7b4"/>
+        <rect x="352" y="292" width="70" height="10" rx="5" fill="#fbe7b4"/>
+        <rect x="0" y="0" width="800" height="500" fill="url(#vg5)"/>
+        <radialGradient id="vg5" cx="50%" cy="60%" r="55%"><stop offset="45%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity="0.75"/></radialGradient>
+      </svg>
+    </div>
+    <h2 id="s5h">And what still works?</h2>
+    <p class="prompt">RP takes things unevenly. Naming what's still strong isn't a consolation prize — it's real information, and it's how good tools get designed. What do you still trust?</p>
+    <div class="choices" role="group" aria-label="What still works well">
+      <button class="choice" data-q="keep" data-v="day">Daylight and bright rooms</button>
+      <button class="choice" data-q="keep" data-v="center">My central, straight-ahead detail</button>
+      <button class="choice" data-q="keep" data-v="voice">Voice, audio, listening</button>
+      <button class="choice" data-q="keep" data-v="memory">Knowing my own spaces cold</button>
+      <button class="choice" data-q="keep" data-v="highc">High-contrast, big-text setups</button>
+    </div>
+    <div class="reveal hidden" id="r5"></div>
+    <div class="btnrow next" id="n5" style="display:none"><button class="btn" data-go="s6">See your world</button></div>
+  </section>
+
+  <!-- ── SCREEN 6 — THE MIRROR (Part 2) ───────────────────────── -->
+  <section class="stage" id="s6" aria-labelledby="s6h">
+    <p class="prog">Part 2 of 3 · your world, reflected</p>
+    <div class="art" role="img" aria-label="A hand-drawn map with a bright lantern at its center and soft dark at the borders.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#efe7d7"/>
+        <path d="M120 120 Q400 60 680 130 T680 380 Q400 440 120 380 Z" fill="#d7c9ad"/>
+        <circle cx="400" cy="250" r="90" fill="#f0c974"/>
+        <circle cx="400" cy="250" r="52" fill="#7a3d00"/>
+        <path d="M400 60 L412 190 L400 250 L388 190 Z" fill="#124a44"/>
+        <path d="M400 440 L412 310 L400 250 L388 310 Z" fill="#124a44"/>
+        <circle cx="400" cy="250" r="320" fill="#0f0d0a" opacity="0.22"/>
+      </svg>
+    </div>
+    <h2 id="s6h">Here's your world</h2>
+    <p class="sub">Not a diagnosis — a picture, in your own answers. This is what a designer would need to build something that actually fits you.</p>
+    <div class="card" id="mirror"></div>
+    <div class="btnrow"><button class="btn" data-go="s7">What's being studied?</button></div>
+  </section>
+
+  <!-- ── SCREEN 7 — THE LANDSCAPE (Part 3, education-not-advice) ─ -->
+  <section class="stage" id="s7" aria-labelledby="s7h">
+    <p class="prog">Part 3 of 3 · what's being studied</p>
+    <div class="art" role="img" aria-label="A cluster of small lab flasks and a magnifying lens over an eye chart, cut-paper style.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#16211f"/>
+        <rect x="120" y="150" width="120" height="220" rx="8" fill="#8fd0c6"/>
+        <rect x="120" y="150" width="120" height="70" rx="8" fill="#cdeee8"/>
+        <rect x="270" y="200" width="90" height="170" rx="8" fill="#7fd3c8"/>
+        <rect x="270" y="200" width="90" height="54" rx="8" fill="#cdeee8"/>
+        <circle cx="540" cy="250" r="120" fill="none" stroke="#f0c974" stroke-width="16"/>
+        <line x1="620" y1="330" x2="700" y2="410" stroke="#f0c974" stroke-width="20" stroke-linecap="round"/>
+        <text x="540" y="235" font-family="Georgia,serif" font-size="70" fill="#7a3d00" text-anchor="middle" font-weight="700">E</text>
+        <text x="540" y="300" font-family="Georgia,serif" font-size="40" fill="#7a3d00" text-anchor="middle" font-weight="700">F P</text>
+      </svg>
+    </div>
+    <h2 id="s7h">What's being studied right now</h2>
+    <p class="disclaimer">This teaches what's being researched. It is not medical advice. For anything about your own eyes, talk to your eye doctor.</p>
+    <div id="landscape"></div>
+    <div class="card teal">
+      <h3>Find a real trial or study</h3>
+      <p>These are the front doors researchers actually use. They're free, and they let you search by your own type — including "unknown."</p>
+      <p><span class="extref">ClinicalTrials.gov — search RP trials &middot; clinicaltrials.gov/search?cond=Retinitis%20Pigmentosa</span></p>
+      <p><span class="extref">Foundation Fighting Blindness — patient resources & trial finder &middot; www.fightingblindness.org</span></p>
+      <p><span class="extref">Mass Eye and Ear — inherited retinal disease research &middot; www.masseyeandear.org</span></p>
+    </div>
+    <div class="btnrow"><button class="btn" data-go="s8">Last part</button></div>
+  </section>
+
+  <!-- ── SCREEN 8 — SHARE (consent-safe) ──────────────────────── -->
+  <section class="stage" id="s8" aria-labelledby="s8h">
+    <p class="prog">Your call · nothing is sent without you</p>
+    <div class="art" role="img" aria-label="An open envelope with a small lantern inside it, warm light spilling out.">
+      <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <rect width="800" height="500" fill="#efe7d7"/>
+        <rect x="200" y="150" width="400" height="240" rx="10" fill="#d7c9ad"/>
+        <path d="M200 150 L400 300 L600 150 Z" fill="#c2b393"/>
+        <circle cx="400" cy="270" r="60" fill="#f0c974"/>
+        <circle cx="400" cy="270" r="32" fill="#7a3d00"/>
+        <circle cx="400" cy="250" r="300" fill="#0f0d0a" opacity="0.12"/>
+      </svg>
+    </div>
+    <h2 id="s8h">Want to help design better tools?</h2>
+    <p class="sub">Your answers can help build games, apps, and interfaces that actually fit RP eyes — including at MassBay. Sharing is optional and entirely yours: the button below opens <em>your own</em> email with your answers filled in. You read it, you decide, you send. Nothing leaves this page any other way.</p>
+    <div class="send">
+      <h3>Send my world (my choice)</h3>
+      <p>Opens your email app with your answers as the message. Edit or delete anything before sending.</p>
+      <a class="btn" id="sendBtn" href="#">Open my email</a>
+      <p class="note">No account, no tracking, no storage. If you close this page without sending, nothing was recorded.</p>
+    </div>
+    <div class="btnrow">
+      <button class="btn ghost" data-go="s6">See my world again</button>
+      <button class="btn ghost" data-go="s0">Start over</button>
+    </div>
+    <footer>
+      Your RP World · a Tight Spiral Productions noticing game · Stage 1.
+      Built by a teacher with RP. Offline and private by design.
+    </footer>
+  </section>
+
+</main>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" id="railBack" aria-label="Back">&larr; Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+  var answers = {};
+  var stages = Array.prototype.slice.call(document.querySelectorAll(".stage"));
+
+  function show(id){
+    stages.forEach(function(s){ s.classList.toggle("on", s.id === id); });
+    window.scrollTo(0,0);
+    var el = document.getElementById(id);
+    if(el){ var h = el.querySelector("h1,h2"); if(h){ h.setAttribute("tabindex","-1"); h.focus(); } }
+  }
+  function go(id){ show(id); }
+
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-go]");
+    if(b){ go(b.getAttribute("data-go")); return; }
+    var c = e.target.closest(".choice");
+    if(c){ pick(c); }
+  });
+
+  // reveal copy per answer — reflect, never diagnose
+  var reveals = {
+    type: {
+      known: "Knowing your gene is real power — it's the key that unlocks which trials you might qualify for. Hold onto it; you'll use it in Part 3.",
+      suspected: "A diagnosis without the gene is common. Genetic testing has gotten cheaper and faster — Part 3 shows where to look.",
+      unknown: "You're in the largest, most under-studied group there is. Researchers genuinely need to hear from undiagnosed people — your world is data they don't have yet.",
+      family: "Welcome. Seeing RP from beside someone is its own kind of knowing, and it's valuable here."
+    },
+    onset: {
+      child:"Early onset often means you've built a lifetime of your own strategies. Those strategies are worth naming.",
+      teen:"Noticing in your teens or twenties is one of the most common patterns in the research.",
+      adult:"Later noticing can mean a longer road to a name for it — you're far from alone in that.",
+      later:"Every timeline is real. What matters is your world now.",
+      na:"That's fine. We'll build the picture from the rest."
+    },
+    loss: {
+      night:"Night vision is the single most common first sign of RP — nearly everyone in the studies names it.",
+      periph:"Peripheral loss is the classic RP signature — the world narrowing from the edges in.",
+      adapt:"Trouble adjusting between bright and dark is reported by most people with RP. It's not clumsiness; it's the retina.",
+      contrast:"Contrast loss is real and under-discussed — it's why curbs and faces get hard before print does.",
+      central:"Central detail usually holds longest in RP, so losing it early is worth telling your doctor about."
+    },
+    hard: {
+      nav:"Getting around is the number-one reported daily impact in the research — you named the big one.",
+      screens:"Screens are the other thing everyone names. This whole game is built to be a screen that doesn't fight you.",
+      social:"Missing faces and gestures is a quiet, heavy part of RP that rarely gets designed for.",
+      work:"Work and school tasks are where RP costs the most time — and where good tools help most.",
+      other:"Noted. The 'something else' answers are often where the best design ideas hide."
+    },
+    keep: {
+      day:"Daylight strength is a real asset — tools can be tuned to lean on it.",
+      center:"Strong central detail is something a good interface can put everything important inside.",
+      voice:"Voice and audio are a growing lane — a world that talks back is a world that fits.",
+      memory:"Spatial memory of your own places is a superpower worth designing around.",
+      highc:"High-contrast, big-text is exactly the floor this game is built on — you and it agree."
+    }
+  };
+
+  function pick(c){
+    var q = c.getAttribute("data-q"), v = c.getAttribute("data-v");
+    var group = c.parentNode.querySelectorAll(".choice");
+    group.forEach(function(x){ x.setAttribute("aria-pressed", x===c ? "true":"false"); });
+    answers[q] = v;
+    var n = c.closest(".stage");
+    var rev = n.querySelector(".reveal");
+    if(rev && reveals[q] && reveals[q][v]){
+      rev.innerHTML = "<b>&#8594;</b> " + reveals[q][v];
+      rev.classList.remove("hidden");
+    }
+    var nx = n.querySelector(".next");
+    if(nx){ nx.style.display = "block"; }
+    if(q==="type"){ answers._known = (v==="known"); }
+    buildMirror(); buildLandscape(); buildSend();
+  }
+
+  var typeLabel = { known:"a known type or gene", suspected:"a diagnosis, gene not yet identified",
+    unknown:"undiagnosed / unknown — the large under-studied group", family:"here for family or research" };
+  var onsetLabel = { child:"first noticed in childhood", teen:"first noticed in the teens/twenties",
+    adult:"first noticed in the thirties/forties", later:"first noticed later", na:"onset not specified" };
+  var lossLabel = { night:"night vision went first", periph:"the peripheral edges went first",
+    adapt:"light/dark adaptation went first", contrast:"contrast went first", central:"central detail went first" };
+  var hardLabel = { nav:"getting around is hardest now", screens:"screens are hardest now",
+    social:"reading faces and gestures is hardest now", work:"work/school tasks are hardest now", other:"something else is hardest now" };
+  var keepLabel = { day:"daylight still works", center:"central detail still works",
+    voice:"voice and audio still work", memory:"known spaces still work", highc:"high-contrast/big-text still works" };
+
+  function buildMirror(){
+    var m = document.getElementById("mirror");
+    var parts = [];
+    if(answers.type) parts.push("You have <b>"+typeLabel[answers.type]+"</b>.");
+    if(answers.onset && answers.onset!=="na") parts.push("You <b>"+onsetLabel[answers.onset]+"</b>.");
+    if(answers.loss) parts.push("For you, <b>"+lossLabel[answers.loss]+"</b>.");
+    if(answers.hard) parts.push("Right now, <b>"+hardLabel[answers.hard]+"</b>.");
+    if(answers.keep) parts.push("And <b>"+keepLabel[answers.keep]+"</b> — that's what good tools should lean on.");
+    if(!parts.length){ m.innerHTML = "Answer a few questions and your world builds here."; return; }
+    m.innerHTML = "<p>"+parts.join(" ")+"</p><p style='margin-top:12px;font-style:italic'>That last line matters most: design starts from what still works.</p>";
+  }
+
+  function buildLandscape(){
+    var L = document.getElementById("landscape");
+    var blocks = [];
+    blocks.push("<div class='card'><h3>Gene therapy</h3><p>For a few specific RP genes, therapies now exist that add a working copy of the gene. They only apply to certain types — which is one big reason knowing your gene matters.</p></div>");
+    blocks.push("<div class='card'><h3>Broad-spectrum approaches</h3><p>Because up to two in five people with RP have no genetic diagnosis, researchers — including teams at Mass Eye and Ear — are studying treatments meant to work regardless of the exact gene. This is the lane that matters most for the 'unknown' group.</p></div>");
+    blocks.push("<div class='card'><h3>Retinal implants & aids</h3><p>Devices and low-vision technology don't cure RP but can extend what you do with the sight you have. These move fast; a trial finder keeps you current.</p></div>");
+    if(answers.type==="unknown" || answers.type==="suspected"){
+      blocks.unshift("<div class='card teal'><h3>Because your type is unknown</h3><p>Genetic testing is now far cheaper than it was, and many trials will test you as part of enrolling. An 'unknown' today is often knowable this year — and either way, broad-spectrum research is being built for exactly your situation.</p></div>");
+    }
+    if(answers._known){
+      blocks.unshift("<div class='card teal'><h3>Because you know your gene</h3><p>Use it. On the trial finders below you can filter by gene — the fastest way to see whether a targeted therapy or trial applies to you.</p></div>");
+    }
+    L.innerHTML = blocks.join("");
+  }
+
+  function buildSend(){
+    var lines = ["My RP world (from the Your RP World game):",""];
+    if(answers.type) lines.push("Type: "+typeLabel[answers.type]);
+    if(answers.onset) lines.push("Onset: "+onsetLabel[answers.onset]);
+    if(answers.loss) lines.push("First loss: "+lossLabel[answers.loss]);
+    if(answers.hard) lines.push("Hardest now: "+hardLabel[answers.hard]);
+    if(answers.keep) lines.push("Still works: "+keepLabel[answers.keep]);
+    lines.push("", "(Sharing this is my choice. Edit or delete anything before sending.)");
+    var body = encodeURIComponent(lines.join("\n"));
+    var subj = encodeURIComponent("My RP World — lived-experience notes");
+    document.getElementById("sendBtn").setAttribute("href",
+      "mailto:mwalsh@massbay.edu?subject="+subj+"&body="+body);
+  }
+
+  buildMirror(); buildLandscape(); buildSend();
+
+  /* ── STUDIO EYES (Comfort Kernel v2) ── */
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  // bottom rail — Back
+  var railBack=document.getElementById('railBack');
+  if(railBack) railBack.addEventListener('click',function(){ history.back(); });
+})();
+</script></body>
+</html>
