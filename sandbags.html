@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  SANDBAGS — a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
+  EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
+
+  THE GAME (founder-directed): every word is clickable and every word looks the same.
+  THREE HIDDEN ROLES:
+    BALLAST (b:1)  — droppable fluff; the balloon rises.
+    MAYBE   (m:1)  — defensible either way; drops to the heap, no lift, no harm.
+    LOAD-BEARING   — the meaning hangs on it. STRIKE 1: the balloon PLUMMETS but
+    holds, the word stays, and a WHY card explains what it was carrying.
+    STRIKE 2 on any load word: CRASH. Fly again in one tap.
+  Liftoff = enough ballast shed (minus altitude lost to strikes) without a second tear.
+
+  SOURCE (sourcing floor, attributed in-game): four pieces by Matt Walsh, verbatim
+  excerpts pulled from Google Drive 2026-07-06:
+    "Ramen at Echigo Kawaguchi"     doc 17IPevuwPsp0Y6MICt88PC_pK0v81Mpi0eNcueY5JbQA
+    "Black Spots on the Crosswalk"  doc 1-5T4gwLGDROu3sXt59eXEPLnSxqUnj21ALjuVvI3o2w
+    "Peach Cobbler"                 doc 1G4YQabQySWSNUZMxOLPRn6k43kAYNjowPMgT-KFcg8g
+    "Dead Ants"                     doc 15XlmThncqd8XnEqVGjahIIk_aO02iYLQDhAL3IEsbrE
+  HITL LAYER: inserted padding is marked ins:1; every b / m / why tag is a studio
+  call awaiting the founder's per-word retune. Why-cards are studio craft notes at
+  the 70% voice tier — founder finishes.
+  CHANGELOG:
+    2026-07-06 retune 1 — fair-crash rule; fluff thickened; auto-capitalization.
+    2026-07-06 retune 2 (founder) — MAYBE role added; two-strike engine (plummet
+    then crash); why-cards on load words; fluff thickened again; strike math keeps
+    liftoff reachable after one strike on every piece.
+
+  DIGNITY FLOOR: neither a strike nor a crash is shame — the word was holding the
+  piece up, and now you know it by feel. A dropped word may fly another day.
+
+  FLOORS: single-file, offline, in-memory. NO GREEN. Landing >50% image. 3-stop
+  comfort knob (never a wall). Explicit dark palette. Fixed-dark chips for
+  white-on-color text. 44px+ targets, keyboard on every word (identical aria-labels
+  — roles never leak), visible focus, reduced-motion instant states, scroll-reset,
+  no emoji. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Sandbags — a flash fiction climb</title>
+<style>
+:root{
+  /* ---- LIGHT: DAY (default) — the page's own warm palette ---- */
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --line:#c2b288;
+  --slate:#3a4654; --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
+  --rust:#8a3a1c; --sky:#cdd8e2; --skyhi:#e4ebf1; --focus:#c8900a;
+  /* chrome / panel / rail tokens (Comfort Kernel v2) */
+  --surface:#fffaf0; --surface-2:#efe0c4; --ink-2:#4a3d22;
+  --accent:#3a4654; --accent-strong:#2b3540; --on-accent:#ffffff;
+  --r:12px; --tap:48px; --motion:.18s;
+  --serif:Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+/* ---- LIGHT: DUSK — warmer, dimmer daylight ---- */
+html[data-light="dusk"]{
+  --bg:#e6d4b0; --card:#f0e2c2; --ink:#241a10; --line:#bda67c;
+  --slate:#324150; --gold:#5e3d00; --gold-br:#b07d08; --gold-pale:#e9d5a4;
+  --rust:#7e3418; --sky:#c2ccd6; --skyhi:#d6dee6; --focus:#9c4000;
+  --surface:#f0e2c2; --surface-2:#e2ca9c; --ink-2:#463a20;
+  --accent:#324150; --accent-strong:#26333f; --on-accent:#ffffff;
+}
+/* ---- LIGHT: WARM-DARK (night) — warm charcoal, never pure black ---- */
+html[data-light="night"]{
+  --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --line:#5d543d;
+  --slate:#9ab6c8; --gold:#f0c357; --gold-br:#f0c357; --gold-pale:#2c2614;
+  --rust:#eaa183; --sky:#20242c; --skyhi:#2a2f3a; --focus:#f0c357;
+  --surface:#262019; --surface-2:#33302a; --ink-2:#d8c59a;
+  --accent:#9ab6c8; --accent-strong:#b8cede; --on-accent:#141109;
+}
+/* ---- TOGGLE: high contrast ---- */
+html.se-contrast:not([data-light="night"]){ --bg:#fbfaf7; --card:#fbfaf7; --surface:#fbfaf7; --surface-2:#f0ece2; --ink:#141109; --ink-2:#2c2517; --line:#b9a06a; }
+html.se-contrast[data-light="night"]{ --bg:#0e0d0b; --card:#161410; --surface:#161410; --ink:#fff7e6; --ink-2:#efe0bc; }
+/* ---- TOGGLE: text size A / A+ / A++ ---- */
+html{ font-size:100%; }
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+/* ---- TOGGLE: reduce motion ---- */
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+/* ---- TOGGLE: colorblind cues ---- */
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+*{box-sizing:border-box}
+body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg); color:var(--ink); font-size:19px; line-height:1.55; }
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; z-index:100; }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent-strong); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-strong);
+  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel ═══ */
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 14px); z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink);
+  border:2px solid var(--accent-strong); border-radius:var(--r); padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 8px; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent-strong); color:var(--on-accent); border-color:var(--accent-strong); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent-strong); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--ink); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--line); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+.updated{ font-family:var(--mono); font-size:.78rem; color:var(--ink-2); margin:.6rem 0 0; }
+.wrap{ max-width:760px; margin:0 auto; padding:.8rem .8rem 4rem; }
+.prompt{ text-align:center; font-weight:800; font-size:1.02rem; color:var(--gold); margin:.3rem 0 .5rem; min-height:1.4em; }
+.plate{ background:var(--card); border:3px solid var(--line); border-radius:16px; overflow:hidden; }
+.skybox{ position:relative; background:linear-gradient(var(--skyhi), var(--sky)); height:56dvh; min-height:320px; overflow:hidden; }
+.liftline{ position:absolute; left:0; right:0; top:64px; border-top:3px dashed var(--rust); }
+.liftlabel{ position:absolute; right:8px; top:66px; font:800 .72rem/1 inherit; color:var(--rust); background:var(--card); padding:.15rem .4rem; border-radius:5px; }
+#balloon{ position:absolute; left:50%; bottom:6px; width:140px; margin-left:-70px;
+  transition:transform 1s cubic-bezier(.3,.6,.3,1); }
+#balloon.falling{ transition:transform .6s cubic-bezier(.6,0,.9,.4); }
+@media (prefers-reduced-motion: reduce){ #balloon, #balloon.falling{ transition:none; } }
+.altrow{ position:absolute; left:8px; top:8px; background:#2b3540; color:#fff; font:800 .74rem/1 inherit; padding:.35rem .55rem; border-radius:7px; }
+.srcrow{ position:absolute; left:8px; bottom:8px; background:var(--card); color:var(--ink); font:700 .72rem/1.3 inherit; padding:.3rem .5rem; border-radius:7px; border:2px solid var(--line); max-width:62%; }
+.manifest{ border-top:3px solid var(--line); background:var(--card); padding:.8rem .9rem .6rem; }
+.mtitle{ font:800 .7rem/1 inherit; letter-spacing:.1em; text-transform:uppercase; color:var(--rust); margin:0 0 .35rem; }
+.draft{ font-family:Georgia,'Times New Roman',serif; font-size:1.22rem; line-height:2.5; }
+/* Hit-area ≠ visual: the words stay prose-sized; each tap box grows to the 44px
+   floor in BOTH dimensions via inline-flex min-sizing (short words like "A"/"to"
+   otherwise fail on width). The paint is the word; the target is the thumb's. */
+.w{ display:inline-flex; align-items:center; justify-content:center;
+    min-width:44px; min-height:44px; padding:0 .3em; border-radius:6px; cursor:pointer; }
+.w:hover{ background:var(--gold-pale); }
+.w:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.w.cut{ display:none; }
+.w.strut{ background:#7a2f14; color:#fff; }
+.whycard{ display:none; background:var(--card); border:3px solid #7a2f14; border-radius:12px; padding:.7rem .9rem; margin:.7rem 0 0; font-size:.95rem; }
+.whycard.on{ display:block; }
+.whycard b{ color:var(--rust); }
+.heaprow{ border-top:3px solid var(--line); background:var(--card); padding:.6rem .9rem .8rem; min-height:60px; }
+.htitle{ font:800 .7rem/1 inherit; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin:0 0 .35rem; }
+.scrap{ display:inline-block; font-family:Georgia,serif; font-size:.95rem; background:var(--gold-pale); border:2px solid var(--line); border-radius:4px; padding:.1rem .4rem; margin:.15rem .2rem; transform:rotate(-2deg); }
+.scrap:nth-child(even){ transform:rotate(2.5deg); }
+.scrap.mb{ background:var(--card); border-style:dashed; }
+.none{ font-size:.85rem; opacity:.75; }
+.hint{ font-size:.88rem; margin:.6rem .2rem 0; min-height:1.4em; }
+.btnrow{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem; }
+.go{ background:var(--gold-br); color:#1f1b12; border:2px solid #1f1b12; border-radius:11px; padding:.65rem 1rem; font:800 .95rem/1 inherit; cursor:pointer; min-height:48px; }
+.go:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.go.ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+.after{ display:none; margin-top:1.3rem; }
+.after.on{ display:block; }
+.label{ font:800 .74rem/1 inherit; letter-spacing:.1em; text-transform:uppercase; color:var(--rust); margin:1.2rem 0 .45rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+.final{ font-family:Georgia,serif; font-size:1.25rem; line-height:1.9; background:var(--card); border:3px solid var(--gold-br); border-radius:14px; padding:1rem 1.1rem; }
+.attr{ font-size:.82rem; margin:.5rem .1rem 0; }
+.foot{ margin-top:2rem; font-size:.82rem; border-top:2px solid var(--line); padding-top:.8rem; }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+</style>
+<style>
+/* LAB STATUS BAND - founder ruling 2026-08-27, "put in lab not as done game."
+   New builds carry a .tsp-lab chip inside the h1, beside the version chip. This is
+   a RETROFIT across 19 shipped games whose heading structures have nothing in
+   common: some carry four h1 elements, one builds its title from a JS template, and
+   three have no h1 at all. Rewriting the title markup of nineteen shipped games to
+   add a label is a large blast radius for a label, so the status mounts as its own
+   band instead. Colours are fixed rather than tokenised, because these files do not
+   share a palette and a status that inherits an unknown token can arrive invisible.
+   #f6efe0 on #241a11 is 13.4:1, which clears the studio floor of 7:1 with room. */
+.tsp-labband{
+  display:block; box-sizing:border-box; width:100%;
+  background:#241a11; color:#f6efe0;
+  border-bottom:3px solid #b98c39;
+  padding:9px 16px; margin:0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:18px; line-height:1.35; font-weight:700; letter-spacing:.02em;
+}
+.tsp-labband b{
+  display:inline-block; color:#f3c675;
+  border:2px dashed #f3c675; border-radius:3px;
+  padding:.06em .38em; margin-right:.5em; letter-spacing:.09em;
+}
+@media print{ .tsp-labband{background:#fff; color:#000; border-bottom:2px solid #000;} }
+</style>
+</head>
+<body>
+<p class="tsp-labband"><b>LAB</b>An experiment on the bench, not a finished game.</p>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<div class="foot">
+    <p>Sandbags · Tight Spiral Studios · walshero@gmail.com. Single-file, offline, stores nothing. A strike is never shame — that word was holding the piece up, and now you know it by feel. Excerpts from four pieces by Matt Walsh, used by the author. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.</p>
+    <p class="updated" id="seUpdated"></p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v17 <span style="opacity:.75">75e938c</span></span> </span> </span>
+  </div>
+
+
+<div class="wrap">
+  <p class="prompt" id="prompt">Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.</p>
+
+  <div class="plate">
+    <div class="skybox" aria-hidden="true">
+      <div class="altrow" id="altnum">on the ground</div>
+      <div class="liftline"></div><span class="liftlabel">liftoff</span>
+      <div class="srcrow" id="srcrow"></div>
+      <svg id="balloon" viewBox="0 0 150 200">
+        <title>A cut-paper hot air balloon — CC0, original, Tight Spiral Paper Craft</title>
+        <path d="M75 8 C36 8 18 40 18 72 c0 34 30 52 44 74 h26 c14 -22 44 -40 44 -74 0 -32 -18 -64 -57 -64 z" fill="var(--rust)" stroke="var(--ink)" stroke-width="3"/>
+        <path d="M75 8 c-14 0 -22 32 -22 64 0 34 12 52 18 74 h8 c6 -22 18 -40 18 -74 0 -32 -8 -64 -22 -64 z" fill="var(--gold-br)" stroke="var(--ink)" stroke-width="2"/>
+        <path d="M62 146 l-10 22 M88 146 l10 22 M75 146 v22" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="56" y="168" width="38" height="24" rx="4" fill="var(--gold-pale)" stroke="var(--ink)" stroke-width="2.5"/>
+        <path d="M60 174 h30 M60 180 h30 M60 186 h30" stroke="var(--ink)" stroke-width="1.5" opacity=".5"/>
+        <g><path d="M46 178 q-3 12 5 16 q8 -2 6 -14 z" fill="var(--slate)" stroke="var(--ink)" stroke-width="2"/><line x1="50" y1="178" x2="56" y2="172" stroke="var(--ink)" stroke-width="2"/></g>
+        <g><path d="M104 178 q3 12 -5 16 q-8 -2 -6 -14 z" fill="var(--slate)" stroke="var(--ink)" stroke-width="2"/><line x1="100" y1="178" x2="94" y2="172" stroke="var(--ink)" stroke-width="2"/></g>
+      </svg>
+    </div>
+    <div class="manifest">
+      <p class="mtitle">The cargo manifest — every word is a sandbag; some are holding the piece up</p>
+      <div class="draft" id="draft"></div>
+      <div class="whycard" id="whycard" aria-live="polite"></div>
+      <p class="hint" id="weightline" aria-live="polite"></p>
+    </div>
+    <div class="heaprow">
+      <p class="htitle">The heap — weight this flight didn't need (it may fly another day)</p>
+      <div id="pile"><span class="none">nothing dropped yet</span></div>
+    </div>
+  </div>
+
+  <p class="sr" id="liveStat" aria-live="polite"></p>
+  <div class="btnrow">
+    <button class="go ghost" id="undo" type="button">Put the last word back</button>
+    <button class="go ghost" id="nextPiece" type="button">Try a different piece</button>
+  </div>
+
+  <div class="after" id="after">
+    <div class="label" id="afterLabel">It flew</div>
+    <div class="final" id="finalPiece"></div>
+    <p class="attr" id="attrLine"></p>
+    <div class="btnrow">
+      <button class="go" id="flyNext" type="button">Fly the next piece</button>
+      <button class="go ghost" id="replaySame" type="button">Fly this one again</button>
+    </div>
+  </div>
+
+  
+</div>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <a href="arcade.html" aria-label="Back to the arcade">Back</a>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  window.scrollTo(0,0);
+
+  /* PIECES — verbatim Matt Walsh excerpts.
+     b:1 = ballast (lifts). m:1 = maybe (heap, no lift, no harm).
+     no flag = load-bearing (strike 1 plummet, strike 2 crash).
+     ins:1 = studio-inserted padding (HITL). g:1 = glue, not clickable.
+     why = craft note shown on a strike (70% tier, founder finishes). */
+  var GENWHY="the sentence tears without it.";
+  var PIECES=[
+   { title:"Ramen at Echigo Kawaguchi", by:"Matt Walsh", liftAt:9, w:[
+    {t:"A",b:1},{t:"heavy",b:1},{t:"rain",why:"the piece opens and closes on rain — cut the first one and the ending loses its echo."},{t:"fell"},{t:",",g:1},{t:"and"},{t:"the"},{t:"villagers"},{t:"slowly",b:1,ins:1},{t:"opened"},{t:"their"},{t:"umbrellas"},{t:".",g:1},
+    {t:"The"},{t:"rainstorm"},{t:"completely",b:1,ins:1},{t:"consumed"},{t:"me",why:"the storm has to swallow HIM — that is the whole emotional weather."},{t:",",g:1},{t:"but"},{t:"I"},{t:"just",b:1},{t:"stood"},{t:"there",m:1},{t:".",g:1},
+    {t:"I"},{t:"quickly",b:1,ins:1},{t:"ran"},{t:"to"},{t:"a"},{t:"small",b:1,ins:1},{t:"noodle"},{t:"shop"},{t:"with"},{t:"big",b:1,ins:1},{t:"bowls"},{t:"of"},{t:"plastic",why:"the whole image — fake ramen in the window, real hunger at the counter. Cut it and it is just a restaurant."},{t:"ramen"},{t:"in"},{t:"the"},{t:"window"},{t:".",g:1},
+    {t:"I"},{t:"sat"},{t:"down",b:1,ins:1},{t:"at"},{t:"the"},{t:"counter"},{t:"with"},{t:"all",b:1,ins:1},{t:"the"},{t:"other",b:1},{t:"salarymen",why:"one word does the whole scene's sociology — a stranger folded in among the regulars."},{t:".",g:1},
+    {t:"We"},{t:"slurped"},{t:"our",m:1},{t:"noodles"},{t:"together",b:1},{t:"without",why:"the comfort is the silence — 'without talking' is the mercy of the scene."},{t:"talking"},{t:"and"},{t:"just",b:1,ins:1},{t:"listened"},{t:"quietly",b:1,ins:1},{t:"to"},{t:"the"},{t:"rain",why:"the piece ends on the sound it opened with. This word is the landing."},{t:".",g:1} ]},
+   { title:"Black Spots on the Crosswalk", by:"Matt Walsh", liftAt:7, w:[
+    {t:"My",m:1},{t:"father",why:"the piece is a transaction between a child and this one man. He has to be named."},{t:"slowly",b:1,ins:1},{t:"reached"},{t:"out",b:1,ins:1},{t:"for"},{t:"my"},{t:"hand",why:"the entire piece is about whether to take it."},{t:"as"},{t:"we"},{t:"stepped"},{t:"right",b:1,ins:1},{t:"to"},{t:"the"},{t:"very",b:1,ins:1},{t:"edge"},{t:"of"},{t:"the"},{t:"curb",why:"the edge the whole piece stands on — one step from the crosswalk and its black spots."},{t:",",g:1},
+    {t:"though"},{t:"I"},{t:"just",b:1,ins:1},{t:"thought"},{t:"I"},{t:"was"},{t:"probably",b:1,ins:1},{t:"old"},{t:"enough"},{t:"that"},{t:"perhaps",b:1},{t:"I"},{t:"didn't"},{t:"really",b:1,ins:1},{t:"need"},{t:"to"},{t:".",g:1},
+    {t:"\u201CWhat"},{t:"are"},{t:"those",m:1},{t:"black",why:"the title lives here. The spots have to be black."},{t:"spots"},{t:"on"},{t:"the"},{t:"crosswalk?\u201D"},{t:"I"},{t:"asked"},{t:"him",b:1},{t:"quietly",b:1,ins:1},{t:".",g:1},
+    {t:"They"},{t:"were"},{t:"quarter"},{t:"and"},{t:"half-dollar"},{t:"sized"},{t:",",g:1},{t:"faceless",why:"the horror is the blankness. 'Faceless' is why the child gasps."},{t:".",g:1} ]},
+   { title:"Peach Cobbler", by:"Matt Walsh", liftAt:8, w:[
+    {t:"We"},{t:"talked"},{t:"about"},{t:"moving"},{t:"again",b:1,ins:1},{t:".",g:1},
+    {t:"My"},{t:"wife"},{t:"even",b:1,ins:1},{t:"made"},{t:"me"},{t:"sleep"},{t:"down",b:1,ins:1},{t:"by"},{t:"the"},{t:"cellar",why:"the funny-sad specific — he guards the one door the neighbors keep coming through."},{t:"door"},{t:".",g:1},
+    {t:"The"},{t:"kids"},{t:"wanted"},{t:"their",m:1},{t:"toys"},{t:"back",b:1},{t:",",g:1},{t:"but"},{t:"the"},{t:"hives",why:"the body keeping score — the conflict has broken out on his skin."},{t:"on"},{t:"my"},{t:"hands"},{t:"only",b:1,ins:1},{t:"got"},{t:"much",b:1,ins:1},{t:"worse"},{t:"when"},{t:"I"},{t:"really",b:1,ins:1},{t:"thought"},{t:"about"},{t:"actually",b:1,ins:1},{t:"going"},{t:"over"},{t:".",g:1},
+    {t:"I"},{t:"simply",b:1,ins:1},{t:"prayed"},{t:"about"},{t:"it"},{t:".",g:1},{t:"I"},{t:"meditated"},{t:"quietly",b:1,ins:1},{t:".",g:1},{t:"I"},{t:"read"},{t:"a"},{t:"whole",b:1,ins:1},{t:"book"},{t:"on"},{t:"conflict"},{t:"resolution"},{t:".",g:1},
+    {t:"In"},{t:"the"},{t:"end"},{t:",",g:1},{t:"I"},{t:"finally",b:1,ins:1},{t:"baked"},{t:"a"},{t:"peach",why:"it is not a cobbler. It is a PEACH cobbler. The specific is the peace offering."},{t:"cobbler"},{t:",",g:1},{t:"and"},{t:"walked"},{t:"it"},{t:"over"},{t:"myself",why:"the entire piece walks to the neighbor's door on this one word."},{t:".",g:1} ]},
+   { title:"Dead Ants", by:"Matt Walsh", liftAt:7, w:[
+    {t:"We"},{t:"were"},{t:"just",b:1,ins:1},{t:"standing"},{t:"around",b:1,ins:1},{t:"by"},{t:"the"},{t:"old",b:1,ins:1},{t:"payphones"},{t:"across"},{t:"from"},{t:"Sparr's",why:"the real name makes the memory real. Proper nouns are load-bearing in memoir."},{t:",",g:1},{t:"patiently",b:1,ins:1},{t:"waiting"},{t:"for"},{t:"the"},{t:"39"},{t:"bus"},{t:".",g:1},
+    {t:"An"},{t:"ant",why:"the smallest life in the piece carries the biggest promise."},{t:"right",b:1,ins:1},{t:"on"},{t:"the"},{t:"sidewalk"},{t:",",g:1},{t:"and"},{t:"you"},{t:"suddenly",b:1,ins:1},{t:"stepped"},{t:"without",why:"the promise breaks 'without thinking' — thoughtlessness, not cruelty, is the story."},{t:"thinking"},{t:",",g:1},
+    {t:"slid"},{t:"your",m:1},{t:"sneaker"},{t:"quickly",b:1,ins:1},{t:"across"},{t:"the"},{t:"pavement"},{t:"and"},{t:"completely",b:1,ins:1},{t:"smeared"},{t:"it"},{t:"from"},{t:"existence",why:"bigger than 'killed it' — the word carries the drunk-philosophical promise it breaks."},{t:",",g:1},
+    {t:"and"},{t:"then",b:1},{t:"you"},{t:"slowly",b:1,ins:1},{t:"looked"},{t:"at"},{t:"me"},{t:"to"},{t:"see"},{t:"if"},{t:"I"},{t:"had"},{t:"seen",why:"the piece ends on being witnessed — the look back is the confession."},{t:".",g:1} ]}
+  ];
+
+  var pi=0, W=[], cut=[], lifted=false, crashed=false, strikes=0;
+  var STRIKE_COST=3;
+
+  function cap(t){ return t.charAt(0).toUpperCase()+t.slice(1); }
+  function sentenceStarts(){
+    var starts=[], ns=true;
+    W.forEach(function(w){
+      if(w.g){ starts.push(false); if(/[.?!]/.test(w.t)) ns=true; return; }
+      if(w.cutNow){ starts.push(false); return; }
+      starts.push(ns); ns=false;
+    });
+    return starts;
+  }
+
+  function loadPiece(i){
+    pi=i%PIECES.length;
+    W=PIECES[pi].w.map(function(x){ return {t:x.t, b:!!x.b, m:!!x.m, g:!!x.g, why:x.why||null, cutNow:false, struck:false}; });
+    cut=[]; lifted=false; crashed=false; strikes=0;
+    $('after').classList.remove('on');
+    $('whycard').classList.remove('on');
+    $('balloon').classList.remove('falling');
+    $('srcrow').textContent='from \u201C'+PIECES[pi].title+'\u201D \u00B7 '+PIECES[pi].by;
+    $('prompt').textContent='Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.';
+    render(); altitude(false);
+  }
+
+  function render(){
+    var box=$('draft'); box.innerHTML='';
+    var caps=sentenceStarts();
+    W.forEach(function(w,i){
+      var sp=document.createElement('span');
+      if(w.g){ sp.textContent=w.t; box.appendChild(sp); return; }
+      sp.className='w'+(w.cutNow?' cut':'')+(w.struck?' strut':'');
+      sp.textContent=' '+(caps[i]?cap(w.t):w.t);
+      if(!w.cutNow && !crashed && !lifted){
+        sp.tabIndex=0; sp.setAttribute('role','button');
+        sp.setAttribute('aria-label','drop the word '+w.t);
+        sp.addEventListener('click',function(){ tapWord(i); });
+        sp.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tapWord(i);} });
+      }
+      box.appendChild(sp);
+    });
+    var p=$('pile'); p.innerHTML='';
+    if(!cut.length){ p.innerHTML='<span class="none">nothing dropped yet</span>'; }
+    else cut.forEach(function(i){ var s=document.createElement('span'); s.className='scrap'+(W[i].m?' mb':''); s.textContent=W[i].t; p.appendChild(s); });
+  }
+
+  function lift(){ return Math.max(0, cut.filter(function(i){return W[i].b;}).length - strikes*STRIKE_COST); }
+
+  function tapWord(i){
+    if(crashed||lifted) return;
+    var w=W[i];
+    if(w.b){
+      w.cutNow=true; cut.push(i);
+      $('whycard').classList.remove('on');
+      render(); altitude(false);
+    } else if(w.m){
+      w.cutNow=true; cut.push(i);
+      $('whycard').classList.remove('on');
+      render(); altitude(false);
+      $('weightline').textContent='\u201C'+w.t+'\u201D was a maybe \u2014 the piece survives either way. It fell to the heap, but nothing got lighter.';
+      $('liveStat').textContent='Dropped the maybe word '+w.t+'. No lift, no harm.';
+    } else {
+      strikes++;
+      w.struck=true;
+      showWhy(w);
+      if(strikes>=2){ crash(w); } else { plummet(w); }
+    }
+  }
+
+  function showWhy(w){
+    var card=$('whycard');
+    card.innerHTML='<b>\u201C'+w.t+'\u201D is a strut.</b> '+(w.why||GENWHY);
+    card.classList.add('on');
+  }
+
+  function plummet(w){
+    $('balloon').classList.add('falling');
+    render(); altitude(true);
+    setTimeout(function(){ $('balloon').classList.remove('falling'); },700);
+    $('prompt').textContent='It plummets \u2014 but holds. That word stays. One more tear and it crashes.';
+    $('weightline').textContent='You lost altitude. Climb again \u2014 carefully.';
+    $('liveStat').textContent='Strike. The word '+w.t+' was load-bearing. The balloon dropped hard but holds.';
+  }
+
+  function altitude(falling){
+    var need=PIECES[pi].liftAt, n=lift(), frac=Math.min(n/need,1.12);
+    $('balloon').style.transform='translateY('+(-frac*200)+'px)'+(falling?' rotate(-6deg)':'');
+    $('altnum').textContent = (crashed?'CRASH':(frac>=1?'LIFTOFF':(n===0?(strikes>0?'back on the ground':'on the ground'):'rising \u2014 '+n+' of '+need+' bags')));
+    if(!crashed && !$('whycard').classList.contains('on')){
+      $('weightline').textContent = frac>=1 ? 'It flies. The heap below is the proof of the climb.'
+        : (n>0 ? 'Lighter \u2014 but every next cut is riskier.' : 'Every word looks the same. Some are holding the piece up.');
+    }
+    $('liveStat').textContent='Lift '+n+' of '+need+'. '+(frac>=1?'Liftoff.':'');
+    if(frac>=1 && !lifted && !crashed){ lifted=true; liftoffReveal(); }
+  }
+
+  function crash(w){
+    crashed=true;
+    $('balloon').classList.add('falling');
+    $('balloon').style.transform='translateY(14px) rotate(-9deg)';
+    $('altnum').textContent='CRASH';
+    $('prompt').textContent='Down it comes. Two tears is more than the meaning can hold.';
+    $('weightline').textContent='Now you know two struts by feel. That is not a loss \u2014 that is the lesson.';
+    $('liveStat').textContent='Crash. The word '+w.t+' was load-bearing.';
+    $('afterLabel').textContent='It crashed \u2014 the words that were holding it up';
+    var struck=W.filter(function(x){return x.struck;}).map(function(x){return '\u201C'+x.t+'\u201D';}).join(' and ');
+    $('finalPiece').textContent=struck+' \u2014 they looked like sandbags. They were struts. A crash is never shame; the next flight starts lighter in the head.';
+    $('attrLine').textContent='from \u201C'+PIECES[pi].title+'\u201D \u00B7 '+PIECES[pi].by;
+    $('after').classList.add('on');
+    render();
+  }
+
+  function liftoffReveal(){
+    var caps=sentenceStarts();
+    var text=W.map(function(w,i){ return w.cutNow?'':((w.g?'':' ')+(caps[i]?cap(w.t):w.t)); }).join('').trim();
+    $('prompt').textContent='Liftoff. The lean piece was inside the whole time.';
+    $('afterLabel').textContent='It flew \u2014 the piece that was inside';
+    $('finalPiece').textContent=text;
+    $('attrLine').textContent='from \u201C'+PIECES[pi].title+'\u201D \u00B7 '+PIECES[pi].by+' \u00B7 '+(strikes===0?'a clean climb \u2014 no torn meaning.':'it flew even after a strike \u2014 that is revision.');
+    $('after').classList.add('on');
+  }
+
+  $('undo').addEventListener('click',function(){
+    if(!cut.length||crashed) return;
+    var i=cut.pop(); W[i].cutNow=false;
+    if(lifted){ lifted=false; $('after').classList.remove('on'); }
+    $('whycard').classList.remove('on');
+    render(); altitude(false);
+  });
+  $('nextPiece').addEventListener('click',function(){ loadPiece(pi+1); });
+  $('flyNext').addEventListener('click',function(){ loadPiece(pi+1); window.scrollTo(0,0); });
+  $('replaySame').addEventListener('click',function(){ loadPiece(pi); window.scrollTo(0,0); });
+
+  loadPiece(0);
+})();
+</script>
+
+<!-- STUDIO EYES controller (Comfort Kernel v2) -->
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  // last-updated: computed, not typed
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var dt=new Date(document.lastModified);
+    u.textContent = isNaN(dt.getTime()) ? 'Last updated recently'
+      : 'Last updated '+dt.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+</body>
+</html>
