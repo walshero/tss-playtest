@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<!--
+  THE ALEPH — every room at once. Tight Spiral Studios · walshero@gmail.com
+  Playtest status board for the whole studio, derived from the 2026-08-01 fleet
+  playtest (playtest-final.json: 69 pages, plus reading-the-fireground.html, fixed
+  and re-verified outside the batches — 70 rows). One row per page, four sections:
+  fixed-and-re-verified, flagged, minors only, clean. Status is computed from the
+  playtest record, not remembered.
+  Comfort Kernel v2 mount copied from studio/props-room.html (reference mount):
+  reserved chrome, Studio Eyes panel, day/dusk/night token remaps, Back+Home rail,
+  computed last-updated stamp. Single file, offline, no storage, no emoji.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Aleph &mdash; every room at once</title>
+<style>
+/* ---- LIGHT: DAY (default) — the page's own palette ---- */
+:root{ color-scheme: light;
+  --bg:#f3ead8; --surface:#fffaf0; --surface-2:#efe3c6;
+  --ink:#1f1b12; --ink-2:#4a4028;
+  --line:#c2b288;
+  --accent:#3a4654; --accent-dark:#2b3540; --on-accent:#ffffff;
+  --gold:#6e4700; --gold-pale:#fbeec6; --gold-br:#c8900a;
+  --focus:#8f3f00; --tap:48px;
+  --serif:Georgia,serif; --sans:system-ui,-apple-system,'Segoe UI',sans-serif; --mono:ui-monospace,Consolas,monospace;
+  --motion:.18s; }
+/* ---- LIGHT: DUSK ---- */
+html[data-light="dusk"]{
+  --bg:#e9dfc9; --surface:#f1e7d0; --surface-2:#dfd0ac;
+  --ink:#241d10; --ink-2:#4a3e22;
+  --line:#b8a478;
+  --accent:#33404e; --accent-dark:#26313d; --on-accent:#ffffff;
+  --gold:#5f3d00; --gold-pale:#f0e0b4; --gold-br:#8a5f00;
+  --focus:#8a3c00; }
+/* ---- LIGHT: WARM-DARK (night — warm charcoal, never pure black) ---- */
+html[data-light="night"]{ color-scheme: dark;
+  --bg:#1c1a16; --surface:#26231d; --surface-2:#343026;
+  --ink:#f3e4c0; --ink-2:#d8c59a;
+  --line:#5e553e;
+  --accent:#8fa6bd; --accent-dark:#9fb6cd; --on-accent:#141109;
+  --gold:#f0c357; --gold-pale:#332c1a; --gold-br:#8a6a20;
+  --focus:#f0c357; }
+/* ---- TOGGLE: high contrast (halation floor) ---- */
+html.se-contrast:not([data-light="night"]){ --bg:#fbfaf7; --surface:#fbfaf7; --surface-2:#f0ece2; --ink:#141109; --ink-2:#2c2517; --line:#a89058; --accent:#243240; --accent-dark:#1a2530; --gold:#513400; --gold-pale:#f6ecd0; }
+html.se-contrast[data-light="night"]{ --bg:#0e0d0b; --surface:#161410; --surface-2:#242018; --ink:#fff7e6; --ink-2:#efe0bc; --accent:#a8bdd2; --accent-dark:#b9cbe0; }
+/* ---- TOGGLE: text size A / A+ / A++ ---- */
+html{ font-size:100%; }
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+/* ---- TOGGLE: reduce motion ---- */
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+/* ---- TOGGLE: colorblind cues ---- */
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+*{box-sizing:border-box;} html,body{margin:0;}
+body{ font-family:var(--serif); background:var(--bg); color:var(--ink); line-height:1.55; font-size:19px;
+  transition:background var(--motion) ease, color var(--motion) ease; }
+
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; z-index:100; }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent-dark); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-dark);
+  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 14px); z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink);
+  border:2px solid var(--accent-dark); border-radius:10px; padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 8px; border:none; padding:0; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent-dark); color:var(--on-accent); border-color:var(--accent-dark); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent-dark); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--accent-dark); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* ═══ CONTENT ═══ */
+.wrap{ max-width:860px; margin:0 auto; padding:1.2rem 1rem 2rem; }
+h1{ font-size:1.55rem; color:var(--ink); margin:.2rem 0 .2rem; }
+.sub{ font-family:var(--sans); font-size:.96rem; font-style:italic; margin:0 0 .4rem; }
+.updated{ font-family:var(--mono); font-size:.72rem; color:var(--ink-2); margin:0 0 1.2rem; display:flex; align-items:center; gap:7px; }
+.updated::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--accent); flex:0 0 auto; }
+h2{ font-size:1.25rem; color:var(--ink); margin:1.6rem 0 .3rem; border-bottom:3px solid var(--accent); padding-bottom:.3rem; }
+p{ margin:0 0 .9rem; } .lead{ font-size:1.05rem; }
+.why{ background:var(--gold-pale); border:2px solid var(--gold-br); border-radius:11px; padding:.8rem 1rem; font-family:var(--sans); font-size:.92rem; margin:.8rem 0 1.2rem; }
+
+/* ═══ THE BOARD — one row per page, big tap targets ═══ */
+.board{ list-style:none; margin:.4rem 0 0; padding:0; }
+.row{ display:flex; align-items:center; gap:12px; min-height:64px; padding:10px 8px;
+  border-bottom:1.5px solid var(--line); }
+.row-main{ flex:1 1 auto; min-width:180px; display:flex; flex-direction:column; gap:2px; }
+.row-link{ font-family:var(--sans); font-weight:700; font-size:1.08rem; color:var(--ink);
+  text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--accent);
+  display:inline-flex; align-items:center; min-height:32px; width:fit-content; }
+.row-link:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.row-bugs{ font-family:var(--sans); font-size:.86rem; color:var(--ink-2); }
+.kind{ flex:0 0 auto; font-family:var(--mono); font-weight:700; font-size:11.5px; letter-spacing:.06em;
+  text-transform:uppercase; color:var(--ink); border:1.5px solid var(--line); border-radius:7px;
+  background:var(--surface-2); padding:5px 9px; }
+/* status chips: same solid background everywhere — shape + word carry the meaning, never color */
+.chip{ flex:0 0 auto; display:inline-flex; align-items:center; gap:8px; min-height:var(--tap); min-width:118px;
+  justify-content:center; padding:8px 12px; border-radius:8px; background:var(--accent-dark);
+  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; }
+.chip::before{ content:""; flex:0 0 auto; width:12px; height:12px; background:currentColor; }
+.chip-fixed::before{ }                                        /* filled square */
+.chip-flagged::before{ transform:rotate(45deg); }             /* filled diamond */
+.chip-minors::before{ border-radius:50%; }                    /* filled circle */
+.chip-clean::before{ background:transparent; border:2.5px solid currentColor; } /* open square */
+@media (max-width:640px){
+  .row{ flex-wrap:wrap; }
+  .chip{ min-width:104px; }
+}
+
+/* ═══ OPEN section ═══ */
+.open-list{ list-style:none; margin:.4rem 0 0; padding:0; font-family:var(--sans); }
+.open-list li{ display:flex; align-items:baseline; gap:10px; min-height:var(--tap); padding:10px 8px;
+  border-bottom:1.5px solid var(--line); }
+.open-list li::before{ content:""; align-self:center; flex:0 0 auto; width:11px; height:11px;
+  border:2.5px solid var(--accent-dark); background:transparent; }
+
+.foot{ margin-top:1.8rem; padding:1rem; background:var(--accent); color:var(--on-accent); border-radius:12px; font-family:var(--sans); font-size:.8rem; }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--line); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+@media (max-width:520px){ body{font-size:18px;} h1{font-size:1.4rem;} .wrap{padding:1rem .8rem 2rem;} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important;} }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+
+
+<div class="wrap">
+  <h1>The Aleph</h1>
+  <p class="sub">Every room at once.</p>
+  <p class="updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v3 <span style="opacity:.75">bbeae15</span></span> </span> </span>
+
+  <p class="lead">This is the point from which every room in the studio is visible &mdash; playtested by the fleet, 2026-08-01.</p>
+  <div class="why"><b>How to read the board:</b> one row per page. The chip carries the status by shape and word, never by color: filled square = fixed and re-verified, diamond = flagged, circle = minors only, open square = clean. Seventy rooms, four piles.</div>
+
+  <h2 id="sec-fixed">Fixed and re-verified &mdash; 26</h2>
+  <ul class="board" aria-label="Fixed and re-verified pages">
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="choose-your-leader-v5-b.html">choose-your-leader-v5-b</a>
+      <span class="row-bugs">1 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="choose-your-leader-v5-slice.html">choose-your-leader-v5-slice</a>
+      <span class="row-bugs">2 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="cliche-cabinet.html">cliche-cabinet</a>
+      <span class="row-bugs">1 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="cliche-cowpaths.html">cliche-cowpaths</a>
+      <span class="row-bugs">1 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="dad-energy.html">dad-energy</a>
+      <span class="row-bugs">2 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="fathom-TRUNK-v01-2026-07-26.html">fathom-TRUNK-v01-2026-07-26</a>
+      <span class="row-bugs">1 blocker fixed, 2 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="funny-boneys-factory.html">funny-boneys-factory</a>
+      <span class="row-bugs">1 major fixed, 3 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="islo-hub.html">islo-hub</a>
+      <span class="row-bugs">1 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="leeder-intake.html">leeder-intake</a>
+      <span class="row-bugs">1 major fixed, 3 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="old-problems-at-new-speed.html">old-problems-at-new-speed</a>
+      <span class="row-bugs">4 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="play-the-semester-flash.html">play-the-semester-flash</a>
+      <span class="row-bugs">2 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="reading-the-fireground.html">reading-the-fireground</a>
+      <span class="row-bugs">1 blocker fixed (would not open &mdash; screen-select rebuilt), 0 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="soundings-TRUNK-v03-2026-07-26.html">soundings-TRUNK-v03-2026-07-26</a>
+      <span class="row-bugs">1 blocker fixed, 1 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/convergence-card-engine.html">studio/convergence-card-engine</a>
+      <span class="row-bugs">1 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/en195-playtest-instructions.html">studio/en195-playtest-instructions</a>
+      <span class="row-bugs">1 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/funny-boneys-oops.html">studio/funny-boneys-oops</a>
+      <span class="row-bugs">2 major fixed</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/group-foreman.html">studio/group-foreman</a>
+      <span class="row-bugs">1 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/massbay-hub.html">studio/massbay-hub</a>
+      <span class="row-bugs">1 blocker fixed, 5 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/play-the-studio.html">studio/play-the-studio</a>
+      <span class="row-bugs">1 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/play-tight-spiral.html">studio/play-tight-spiral</a>
+      <span class="row-bugs">2 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/recursion-ledger.html">studio/recursion-ledger</a>
+      <span class="row-bugs">1 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="the-slip.html">the-slip</a>
+      <span class="row-bugs">1 blocker fixed, 2 major fixed, 1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="tsp-spiral-studio.html">tsp-spiral-studio</a>
+      <span class="row-bugs">1 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="weekend-concierge.html">weekend-concierge</a>
+      <span class="row-bugs">1 blocker fixed, 1 major fixed &middot; absent from repo</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="writerly-moves-deck.html">writerly-moves-deck</a>
+      <span class="row-bugs">1 blocker fixed, 3 minor open &middot; absent from repo</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="your-rp-world.html">your-rp-world</a>
+      <span class="row-bugs">2 major fixed, 2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-fixed">FIXED</span>
+  </li>
+  </ul>
+
+  <h2 id="sec-flagged">Flagged &mdash; 1</h2>
+  <ul class="board" aria-label="Flagged pages">
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="confluence-TRUNK.html">confluence-TRUNK</a>
+      <span class="row-bugs">1 major open &middot; Confluence lane owns this file</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-flagged">FLAGGED</span>
+  </li>
+  </ul>
+
+  <h2 id="sec-minors">Minors only &mdash; 38</h2>
+  <ul class="board" aria-label="Minors only pages">
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="arcade.html">arcade</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="behind-this-door.html">behind-this-door</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="choose-your-leader-nixon-slice.html">choose-your-leader-nixon-slice</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="choose-your-leader-v5.html">choose-your-leader-v5</a>
+      <span class="row-bugs">4 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="choose-your-leader-v6.html">choose-your-leader-v6</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="cliche-city.html">cliche-city</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="cliche-field.html">cliche-field</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="cliche-line.html">cliche-line</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="comfort-control.html">comfort-control</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="confluence-massbay-assessment.html">confluence-massbay-assessment</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="course-river.html">course-river</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="en195-what-counts-now.html">en195-what-counts-now</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="en195.html">en195</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="flash-ballast.html">flash-ballast</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="fys_fys-treasure-trove.html">fys_fys-treasure-trove</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="how-an-idea-travels.html">how-an-idea-travels</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="motion-specimen.html">motion-specimen</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="play-the-semester.html">play-the-semester</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="review-bench.html">review-bench</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="sticker-price.html">sticker-price</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/assignment-auditor.html">studio/assignment-auditor</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/confluence-console.html">studio/confluence-console</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/dark-stop-lab.html">studio/dark-stop-lab</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/elves-house.html">studio/elves-house</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/flash-compression-game-intake.html">studio/flash-compression-game-intake</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/laughter-foundry-spec-and-log.html">studio/laughter-foundry-spec-and-log</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/legibility-optimizer.html">studio/legibility-optimizer</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/network-strategy-spec.html">studio/network-strategy-spec</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/open-house-strategic-plan.html">studio/open-house-strategic-plan</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/palette-chooser.html">studio/palette-chooser</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/paper-craft-ceiling.html">studio/paper-craft-ceiling</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">doc</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/props-room.html">studio/props-room</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/provenance-ledger.html">studio/provenance-ledger</a>
+      <span class="row-bugs">3 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/studio-intake.html">studio/studio-intake</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="table-four.html">table-four</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="the-console.html">the-console</a>
+      <span class="row-bugs">2 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="the-viscosity.html">the-viscosity</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="tsp-opportunity-bridge.html">tsp-opportunity-bridge</a>
+      <span class="row-bugs">1 minor open</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-minors">MINORS</span>
+  </li>
+  </ul>
+
+  <h2 id="sec-clean">Clean &mdash; 5</h2>
+  <ul class="board" aria-label="Clean pages">
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="advantage-intake.html">advantage-intake</a>
+      <span class="row-bugs">no bugs</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-clean">CLEAN</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="en195-hub.html">en195-hub</a>
+      <span class="row-bugs">no bugs</span>
+    </div>
+    <span class="kind">hub</span>
+    <span class="chip chip-clean">CLEAN</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="en195-last-week.html">en195-last-week</a>
+      <span class="row-bugs">no bugs</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-clean">CLEAN</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="sandbags.html">sandbags</a>
+      <span class="row-bugs">no bugs</span>
+    </div>
+    <span class="kind">game</span>
+    <span class="chip chip-clean">CLEAN</span>
+  </li>
+  <li class="row">
+    <div class="row-main">
+      <a class="row-link" href="studio/founder-compass.html">studio/founder-compass</a>
+      <span class="row-bugs">no bugs</span>
+    </div>
+    <span class="kind">tool</span>
+    <span class="chip chip-clean">CLEAN</span>
+  </li>
+  </ul>
+
+  <h2 id="sec-open">Open &mdash; what the board can't close</h2>
+  <ul class="open-list">
+    <li>Five pages are absent from the repo and await shelf reconciliation: fathom-TRUNK, soundings-TRUNK, the-slip, weekend-concierge, writerly-moves-deck.</li>
+    <li>confluence-TRUNK.html is routed to the Confluence lane &mdash; that project owns the file; this board only reads it.</li>
+    <li>113 minors are logged in FUNES-PLAYTEST-2026-08-01.md.</li>
+    <li>The iSLO suite got its own post-merge Funes playtest on 2026-08-03 (11 alephs, one per page): one night-mode contrast regression and seven correctness/integrity defects fixed, minor residuals logged in FUNES-PLAYTEST-2026-08-03.md.</li>
+  </ul>
+
+  <div class="foot">Tight Spiral Studios &middot; walshero@gmail.com &mdash; The Aleph, playtest status board. Status is computed from playtest-final.json (69 pages + reading-the-fireground, whose fix re-verified 48/48 outside the batches; 70 rows, 52 fix/verify records), not remembered. Comfort Kernel v2 mounted from the Props Room reference. Single file, offline, no storage.</div>
+</div>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  // last-updated: computed, not typed
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+</body>
+</html>
