@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="only light">
+<title>Funny Boney's Factory</title>
+<!--
+  FUNNY BONEY'S FACTORY  ·  Tight Spiral Productions  ·  v3 (playable)
+  Play. Notice. Design.
+
+  Single file. Offline. No network. No data leaves this page.
+  Built against: funny-boneys-factory-spec.md v2 + tight-spiral-visual-constitution.md
+  This v3 moves the ship gate: playable second screen + beauty + joy, per founder voice ruling 2026-07-06.
+
+  Four car-rulings baked in (founder voice session 2026-07-06):
+   1. INVERT THE STACK  — play/silliness on top, the real-world system underneath (Glass Engine ring).
+   2. EPISTEMIC TOGGLE  — Spellcaster / Coder / Storyteller: one engine, three lenses. A screen, not three builds.
+   3. FAILURE IS DIAGNOSTIC — a flat gag is not "oops," it is information about the audience.
+   4. ADAPTIVE POLLING (the buried thesis) — bad polling gives garbage; adaptive polling gives real signal;
+      real signal lets you design better. Calibration = the COMPUTED gap between predicted and surveyed laughs.
+
+  Floors (constitution): no emoji ever · accessibility is a floor not a wall · comfort is a knob not a gate ·
+  scene-first opening · >50% visual, never a text wall · computed calibration, never self-report.
+  Humor is culturally situated: the audience you poll changes what lands. That is taught, not hidden.
+
+  CHANGELOG
+   v6  2026-07-19  COLD-OPEN REBUILD (founder eye: "fails splash. no text or minimal").
+                  The old opening was a wide 2.26:1 strip carrying a four-line
+                  instruction paragraph in an OPAQUE headline box. On a phone the
+                  strip collapsed to a ~160px band and the box painted over the whole
+                  scene: the first screen was a wall of text and the machine was
+                  invisible. Studio Eyes waved it through - it measures contrast, not
+                  whether a splash is a picture or a paragraph. Fix: the scene is now
+                  a near-square (760x680) WORDLESS poster that fills the phone with
+                  the machine and holds one lean line - "Make the cat laugh." The
+                  paragraph is gone; the "How this plays" panel already carries it.
+                  Image first, words last, per constitution s7 (50% text) + s7.1
+                  (splash fills the first screen, idea above the fold).
+   v5  2026-07-18  NAV FLOOR. Added standing HOME control (bottom-left, mirrors
+                  the Comfort corner bottom-right). Was BACK-only -> HALT under the
+                  founder nav rule (2026-07-16, the Barcelona-v2 miss). Home hidden
+                  only on the scene (no-op there); shown on bench/how/result. The
+                  contrast gate could not catch this - it has no idea a product has
+                  screens. That is why the nav_floor tooth now ships in the gate.
+   v4  2026-07-13  TOKEN-ROLE LAW. Split --lens (decoration) from --lens-ink (text).
+                  Gate HALTed v3: one token painted both SVG fills and link text.
+                  Arithmetic caught what three eye-checks missed. 0-HALT.
+   v3  2026-07-06  First playable. Core loop fires: BUILD -> SHOW -> POLL -> SEE THE GAP -> RECALIBRATE.
+                  Epistemic toggle live. Glass Engine ring live. Comfort knobs live (three real stops).
+-->
+<style>
+  /* ---- palette: arcade dark-stop B (default), green-free, high-lumen ---- */
+  :root{
+    --bg:#10151c;         /* control-room slate */
+    --surface:#182230;
+    --surface-2:#1f2c3d;
+    --ink:#f2f6fb;        /* 16:1 on --bg */
+    --ink-soft:#b7c4d4;
+    --line:#33465e;
+    --amber:#ffb347;      /* arcade accent */
+    --amber-deep:#e08a1e;
+    --violet:#b98cff;     /* spellcaster lens */
+    --cyan:#5fd0e6;       /* coder lens */
+    --rose:#ff8fa8;       /* storyteller lens */
+    --lens:var(--amber);      /* DECORATION ONLY: borders, fills, dots, glows */
+    --lens-ink:var(--amber);  /* TEXT ONLY: contrast-guaranteed twin, set by JS */
+    --good:#7fe3a4;       /* signal-clean (not structural green; used only as data ink) */
+    --flat:#8899ac;       /* a flat gag: honest grey, never punishing red */
+    --paper-sep:0;        /* comfort stop marker, for the sweep */
+    --r:14px;
+    --tap:48px;
+    --accent:var(--amber); --accent-strong:var(--amber-deep); --on-accent:#10151c; --focus:var(--amber);
+    --shadow:0 8px 30px rgba(0,0,0,.45);
+    --font: ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  /* ═══ STUDIO EYES — LIGHT remaps on html[data-light], on THIS page's tokens ═══
+     Default (day) keeps the native arcade palette above. Dusk warms and lifts it;
+     Warm-dark is a warm charcoal (never pure black). Every text stays >=4.5:1. */
+  html[data-light="dusk"]{
+    --bg:#1a1410; --surface:#241c14; --surface-2:#2f2519; --line:#4a3d2a;
+    --ink:#f6efe0; --ink-soft:#d7c9b2;
+    --amber:#ffbe5c; --amber-deep:#e89530;
+    --accent:#ffbe5c; --accent-strong:#e89530; --on-accent:#1a1410; --focus:#ffbe5c;
+  }
+  html[data-light="night"]{
+    --bg:#16150f; --surface:#1e1c14; --surface-2:#2a271c; --line:#443f30;
+    --ink:#f4ede0; --ink-soft:#d8ccb6;
+    --amber:#ffca6a; --amber-deep:#eea23c;
+    --accent:#ffca6a; --accent-strong:#eea23c; --on-accent:#16150f; --focus:#ffca6a;
+  }
+  /* ═══ STUDIO EYES — text size / comfort toggles ═══ */
+  html.se-a1{ zoom:1.15; }
+  html.se-a2{ zoom:1.3; }
+  html.se-contrast[data-light="night"]{ --bg:#0e0d0b; --surface:#161410; --ink:#fff7e6; --ink-soft:#efe0bc; }
+  html.se-contrast:not([data-light="night"]){ --ink:#fbfdff; --ink-soft:#e6edf5; --line:#5a6b80; }
+  html.se-reduce *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+  html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink); font-family:var(--font);
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  html[data-motion="calm"] *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+
+  button{ font-family:inherit; cursor:pointer; color:inherit; border:none; background:none; }
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible{
+    outline:3px solid var(--lens); outline-offset:3px; border-radius:6px;
+  }
+  .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+  /* ---- shell ---- */
+  .stage{ max-width:1040px; margin:0 auto; padding:18px 18px 60px; }
+
+  /* ---- top bar: comfort knobs + lens toggle. never a gate; always reachable ---- */
+  .bar{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    padding:10px 12px; margin-top:22px; margin-bottom:16px;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--r);
+  
+    /* SITS BELOW THE SCENE (2026-07-14). It used to sit ABOVE it, where it was a wall:
+       a player met a brand mark, three lens buttons and two dropdowns before they met
+       the cat. Now it is what its own comment always claimed — a LIVE control, always
+       reachable, never a gate. Deliberately RECESSIVE: the scene is the loud thing. */
+    opacity:.9;
+  }
+  .bar:hover, .bar:focus-within { opacity:1; }
+  .brand{ font-weight:800; letter-spacing:.3px; font-size:1.02rem; margin-right:auto; display:flex; align-items:center; gap:9px;}
+  .brand .glyph{ width:22px; height:22px; }
+  .knobs{ display:flex; gap:6px; flex-wrap:wrap; }
+  .knob{
+    font-size:.74rem; padding:6px 10px; border-radius:999px;
+    background:var(--surface-2); border:1px solid var(--line); color:var(--ink-soft);
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .knob[aria-pressed="true"]{ color:var(--ink); border-color:var(--lens); box-shadow:inset 0 0 0 1px var(--lens); }
+  .knob small{ opacity:.7; font-size:.68rem;}
+
+  /* lens toggle */
+  .lenses{ display:flex; gap:6px; background:var(--surface-2); padding:4px; border-radius:999px; border:1px solid var(--line);}
+  .lens-btn{ font-size:.78rem; font-weight:700; min-height:44px; padding:6px 12px; border-radius:999px; color:var(--ink-soft); position:relative;}
+  .lens-btn[data-l="spell"][aria-pressed="true"]{ background:#b98cff; color:#10151c; }
+  .lens-btn[data-l="code"][aria-pressed="true"]{ background:#5fd0e6; color:#10151c; }
+  .lens-btn[data-l="story"][aria-pressed="true"]{ background:#ff8fa8; color:#10151c; }
+
+  /* ---- scene-first opening: a WORDLESS SPLASH ----
+     2026-07-19 rebuild (founder eye: "fails splash. no text or minimal").
+     The old opening was a wide 2.26:1 strip. On a phone it collapsed to a
+     ~160px band, and the headline block (an OPAQUE box carrying a four-line
+     paragraph) painted straight over the art. The result was a text box, not
+     a scene: the joke was invisible and the first screen was reading, not
+     looking. So this is now a near-square POSTER that fills the phone with
+     picture, holds one lean line of caption, and lets the machine carry the
+     idea. Image first, words last. */
+  .scene{
+    position:relative; width:min(100%, 620px); margin-inline:auto; background:
+      radial-gradient(120% 90% at 50% 0%, var(--surface-2), var(--surface) 70%);
+    border:1px solid var(--line); border-radius:22px; overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .scene svg{ display:block; width:100%; height:auto; }
+
+  /* A lean caption band — a thin fade at the foot of the poster, never an
+     opaque box. Only the art sits behind it; it can no longer swallow a scene. */
+  /* A solid caption band at the foot of the poster. It was a fade (a background
+     IMAGE), but text over an image can only be graded by pixel-sampling — and a
+     white glyph is its own brightest pixel, so it scored ~1:1 in every stop. A
+     single opaque band gives the white headline one guaranteed ground and reads
+     the same in every comfort stop, incl. daylight. */
+  .headline{ position:absolute; left:0; right:0; bottom:0; padding:16px 22px 16px;
+    background:#06090d;
+    color:#fff; }
+  .headline h1{ margin:0; font-size:clamp(1.5rem,6vw,2.3rem); letter-spacing:.3px; line-height:1.05; }
+
+  /* ---- primary controls under the scene ---- */
+  .row{ display:flex; flex-wrap:wrap; gap:12px; margin:16px 0; }
+  .btn{
+    font-weight:800; font-size:1rem; padding:14px 22px; border-radius:12px;
+    background:var(--lens); color:#10151c; box-shadow:0 4px 0 rgba(0,0,0,.3);
+    transition:transform .08s ease, box-shadow .08s ease; min-height:48px;
+  }
+  .btn:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.3); }
+  .btn.ghost{ background:var(--surface-2); color:var(--ink); border:1px solid var(--line); box-shadow:none;}
+  .btn[disabled]{ opacity:.4; cursor:not-allowed; transform:none; box-shadow:0 4px 0 rgba(0,0,0,.3); }
+
+  /* ---- the workbench: choose gag parts (the "build" is choosing what should be funny) ---- */
+  .bench{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; }
+  .bench h2{ margin:.1rem 0 2px; font-size:1.05rem; }
+  .bench .sub{ margin:0 0 14px; color:var(--ink-soft); font-size:.9rem; }
+  .parts{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+  .part{
+    text-align:left; background:var(--surface-2); border:1px solid var(--line);
+    border-radius:12px; padding:12px; display:flex; gap:11px; align-items:flex-start;
+    transition:border-color .1s, transform .1s;
+  }
+  .part:hover{ transform:translateY(-2px); }
+  .part[aria-pressed="true"]{ border-color:var(--lens); box-shadow:inset 0 0 0 1px var(--lens); }
+  .part .ic{ flex:0 0 auto; width:40px; height:40px; }
+  .part .tx{ display:flex; flex-direction:column; gap:2px; }
+  .part .tx b{ font-size:.92rem; }
+  .part .tx span{ font-size:.76rem; color:var(--ink-soft); }
+  .part .pred{ margin-top:5px; font-size:.7rem; color:#ffb347; font-weight:700; letter-spacing:.4px;}
+
+  /* ---- the audience picker (humor is situated: WHO you show it to changes what lands) ---- */
+  .aud{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
+  .aud-btn{ font-size:.8rem; padding:8px 12px; border-radius:999px; background:var(--surface-2);
+    border:1px solid var(--line); color:var(--ink-soft); }
+  .aud-btn[aria-pressed="true"]{ color:var(--ink); border-color:var(--lens); box-shadow:inset 0 0 0 1px var(--lens);}
+
+  /* ---- the poll result: the SECOND SCREEN. the gap made visible ---- */
+  .result{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; }
+  .gapwrap{ display:grid; grid-template-columns:1fr; gap:16px; }
+  @media(min-width:720px){ .gapwrap{ grid-template-columns:1.2fr .8fr; } }
+
+  .crowd{ display:grid; grid-template-columns:repeat(10,1fr); gap:7px; }
+  .face{ aspect-ratio:1; }
+  .meter{ background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:14px; }
+  .meter h3{ margin:0 0 12px; font-size:.95rem; }
+  .bars{ display:flex; flex-direction:column; gap:12px; }
+  .bar-lab{ display:flex; justify-content:space-between; font-size:.78rem; color:var(--ink-soft); margin-bottom:4px;}
+  .track{ height:16px; background:var(--surface); border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+  .fill{ height:100%; border-radius:999px; transition:width .7s cubic-bezier(.2,.8,.2,1); }
+  .fill.pred{ background:var(--lens); }
+  .fill.actual{ background:var(--good); }
+  .gapnum{ text-align:center; margin-top:6px; }
+  .gapnum .big{ font-size:2.4rem; font-weight:800; line-height:1; }
+  .gapnum .cap{ font-size:.76rem; color:var(--ink-soft); letter-spacing:.5px; text-transform:uppercase;}
+
+  .read{ background:var(--surface-2); border:1px solid var(--line); border-left:4px solid var(--lens);
+    border-radius:10px; padding:13px 15px; font-size:.9rem; }
+  .read b{ color:var(--ink); }
+
+  /* ---- the poll-quality lever: the buried thesis, made a knob ---- */
+  .polling{ margin-top:16px; background:var(--surface); border:1px dashed var(--line); border-radius:var(--r); padding:14px 16px;}
+  .polling h3{ margin:0 0 4px; font-size:.92rem; display:flex; gap:8px; align-items:center;}
+  .polling p{ margin:0 0 12px; color:var(--ink-soft); font-size:.84rem; max-width:66ch;}
+  .pollpick{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pollpick button{ flex:1 1 180px; text-align:left; padding:11px 13px; border-radius:11px;
+    background:var(--surface-2); border:1px solid var(--line); }
+  .pollpick button[aria-pressed="true"]{ border-color:var(--lens); box-shadow:inset 0 0 0 1px var(--lens); }
+  .pollpick b{ display:block; font-size:.86rem; }
+  .pollpick span{ font-size:.74rem; color:var(--ink-soft); }
+
+  /* ---- glass engine ring: the real-world system, hidden until noticed ---- */
+  .ring{ margin:20px 0 0; text-align:center; }
+  .ring button{ font-size:.8rem; color:var(--ink-soft); border:1px solid var(--line);
+    padding:8px 16px; border-radius:999px; background:var(--surface); }
+  .engine{ margin-top:14px; background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--r); padding:18px; display:none; }
+  .engine.open{ display:block; }
+  .engine h3{ margin:0 0 8px; }
+  .engine p{ margin:0 0 10px; color:var(--ink-soft); font-size:.9rem; }
+  .engine .map{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:6px;}
+  .engine .node{ background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+    padding:10px 14px; font-size:.82rem; max-width:180px;}
+  .engine .arrow{ color:var(--lens-ink); font-weight:800; }
+
+  /* ---- progress rail (Jenova flow made visible: studio vocabulary) ---- */
+  .rail{ display:flex; align-items:center; gap:0; margin:22px 0 4px; }
+  .stop{ flex:1; text-align:center; position:relative; }
+  .stop .dot{ width:16px; height:16px; border-radius:50%; background:var(--surface-2);
+    border:2px solid var(--line); margin:0 auto 6px; }
+  .stop.done .dot{ background:var(--lens); border-color:var(--lens); }
+  .stop.now .dot{ border-color:var(--lens); box-shadow:0 0 0 4px color-mix(in srgb, var(--lens) 30%, transparent);}
+  .stop .lab{ font-size:.7rem; color:var(--ink-soft); }
+  .stop.done .lab, .stop.now .lab{ color:var(--ink); }
+  .stop::after{ content:""; position:absolute; top:8px; left:50%; width:100%; height:2px; background:var(--line); z-index:-1;}
+  .stop:last-child::after{ display:none; }
+
+  .hidden{ display:none !important; }
+  .fade-in{ animation:fade .5s ease both; }
+  @keyframes fade{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+  .foot{ margin-top:34px; padding-top:16px; border-top:1px solid var(--line); color:var(--ink-soft); font-size:.78rem; text-align:center;}
+  .foot a{ color:var(--lens-ink); }
+  .badge{ display:inline-block; font-size:.68rem; padding:3px 9px; border-radius:999px;
+    background:var(--surface-2); border:1px solid var(--line); color:var(--ink-soft); margin-left:8px;}
+
+/* ═══ (legacy 5-stop comfort palette removed — superseded by Studio Eyes
+   html[data-light] Default / Dusk / Warm-dark above) ═══════════════════════ */
+
+/* ═══ (legacy Clear Reader stop removed with the old comfort control) ═══════
+   Not a palette. The design taken OFF.
+
+   What survives is what a screen reader actually receives: headings, lists,
+   links, in document order. A sighted person has never seen that document —
+   they do not know whether the thing they built has a spine, or whether the
+   layout was doing all the work.
+
+   Tap it, and the game becomes its own outline. If it is unplayable here, it is
+   unplayable with a screen reader. No plugin, no expertise. One tap, and you are
+   looking at the truth.
+
+   MAKE THE INVISIBLE STRUCTURE VISIBLE. That is every game in this studio. This
+   is that engine, pointed at the studio's own interface.
+   ═════════════════════════════════════════════════════════════════════════ */
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--line);
+  position:sticky; top:0; z-index:100; }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--amber); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--font); font-size:16px; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-strong);
+  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 14px); z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink);
+  border:2px solid var(--accent-strong); border-radius:var(--r); padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.5); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent-strong); color:var(--on-accent); border-color:var(--accent-strong); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--font); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent-strong); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); }
+.se-tog[aria-pressed="true"] .st{ color:var(--amber); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:1px solid var(--line); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-updated{ font-family:var(--mono); font-size:.74rem; color:var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation:none !important; transition:none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes. Its own row; never overlaps. -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<div class="foot">
+    Tight Spiral Productions · Play. Notice. Design.
+    <span class="badge">Offline · nothing leaves this page</span>
+    <span class="badge" id="build-badge">v3 playable</span>
+    <div style="margin-top:8px"><span class="se-updated" id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v25 <span style="opacity:.75">246aeaf</span></span> </span> </span> </span> </span></div>
+
+
+<div class="stage">
+
+  <!-- ============ SCENE FIRST. LITERALLY FIRST. ============================
+       BUG (found 2026-07-14, by the founder's eye, not by any gate):
+       the control bar was ABOVE the scene in the DOM. A player opened this game
+       and met a brand mark, three lens buttons, and two dropdowns — "View: Arcade,
+       Motion: Full" — BEFORE they met the cat. The joke was below the fold.
+
+       The CSS comment on .bar already said "never a gate; always reachable."
+       The comment on .scene already said "scene-first opening." BOTH WERE TRUE
+       AS INTENTIONS AND FALSE AS FACTS, because the DOM order contradicted them.
+       A settings panel you must scroll past IS a gate. It does not stop being one
+       because it is pretty, or because a comment says it isn't.
+
+       The studio retired this pattern on 2026-06-29 and wrote it into law:
+       NO OPENING WALL — the first screen is the scene, never a preference gate.
+       This file kept shipping the retired pattern for six weeks, and Studio Eyes
+       waved it through every time, because Studio Eyes only knows ARITHMETIC.
+       It can prove a colour is unreadable. It has no idea whether a game opens
+       on a joke or on a control panel. That is a real limit of the auditor and
+       it is worth naming: a 0-HALT is not a verdict that something is GOOD.
+
+       "Make the cat laugh." is a great first line. It should be the first thing
+       you see. Now it is.
+       ==================================================================== -->
+  <div class="scene" id="scene">
+    <!-- WORDLESS SPLASH. A near-square poster (760x680) so it fills a phone with
+         picture instead of prose. The whole gag reads top-to-bottom down a centre
+         column: marble rolls the ramp -> tips a bucket -> a rubber chicken drops ->
+         a springboard flings it -> at a sleeping cat, the audience of one. The
+         viewBox background is painted edge to edge, so there is no matting and no
+         empty band at any width. No instructions live here on purpose: the machine
+         IS the instruction. -->
+    <!-- viewBox reframed to a portrait crop of the SAME art (no paths moved): the
+         machine column lives at x110-610, so a tighter frame fills the phone
+         vertically and keeps the splash scene-first (>=50% of the first screen)
+         without redrawing anything. -->
+    <!-- ART-ASK (art-department sweep 2026-08-01) — cold-open splash poster.
+         This hand-authored SVG is the file's only art-gate HALT and it stays a HALT
+         on purpose: no false provenance. Replace it with a mounted plate from one of
+         the two legal lanes below, then base64-embed in an aspect-locked container
+         with data-art provenance attribute + aria-label per art-doctrine.md.
+         Plate lane checked and ruled out: all 12 plates in art/cyl/plates are Choose
+         Your Leader 1962-69 canon (cyl-period-bible.md) — no machine, no cat, and
+         mounting CYL canon here crosses lanes.
+
+         PRIMARY, MJ lane — founder prompt (house style per
+         the-first-image-midjourney-spec.md):
+           a tall handmade Rube Goldberg chain-reaction machine in a vaudeville prop
+           workshop, read top to bottom down one centered column: a clay marble poised
+           at the top of a wooden ramp on cast-iron brackets, tipping a galvanized tin
+           pail with a wire bail handle, spilling onto a rubber chicken falling toward
+           a cocked coiled-steel springboard on a riveted brass base, aimed at a small
+           tabby cat asleep on a braided rag rug at the bottom of the frame, hemp
+           twine and sash-cord pulleys, slotted screws, letterpress circus playbill
+           scraps, kraft paper and worn wood, pre-steampunk circus Dada meets BioShock
+           brass-machine, hand-built diorama, single warm incandescent work light,
+           true cast shadows, matte aged surfaces, slightly worn, dark quiet ground
+           across the bottom of the frame, no text, no letters, no numbers, no people,
+           no human faces --ar 3:4 --style raw
+         Reject gate for the founder's eye: any plastic, nylon rope (1938), or
+         Phillips screw (1936) = regenerate; any lettering = regenerate; cat reads
+         dead or absent = regenerate; bottom ~15% band busy = regenerate (the opaque
+         #06090d caption band and white headline must sit on dark quiet ground);
+         glossy 3D-render sheen = regenerate. Accept test: pick the variant where the
+         chain reads as ABOUT TO GO — the marble one nudge from rolling. Nothing in
+         frame later than 1931. No humans, no faces, no baked text.
+
+         FALLBACK, legal-photo lane — Period Librarian brief: Rube Goldberg's own
+         'Inventions' panels, syndicated 1914 (New York Evening Mail) through the
+         1920s. Search LOC Prints and Photographs (Cartoon Drawings; originals also
+         at LOC and Smithsonian NPG) and Wikimedia Commons Category:Rube Goldberg,
+         using the era's own vocabulary: 'Rube Goldberg invention', 'Professor
+         Lucifer Gorgonzola Butts', 'Evening Mail cartoon', 'automatic device
+         cartoon'; then HathiTrust pre-1931 Collier's scans. License target: US
+         public domain by publication date — as of 2026 that means published 1930 or
+         earlier (the Self-Operating Napkin is 1931, PD 2027-01-01, do not use this
+         year; RGI actively licenses later work, verification is load-bearing).
+         Verify publication date and PD status on the SOURCE page, not the search
+         result; record source URL + license string in the mount; license unverified
+         does not ship. Mount constraint: crop to the machine drawing itself — the
+         hand-lettered captions and A-B-C labels violate the no-baked-text floor, and
+         the Professor Butts figure violates the no-real-faces withholding rule; if
+         the crop cannot exclude both, the panel is withheld. The sleeping cat and
+         the caption band remain the live game's own layer on top. A zero-result LOC
+         search is not evidence of absence: list the collection and look. -->
+    <svg viewBox="110 0 500 680" role="img" aria-label="A tall Rube Goldberg machine mid-chain: a marble is about to roll down a ramp, tip a bucket, drop a rubber chicken onto a springboard, and fling it toward a sleeping cat below.">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="var(--surface-2)"/><stop offset="1" stop-color="var(--surface)"/>
+        </linearGradient>
+        <radialGradient id="spot" cx="50%" cy="14%" r="72%">
+          <stop offset="0" stop-color="rgba(255,255,255,.12)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/>
+        </radialGradient>
+      </defs>
+      <rect x="0" width="760" height="680" fill="url(#sky)"/>
+      <rect x="0" width="760" height="680" fill="url(#spot)"/>
+
+      <!-- floor the cat rests on -->
+      <rect x="0" y="588" width="760" height="92" fill="var(--line)" opacity=".5"/>
+
+      <!-- 1 · ramp + marble, top-left, about to roll -->
+      <path d="M120 118 L360 214" stroke="var(--amber)" stroke-width="13" stroke-linecap="round"/>
+      <g id="marble">
+        <circle cx="150" cy="110" r="19" fill="var(--lens)"/>
+        <circle cx="143" cy="102" r="6.5" fill="#fff" opacity=".72"/>
+      </g>
+
+      <!-- 2 · bucket on a pivot, tipping right, spilling -->
+      <polygon points="388,268 380,292 396,292" fill="var(--line)"/>
+      <g id="bucket">
+        <line x1="342" y1="222" x2="446" y2="222" stroke="var(--line)" stroke-width="5"/>
+        <path d="M356 224 q32 44 66 0 l-7 -50 h-52 z" fill="var(--surface-2)" stroke="var(--line)" stroke-width="3.5"/>
+      </g>
+      <g fill="var(--amber)" opacity=".9">
+        <circle cx="452" cy="250" r="5"/><circle cx="470" cy="272" r="4"/><circle cx="462" cy="234" r="3.5"/>
+      </g>
+
+      <!-- 3 · rubber chicken, dropping through the middle -->
+      <g id="chicken">
+        <ellipse cx="470" cy="326" rx="19" ry="30" fill="#f2f6fb" opacity=".94"/>
+        <path d="M470 302 q12 -16 23 -7 q-7 9 -16 11 z" fill="var(--amber)"/>
+        <circle cx="463" cy="311" r="2.8" fill="#10151c"/>
+        <path d="M470 356 q-7 12 3 26" stroke="var(--line)" stroke-width="3" fill="none"/>
+      </g>
+
+      <!-- 4 · springboard, centre-lower, cocked to fling -->
+      <g id="spring">
+        <rect x="300" y="430" width="150" height="14" rx="5" fill="var(--amber-deep)"/>
+        <path d="M320 444 l0 22 m26 -22 l0 22 m26 -22 l0 22 m26 -22 l0 22 m26 -22 l0 22"
+              stroke="var(--line)" stroke-width="3.5"/>
+      </g>
+
+      <!-- 5 · sleeping cat, the audience of one, bottom-centre -->
+      <g id="cat">
+        <ellipse cx="400" cy="556" rx="88" ry="32" fill="var(--surface-2)" stroke="var(--line)" stroke-width="3.5"/>
+        <path d="M330 547 q-10 -24 8 -28 q6 15 13 18z" fill="var(--surface-2)" stroke="var(--line)" stroke-width="3.5"/>
+        <path d="M337 542 l5 -10 l8 10" fill="none" stroke="var(--line)" stroke-width="2.4"/>
+        <path d="M344 558 q8 8 18 0" stroke="var(--line)" stroke-width="2.6" fill="none"/>
+        <path d="M324 542 q-13 -3 -23 3 M324 549 q-15 1 -25 6" stroke="var(--ink-soft)" stroke-width="1.8"/>
+        <!-- sleep "z z" drawn as strokes, not <text>: a rendered text glyph on a
+             gradient defeats pixel-contrast sampling (the glyph is its own extreme).
+             Same picture, no text node. -->
+        <g fill="none" stroke="var(--ink-soft)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M462 502 h20 l-20 22 h20"/>
+          <path d="M489 476 h13 l-13 15 h13"/>
+        </g>
+      </g>
+
+      <!-- motion hints: the chain, drawn as arcs from link to link -->
+      <g stroke="var(--lens)" stroke-width="3.5" fill="none" opacity=".5" stroke-linecap="round">
+        <path d="M172 118 q40 26 78 40"/>
+        <path d="M470 360 q6 30 -2 58" stroke-dasharray="2 10"/>
+        <path d="M392 426 q10 -30 34 -50" stroke-dasharray="2 10"/>
+        <path d="M300 476 q40 58 96 66" stroke-dasharray="2 12"/>
+      </g>
+    </svg>
+    <div class="headline">
+      <h1>Make the cat laugh.</h1>
+    </div>
+  </div>
+
+  <!-- ============ PRIMARY CTA ROW ============ -->
+  <div class="row">
+    <button class="btn" id="cta-start" onclick="goBuild()">Step in</button>
+    <button class="btn ghost" onclick="openHow()">How this plays</button>
+  </div>
+
+  <!-- ============ THE CONTROLS — BELOW the scene, on purpose ==================
+       These used to sit ABOVE the scene, which made them a wall. Comfort and lens
+       are LIVE CONTROLS, not a preference gate: they are always reachable, they
+       never block, and they do not stand between a person and the joke.
+
+       The rule (locked 2026-06-29, re-enforced here): the first screen is the
+       SCENE. Comfort is a corner control. You change the lens BECAUSE you have
+       seen something and want to see it differently — not before you have seen
+       anything at all, when the choice is meaningless.
+       ==================================================================== -->
+  <div class="bar" role="region" aria-label="Lens controls">
+    <div class="brand">
+      <svg class="glyph" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" fill="none" stroke="var(--lens)" stroke-width="2"/>
+        <path d="M16 4 A12 12 0 0 1 28 16 A9 9 0 0 1 16 25 A6.5 6.5 0 0 1 9.5 18.5 A4.5 4.5 0 0 1 16 14.5"
+              fill="none" stroke="var(--lens)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Funny Boney's Factory
+    </div>
+
+    <div class="lenses" role="group" aria-label="Choose your lens">
+      <button class="lens-btn" data-l="spell"  aria-pressed="false" onclick="setLens('spell')">Spellcaster</button>
+      <button class="lens-btn" data-l="code"   aria-pressed="false" onclick="setLens('code')">Coder</button>
+      <button class="lens-btn" data-l="story"  aria-pressed="false" onclick="setLens('story')">Storyteller</button>
+    </div>
+
+    </div>
+
+  <!-- ============ PROGRESS RAIL (studio vocabulary: the loop, made visible) ============ -->
+  <div class="rail" id="rail" aria-hidden="true">
+    <div class="stop now"  data-s="build"><div class="dot"></div><div class="lab">Build</div></div>
+    <div class="stop"      data-s="show"><div class="dot"></div><div class="lab">Show</div></div>
+    <div class="stop"      data-s="poll"><div class="dot"></div><div class="lab">Poll</div></div>
+    <div class="stop"      data-s="gap"><div class="dot"></div><div class="lab">See the gap</div></div>
+    <div class="stop"      data-s="tune"><div class="dot"></div><div class="lab">Recalibrate</div></div>
+  </div>
+
+  <!-- ============ SCREEN 1: THE BENCH (build = choose what should be funny) ============ -->
+  <section class="bench hidden" id="bench" aria-label="Build your gag">
+    <h2 id="bench-title">Pick the beat you think lands hardest.</h2>
+    <p class="sub" id="bench-sub">You are guessing what a crowd will find funny. That guess is the whole game. Choose one.</p>
+
+    <div class="parts" id="parts" role="group" aria-label="Gag parts"></div>
+
+    <div style="margin-top:16px">
+      <div class="sub" style="margin-bottom:6px"><b style="color:var(--ink)">Who are you showing it to?</b> The same gag lands differently for a different crowd. That is not a bug — it is the point.</div>
+      <div class="aud" id="aud" role="group" aria-label="Choose an audience"></div>
+    </div>
+
+    <div class="row" style="margin-bottom:0">
+      <button class="btn" id="show-btn" disabled onclick="doShow()">Show the crowd</button>
+      <button class="btn ghost" onclick="backToScene()">Back to the scene</button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 2: THE SECOND SCREEN — the gap made visible ============ -->
+  <section class="result hidden" id="result" aria-label="What the crowd actually thought">
+    <div class="gapwrap">
+      <div>
+        <h2 style="margin:.1rem 0 10px">You showed it. Here is the room.</h2>
+        <div class="crowd" id="crowd" aria-label="The crowd, laughing or not"></div>
+        <div class="read" id="read" style="margin-top:14px"></div>
+      </div>
+
+      <div class="meter">
+        <h3>Predicted vs. actual</h3>
+        <div class="bars">
+          <div>
+            <div class="bar-lab"><span>You predicted</span><span id="pred-pct">0%</span></div>
+            <div class="track"><div class="fill pred" id="pred-fill" style="width:0%"></div></div>
+          </div>
+          <div>
+            <div class="bar-lab"><span>They actually laughed</span><span id="act-pct">0%</span></div>
+            <div class="track"><div class="fill actual" id="act-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="gapnum">
+          <div class="big" id="gap-big">0</div>
+          <div class="cap">points off — your calibration gap</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THE BURIED THESIS as a live knob: poll quality changes the truth you get -->
+    <div class="polling" aria-label="How you polled the crowd">
+      <h3>How did you ask them?</h3>
+      <p>Here is the quiet lesson under the whole game: <b style="color:var(--ink)">the way you poll decides what you learn.</b> Ask a lazy question and you get a comforting number that isn't true. Ask well, and the crowd hands you a real signal you can design against. Switch it and watch your gap move.</p>
+      <div class="pollpick" role="group" aria-label="Polling method">
+        <button data-p="thumbs" aria-pressed="true" onclick="setPoll('thumbs')">
+          <b>"Was that funny?" — yes / no</b><span>One blunt question. Cheap. People say yes to be kind. Noisy.</span></button>
+        <button data-p="laughs" aria-pressed="false" onclick="setPoll('laughs')">
+          <b>Count the real laughs</b><span>Measure what bodies did, not what mouths said. Cleaner.</span></button>
+        <button data-p="adaptive" aria-pressed="false" onclick="setPoll('adaptive')">
+          <b>Adaptive: ask, then follow up</b><span>Ask, then ask the surprised ones why. The truest signal — and the most work.</span></button>
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px; margin-bottom:0">
+      <button class="btn" onclick="recalibrate()">Recalibrate &amp; go again</button>
+      <button class="btn ghost" onclick="carryOut()">Carry this out</button>
+    </div>
+
+    <!-- GLASS ENGINE RING: the real-world system, hidden until noticed -->
+    <div class="ring">
+      <button id="ring-btn" onclick="toggleEngine()" aria-expanded="false">Show the engine underneath</button>
+      <div class="engine" id="engine" role="region" aria-label="What this machine is really teaching">
+        <h3>You thought you were making a cat laugh.</h3>
+        <p>Underneath, you were running the exact loop a designer runs on a hard real-world problem: guess what an audience needs, build it, measure the gap honestly, and let the measurement — not your hunch — drive the next version. Swap "make the cat laugh" for "get water to a dry field with a cheap machine" and the loop is identical.</p>
+        <div class="map">
+          <div class="node">Guess what lands</div>
+          <div class="arrow" aria-hidden="true">-&gt;</div>
+          <div class="node">Build it for a real audience</div>
+          <div class="arrow" aria-hidden="true">-&gt;</div>
+          <div class="node">Measure the gap, honestly</div>
+          <div class="arrow" aria-hidden="true">-&gt;</div>
+          <div class="node">Let the signal redesign it</div>
+        </div>
+        <p style="margin-top:12px; font-size:.82rem">The launch problem this maps to: <b style="color:var(--ink)">robotics and sustainable agriculture</b> — machines that help grow food where it is hard to grow. The laugh was the door. The calibration was the room.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ "HOW THIS PLAYS" panel ============ -->
+  <section class="bench hidden" id="how" aria-label="How this plays">
+    <h2>How this plays</h2>
+    <p class="sub">Five beats, on a loop. The rail up top shows where you are.</p>
+    <div class="parts">
+      <div class="part"><div class="tx"><b>1 · Build</b><span>Guess which beat is funny. The guess is the game.</span></div></div>
+      <div class="part"><div class="tx"><b>2 · Show</b><span>Put it in front of a crowd you choose.</span></div></div>
+      <div class="part"><div class="tx"><b>3 · Poll</b><span>Ask them — and how you ask changes the truth.</span></div></div>
+      <div class="part"><div class="tx"><b>4 · See the gap</b><span>Your guess vs. what actually landed. A number.</span></div></div>
+      <div class="part"><div class="tx"><b>5 · Recalibrate</b><span>Use the gap to guess better next time.</span></div></div>
+    </div>
+    <p class="sub" style="margin-top:14px">A flat gag is never a failure here. It is the crowd telling you something you didn't know. That is worth more than an easy laugh.</p>
+    <div class="row" style="margin-bottom:0"><button class="btn" onclick="closeHow()">Got it — let me play</button></div>
+  </section>
+
+  
+    <div style="margin-top:8px">Humor is situated: what's funny depends on who's in the room, how their mind works, and where they're from. This game is honest about that.</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV RAIL — Back + Home -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+/* ═══ STUDIO EYES — the reconciled studio comfort control (v2 kernel) ═══════
+   Light: Default / Dusk / Warm-dark (html[data-light]). Text size A/A+/A++.
+   Toggles: High contrast · Reduce motion · Colorblind cues. No storage. */
+(function(){
+  "use strict";
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+
+<script>
+/* =========================================================================
+   FUNNY BONEY'S FACTORY — engine
+   No network. All state in memory. Nothing persists unless the player
+   chooses "Carry this out" (an emit, not storage).
+   ========================================================================= */
+
+/* ---- LENS DEFINITIONS: one engine, three epistemic frames (car-ruling #2) ----
+   Each lens reskins the SAME underlying moves. The mechanic is identical;
+   the permission structure for how you think about it changes. */
+const LENSES = {
+  spell: {
+    name:"Spellcaster", color:"var(--violet)", dark:"#b98cff", light:"#6b3fc0",
+    benchTitle:"Choose the spell you think will land hardest.",
+    benchSub:"You are guessing which enchantment makes a crowd laugh. That guess is the whole game. Choose one.",
+    verb:"cast",
+    parts:[
+      {b:"Tumbling Charm",  s:"the marble trips over its own feet",         pred:62, ic:"orb"},
+      {b:"Bucket Hex",      s:"a pail forgets which way is up",             pred:48, ic:"bucket"},
+      {b:"Fowl Summons",    s:"a rubber chicken appears from nowhere",       pred:78, ic:"chicken"},
+      {b:"Boing Enchant",   s:"the floor decides to be a trampoline",        pred:55, ic:"spring"},
+    ],
+  },
+  code: {
+    name:"Coder", color:"var(--cyan)", dark:"#5fd0e6", light:"#0f6d82",
+    benchTitle:"Choose the function you think returns the biggest laugh.",
+    benchSub:"You are guessing which routine makes a crowd laugh. That guess is the whole game. Choose one.",
+    verb:"run",
+    parts:[
+      {b:"rollMarble()",   s:"a loop that trips on its own edge case",       pred:62, ic:"orb"},
+      {b:"flipBucket()",   s:"gravity, but the sign is wrong",               pred:48, ic:"bucket"},
+      {b:"spawnChicken()", s:"an object appears with no null-check",          pred:78, ic:"chicken"},
+      {b:"bounce()",       s:"the floor returns true, then true again",       pred:55, ic:"spring"},
+    ],
+  },
+  story: {
+    name:"Storyteller", color:"var(--rose)", dark:"#ff8fa8", light:"#b03050",
+    benchTitle:"Choose the turn you think the crowd won't see coming.",
+    benchSub:"You are guessing which twist makes a crowd laugh. That guess is the whole game. Choose one.",
+    verb:"tell",
+    parts:[
+      {b:"The Clumsy Hero",   s:"our marble trips at the worst moment",      pred:62, ic:"orb"},
+      {b:"The Traitor Pail",  s:"the bucket everyone trusted turns",         pred:48, ic:"bucket"},
+      {b:"The Sudden Chicken",s:"nobody wrote a chicken into this story",     pred:78, ic:"chicken"},
+      {b:"The Floor Rebels",  s:"even the ground has had enough",            pred:55, ic:"spring"},
+    ],
+  }
+};
+
+/* ---- AUDIENCES: humor is situated. WHO you poll changes the true laugh-rate.
+   Each audience has a hidden "taste vector" that rewards different beats.
+   The player never sees these numbers — they discover them by polling. ---- */
+const AUDIENCES = {
+  cat:      { label:"One sleepy cat",     taste:{orb:.4, bucket:.5, chicken:.55, spring:.9} },
+  kids:     { label:"A room of kids",     taste:{orb:.7, bucket:.6, chicken:.95, spring:.8} },
+  grownups: { label:"Tired grown-ups",    taste:{orb:.55, bucket:.75, chicken:.45, spring:.5} },
+  world:    { label:"Strangers online",   taste:{orb:.6, bucket:.5, chicken:.7, spring:.65} },
+};
+
+/* ---- POLL METHODS: the buried thesis (car-ruling #4).
+   quality = how close the surveyed number lands to the TRUE laugh-rate.
+   noise   = how much random slop corrupts it.
+   Bad polling literally lies to you; adaptive polling tells the truth. ---- */
+const POLLS = {
+  thumbs:   { quality:.55, noise:.30, note:"Yes/no is kind and cheap — people nod to be polite, so the number drifts high and jumps around. You are half-guessing." },
+  laughs:   { quality:.80, noise:.14, note:"Counting real laughs measures bodies, not manners. Much closer to the truth, steadier run to run." },
+  adaptive: { quality:.97, noise:.05, note:"Asking, then following up with the surprised faces, gets you the real signal — the truest read, and the most work. This is what good designers actually do." },
+};
+
+/* ---- part icons (tiny authored SVG, skin-tone-neutral, prop-carries-the-role) ---- */
+function partIcon(kind){
+  const c="var(--lens)", l="var(--line)";
+  switch(kind){
+    case "orb": return `<svg viewBox="0 0 40 40"><circle cx="20" cy="22" r="12" fill="${c}"/><circle cx="16" cy="18" r="4" fill="#fff" opacity=".7"/><path d="M6 34 h28" stroke="${l}" stroke-width="3"/></svg>`;
+    case "bucket": return `<svg viewBox="0 0 40 40"><path d="M11 14 h18 l-3 20 h-12 z" fill="var(--surface)" stroke="${c}" stroke-width="2.5"/><path d="M11 14 q9 -8 18 0" fill="none" stroke="${l}" stroke-width="2.5"/></svg>`;
+    case "chicken": return `<svg viewBox="0 0 40 40"><ellipse cx="20" cy="22" rx="10" ry="14" fill="#f2f6fb"/><path d="M20 8 q7 -8 12 -2 q-4 6 -10 6z" fill="${c}"/><circle cx="16" cy="14" r="1.8" fill="#10151c"/></svg>`;
+    case "spring": return `<svg viewBox="0 0 40 40"><rect x="8" y="28" width="24" height="6" rx="2" fill="${c}"/><path d="M12 28 v-8 m6 8 v-8 m6 8 v-8 m6 8 v-8" stroke="${l}" stroke-width="2.5"/></svg>`;
+  }
+  return "";
+}
+
+/* ---- STATE ---- */
+let state = {
+  lens:"spell",
+  part:null,        // chosen gag part key (index)
+  audience:"cat",
+  poll:"thumbs",
+  round:0,
+  lastActualTrue:null,   // the true laugh-rate of last show (0..1), before poll distortion
+  lastSurveyed:null,     // the polled rate the player last SAW (0..1) — reuse, never re-roll
+  history:[],
+};
+
+/* ---- boot ---- */
+if('scrollRestoration' in history) history.scrollRestoration='manual';
+window.scrollTo(0,0);
+setLens("spell");
+
+/* =================== LENS =================== */
+function setLens(l){
+  state.lens = l;
+  applyLensColor();
+  document.querySelectorAll('.lens-btn').forEach(b=>{
+    b.setAttribute('aria-pressed', b.dataset.l===l ? 'true':'false');
+  });
+  renderBench();
+}
+/* --lens carries the ACTIVE lens accent, chosen light-or-dark so accent TEXT
+   stays legible against whichever comfort stop is showing. This is the fix for
+   the "bright accent that only reads on dark" failure class. */
+function applyLensColor(){
+  /* Studio Eyes keeps all three lights dark (Default / Dusk / Warm-dark), so the
+     bright lens accent (L.dark) stays legible in every mode. One source of truth. */
+  const L=LENSES[state.lens];
+  document.documentElement.style.setProperty('--lens', L.dark);
+}
+
+let motionCalm=false;
+function toggleMotion(){
+  motionCalm=!motionCalm;
+  document.documentElement.setAttribute('data-motion', motionCalm?'calm':'full');
+  document.getElementById('motion-lab').textContent = motionCalm?'Calm':'Full';
+  document.getElementById('k-motion').setAttribute('aria-pressed', motionCalm?'true':'false');
+}
+
+/* =================== NAV =================== */
+function goBuild(){
+  show('bench'); hide('result'); hide('how'); setHome(true);
+  document.getElementById('rail').setAttribute('aria-hidden','false');
+  setRail('build');
+  document.getElementById('bench').classList.add('fade-in');
+  document.getElementById('bench').scrollIntoView({behavior: motionCalm?'auto':'smooth', block:'start'});
+}
+function goHome(){
+  hide('bench'); hide('result'); hide('how');
+  document.getElementById('scene').scrollIntoView({behavior: motionCalm?'auto':'smooth'});
+  setHome(false);
+}
+function setHome(on){ var h=document.getElementById('homenav'); if(h) h.hidden = !on; }
+function backToScene(){
+  hide('bench'); setHome(false);
+  document.getElementById('scene').scrollIntoView({behavior: motionCalm?'auto':'smooth'});
+}
+function openHow(){ show('how'); hide('bench'); hide('result'); setHome(true); }
+function closeHow(){ hide('how'); goBuild(); }
+
+/* =================== BENCH =================== */
+function renderBench(){
+  const L = LENSES[state.lens];
+  document.getElementById('bench-title').textContent = L.benchTitle;
+  document.getElementById('bench-sub').textContent = L.benchSub;
+
+  // parts
+  const wrap = document.getElementById('parts'); wrap.innerHTML="";
+  L.parts.forEach((p,i)=>{
+    const btn=document.createElement('button');
+    btn.className='part'; btn.setAttribute('aria-pressed', state.part===i?'true':'false');
+    btn.onclick=()=>pickPart(i);
+    btn.innerHTML = `<div class="ic" aria-hidden="true">${partIcon(p.ic)}</div>
+      <div class="tx"><b>${p.b}</b><span>${p.s}</span>
+      <div class="pred">You bet: ${p.pred}% will laugh</div></div>`;
+    wrap.appendChild(btn);
+  });
+
+  // audiences
+  const aud = document.getElementById('aud'); aud.innerHTML="";
+  Object.entries(AUDIENCES).forEach(([k,a])=>{
+    const b=document.createElement('button');
+    b.className='aud-btn'; b.setAttribute('aria-pressed', state.audience===k?'true':'false');
+    b.textContent=a.label; b.onclick=()=>pickAud(k);
+    aud.appendChild(b);
+  });
+  updateShowBtn();
+}
+function pickPart(i){ state.part=i; renderBench(); }
+function pickAud(k){ state.audience=k; renderBench(); }
+function updateShowBtn(){
+  document.getElementById('show-btn').disabled = (state.part===null);
+}
+
+/* =================== SHOW + POLL (compute the gap; never self-report) =================== */
+function computeTrueRate(){
+  // TRUE laugh-rate = how well this gag matches this audience's hidden taste.
+  const L = LENSES[state.lens];
+  const part = L.parts[state.part];
+  const taste = AUDIENCES[state.audience].taste[part.ic]; // 0..1
+  // small stable jitter so repeat shows vary a little but not wildly
+  const j = (Math.sin((state.round+1)*12.9898 + state.part*4.1) * 43758.5453) % 1;
+  const jitter = (Math.abs(j)-0.5)*0.08;
+  return clamp(taste + jitter, 0, 1);
+}
+function surveyThrough(trueRate){
+  // The poll DISTORTS the true rate. Bad polls pull toward a flattering 0.7 and add noise.
+  const P = POLLS[state.poll];
+  const pull = 0.7; // the comforting default a lazy poll drifts toward
+  const biased = trueRate*P.quality + pull*(1-P.quality);
+  const noise = (Math.random()-0.5)*2*P.noise;
+  return clamp(biased + noise, 0, 1);
+}
+
+function doShow(){
+  state.round++;
+  state.lastActualTrue = computeTrueRate();
+  setRail('show');
+  // brief beat, then reveal the room
+  show('result'); hide('bench'); setHome(true);
+  document.getElementById('result').classList.remove('fade-in'); void document.getElementById('result').offsetWidth;
+  document.getElementById('result').classList.add('fade-in');
+  setRail('poll');
+  renderResult();
+  document.getElementById('result').scrollIntoView({behavior: motionCalm?'auto':'smooth', block:'start'});
+}
+
+function setPoll(p){
+  state.poll=p;
+  document.querySelectorAll('.pollpick button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.p===p?'true':'false'));
+  renderResult(); // re-poll live so the player SEES the method change the truth
+}
+
+function renderResult(){
+  const L = LENSES[state.lens];
+  const part = L.parts[state.part];
+  const predicted = part.pred/100;                 // what the player bet
+  const trueRate  = state.lastActualTrue;          // hidden truth
+  const surveyed  = surveyThrough(trueRate);       // what the poll reports
+  state.lastSurveyed = surveyed;                   // remember what the player SAW
+  setRail('gap');
+
+  // crowd of 30 faces, seeded by surveyed rate
+  renderCrowd(surveyed);
+
+  // bars
+  const predPct = Math.round(predicted*100);
+  const actPct  = Math.round(surveyed*100);
+  document.getElementById('pred-pct').textContent = predPct+"%";
+  document.getElementById('act-pct').textContent  = actPct+"%";
+  document.getElementById('pred-fill').style.width = predPct+"%";
+  document.getElementById('act-fill').style.width  = actPct+"%";
+
+  const gap = Math.abs(predPct-actPct);
+  document.getElementById('gap-big').textContent = gap;
+
+  // the read: failure is diagnostic (car-ruling #3), poll quality is named (car-ruling #4)
+  const aud = AUDIENCES[state.audience].label.toLowerCase();
+  let msg;
+  if(actPct < 35){
+    msg = `<b>That landed flat.</b> Not a failure — a fact. For ${aud}, this beat isn't it. You just learned something about them you didn't know. That's worth more than a polite laugh.`;
+  } else if(gap <= 8){
+    msg = `<b>Dead-on read.</b> Your guess and the room almost matched. You're calibrated to ${aud} — for now. Change the crowd and watch it slip.`;
+  } else if(predPct > actPct){
+    msg = `<b>You over-guessed.</b> You thought it was funnier than ${aud} did. The gap is the lesson: your taste isn't their taste.`;
+  } else {
+    msg = `<b>You under-guessed.</b> It landed harder than you bet. ${aud[0].toUpperCase()+aud.slice(1)} found something you didn't expect.`;
+  }
+  msg += `<div style="margin-top:9px; font-size:.82rem; color:var(--ink-soft)">Polling note: ${POLLS[state.poll].note}</div>`;
+  document.getElementById('read').innerHTML = msg;
+}
+
+function renderCrowd(rate){
+  const wrap = document.getElementById('crowd'); wrap.innerHTML="";
+  const N=30, laughing=Math.round(rate*N);
+  for(let i=0;i<N;i++){
+    const laughs = i<laughing;
+    const div=document.createElement('div'); div.className='face';
+    div.innerHTML = faceSVG(laughs);
+    div.style.animationDelay = (i*18)+'ms';
+    if(!motionCalm) div.classList.add('fade-in');
+    wrap.appendChild(div);
+  }
+}
+function faceSVG(laughs){
+  const ink="var(--ink)";
+  const mouth = laughs
+    ? `<path d="M6 12 q6 8 12 0" fill="none" stroke="var(--good)" stroke-width="2.2" stroke-linecap="round"/>`
+    : `<path d="M7 13 h10" stroke="var(--flat)" stroke-width="2.2" stroke-linecap="round"/>`;
+  const eyes = laughs
+    ? `<path d="M7 8 q1.5 -2 3 0 M14 8 q1.5 -2 3 0" stroke="${ink}" stroke-width="1.8" fill="none"/>`
+    : `<circle cx="8.5" cy="8" r="1.3" fill="var(--flat)"/><circle cx="15.5" cy="8" r="1.3" fill="var(--flat)"/>`;
+  return `<svg viewBox="0 0 24 20" width="100%" height="100%"><circle cx="12" cy="11" r="9" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1"/>${eyes}${mouth}</svg>`;
+}
+
+/* =================== GLASS ENGINE RING =================== */
+function toggleEngine(){
+  const e=document.getElementById('engine'), b=document.getElementById('ring-btn');
+  const open=e.classList.toggle('open');
+  b.setAttribute('aria-expanded', open?'true':'false');
+  b.textContent = open ? "Hide the engine" : "Show the engine underneath";
+  if(open) e.scrollIntoView({behavior: motionCalm?'auto':'smooth', block:'nearest'});
+}
+
+/* =================== RECALIBRATE =================== */
+function recalibrate(){
+  // log this round, then return to the bench smarter
+  const L=LENSES[state.lens], part=L.parts[state.part];
+  state.history.push({
+    round:state.round, lens:state.lens, gag:part.b,
+    audience:AUDIENCES[state.audience].label, poll:state.poll,
+    predicted:part.pred, surveyed:Math.round(state.lastSurveyed*100)
+  });
+  setRail('tune');
+  setTimeout(()=>{ goBuild(); }, motionCalm?0:250);
+}
+
+/* =================== CARRY-OUT (emit, not store; FERPA-clean) =================== */
+function carryOut(){
+  const L=LENSES[state.lens], part=L.parts[state.part];
+  const surveyed = Math.round(state.lastSurveyed*100);
+  const gap = Math.abs(part.pred - surveyed);
+  const card =
+`FUNNY BONEY'S FACTORY — carried machine
+lens: ${L.name}
+gag: ${part.b} (${part.s})
+crowd: ${AUDIENCES[state.audience].label}
+polled by: ${state.poll}
+you predicted: ${part.pred}%   they laughed: ${surveyed}%   gap: ${gap}
+--
+Paste this into a friend's factory to stack it. Nothing was stored; you carried it.`;
+  navigator.clipboard?.writeText(card).then(
+    ()=>flash("Copied. Paste it anywhere to stack it."),
+    ()=>flash("Here it is — select and copy:\n\n"+card)
+  );
+}
+
+/* =================== RAIL =================== */
+function setRail(stage){
+  const order=["build","show","poll","gap","tune"];
+  const at=order.indexOf(stage);
+  document.querySelectorAll('#rail .stop').forEach(s=>{
+    const ix=order.indexOf(s.dataset.s);
+    s.classList.toggle('done', ix<at);
+    s.classList.toggle('now', ix===at);
+  });
+}
+
+/* =================== helpers =================== */
+function show(id){ document.getElementById(id)?.classList.remove('hidden'); }
+function hide(id){ document.getElementById(id)?.classList.add('hidden'); }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function flash(t){ alert(t); }
+</script>
+
+<!-- TSP shared mobile nav + device adaptation -->
+<script>window.TSP_MOBILE = { nav:false, home:"index.html" };</script>
+<!-- TSP-MOBILE (inlined from tsp-mobile.js — single-file-offline law) -->
+<script>
+/* Tight Spiral Studios — shared mobile controls + Home/Back nav.
+   Source & docs: tsp-mobile.js. Edit there, then re-inline. */
+(function () {
+  "use strict";
+
+  var d = document, root = d.documentElement, cfg = window.TSP_MOBILE || {};
+
+  /* ---- Device detection --------------------------------------------------- */
+  var hasTouch = ("ontouchstart" in window) ||
+                 (navigator.maxTouchPoints > 0) ||
+                 (navigator.msMaxTouchPoints > 0);
+  var coarse   = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  var narrow   = Math.min(screen.width || 9999, screen.height || 9999) < 820;
+  var isMobile = hasTouch && (coarse || narrow);
+
+  root.classList.add(hasTouch ? "tsp-touch" : "tsp-no-touch");
+  if (isMobile) root.classList.add("tsp-mobile");
+
+  /* ---- Synthetic keyboard dispatch --------------------------------------- */
+  // Games listen on window (or document) for keydown/keyup and read e.key.
+  var evTarget = (cfg.target === "document") ? d : window;
+
+  function dispatchKey(type, key) {
+    var ev;
+    try {
+      ev = new KeyboardEvent(type, {
+        key: key, code: codeFor(key),
+        bubbles: true, cancelable: true, view: window
+      });
+    } catch (e) {
+      // Legacy fallback
+      ev = d.createEvent("Event");
+      ev.initEvent(type, true, true);
+      try { ev.key = key; } catch (_) {}
+    }
+    evTarget.dispatchEvent(ev);
+  }
+
+  function codeFor(key) {
+    switch (key) {
+      case "ArrowLeft":  return "ArrowLeft";
+      case "ArrowRight": return "ArrowRight";
+      case "ArrowUp":    return "ArrowUp";
+      case "ArrowDown":  return "ArrowDown";
+      case " ":          return "Space";
+      case "Enter":      return "Enter";
+      case "Shift":      return "ShiftLeft";
+      default:
+        if (key && key.length === 1) return "Key" + key.toUpperCase();
+        return "";
+    }
+  }
+
+  /* ---- Styles (injected once) -------------------------------------------- */
+  function injectStyles() {
+    if (d.getElementById("tsp-mobile-style")) return;
+    var css = [
+      /* Navigation chip — always available, subtle on desktop */
+      ".tsp-nav{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));",
+        "z-index:2147483000;display:flex;gap:8px;font-family:'Helvetica Neue',Arial,sans-serif}",
+      ".tsp-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.4em;text-decoration:none;",
+        "padding:.5em .85em;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.04em;",
+        "color:#f4f1e8;background:#14120f;border:1px solid rgba(255,207,90,.45);",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1;",
+        "box-shadow:0 4px 14px rgba(0,0,0,.35);transition:background .15s,border-color .15s,transform .08s}",
+      ".tsp-nav a:hover,.tsp-nav a:focus-visible{background:rgba(40,34,24,.9);border-color:#ffcf5a;outline:none}",
+      ".tsp-nav a:active{transform:translateY(1px)}",
+      "@media (min-width:900px) and (pointer:fine){.tsp-nav{opacity:.55}.tsp-nav:hover{opacity:1}}",
+
+      /* Nav integrated into the studio's shared .topbar (no overlap) */
+      ".tsp-barnav{display:inline-flex;align-items:center;gap:.35rem;margin-right:.25rem;flex:none}",
+      ".tsp-barnav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.3em;text-decoration:none;color:inherit;",
+        "font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.02em;line-height:1;",
+        "padding:.4em .7em;border-radius:999px;border:1px solid currentColor;opacity:.85;",
+        "background:transparent;white-space:nowrap;transition:opacity .12s,background .12s}",
+      ".tsp-barnav a:hover,.tsp-barnav a:focus-visible{opacity:1;background:rgba(127,127,127,.18);outline:none}",
+      ".tsp-barnav a:active{transform:translateY(1px)}",
+      /* Keep the shared bar on one row once Home/Back are added: title ellipsizes */
+      ".tsp-touch .topbar{gap:.4rem}",
+      ".tsp-touch .topbar .wm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto}",
+
+      /* Gamepad — only rendered on touch devices */
+      ".tsp-pad{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;",
+        "display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;",
+        "padding:0 max(14px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));",
+        "font-family:'Helvetica Neue',Arial,sans-serif;touch-action:none}",
+      ".tsp-cluster{display:flex;gap:12px;pointer-events:none;align-items:flex-end;flex-wrap:wrap;max-width:46vw}",
+      ".tsp-cluster.right{justify-content:flex-end}",
+      ".tsp-btn{pointer-events:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;",
+        "touch-action:none;min-width:62px;min-height:62px;padding:0 14px;border-radius:16px;",
+        "display:flex;align-items:center;justify-content:center;text-align:center;",
+        "font-size:15px;font-weight:700;letter-spacing:.03em;color:#f4f1e8;",
+        "background:rgba(24,20,15,.6);border:1.5px solid rgba(255,207,90,.5);",
+        "-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);",
+        "box-shadow:0 6px 18px rgba(0,0,0,.4);transition:background .06s,transform .06s;cursor:pointer}",
+      ".tsp-btn.big{min-width:82px;min-height:82px;font-size:16px}",
+      ".tsp-btn:active,.tsp-btn.on{background:rgba(255,207,90,.9);color:#1a0d09;transform:scale(.94)}",
+      /* Hide gamepad on non-touch so desktop keeps keyboard feel */
+      ".tsp-no-touch .tsp-pad{display:none}",
+
+      /* Rotate-for-more-room hint — canvas games only, portrait phones only */
+      ".tsp-rot{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top));",
+        "z-index:2147482500;display:none;align-items:center;gap:.55em;padding:.5em .55em .5em .9em;",
+        "border-radius:999px;background:rgba(24,20,15,.86);color:#f4f1e8;",
+        "border:1px solid rgba(255,207,90,.5);white-space:nowrap;",
+        "font:600 12px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.4)}",
+      ".tsp-rot .rk{font-size:14px;color:#ffcf5a}",
+      ".tsp-rot button{background:none;border:none;color:inherit;font-size:16px;line-height:1;",
+        "padding:0 .15em;margin:0;cursor:pointer;opacity:.65}",
+      ".tsp-rot button:active{opacity:1}",
+      "@media (orientation:portrait){.tsp-touch .tsp-rot{display:inline-flex}}",
+      ".tsp-rot-dismissed .tsp-rot{display:none!important}"
+    ].join("");
+    var s = d.createElement("style");
+    s.id = "tsp-mobile-style";
+    s.textContent = css;
+    d.head.appendChild(s);
+  }
+
+  /* ---- Navigation (Home / Back) ------------------------------------------ */
+  function makeLink(href, label, aria) {
+    var a = d.createElement("a");
+    a.href = href; a.innerHTML = label;
+    a.setAttribute("aria-label", aria);
+    return a;
+  }
+
+  function buildNav() {
+    if (cfg.nav === false) return;
+    if (d.querySelector(".tsp-nav, .tsp-barnav")) return;
+
+    var home = cfg.home === undefined ? "index.html" : cfg.home;
+    var links = [];
+    if (cfg.back) links.push(makeLink(cfg.back, "‹ Back", "Back"));
+    if (home)     links.push(makeLink(home, "⌂ Home", "Home"));
+    if (!links.length) return;
+
+    // Prefer integrating into the studio's shared sticky header if present —
+    // avoids overlapping page titles and matches each page's palette.
+    var bar = cfg.floatNav ? null : d.querySelector(".topbar");
+    if (bar) {
+      var wrap = d.createElement("span");
+      wrap.className = "tsp-barnav";
+      links.forEach(function (l) { wrap.appendChild(l); });
+      bar.insertBefore(wrap, bar.firstChild);
+      return;
+    }
+
+    // Otherwise: floating chip, and reserve top space on scrollable pages so
+    // it never covers the header/title.
+    var nav = d.createElement("nav");
+    nav.className = "tsp-nav";
+    nav.setAttribute("aria-label", "Site navigation");
+    links.forEach(function (l) { nav.appendChild(l); });
+    d.body.appendChild(nav);
+    reserveTopSpace();
+  }
+
+  function reserveTopSpace() {
+    if (!hasTouch) return;                 // desktop keeps its exact layout
+    // Skip full-viewport apps (canvas games, fixed overlays) — the chip sits
+    // in their letterbox margin and body padding would distort them.
+    var cs = getComputedStyle(d.body);
+    if (cs.overflowY === "hidden" || cs.overflowX === "hidden") return;
+    var scrolls = root.scrollHeight > (window.innerHeight + 4);
+    if (!scrolls) return;
+    var pad = parseFloat(cs.paddingTop) || 0;
+    d.body.style.paddingTop = (pad + 58) + "px";
+  }
+
+  /* ---- Gamepad ------------------------------------------------------------ */
+  function buildPad() {
+    if (!hasTouch) return;                       // keyboard devices skip it
+    if (!cfg.controls || !cfg.controls.length) return;
+    if (d.querySelector(".tsp-pad")) return;
+
+    var pad = d.createElement("div");
+    pad.className = "tsp-pad";
+    var left  = d.createElement("div"); left.className  = "tsp-cluster left";
+    var right = d.createElement("div"); right.className = "tsp-cluster right";
+    pad.appendChild(left); pad.appendChild(right);
+
+    cfg.controls.forEach(function (c) {
+      var btn = d.createElement("button");
+      btn.type = "button";
+      btn.className = "tsp-btn" + (c.big ? " big" : "");
+      btn.innerHTML = c.label || "";
+      btn.setAttribute("aria-label", c.aria || c.label || c.key);
+      bindButton(btn, c);
+      (c.side === "left" ? left : right).appendChild(btn);
+    });
+
+    d.body.appendChild(pad);
+  }
+
+  function bindButton(btn, c) {
+    var key = c.key, held = false;
+
+    function press(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (c.hold) {
+        if (held) return;
+        held = true;
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+      } else {
+        // tap: quick down/up so edge-triggered actions (fire/rotate/drop) fire once
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+        setTimeout(function () { dispatchKey("keyup", key); }, 24);
+        setTimeout(function () { btn.classList.remove("on"); }, 90);
+      }
+    }
+    function release(e) {
+      if (e) e.preventDefault();
+      if (c.hold && held) {
+        held = false;
+        btn.classList.remove("on");
+        dispatchKey("keyup", key);
+      }
+    }
+
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", function (e) {
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+        press(e);
+      });
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointercancel", release);
+      btn.addEventListener("lostpointercapture", release);
+    } else {
+      btn.addEventListener("touchstart", press, { passive: false });
+      btn.addEventListener("touchend", release);
+      btn.addEventListener("touchcancel", release);
+      btn.addEventListener("mousedown", press);
+      btn.addEventListener("mouseup", release);
+      btn.addEventListener("mouseleave", release);
+    }
+    // Safety: releasing a held key if the page loses focus
+    window.addEventListener("blur", release);
+  }
+
+  /* ---- Rotate hint -------------------------------------------------------- */
+  function buildRotateHint() {
+    if (!hasTouch) return;
+    if (cfg.rotateHint === false) return;
+    if (!cfg.controls || !cfg.controls.length) return;   // canvas games only
+    if (d.querySelector(".tsp-rot")) return;
+    var hint = d.createElement("div");
+    hint.className = "tsp-rot";
+    hint.setAttribute("role", "note");
+    hint.innerHTML = '<span class="rk">↻</span>' +
+      '<span>Turn sideways for more room</span>' +
+      '<button type="button" aria-label="Dismiss">×</button>';
+    hint.querySelector("button").addEventListener("click", function () {
+      root.classList.add("tsp-rot-dismissed");
+    });
+    d.body.appendChild(hint);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    injectStyles();
+    buildNav();
+    buildPad();
+    buildRotateHint();
+  }
+
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose a tiny API for pages that want to toggle the pad (e.g. hide on menus)
+  window.TSPMobile = {
+    isTouch: hasTouch,
+    isMobile: isMobile,
+    press: function (key) { dispatchKey("keydown", key); dispatchKey("keyup", key); },
+    showPad: function (v) {
+      var p = d.querySelector(".tsp-pad");
+      if (p) p.style.display = v === false ? "none" : "";
+    }
+  };
+})();
+</script></body>
+</html>
