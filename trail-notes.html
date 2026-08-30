@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trail Notes — Nantahala with Evan</title>
+<meta name="tsp:surface" content="app">
+<style>
+  /* ---- LIGHT: DEFAULT (day) ---- */
+  :root{
+    --paper:#f4efe6;
+    --ink:#161310;
+    --ink-soft:#443c32;
+    --river:#1d574f;
+    --river-deep:#123c37;
+    --rail:#7c3b1e;
+    --gold:#9a6410;
+    --line:#cabfad;
+    --card:#fbf8f2;
+    --shadow:rgba(20,15,10,.12);
+    --win:#1d574f;
+    --near:#1d574f;
+    --mid:#7c3b1e;
+    --far:#5a4a2a;
+    --on-rail:#fbf7ef;
+    --far-fg:var(--far); --ink-fg:var(--ink); --mid-fg:var(--mid); --near-fg:var(--near);
+    --paper-fg:var(--paper); --rail-fg:var(--rail); --river-fg:var(--river);
+  }
+  /* ---- LIGHT: DUSK ---- */
+  html[data-light="dusk"]{
+    --paper:#e6dcc7;
+    --ink:#171208;
+    --ink-soft:#463d2e;
+    --river:#134a42;
+    --river-deep:#0f3a35;
+    --rail:#6d3117;
+    --gold:#7f5006;
+    --line:#c9bda4;
+    --card:#efe7d6;
+    --shadow:rgba(20,15,10,.15);
+    --win:#134a42;
+    --near:#134a42;
+    --mid:#6d3117;
+    --far:#4a3d20;
+    --on-rail:#fbf7ef;
+    --far-fg:var(--far); --ink-fg:var(--ink); --mid-fg:var(--mid); --near-fg:var(--near);
+    --paper-fg:var(--paper); --rail-fg:var(--rail); --river-fg:var(--river);
+  }
+  /* ---- LIGHT: WARM-DARK (night) — warm charcoal, never pure black ---- */
+  html[data-light="night"]{
+    --paper:#1c1813;
+    --ink:#f1e7d6;
+    --ink-soft:#cdbfa8;
+    --river:#6fc9b8;
+    --river-deep:#274944;
+    --rail:#e2955f;
+    --gold:#e3b24d;
+    --line:#3a3128;
+    --card:#26201a;
+    --shadow:rgba(0,0,0,.5);
+    --win:#6fc9b8;
+    --near:#6fc9b8;
+    --mid:#e2955f;
+    --far:#d6b56a;
+    --on-rail:#17120d;
+    --far-fg:var(--far); --ink-fg:var(--ink); --mid-fg:var(--mid); --near-fg:var(--near);
+    --paper-fg:var(--paper); --rail-fg:var(--rail); --river-fg:var(--river);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink-fg);
+    font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;
+    font-size:1.125rem;line-height:1.5;-webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:660px;margin:0 auto;padding:24px 18px 130px}
+
+  /* ═══ RESERVED CHROME — grid header: Home · teaspoon brand · Studio Eyes ═══ */
+  .se-chrome{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;
+    padding:9px 14px;background:var(--card);border-bottom:2px solid var(--ink);
+    position:sticky;top:0;z-index:100;}
+  .se-home{justify-self:start;display:inline-flex;align-items:center;min-height:44px;
+    padding:8px 12px;border:2px solid var(--ink);border-radius:11px;background:var(--paper);
+    color:var(--ink-fg);font:inherit;font-size:14px;font-weight:700;text-decoration:none;}
+  .se-brand{justify-self:center;display:inline-flex;align-items:center;gap:9px;color:var(--ink-fg);}
+  .se-brand svg{width:34px;height:20px;color:var(--river-fg);flex:0 0 auto;}
+  .se-brand .wm{font-size:16px;letter-spacing:.01em;white-space:nowrap;font-weight:700;}
+  .se-eyes{justify-self:end;display:inline-flex;align-items:center;min-height:44px;
+    padding:8px 13px;border:2px solid var(--rail);border-radius:11px;background:var(--paper);
+    color:var(--ink-fg);font:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+  .se-home:focus-visible,.se-eyes:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+  @media (max-width:520px){ .se-brand .wm{display:none;} }
+
+  /* ═══ STUDIO EYES panel ═══ */
+  .se-panel{position:fixed;right:12px;top:62px;z-index:101;
+    width:min(320px,calc(100vw - 24px));background:var(--card);color:var(--ink-fg);
+    border:2px solid var(--river);border-radius:14px;padding:15px;
+    box-shadow:0 10px 34px var(--shadow);display:none;}
+  .se-panel[data-open="1"]{display:block;}
+  .se-panel h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-soft);margin:0 0 8px;font-weight:800;}
+  .se-row{display:flex;gap:6px;margin-bottom:14px;}
+  .se-btn{flex:1;min-height:44px;padding:8px 4px;border:2px solid var(--line);border-radius:10px;
+    background:var(--paper);color:var(--ink-fg);font:inherit;font-weight:700;font-size:14px;cursor:pointer;}
+  .se-btn[aria-pressed="true"]{background:var(--river);color:var(--paper-fg);border-color:var(--river);}
+  .se-btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+  .se-tog{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;
+    min-height:44px;padding:8px 11px;margin-bottom:6px;border:2px solid var(--line);border-radius:10px;
+    background:var(--paper);color:var(--ink-fg);font:inherit;font-weight:600;font-size:15px;cursor:pointer;text-align:left;}
+  .se-tog[aria-pressed="true"]{border-color:var(--river);}
+  .se-tog .st{font-size:13px;color:var(--ink-soft);font-weight:700;}
+  .se-tog[aria-pressed="true"] .st{color:var(--river-fg);}
+  .se-tog:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+  .se-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+  html.se-contrast:not([data-light="night"]){--paper:#ffffff;--card:#ffffff;--ink:#0f0c08;--ink-soft:#2c2517;--line:#8a7a58;}
+  html.se-contrast[data-light="night"]{--paper:#0c0a08;--card:#141009;--ink:#fff7e6;--ink-soft:#e6d8b8;}
+  html.se-reduce *{animation:none!important;transition:none!important;scroll-behavior:auto!important;}
+  html.se-a1{ zoom:1.15; } html.se-a2{ zoom:1.3; }
+  html.se-cb .idea p a,html.se-cb .note{text-decoration:underline;text-underline-offset:2px;}
+
+  /* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+  .se-rail{display:flex;gap:10px;justify-content:center;padding:20px 0 4px;
+    border-top:2px solid var(--line);margin-top:26px;}
+  .se-rail a,.se-rail button{min-height:44px;padding:10px 18px;border:2px solid var(--line);
+    border-radius:11px;background:var(--card);color:var(--ink-fg);font:inherit;font-weight:700;
+    font-size:14px;text-decoration:none;cursor:pointer;}
+  .se-rail a:focus-visible,.se-rail button:focus-visible{outline:3px solid var(--gold);outline-offset:2px;}
+
+  header.hero{text-align:center;margin:6px 0 22px}
+  .kicker{font-size:14px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--rail-fg);font-weight:700;margin-bottom:6px}
+  h1{font-size:30px;line-height:1.1;margin:0 0 6px;font-weight:800}
+  .sub{color:var(--ink-soft);font-size:16px}
+  .ridge{width:100%;max-width:100%;height:34px;margin:14px 0 0;display:block}
+
+  nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:55;
+    display:flex;background:var(--card);border-top:2px solid var(--line);}
+  nav.tabs button{flex:1;font:inherit;font-weight:700;font-size:15px;
+    min-height:56px;border:none;background:transparent;color:var(--ink-soft);
+    cursor:pointer;border-top:4px solid transparent;}
+  nav.tabs button[aria-selected="true"]{color:var(--ink-fg);
+    border-top-color:var(--rail);background:var(--paper)}
+  nav.tabs button:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+
+  section[hidden]{display:none}
+  h2{font-size:22px;margin:0 0 6px;font-weight:800}
+  .lede{color:var(--ink-soft);font-size:15px;margin:0 0 16px}
+
+  .day{background:var(--card);border:2px solid var(--line);
+    border-radius:15px;padding:16px 16px 14px;margin:0 0 14px;
+    box-shadow:0 3px 10px var(--shadow)}
+  .day .lbl{display:flex;justify-content:space-between;align-items:baseline;
+    border-bottom:2px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+  .day .lbl b{font-size:19px}
+  .day .lbl span{font-size:14px;color:var(--rail-fg);font-weight:700;
+    letter-spacing:.05em;text-transform:uppercase}
+  .row{display:flex;gap:11px;padding:7px 0;align-items:flex-start}
+  .row .t{min-width:74px;font-weight:700;color:var(--river-fg);font-variant-numeric:tabular-nums}
+  .row .d{flex:1}
+  .row .d small{display:block;color:var(--ink-soft);font-size:14px;margin-top:1px}
+  .flag{margin-top:9px;background:var(--paper);border-left:5px solid var(--gold);
+    padding:9px 11px;border-radius:0 9px 9px 0;font-size:15px;color:var(--ink-fg)}
+  .flag b{color:var(--rail-fg)}
+  .slotfit{margin-top:9px;font-size:14px;color:var(--ink-soft)}
+  .slotfit b{color:var(--river-fg)}
+
+  .who{display:flex;gap:8px;margin:0 0 14px}
+  .who button{flex:1;font:inherit;font-weight:700;min-height:48px;
+    border:2px solid var(--ink);border-radius:12px;background:var(--card);
+    color:var(--ink-fg);cursor:pointer}
+  .who button[aria-pressed="true"]{background:var(--river);color:var(--paper-fg);border-color:var(--river)}
+  .who button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .compose{display:flex;flex-direction:column;gap:9px;margin:0 0 20px}
+  .compose textarea{font:inherit;font-size:17px;min-height:70px;padding:11px;
+    border:2px solid var(--line);border-radius:12px;background:var(--card);
+    color:var(--ink-fg);resize:vertical}
+  .compose textarea:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+  .compose .add{font:inherit;font-weight:700;min-height:48px;border:none;
+    border-radius:12px;background:var(--rail);color:var(--on-rail);cursor:pointer}
+  .compose .add:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+  .idea{background:var(--card);border:2px solid var(--line);border-radius:13px;
+    padding:13px 14px;margin:0 0 11px;box-shadow:0 2px 7px var(--shadow)}
+  .idea .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+  .idea .by{font-weight:700;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+  .idea .by.dad{color:var(--river-fg)} .idea .by.evan{color:var(--rail-fg)}
+  .idea p{margin:0 0 10px}
+  .idea .vote{display:flex;align-items:center;gap:10px}
+  .idea .vote button{font:inherit;font-weight:700;min-height:44px;padding:6px 16px;
+    border:2px solid var(--ink);border-radius:11px;background:var(--paper);
+    color:var(--ink-fg);cursor:pointer}
+  .idea .vote button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .idea .vote .n{font-weight:800;font-size:20px;font-variant-numeric:tabular-nums;color:var(--win)}
+  .empty{color:var(--ink-soft);text-align:center;padding:26px 10px;font-style:italic}
+
+  .addschool{display:flex;flex-direction:column;gap:9px;margin:0 0 8px}
+  .addschool .fields{display:flex;gap:9px}
+  .addschool input[type=text]{font:inherit;font-size:17px;padding:11px;
+    border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink-fg)}
+  .addschool input.name{flex:1}
+  .addschool input.mins{width:118px;text-align:center}
+  .addschool input:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+  .addschool .hint{font-size:13px;color:var(--ink-soft);margin:0}
+  .addschool .add{font:inherit;font-weight:700;min-height:48px;border:none;
+    border-radius:12px;background:var(--rail);color:var(--on-rail);cursor:pointer}
+  .addschool .add:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+  .school{background:var(--card);border:2px solid var(--line);border-radius:13px;
+    padding:13px 14px;margin:0 0 11px;box-shadow:0 2px 7px var(--shadow)}
+  .school .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  .school .nm{font-weight:800;font-size:19px}
+  .school .nm small{display:block;font-weight:400;color:var(--ink-soft);font-size:14px;margin-top:1px}
+  .school .time{text-align:right;white-space:nowrap}
+  .school .time .val{font-weight:800;font-size:19px;font-variant-numeric:tabular-nums}
+  .band{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.04em;
+    text-transform:uppercase;padding:2px 9px;border-radius:20px;border:2px solid;margin-top:5px}
+  .band.near{color:var(--near-fg);border-color:var(--near)}
+  .band.mid{color:var(--mid-fg);border-color:var(--mid)}
+  .band.far{color:var(--far-fg);border-color:var(--far)}
+  .school .fits{margin-top:10px;font-size:14px;color:var(--ink-fg);
+    background:var(--paper);border-left:5px solid var(--gold);
+    padding:8px 11px;border-radius:0 9px 9px 0}
+  .school .fits b{color:var(--river-fg)}
+  .school .rm{margin-top:10px}
+  .school .rm button{font:inherit;font-size:14px;font-weight:700;min-height:40px;
+    padding:5px 13px;border:2px solid var(--ink);border-radius:10px;
+    background:var(--paper);color:var(--ink-fg);cursor:pointer}
+  .school .rm button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px;font-size:13px;color:var(--ink-soft)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:13px;height:13px;border-radius:50%;border:2px solid;display:inline-block}
+  .legend i.near{border-color:var(--near)} .legend i.mid{border-color:var(--mid)} .legend i.far{border-color:var(--far)}
+
+  .swap{margin-top:20px;padding:15px;border:2px dashed var(--line);
+    border-radius:14px;background:var(--card)}
+  .swap p{margin:0 0 11px;font-size:15px;color:var(--ink-soft)}
+  .swap .btns{display:flex;gap:9px;flex-wrap:wrap}
+  .swap button,.swap label{font:inherit;font-weight:700;min-height:48px;
+    padding:8px 16px;border:2px solid var(--ink);border-radius:12px;
+    background:var(--paper);color:var(--ink-fg);cursor:pointer;display:inline-flex;
+    align-items:center}
+  .swap button:focus-visible,.swap label:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+  .swap input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+  .note{font-size:14px;color:var(--ink-soft);text-align:center;margin-top:22px;line-height:1.45}
+
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.4rem 0 1rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v9 <span style="opacity:.75">75e938c</span></span></span></p>
+<script>(function(){var u=document.getElementById('seUpdated');if(!u)return;var d=new Date(document.lastModified);u.textContent=isNaN(d.getTime())?'Last updated recently':'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});})();</script>
+
+
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">Labor Day weekend &middot; Boston to the Blue Ridge</div>
+    <h1>Trail Notes</h1>
+    <div class="sub">You and Evan, planning from the Ash cabin in Nantahala</div>
+    <svg class="ridge" viewBox="0 0 660 34" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,34 L0,20 L60,8 L120,22 L190,4 L260,20 L330,10 L400,24 L470,7 L540,21 L600,12 L660,24 L660,34 Z"
+        fill="var(--river-deep)" opacity="0.9"/>
+      <path d="M0,34 L0,26 L80,18 L160,28 L240,15 L320,26 L400,17 L480,28 L560,19 L660,29 L660,34 Z"
+        fill="var(--river)" opacity="0.55"/>
+    </svg>
+  </header>
+
+  <section id="plan" aria-label="The plan">
+    <h2>The four days</h2>
+    <p class="lede">Flying Boston to Asheville, based at the cabin the whole trip.</p>
+
+    <div class="day">
+      <div class="lbl"><b>Friday</b><span>Sept 4 &middot; get there</span></div>
+      <div class="row"><div class="t">9:00 AM</div><div class="d">Fly Boston (BOS) to Asheville (AVL)<small>Land around noon</small></div></div>
+      <div class="row"><div class="t">~12:30</div><div class="d">Pick up the car, drive to the cabin<small>About 90 minutes, AVL to Nantahala</small></div></div>
+      <div class="row"><div class="t">Evening</div><div class="d">Settle in &middot; open slot<small>Bryson City for dinner is 20 min out</small></div></div>
+    </div>
+
+    <div class="day">
+      <div class="lbl"><b>Saturday</b><span>Sept 5 &middot; the train</span></div>
+      <div class="row"><div class="t">10:30 AM</div><div class="d">Nantahala Gorge train, departs Bryson City<small>~4.5 hr round trip &middot; 1 hr layover at the Nantahala Outdoor Center</small></div></div>
+      <div class="row"><div class="t">~3:00 PM</div><div class="d">Back in Bryson City &middot; afternoon open<small>Good window for a short drive or a nearby campus</small></div></div>
+      <div class="slotfit" id="satFit"></div>
+    </div>
+
+    <div class="day">
+      <div class="lbl"><b>Sunday</b><span>Sept 6 &middot; the big day</span></div>
+      <div class="row"><div class="t">All day</div><div class="d">Fishing trip (about 8 hours)<small>Full day &mdash; keep the evening light</small></div></div>
+    </div>
+
+    <div class="day">
+      <div class="lbl"><b>Monday</b><span>Sept 7 &middot; Labor Day, fly home</span></div>
+      <div class="row"><div class="t">AM</div><div class="d">Drive to Asheville, fly out<small>A close campus on the way out could fit</small></div></div>
+      <div class="flag"><b>Heads up:</b> Monday is Labor Day. Admissions offices are usually closed, so a guided campus visit that morning likely won't happen. A self-guided walk still works.</div>
+      <div class="slotfit" id="monFit"></div>
+    </div>
+  </section>
+
+  <section id="schools" aria-label="Colleges" hidden>
+    <h2>Colleges</h2>
+    <p class="lede">Add a school and the minutes from the cabin. It sorts by drive and shows which day it fits.</p>
+    <div class="legend" aria-hidden="true">
+      <span><i class="near"></i>Under 1 hr</span>
+      <span><i class="mid"></i>1 to 2.5 hr</span>
+      <span><i class="far"></i>Farther</span>
+    </div>
+    <div class="addschool">
+      <div class="fields">
+        <input class="name" type="text" id="schName" placeholder="School name" aria-label="School name">
+        <input class="mins" type="text" id="schMins" inputmode="numeric" placeholder="minutes" aria-label="Drive minutes from cabin">
+      </div>
+      <p class="hint">Minutes one way from the Ash cabin. Confirm the number before you commit a morning to it.</p>
+      <button class="add" id="addSch" type="button">Add school</button>
+    </div>
+    <div id="schoolList"></div>
+  </section>
+
+  <section id="ideas" aria-label="Ideas" hidden>
+    <h2>Ideas board</h2>
+    <div class="who" role="group" aria-label="Who's posting">
+      <button id="whoDad"  type="button" aria-pressed="true">Dad</button>
+      <button id="whoEvan" type="button" aria-pressed="false">Evan</button>
+    </div>
+    <div class="compose">
+      <textarea id="ideaText" placeholder="A drive, a stop, a place to eat, a campus to see..."></textarea>
+      <button class="add" id="addIdea" type="button">Add idea</button>
+    </div>
+    <div id="ideaList"></div>
+  </section>
+
+  <div class="swap" id="swapBox" hidden>
+    <p>Trading the board with Evan: save it, send the file (text, email, AirDrop), and the other person loads it back in. Schools and ideas both travel.</p>
+    <div class="btns">
+      <button id="saveBoard" type="button">Save board</button>
+      <label tabindex="0">Load a board
+        <input type="file" id="loadBoard" accept=".json,application/json">
+      </label>
+    </div>
+  </div>
+
+  <p class="note">Everything stays on this page &mdash; nothing is sent anywhere unless you save and share the file yourself.</p>
+
+  <!-- BOTTOM NAV RAIL — Back + Home -->
+  <nav class="se-rail" aria-label="Page navigation">
+    <button type="button" id="seBack" aria-label="Back">Back</button>
+    <a href="index.html" aria-label="Home">Home</a>
+  </nav>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button id="tPlan"    role="tab" aria-selected="true"  aria-controls="plan">Plan</button>
+  <button id="tSchools" role="tab" aria-selected="false" aria-controls="schools">Colleges</button>
+  <button id="tIdeas"   role="tab" aria-selected="false" aria-controls="ideas">Ideas</button>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+  var tabs=[["tPlan","plan"],["tSchools","schools"],["tIdeas","ideas"]];
+  var swapBox=document.getElementById("swapBox");
+  function show(sec){
+    tabs.forEach(function(p){
+      var sel=p[1]===sec;
+      document.getElementById(p[0]).setAttribute("aria-selected",sel?"true":"false");
+      document.getElementById(p[1]).hidden=!sel;
+    });
+    swapBox.hidden = (sec==="plan");
+    window.scrollTo(0,0);
+  }
+  tabs.forEach(function(p){
+    document.getElementById(p[0]).addEventListener("click",function(){show(p[1]);});
+  });
+  var backBtn=document.getElementById("seBack");
+  if(backBtn)backBtn.addEventListener("click",function(){history.back();});
+
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+  var schools=[
+    {nm:"Appalachian State", loc:"Boone, NC",     mins:150},
+    {nm:"Western Carolina",  loc:"Cullowhee, NC",  mins:45},
+    {nm:"UNC Asheville",     loc:"Asheville, NC",  mins:90},
+    {nm:"UNC Charlotte",     loc:"Charlotte, NC",  mins:150},
+    {nm:"NC State",          loc:"Raleigh, NC",    mins:255}
+  ];
+
+  function bandOf(m){ if(m<60)return "near"; if(m<=150)return "mid"; return "far"; }
+  function fmt(m){
+    if(m<60)return m+" min";
+    var h=Math.floor(m/60), r=m%60;
+    if(r===0)return h+" hr";
+    if(r===30)return h+".5 hr";
+    return h+" hr "+r+" min";
+  }
+  function fitsText(m){
+    if(m<60)return {ok:true, txt:"Fits Saturday afternoon or Monday on the way out."};
+    if(m<=90)return {ok:true, txt:"Tight but doable Saturday afternoon. Monday only self-guided (holiday)."};
+    if(m<=150)return {ok:false, txt:"About "+fmt(m)+" each way &mdash; would eat most of an open day. Saturday only if you skip the drive."};
+    return {ok:false, txt:"Too far for a day-trip from the cabin ("+fmt(m)+" each way)."};
+  }
+
+  var schoolList=document.getElementById("schoolList");
+  function renderSchools(){
+    schools.sort(function(a,b){return a.mins-b.mins;});
+    if(!schools.length){
+      schoolList.innerHTML='<div class="empty">No schools yet. Add one above.</div>';
+    } else {
+      schoolList.innerHTML=schools.map(function(s,i){
+        var b=bandOf(s.mins), f=fitsText(s.mins);
+        var locLine = s.loc ? '<small>'+esc(s.loc)+'</small>' : '';
+        var bandLbl = (b==="near"?"under 1 hr":b==="mid"?"1&ndash;2.5 hr":"farther");
+        return '<div class="school"><div class="top">'+
+          '<div class="nm">'+esc(s.nm)+locLine+'</div>'+
+          '<div class="time"><span class="val">'+fmt(s.mins)+'</span>'+
+          '<div><span class="band '+b+'">'+bandLbl+'</span></div></div>'+
+          '</div>'+
+          '<div class="fits"><b>'+(f.ok?"Fits a slot":"Tough fit")+'.</b> '+f.txt+'</div>'+
+          '<div class="rm"><button type="button" data-rm="'+i+'">Remove</button></div>'+
+          '</div>';
+      }).join("");
+    }
+    renderSlotFit();
+  }
+  schoolList.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-rm]"); if(!b)return;
+    schools.splice(+b.getAttribute("data-rm"),1); renderSchools();
+  });
+  function addSchool(){
+    var n=document.getElementById("schName"), m=document.getElementById("schMins");
+    var nm=n.value.trim(), mins=parseInt(m.value,10);
+    if(!nm)return;
+    if(isNaN(mins)||mins<0){ m.focus(); return; }
+    schools.push({nm:nm, loc:"", mins:mins});
+    n.value=""; m.value=""; n.focus(); renderSchools();
+  }
+  document.getElementById("addSch").addEventListener("click",addSchool);
+  document.getElementById("schMins").addEventListener("keydown",function(e){ if(e.key==="Enter")addSchool(); });
+
+  function renderSlotFit(){
+    var sat=document.getElementById("satFit"), mon=document.getElementById("monFit");
+    var near=schools.filter(function(s){return s.mins<=90;}).sort(function(a,b){return a.mins-b.mins;});
+    if(near.length){
+      sat.innerHTML='<b>Closest campus for the Saturday window:</b> '+esc(near[0].nm)+' ('+fmt(near[0].mins)+' each way).';
+      mon.innerHTML='<b>Monday self-guided option:</b> '+esc(near[0].nm)+' if it is on the way to Asheville.';
+    } else {
+      sat.innerHTML='<b>No campus under 90 min yet.</b> Add one on the Colleges tab to see what fits here.';
+      mon.innerHTML='';
+    }
+  }
+
+  var who="Dad";
+  document.getElementById("whoDad").addEventListener("click",function(){setWho("Dad");});
+  document.getElementById("whoEvan").addEventListener("click",function(){setWho("Evan");});
+  function setWho(w){who=w;
+    document.getElementById("whoDad").setAttribute("aria-pressed",w==="Dad"?"true":"false");
+    document.getElementById("whoEvan").setAttribute("aria-pressed",w==="Evan"?"true":"false");
+  }
+  var ideas=[
+    {by:"Dad", text:"Drive the Blue Ridge Parkway stretch near Cherokee on Saturday after the train.", votes:1},
+    {by:"Evan",text:"Look at Western Carolina Saturday afternoon &mdash; it's the closest one.", votes:1}
+  ];
+  var list=document.getElementById("ideaList");
+  function renderIdeas(){
+    if(!ideas.length){list.innerHTML='<div class="empty">No ideas yet. Add the first one above.</div>';return;}
+    list.innerHTML=ideas.map(function(it,i){
+      var cls=it.by==="Dad"?"dad":"evan";
+      return '<div class="idea"><div class="top"><span class="by '+cls+'">'+esc(it.by)+
+        '</span></div><p>'+esc(it.text)+'</p><div class="vote">'+
+        '<button type="button" data-i="'+i+'">Like</button>'+
+        '<span class="n" aria-label="'+it.votes+' likes">'+it.votes+'</span></div></div>';
+    }).join("");
+  }
+  list.addEventListener("click",function(e){
+    var b=e.target.closest("button[data-i]"); if(!b)return;
+    ideas[+b.getAttribute("data-i")].votes++; renderIdeas();
+  });
+  document.getElementById("addIdea").addEventListener("click",function(){
+    var t=document.getElementById("ideaText"); var v=t.value.trim();
+    if(!v)return; ideas.unshift({by:who,text:v,votes:0}); t.value=""; renderIdeas();
+  });
+
+  document.getElementById("saveBoard").addEventListener("click",function(){
+    var blob=new Blob([JSON.stringify({v:2,schools:schools,ideas:ideas},null,2)],{type:"application/json"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="trail-notes-board.json"; a.click();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+  });
+  document.getElementById("loadBoard").addEventListener("change",function(e){
+    var f=e.target.files[0]; if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{var d=JSON.parse(r.result);
+        if(d&&Array.isArray(d.schools))schools=d.schools;
+        if(d&&Array.isArray(d.ideas))ideas=d.ideas;
+        renderSchools(); renderIdeas();
+      }catch(err){alert("That file didn't read as a saved board. Try the .json you saved from here.");}
+    };
+    r.readAsText(f);
+  });
+
+  renderSchools(); renderIdeas();
+})();
+</script>
+<!-- STUDIO EYES — the studio's one comfort control, in the chrome. -->
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+})();
+</script>
+</body>
+</html>
