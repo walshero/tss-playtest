@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<!--
+  PLAY THE SEMESTER — EN195 Flash Fiction vertical slice. Tight Spiral Studios · walshero@gmail.com
+
+  WHAT IT IS: the Course River, but PLAYABLE for one genre (Flash Fiction, the live Week-6
+  unit). A score on the flash piece UNLOCKS the genre games (Sandbags, the Review Bench).
+  Two ways a score enters — no proof required, by founder design:
+    1. SELF-REPORT  — the student says where they are (honor system; Carry-Out pattern).
+    2. PASTE-IN     — the instructor (Matt) pastes a score block exported from a Google
+                      Sheet. Matt is the legitimate record-holder; this is the only person
+                      touching real scores. The file NEVER reads the Sheet (offline floor)
+                      and NEVER verifies, stores a roster, or transmits anything.
+
+  FERPA WALL [HARD, founder-confirmed "without proof ok"]: de-identifier is a SEAT LABEL
+  the student/instructor chooses (initials, seat number, a nickname) — NEVER a full name.
+  The paste-in format refuses to ask for names. Nothing is stored across sessions; nothing
+  leaves the page. Architecture A (paste-in) keeps single-file-offline intact.
+
+  SCOPE [Cleese/PM]: FLASH ONLY. The other three genres are shown on the river as future
+  reaches but are not playable here. One genre, end to end. Don't balloon to four.
+
+  UNLOCK: the genre games are separate single files in the same folder
+  (sandbags.html, review-bench.html, workshop-wall.html). This opens them by filename;
+  if they aren't beside this file, it says so plainly instead of breaking.
+
+  COMFORT: STUDIO EYES (Comfort Kernel v2) — Light Default/Dusk/Warm-dark via
+  html[data-light]; text size A/A+/A++; high-contrast/reduce-motion/colorblind toggles.
+  FLOOR: single-file, offline, in-memory; every text >=4.5:1 in all three light modes;
+  large type; 44px+; keyboard; visible focus; reduced-motion safe; scroll-reset;
+  shape+label not color alone; no emoji; phone-width.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="tsp:surface" content="tool">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Play the Semester — EN195 Flash</title>
+<style>
+/* ---- LIGHT: DEFAULT (day) ---- lock the palette. */
+:root{ color-scheme: light; }
+
+:root{
+  --bg:#f3ead8; --surface:#fffaf0; --surface-2:#efe4c8; --ink:#1f1b12; --ink2:#1f1b12; --ink-fill:#1f1b12;
+  --line:#d8caa8; --line2:#c2b288;
+  --accent:#3a4654; --accent2:#2b3540;        /* slate-B placeholder, GREEN-FREE */
+  --water:#4a6b86; --water-d:#2b4256;
+  --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
+  --rust:#8a3a1c;
+  --focus:#c8900a; --on-accent:#ffffff;
+  --tap:48px; --r:12px;
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,Consolas,monospace;
+}
+/* ---- LIGHT: DUSK ---- */
+html[data-light="dusk"]{
+  --bg:#e2d7bd; --surface:#f7f1e6; --surface-2:#e8ddc4; --ink:#2c2618; --ink2:#2c2618; --ink-fill:#2c2618;
+  --line:#ccbf9f; --line2:#b8a97f;
+}
+/* ---- LIGHT: WARM-DARK (night) — warm charcoal, never pure black ---- */
+html[data-light="night"]{
+  --bg:#1c1a16; --surface:#26231d; --surface-2:#33302a; --ink:#f3e4c0; --ink2:#f3e4c0; --ink-fill:#f3e4c0;
+  --line:#4a4230; --line2:#5e553e;
+  --accent:#8fa6bd; --accent2:#9fb6cd; --water:#8fb4d0; --water-d:#a9c6dd;
+  --gold:#f0c357; --gold-br:#f0c357; --gold-pale:#332c1a; --rust:#e8a07c; --on-accent:#0f0e0b;
+}
+/* ---- TOGGLE: high contrast ---- */
+html.se-contrast:not([data-light="night"]){ --bg:#fbfaf7; --surface:#fbfaf7; --surface-2:#f0ece2; --ink:#141109; --ink2:#141109; --ink-fill:#141109; --line:#b9a06a; --line2:#b9a06a; }
+html.se-contrast[data-light="night"]{ --bg:#0e0d0b; --surface:#161410; --surface-2:#221f19; --ink:#fff7e6; --ink2:#fff7e6; --ink-fill:#fff7e6; }
+/* ---- TOGGLE: text size A / A+ / A++ ---- */
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+/* ---- TOGGLE: reduce motion ---- */
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+/* ---- TOGGLE: colorblind cues ---- */
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+*{box-sizing:border-box;} html,body{margin:0;}
+body{ font-family:var(--serif); background:var(--bg); color:var(--ink); line-height:1.55; font-size:1.1875rem; -webkit-text-size-adjust:100%; }
+
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; z-index:100; font-family:var(--sans); }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 12px; border:1.5px solid var(--line2); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent2); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent2);
+  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel ═══ */
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 14px); z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink);
+  border:2px solid var(--accent2); border-radius:var(--r); padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; font-family:var(--sans); }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink2); margin:0 0 8px; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--line2); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent2); color:var(--on-accent); border-color:var(--accent2); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--line2); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent2); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--accent2); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+.wrap{ max-width:660px; margin:0 auto; padding:1.1rem 1rem 2.2rem; }
+.screen{ display:none; } .screen.on{ display:block; animation:fade .25s ease; }
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.where{ font:800 .72rem/1 var(--sans); letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem; }
+h1{ font-size:1.6rem; line-height:1.16; color:var(--ink); margin:.2rem 0 .5rem; }
+h2{ font-size:1.22rem; color:var(--ink); margin:.2rem 0 .6rem; }
+p{ margin:0 0 .9rem; } .lead{ font-size:1.06rem; } .beat{ font-style:italic; color:var(--ink2); }
+
+.go{ display:block; width:100%; font:800 1.04rem/1.2 var(--sans); cursor:pointer; min-height:56px; padding:.9rem 1rem; border:none; border-radius:13px; background:var(--accent); color:var(--on-accent); margin:.45rem 0; text-align:center; }
+.go:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; }
+.go.sec{ background:var(--surface); color:var(--ink); border:2px solid var(--ink-fill); }
+.go.ghost{ background:transparent; color:var(--ink); border:2px solid var(--line2); font-weight:700; min-height:48px; }
+.go:disabled{ opacity:.55; cursor:default; }
+
+/* role choose */
+.choice{ display:flex; align-items:center; gap:.7rem; border:3px solid var(--line2); border-radius:14px; background:var(--surface); padding:.9rem; margin:.6rem 0; cursor:pointer; min-height:66px; width:100%; text-align:left; }
+.choice:hover{ border-color:var(--gold-br); } .choice:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.choice .ci{ width:42px; height:42px; flex:none; }
+.choice .cn{ font:800 1.06rem/1.15 var(--sans); color:var(--ink); }
+.choice .cd{ font:400 .88rem/1.3 var(--sans); color:var(--ink2); }
+
+/* river mini-spine */
+.river{ border:2px solid var(--line2); border-radius:14px; background:var(--surface); padding:.8rem .9rem; margin:.6rem 0 1rem; }
+.river .rh{ font:800 .72rem/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin-bottom:.5rem; }
+.reach2{ position:relative; padding-left:26px; margin:.3rem 0; }
+.reach2::before{ content:''; position:absolute; left:8px; top:-4px; bottom:-4px; width:5px; background:var(--water); border-radius:3px; opacity:.7; }
+.stage{ position:relative; padding:.5rem .2rem; }
+.stage::before{ content:''; position:absolute; left:-22px; top:.7rem; width:12px; height:12px; border-radius:50%; background:var(--surface); border:3px solid var(--water-d); }
+.stage.here::before{ background:var(--gold-br); border-color:var(--gold-br); width:16px; height:16px; left:-24px; }
+.stage.sea::before{ background:var(--gold-br); border-color:var(--gold-br); }
+.stage .sn{ font:700 .96rem/1.3 var(--sans); color:var(--ink); }
+.stage .sd{ font:400 .82rem/1.3 var(--sans); color:var(--ink2); }
+.stage.future .sn{ color:var(--ink2); } .stage.future .sd::after{ content:' · later in the river'; font-style:italic; }
+
+/* score panel */
+.panel{ border:3px solid var(--accent2); border-radius:16px; background:var(--surface); padding:1rem; margin:.8rem 0; }
+.panel h2{ margin-top:0; }
+.field{ margin:.7rem 0; }
+.field label{ display:block; font:800 .85rem/1.3 var(--sans); margin-bottom:.25rem; }
+.field input, .field textarea, .field select{ width:100%; font:400 .96rem/1.4 var(--sans); padding:.6rem; border:2px solid var(--line2); border-radius:9px; background:var(--bg); color:var(--ink); min-height:48px; }
+.field textarea{ min-height:90px; resize:vertical; font-family:var(--mono); font-size:.86rem; }
+.field input:focus-visible, .field textarea:focus-visible, .field select:focus-visible{ outline:3px solid var(--focus); outline-offset:1px; }
+.note{ font:400 .85rem/1.4 var(--sans); background:var(--gold-pale); border:2px solid var(--gold-br); border-radius:10px; padding:.6rem .8rem; margin:.6rem 0; color:var(--ink); }
+.tiers{ display:flex; flex-direction:column; gap:.45rem; margin:.5rem 0; }
+.tier{ display:flex; align-items:center; gap:.6rem; border:2px solid var(--line2); border-radius:11px; background:var(--bg); padding:.7rem .8rem; cursor:pointer; min-height:54px; font:600 .96rem/1.3 var(--sans); color:var(--ink); }
+.tier:hover{ border-color:var(--gold-br); } .tier:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.tier.sel{ border-color:var(--gold-br); background:var(--gold-pale); }
+.tier .dot{ width:20px; height:20px; border:3px solid var(--ink-fill); border-radius:50%; flex:none; }
+.tier.sel .dot{ background:var(--gold-br); border-color:var(--gold-br); box-shadow:inset 0 0 0 3px var(--surface); }
+
+/* unlock cards */
+.unlocked{ border:3px solid var(--gold-br); border-radius:16px; background:var(--gold-pale); padding:1rem; margin:.8rem 0; }
+.locked{ border:2px dashed var(--line2); border-radius:14px; background:var(--surface); padding:1rem; margin:.8rem 0; }
+.gamecard{ border:2px solid var(--accent2); border-radius:12px; background:var(--surface); padding:.7rem .8rem; margin:.5rem 0; }
+.gamecard .gt{ font:800 1.02rem/1.2 var(--sans); color:var(--ink); }
+.gamecard .gd{ font:400 .88rem/1.35 var(--sans); color:var(--ink2); margin:.2rem 0 .5rem; }
+.openbtn{ display:block; width:100%; min-height:50px; font:800 .98rem/1 var(--sans); border:none; border-radius:11px; background:var(--accent); color:var(--on-accent); cursor:pointer; text-align:center; text-decoration:none; padding:.7rem; }
+.openbtn:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; }
+.miss{ font:700 .82rem/1.35 var(--sans); color:var(--rust); margin:.3rem 0 0; }
+
+.slug{ border:3px solid var(--water-d); border-radius:16px; background:var(--surface); padding:1rem; margin:.8rem 0; }
+.slug h2{ margin-top:0; }
+.slug .opt{ display:flex; gap:.6rem; align-items:flex-start; border:2px solid var(--line2); border-radius:11px; padding:.6rem .75rem; margin:.4rem 0; background:var(--bg); }
+.slug .opt .on{ font:700 .94rem/1.3 var(--sans); }
+.slug .opt .od{ font:400 .84rem/1.3 var(--sans); color:var(--ink2); }
+
+.copied{ font:700 .85rem/1 var(--sans); color:var(--ink); margin:.4rem 0 0; min-height:1.2em; }
+.foot{ margin-top:1.6rem; padding:1rem; background:var(--accent); color:var(--on-accent); border-radius:12px; font-family:var(--sans); font-size:.8rem; }
+.foot #seUpdated{ display:block; margin-top:.5rem; font-family:var(--mono); }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--line2); font-family:var(--sans); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line2); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+@media (max-width:520px){ body{font-size:1.125rem;} h1{font-size:1.4rem;} .wrap{padding:1rem .8rem 2rem;} }
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+
+
+<div class="wrap">
+
+  <!-- SCREEN 1 — ROLE -->
+  <section class="screen on" id="role" aria-labelledby="roleh">
+    <div class="where">Who's at the wheel</div>
+    <h1 id="roleh">Who are you right now?</h1>
+    <p class="lead">The semester plays the same either way. This just sets how a score gets in.</p>
+    <button class="choice" id="asStudent">
+      <svg class="ci" viewBox="0 0 42 42" aria-hidden="true">
+        <path d="M9 37 C9 25 33 25 33 37 Z" fill="var(--line2)"/>
+        <circle cx="23" cy="15" r="7.5" fill="var(--line2)"/>
+        <path d="M7 35 C7 23 31 23 31 35 Z" fill="var(--ink-fill)"/>
+        <circle cx="21" cy="13" r="7.5" fill="var(--ink-fill)"/>
+      </svg>
+      <span><span class="cn">I'm a student</span><br><span class="cd">I'll say where I am with the flash piece — honor system, no proof needed.</span></span>
+    </button>
+    <button class="choice" id="asInstructor">
+      <svg class="ci" viewBox="0 0 42 42" aria-hidden="true">
+        <rect x="9" y="11" width="28" height="20" rx="3" fill="var(--line2)"/>
+        <rect x="7" y="9" width="28" height="20" rx="3" fill="var(--ink-fill)"/>
+        <rect x="11" y="13" width="20" height="12" rx="1.5" fill="var(--surface)"/>
+        <rect x="17" y="29" width="4" height="6" fill="var(--ink-fill)"/>
+        <rect x="12" y="35" width="18" height="3.5" rx="1.75" fill="var(--ink-fill)"/>
+      </svg>
+      <span><span class="cn">I'm the instructor</span><br><span class="cd">I'll paste a score block I exported from my Google Sheet.</span></span>
+    </button>
+  </section>
+
+  <!-- SCREEN 2A — STUDENT SELF-REPORT -->
+  <section class="screen" id="student" aria-labelledby="studenth">
+    <div class="where">Where the river is now · Week 6, Flash Fiction</div>
+    <h1 id="studenth">Where are you with the flash piece?</h1>
+
+    <div class="river">
+      <div class="rh">Your position on the river</div>
+      <div class="reach2">
+        <div class="stage future"><div class="sn">Creative Nonfiction</div><div class="sd">tributary 1</div></div>
+        <div class="stage future"><div class="sn">Poetry</div><div class="sd">tributary 2</div></div>
+        <div class="stage future"><div class="sn">10-minute Play</div><div class="sd">tributary 3</div></div>
+        <div class="stage here"><div class="sn">Flash Fiction — you are here</div><div class="sd">write it, then workshop it</div></div>
+        <div class="stage sea"><div class="sn">Portfolio</div><div class="sd">the sea — all four arrive</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Pick where you honestly are</h2>
+      <p class="beat" style="margin:0 0 .6rem;">No proof, no checking. This just opens the right tool for where you are.</p>
+      <div class="tiers" id="tiers" role="radiogroup" aria-label="Where you are with the flash piece">
+        <button class="tier" role="radio" aria-checked="false" data-tier="none"><span class="dot"></span>I haven't started the flash story yet</button>
+        <button class="tier" role="radio" aria-checked="false" data-tier="draft"><span class="dot"></span>I have a rough draft — it's probably too long / baggy</button>
+        <button class="tier" role="radio" aria-checked="false" data-tier="ready"><span class="dot"></span>It's drafted and I want to sharpen it for workshop</button>
+      </div>
+      <button class="go" id="studentGo" disabled>Open what fits &rarr;</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 2B — INSTRUCTOR PASTE-IN -->
+  <section class="screen" id="instructor" aria-labelledby="instructorh">
+    <div class="where">Instructor · paste-in from Sheets</div>
+    <h1 id="instructorh">Paste a score block.</h1>
+    <p class="lead">Export a column from your Sheet in this shape, one per line. <b>Seat labels only — never full names.</b> The page reads it, shows the board, and forgets it when you close. Nothing is sent or saved.</p>
+    <div class="note"><b>Format:</b> <code>seat-label, stage</code> &nbsp;where stage is <code>none</code>, <code>draft</code>, or <code>ready</code>.<br>Example:<br><code>A1, ready</code><br><code>A2, draft</code><br><code>B3, none</code></div>
+    <div class="field">
+      <label for="paste">Score block (seat-label, stage — one per line)</label>
+      <textarea id="paste" placeholder="A1, ready
+A2, draft
+B3, none"></textarea>
+    </div>
+    <button class="go" id="loadPaste">Load the board &rarr;</button>
+    <div id="boardOut"></div>
+  </section>
+
+  <!-- SCREEN 3 — UNLOCK (student) -->
+  <section class="screen" id="unlock" aria-labelledby="unlockh">
+    <div class="where">Your move</div>
+    <h1 id="unlockh">Here's what fits where you are.</h1>
+    <div id="unlockBody"></div>
+    <button class="go ghost" id="backToTiers" style="margin-top:.8rem;">Pick a different spot</button>
+  </section>
+
+  <div class="foot">
+    Tight Spiral Studios · walshero@gmail.com — <b>Play the Semester</b>, Flash Fiction slice. A score (your own, or pasted from the instructor's Sheet) opens the tool that fits. No proof, no verifying, no roster, nothing sent or stored. Single file, offline.<br>
+    <b>Privacy:</b> seat labels only, never full names. The real grade still lives in the gradebook, entered by the instructor. <b>How this was made:</b> the founder's playable-semester idea, scoped to one genre and built on the honor system (Carry-Out pattern) so it stays FERPA-clean and offline. Green-free slate placeholder pending the palette pick.
+    <span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v14 <span style="opacity:.75">d701f4e</span></span> </span> </span>
+  </div>
+</div>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <a href="play-the-semester.html" aria-label="Back to Play the Semester">Back</a>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  var root=document.documentElement, sr=$('seSr');
+
+  /* last-updated: computed, not typed */
+  (function(){ var u=$('seUpdated'); if(!u) return;
+    var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+
+  /* STUDIO EYES */
+
+  /* screen router */
+  function show(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');}); $(id).classList.add('on'); window.scrollTo(0,0); var h=$(id).querySelector('h1'); if(h){ h.setAttribute('tabindex','-1'); h.focus(); } }
+  $('asStudent').addEventListener('click',function(){ show('student'); });
+  $('asInstructor').addEventListener('click',function(){ show('instructor'); });
+
+  /* tier select */
+  var tier=null;
+  Array.prototype.forEach.call(document.querySelectorAll('.tier'),function(t){
+    t.addEventListener('click',function(){
+      document.querySelectorAll('.tier').forEach(function(x){x.classList.remove('sel'); x.setAttribute('aria-checked','false');});
+      t.classList.add('sel'); t.setAttribute('aria-checked','true'); tier=t.dataset.tier; $('studentGo').disabled=false;
+    });
+  });
+  $('backToTiers').addEventListener('click',function(){ show('student'); });
+
+  /* the unlock logic — maps a stage to the tool that fits.
+     none  -> the SLUG on-ramp (tiny chosen-form seed that gets you to a draft)
+     draft -> Sandbags (cut the baggy draft light)
+     ready -> the Review Bench (sharpen by naming moves) + the Workshop Wall */
+  function gameCard(file, title, desc, cta){
+    return '<div class="gamecard"><div class="gt">'+title+'</div><div class="gd">'+desc+'</div>'+
+           '<a class="openbtn" href="'+file+'" target="_blank" rel="noopener" data-file="'+file+'">'+cta+'</a></div>';
+  }
+  function slugBlock(){
+    return '<div class="slug"><h2>No draft yet? Start the smallest possible version.</h2>'+
+      '<p class="beat" style="margin:.1rem 0 .7rem;">Pick a form. Any of these counts as starting — you choose how.</p>'+
+      '<div class="opt"><span><span class="on">A single image.</span><br><span class="od">One thing you saw this week. A sentence. That’s the seed of a flash piece.</span></span></div>'+
+      '<div class="opt"><span><span class="on">A voice memo.</span><br><span class="od">Say the story out loud in 60 seconds, then jot the one line you can’t lose.</span></span></div>'+
+      '<div class="opt"><span><span class="on">The last line first.</span><br><span class="od">Write the ending you want. The story is how you earn it.</span></span></div>'+
+      '<p style="margin:.7rem 0 0;">Got even one of those down? You have a draft. Come back and pick <b>"rough draft."</b></p></div>';
+  }
+
+  $('studentGo').addEventListener('click',function(){
+    var body=$('unlockBody'); body.innerHTML='';
+    if(tier==='none'){
+      body.innerHTML = slugBlock();
+    } else if(tier==='draft'){
+      body.innerHTML =
+        '<div class="unlocked"><h2 style="margin-top:0;">Unlocked: cut it light.</h2>'+
+        '<p style="margin:.1rem 0 .6rem;">A baggy draft is exactly the right problem. Drop the dead weight and watch the piece rise.</p>'+
+        gameCard('sandbags.html','Sandbags','Tap words to cut; each one drops as a sandbag and the piece lifts. You’re aiming for lean, not zero.','Open Sandbags &rarr;')+
+        '</div>';
+    } else if(tier==='ready'){
+      body.innerHTML =
+        '<div class="unlocked"><h2 style="margin-top:0;">Unlocked: sharpen for workshop.</h2>'+
+        '<p style="margin:.1rem 0 .6rem;">Drafted and ready? Learn to name the moves — then you’ll review your group with real vocabulary.</p>'+
+        gameCard('review-bench.html','The Review Bench','Read a sample piece and place named moves on it, then compare with a strong reviewer. Trains how you’ll comment in workshop.','Open the Review Bench &rarr;')+
+        gameCard('workshop-wall.html','The Workshop Wall','The six moves as a labeled rack — the toolkit you pull from when you review.','Open the Workshop Wall &rarr;')+
+        '</div>';
+    }
+    /* graceful degradation: if a game file isn't beside this one, the link still
+       opens; warn the player so a 404 isn't a mystery. We can't truly probe a local
+       file offline, so we add a plain note rather than a broken-feeling silence. */
+    var notes=document.createElement('p'); notes.className='miss';
+    notes.textContent='If a game doesn’t open, it needs to be saved in the same folder as this file.';
+    body.appendChild(notes);
+    show('unlock');
+  });
+
+  /* instructor paste-in -> board (de-identified, in-memory only) */
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  $('loadPaste').addEventListener('click',function(){
+    var raw=$('paste').value.trim();
+    var out=$('boardOut'); out.innerHTML='';
+    if(!raw){ out.innerHTML='<p class="miss">Paste a score block first.</p>'; return; }
+    var rows=raw.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var counts={none:0,draft:0,ready:0,unknown:0}; var parsed=[];
+    rows.forEach(function(l){
+      var parts=l.split(','); var seat=(parts[0]||'').trim(); var st=(parts[1]||'').trim().toLowerCase();
+      if(['none','draft','ready'].indexOf(st)<0) st='unknown';
+      counts[st]++; parsed.push({seat:seat, st:st});
+    });
+    var html='<div class="panel"><h2 style="margin-top:0;">The board</h2>'+
+      '<p class="beat" style="margin:.1rem 0 .7rem;">In memory only — closes when you leave. Seat labels as you pasted them.</p>'+
+      '<p><b>Not started:</b> '+counts.none+' &nbsp;·&nbsp; <b>Rough draft:</b> '+counts.draft+' &nbsp;·&nbsp; <b>Ready:</b> '+counts.ready+
+      (counts.unknown?(' &nbsp;·&nbsp; <b>unreadable:</b> '+counts.unknown):'')+'</p>';
+    html+='<div class="river"><div class="rh">By seat</div>';
+    parsed.forEach(function(p){
+      var label = p.st==='none'?'not started':p.st==='draft'?'rough draft':p.st==='ready'?'ready to sharpen':'unreadable line';
+      html+='<div class="stage'+(p.st==='ready'?' here':'')+'"><div class="sn">'+ esc(p.seat||'(no label)') +'</div><div class="sd">'+label+'</div></div>';
+    });
+    html+='</div>';
+    html+='<p style="margin:.6rem 0 0; font:400 .88rem/1.4 var(--sans);">Use this to see who needs the slug on-ramp (not started), who needs <b>Sandbags</b> (baggy draft), and who’s <b>ready</b> for the Review Bench. Point each student to the tool that fits — the games are the same ones the students open.</p>';
+    html+='</div>';
+    out.innerHTML=html;
+  });
+})();
+</script>
+</body>
+</html>
