@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<!--
+  BALLAST — a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
+  EN195 Creative Writing. The last week. The compression move, made physical.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ballast — a flash fiction climb</title>
+<style>
+/* STUDIO EYES v2 (Comfort Kernel v2): light ladder via html[data-light]. */
+:root{ color-scheme: light dark; }
+html{ font-size:100%; }
+
+/* ---- LIGHT: DAY (default) ---- */
+:root{
+  --bg:#f3ead8; --surface:#fffaf0; --surface-2:#efe4c8; --ink:#1f1b12; --ink2:#1f1b12; --ink-fill:#1f1b12;
+  --line:#d8caa8; --line2:#c2b288;
+  --accent:#3a4654; --accent2:#2b3540; --accent2-ink:#2b3540; --accent-strong:#2b3540; --on-accent:#ffffff;
+  --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
+  --rust:#8a3a1c; --sky:#cdd8e2;
+  --focus:#c8900a; --tap:48px; --r:12px;
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  --display:'Times New Roman',Georgia,serif;
+}
+/* ---- LIGHT: DUSK ---- */
+html[data-light="dusk"]{
+  --bg:#e6d8b8; --surface:#f2e8d2; --surface-2:#e0d0aa; --ink:#221c10; --ink2:#221c10; --ink-fill:#221c10;
+  --line:#cdb98d; --line2:#b8a373; --sky:#c4cfda;
+  --accent:#37536a; --accent2:#24384a; --accent2-ink:#24384a; --accent-strong:#24384a; --on-accent:#ffffff;
+  --gold:#5f3d00; --gold-br:#b3810a; --gold-pale:#f3e3ba;
+}
+/* ---- LIGHT: WARM-DARK (night) — warm charcoal, never pure black ---- */
+html[data-light="night"]{
+  --bg:#1c1a16; --surface:#26231d; --surface-2:#33302a; --ink:#f3e4c0; --ink2:#f3e4c0; --ink-fill:#f3e4c0;
+  --line:#4a4230; --line2:#5e553e;
+  --accent:#8fa6bd; --accent2:#9fb6cd; --accent2-ink:#9fb6cd; --accent-strong:#a9bcd0; --on-accent:#141109;
+  --gold:#f0c357; --gold-br:#f0c357; --gold-pale:#332c1a;
+  --rust:#e8a07c; --sky:#2c3540; --focus:#f0c357;
+}
+/* ---- STUDIO EYES toggles ---- */
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+html.se-contrast:not([data-light="night"]){ --bg:#fbfaf7; --surface:#fbfaf7; --surface-2:#f0ece2; --ink:#141109; --ink2:#141109; --ink-fill:#141109; --line:#b9a06a; --line2:#9c8347; }
+html.se-contrast[data-light="night"]{ --bg:#0e0d0b; --surface:#161410; --surface-2:#22201a; --ink:#fff7e6; --ink2:#fff7e6; --ink-fill:#fff7e6; }
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+*{box-sizing:border-box;} html,body{margin:0;}
+body{ font-family:var(--serif); background:var(--bg); color:var(--ink); line-height:1.55; font-size:1.1875rem; -webkit-text-size-adjust:100%; }
+
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; z-index:100; font-family:var(--sans); }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 12px; border:1.5px solid var(--line2); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent-strong); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-strong);
+  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 14px); z-index:101;
+  width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink);
+  border:2px solid var(--accent-strong); border-radius:var(--r); padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink2); margin:0 0 8px; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--line2); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent-strong); color:var(--on-accent); border-color:var(--accent-strong); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
+  min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--line2); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent-strong); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--accent-strong); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--line2); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line2); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+.wrap{ max-width:660px; margin:0 auto; padding:1.1rem 1rem 5rem; }
+.screen{ display:none; } .screen.on{ display:block; animation:fade .25s ease; }
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.where{ font:800 .72rem/1 var(--sans); letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem; }
+h1{ font-size:1.7rem; line-height:1.16; color:var(--ink); margin:.2rem 0 .5rem; }
+h2{ font-size:1.3rem; color:var(--ink); margin:.2rem 0 .6rem; }
+p{ margin:0 0 .9rem; } .lead{ font-size:1.1rem; } .beat{ font-style:italic; color:var(--ink2); }
+
+.go{ display:block; width:100%; font:800 1.04rem/1.2 var(--sans); cursor:pointer; min-height:56px; padding:.9rem 1rem; border:none; border-radius:13px; background:var(--accent); color:var(--on-accent); margin:.45rem 0; text-align:center; }
+.go:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; }
+.go.sec{ background:var(--surface); color:var(--ink); border:2px solid var(--ink-fill); }
+.go.ghost{ background:transparent; color:var(--ink); border:2px solid var(--line2); font-weight:700; min-height:48px; }
+.go:disabled{ opacity:.6; cursor:default; }
+
+
+.sky{ position:sticky; top:46px; z-index:20; background:var(--sky); border:2px solid var(--line2); border-radius:14px; padding:.55rem .7rem; margin:0 0 .9rem; }
+.sky .skytop{ display:flex; align-items:center; gap:.5rem; }
+.sky .alt{ font:800 .82rem/1 var(--sans); color:var(--ink); }
+.sky .altnum{ font:800 1.05rem/1 var(--sans); color:var(--ink); }
+.sky .track{ position:relative; height:260px; margin:.55rem 0 .2rem; background:linear-gradient(180deg, var(--sky) 0%, var(--surface) 100%); border-radius:10px; overflow:hidden; }
+.sky .ground{ position:absolute; left:0; right:0; bottom:0; height:3px; background:var(--ink-fill); border-radius:2px; }
+.sky .ball{ position:absolute; left:50%; transform:translateX(-50%); bottom:6px; width:88px; height:106px; transition:bottom .6s cubic-bezier(.2,1.2,.3,1); }
+/* Scene-first: the launch field is the first paint — the balloon roped to the ground,
+   the thing the whole game is about, before a word of instruction. */
+.launchscene{ position:relative; height:56dvh; min-height:340px; margin:0 0 1rem; border:3px solid var(--line2); border-radius:14px; overflow:hidden;
+  background:linear-gradient(180deg, var(--sky) 0%, var(--surface) 100%); }
+.launchscene::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:4px; background:var(--ink-fill); }
+.launchscene .ls-ball{ position:absolute; left:50%; bottom:10px; transform:translateX(-50%); width:min(40vw,150px); height:auto; }
+.sky .liftmark{ position:absolute; left:0; right:0; border-top:2px dashed var(--gold-br); }
+.sky .liftlabel{ position:absolute; right:2px; font:800 .64rem/1 var(--sans); color:var(--gold); background:var(--sky); padding:0 .2rem; }
+.sky .weight{ font:700 .76rem/1.2 var(--sans); color:var(--ink); }
+
+.playbill{ border:3px solid var(--accent2); border-radius:16px; background:var(--surface); padding:.7rem .8rem 1rem; margin:.4rem 0 1rem; }
+.bill-h{ text-align:center; border-bottom:3px double var(--accent2); padding-bottom:.4rem; margin-bottom:.6rem; }
+.bill-h .k{ font:800 .68rem/1 var(--sans); letter-spacing:.18em; text-transform:uppercase; color:var(--accent2-ink); }
+.bill-h .t{ font:800 1.05rem/1.1 var(--display); color:var(--ink); letter-spacing:.02em; }
+.draft{ font-size:1.12rem; line-height:2.15; }
+.w{ display:inline-block; cursor:pointer; padding:.06em .28em; margin:.06em .02em; border-radius:7px; border:2px solid var(--line); background:var(--surface); }
+.w:hover{ border-color:var(--gold-br); background:var(--gold-pale); }
+.w:focus-visible{ outline:3px solid var(--focus); outline-offset:1px; }
+.w.locked{ cursor:default; font-weight:700; }
+.w.cut{ opacity:.18; text-decoration:line-through; cursor:default; }
+
+.heap{ border:2px solid var(--line2); border-radius:12px; background:var(--surface); padding:.6rem .75rem; margin:0 0 1rem; min-height:58px; }
+.heap .hh{ font:800 .68rem/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin-bottom:.35rem; }
+.heap .pile{ display:flex; flex-wrap:wrap; gap:.3rem; }
+.scrap{ display:inline-block; font:600 .82rem/1 var(--sans); padding:.28rem .45rem; border:2px solid var(--line2); border-radius:7px; background:var(--bg); color:var(--ink); }
+@keyframes fall{ 0%{ transform:translateY(-26px) rotate(0); opacity:0; } 55%{ transform:translateY(4px) rotate(-3deg); } 100%{ transform:translateY(0) rotate(-2deg); opacity:1; } }
+.scrap.new{ animation:fall .5s ease; }
+.heap .none{ font:italic 400 .85rem/1.3 var(--serif); color:var(--ink2); }
+
+.hint{ border-left:5px solid var(--gold-br); background:var(--gold-pale); border-radius:0 10px 10px 0; padding:.7rem .9rem; margin:.8rem 0; font:400 .96rem/1.45 var(--sans); }
+.lift-msg{ border:3px solid var(--gold-br); border-radius:14px; background:var(--gold-pale); padding:.85rem 1rem; margin:1rem 0; }
+.lift-msg .lm{ font:800 1.08rem/1.25 var(--sans); color:var(--ink); }
+.controls{ display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0; }
+.controls .go{ flex:1; min-width:150px; }
+
+.engine{ border:2px dashed var(--accent2); border-radius:13px; background:var(--surface); padding:.85rem .9rem; margin:1rem 0; font-family:var(--sans); }
+.engine .eh{ font:800 .78rem/1 var(--sans); letter-spacing:.05em; text-transform:uppercase; color:var(--accent2-ink); margin-bottom:.5rem; }
+.engine table{ width:100%; border-collapse:collapse; font-size:.88rem; } .engine td{ padding:.4rem .3rem; border-bottom:1px solid var(--line); vertical-align:top; } .engine td:first-child{ font-weight:800; width:42%; }
+.engine tr:last-child td{ border-bottom:none; }
+.copyout{ border:2px solid var(--accent2); border-radius:13px; background:var(--surface); padding:.85rem .9rem; margin:1rem 0; }
+.copyout .ch{ font:800 .78rem/1 var(--sans); letter-spacing:.05em; text-transform:uppercase; color:var(--accent2-ink); margin-bottom:.5rem; }
+.copyout label{ display:block; font:700 .85rem/1.3 var(--sans); margin:.6rem 0 .25rem; }
+.copyout textarea{ width:100%; font:400 .9rem/1.5 var(--sans); padding:.6rem; border:2px solid var(--line2); border-radius:9px; background:var(--bg); color:var(--ink); min-height:80px; resize:vertical; }
+.copyout textarea:focus-visible{ outline:3px solid var(--focus); outline-offset:1px; }
+#carry{ width:100%; font:400 .86rem/1.5 var(--sans); padding:.7rem; border:2px solid var(--line2); border-radius:9px; background:var(--bg); color:var(--ink); min-height:160px; resize:vertical; white-space:pre-wrap; margin-top:.5rem; }
+.copied{ font:700 .85rem/1 var(--sans); color:var(--ink); margin:.4rem 0 0; min-height:1.2em; }
+
+.peak{ text-align:center; padding:1.2rem 1rem .3rem; }
+.final-piece{ border:3px double var(--accent2); border-radius:14px; background:var(--surface); padding:1rem 1.1rem; margin:1rem 0; font-size:1.18rem; line-height:1.7; text-align:left; }
+.foot{ margin-top:1.6rem; padding:1rem; background:#2b3540; color:#fff; border-radius:12px; font-family:var(--sans); font-size:.8rem; }
+.foot a{ color:#fff; text-decoration:underline; }
+a:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; border-radius:2px; }
+.tsp-barnav a:focus-visible, .tsp-nav a:focus-visible{ outline:3px solid var(--focus) !important; outline-offset:2px; }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+@media (max-width:520px){ body{font-size:1.125rem;} h1{font-size:1.46rem;} .wrap{padding:1rem .8rem 5rem;} .draft{font-size:1.06rem; line-height:2.05;} }
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+<style>
+/* LAB STATUS BAND - founder ruling 2026-08-27, "put in lab not as done game."
+   New builds carry a .tsp-lab chip inside the h1, beside the version chip. This is
+   a RETROFIT across 19 shipped games whose heading structures have nothing in
+   common: some carry four h1 elements, one builds its title from a JS template, and
+   three have no h1 at all. Rewriting the title markup of nineteen shipped games to
+   add a label is a large blast radius for a label, so the status mounts as its own
+   band instead. Colours are fixed rather than tokenised, because these files do not
+   share a palette and a status that inherits an unknown token can arrive invisible.
+   #f6efe0 on #241a11 is 13.4:1, which clears the studio floor of 7:1 with room. */
+.tsp-labband{
+  display:block; box-sizing:border-box; width:100%;
+  background:#241a11; color:#f6efe0;
+  border-bottom:3px solid #b98c39;
+  padding:9px 16px; margin:0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:18px; line-height:1.35; font-weight:700; letter-spacing:.02em;
+}
+.tsp-labband b{
+  display:inline-block; color:#f3c675;
+  border:2px dashed #f3c675; border-radius:3px;
+  padding:.06em .38em; margin-right:.5em; letter-spacing:.09em;
+}
+@media print{ .tsp-labband{background:#fff; color:#000; border-bottom:2px solid #000;} }
+</style>
+</head>
+<body>
+<p class="tsp-labband"><b>LAB</b>An experiment on the bench, not a finished game.</p>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+<p class="se-stamp" style="margin:.4rem 0 1rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v17 <span style="opacity:.75">75e938c</span></span></span></p>
+<script>(function(){var u=document.getElementById('seUpdated');if(!u)return;var d=new Date(document.lastModified);u.textContent=isNaN(d.getTime())?'Last updated recently':'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});})();</script>
+
+
+<div class="wrap">
+
+  <section class="screen on" id="scene" aria-labelledby="sceneh">
+    <div class="where">The launch field</div>
+    <div class="launchscene" aria-hidden="true">
+      <svg class="ls-ball" viewBox="0 0 40 48"><path d="M20 2 C31 2 37 11 37 20 C37 29 29 35 24 38 L16 38 C11 35 3 29 3 20 C3 11 9 2 20 2 Z" fill="var(--rust)" stroke="var(--ink-fill)" stroke-width="1.5"/><path d="M20 2 C24 8 24 32 24 38 M20 2 C16 8 16 32 16 38" stroke="var(--ink-fill)" stroke-width="1" fill="none" opacity=".5"/><rect x="15" y="40" width="10" height="6" rx="1.5" fill="var(--gold-br)" stroke="var(--ink-fill)" stroke-width="1.2"/><path d="M16 40 L17 38 M24 40 L23 38" stroke="var(--ink-fill)" stroke-width="1"/></svg>
+    </div>
+    <div class="playbill" aria-hidden="false">
+      <div class="bill-h"><div class="k">One night only · The astounding</div><div class="t">OVERWRITTEN BALLOON CO.</div></div>
+      <p class="lead" style="margin-bottom:.4rem;">A balloon sits on the ground. It is roped to the dirt by every extra word in the draft tied to it.</p>
+      <p class="beat" style="margin:0;">It wants to fly. It can't. It's carrying too much.</p>
+    </div>
+    <h1 id="sceneh">You're going to make it fly.</h1>
+    <p>Not by adding anything. By <b>cutting weight.</b></p>
+    <p>Tap any word in the draft to drop it. Each word you cut falls to the ground as ballast — and the balloon rises. When the piece is light enough, it lifts off. That's the whole game.</p>
+    <div class="hint" style="background:var(--surface); border-left-color:var(--accent2);"><b>One promise:</b> a word you cut isn't a bad word. It's just weight <i>this</i> flight doesn't need. It can fly another day, in another piece.</div>
+    <button class="go" id="toPlay">Walk up to the balloon &rarr;</button>
+  </section>
+
+  <section class="screen" id="play" aria-labelledby="playh">
+    <div class="where">The climb</div>
+
+    <div class="sky" id="skybox" aria-hidden="true">
+      <div class="skytop"><span class="alt">Altitude</span><span class="altnum" id="altnum" style="margin-left:auto;">on the ground</span></div>
+      <div class="track" id="track">
+        <div class="liftmark" id="liftmark" style="bottom:156px;"><span class="liftlabel">liftoff</span></div>
+        <div class="ground"></div>
+        <svg class="ball" id="ball" viewBox="0 0 40 48" aria-hidden="true">
+          <path d="M20 2 C31 2 37 11 37 20 C37 29 29 35 24 38 L16 38 C11 35 3 29 3 20 C3 11 9 2 20 2 Z" fill="var(--rust)" stroke="var(--ink-fill)" stroke-width="1.5"/>
+          <path d="M20 2 C24 8 24 32 24 38 M20 2 C16 8 16 32 16 38" stroke="var(--ink-fill)" stroke-width="1" fill="none" opacity=".5"/>
+          <rect x="15" y="40" width="10" height="6" rx="1.5" fill="var(--gold-br)" stroke="var(--ink-fill)" stroke-width="1.2"/>
+          <path d="M16 40 L17 38 M24 40 L23 38" stroke="var(--ink-fill)" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="weight" id="weightline" aria-live="polite">Carrying 41 words. Drop the dead weight.</div>
+    </div>
+
+    <p class="sr" id="liveStat" aria-live="polite"></p>
+
+    <div class="playbill">
+      <div class="bill-h"><div class="k">The draft tied to the balloon</div><div class="t">"Last Stop"</div></div>
+      <div class="draft" id="draft"></div>
+    </div>
+
+    <div class="heap" aria-live="off">
+      <div class="hh">Ballast on the ground (the climb made visible)</div>
+      <div class="pile" id="pile"><span class="none">nothing dropped yet</span></div>
+    </div>
+
+    <div class="hint" id="hintbox">Tap words you don't need. Watch the balloon. You're aiming for the dashed <b>liftoff</b> line — not for zero.</div>
+
+    <div class="lift-msg" id="liftMsg" hidden>
+      <div class="lm" id="liftText"></div>
+    </div>
+
+    <div class="controls">
+      <button class="go ghost" id="undo">Put the last word back</button>
+      <button class="go" id="toReveal" disabled>See what flew &rarr;</button>
+    </div>
+  </section>
+
+  <section class="screen" id="reveal" aria-labelledby="revealh">
+    <div class="peak">
+      <div class="where" style="text-align:center;">Liftoff</div>
+      <h1 id="revealh">It flew.</h1>
+      <p class="lead">Here's the piece that was inside the heavy one the whole time — the part light enough to leave the ground.</p>
+    </div>
+    <div class="final-piece" id="finalPiece"></div>
+    <p>You didn't write less. You found the piece that could fly. Everything on the ground was real work — it's how you found this.</p>
+
+    <div class="engine">
+      <div class="eh">Show the engine — what this drill was</div>
+      <table>
+        <tr><td>The move</td><td>Compression: cut to what carries weight, keep what lifts.</td></tr>
+        <tr><td>The flash-fiction craft</td><td>Every word earns its place or it's ballast. Implication does the work the cut words were doing.</td></tr>
+        <tr><td>What "liftoff" measured</td><td>Not fewest words — <i>lean enough to fly.</i> Many different cuts lift off. There's no single right answer, which is the point.</td></tr>
+        <tr><td>EN195 link</td><td>This is the Flash Fiction workshop revision move, made physical: the portfolio piece is the one that flies.</td></tr>
+      </table>
+    </div>
+
+    <div class="copyout">
+      <div class="ch">Carry it out — your record (nothing is sent)</div>
+      <p style="font:400 .9rem/1.45 var(--sans); margin:0 0 .3rem;">This builds a clean note you can copy into a Doc, an email, or your portfolio. You choose whether to share it.</p>
+      <label for="learned">One thing cutting taught you about this piece</label>
+      <textarea id="learned" placeholder="e.g. the ending was stronger once I stopped explaining it"></textarea>
+      <label for="kept">A word or line you fought to keep — and why</label>
+      <textarea id="kept" placeholder="e.g. kept 'cold' — it's the only weather the story needs"></textarea>
+      <button class="go" id="buildCarry" style="margin-top:.7rem;">Build my record &rarr;</button>
+      <textarea id="carry" readonly aria-label="Your carry-out record"></textarea>
+      <button class="go sec" id="copyCarry">Copy it</button>
+      <p class="copied" id="copiedMsg" aria-live="polite"></p>
+    </div>
+
+    <div class="controls">
+      <button class="go ghost" id="replay">Fly it again (new draft weight)</button>
+    </div>
+  </section>
+
+  <div class="foot">
+    Tight Spiral Studios · <a href="mailto:walshero@gmail.com">walshero@gmail.com</a> — <b>Ballast</b>, a flash-fiction climb for EN195.
+    Single file, offline, nothing leaves the page. The draft is original studio text, not a published work.
+    Green-free slate placeholder pending the palette pick. <br>
+    <b>How this was made:</b> the cut-as-ascent mechanic was the founder's image — drop weight, rise. Panel (Cleese conducting) cleared it on the dignity wording: a cut word is weight, never a failure. You are the human in the loop.
+  </div>
+</div>
+
+<!-- BOTTOM NAV RAIL -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" id="seBack" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function show(id){ document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');}); $(id).classList.add('on'); window.scrollTo(0,0); var h=$(id).querySelector('h1'); if(h){ h.setAttribute('tabindex','-1'); h.focus(); } }
+  $('toPlay').addEventListener('click',function(){ show('play'); });
+  var DRAFT = [
+    {t:"The",lock:true},{t:"last",lock:true},{t:"bus",lock:true},{t:"of",lock:false},{t:"the",lock:false},{t:"entire",lock:false},{t:"night",lock:false},
+    {t:"pulled",lock:true},{t:"slowly",lock:false},{t:"away",lock:true},{t:"just",lock:false},{t:"as",lock:true},
+    {t:"she",lock:true},{t:"finally",lock:false},{t:"reached",lock:true},{t:"the",lock:true},{t:"very",lock:false},{t:"edge",lock:false},{t:"of",lock:false},{t:"the",lock:false},{t:"empty",lock:false},{t:"curb",lock:true},{t:".",lock:true,glue:true},
+    {t:"He",lock:true},{t:"had",lock:false},{t:"actually",lock:false},{t:"promised",lock:true},{t:"he",lock:true},{t:"would",lock:true},{t:"definitely",lock:false},{t:"wait",lock:true},{t:".",lock:true,glue:true},
+    {t:"The",lock:true},{t:"cold",lock:false},{t:"taillights",lock:true},{t:"got",lock:true},{t:"smaller",lock:true},{t:"and",lock:false},{t:"smaller",lock:false},{t:".",lock:true,glue:true}
+  ];
+  var totalCut = DRAFT.filter(function(w){ return !w.lock && !w.glue; }).length;
+  var LIFT_AT = 9;
+  var cut = [];
+  function renderDraft(){
+    var box=$('draft'); box.innerHTML='';
+    DRAFT.forEach(function(w,i){
+      var sp=document.createElement('span');
+      sp.className='w'+(w.lock?' locked':'')+(w.cutNow?' cut':'');
+      sp.textContent=(w.glue?'':' ')+w.t;
+      if(!w.lock && !w.cutNow){
+        sp.tabIndex=0; sp.setAttribute('role','button'); sp.setAttribute('aria-label','drop the word '+w.t);
+        sp.addEventListener('click',function(){ dropWord(i); });
+        sp.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); dropWord(i);} });
+      } else if(w.lock){
+        sp.setAttribute('aria-label',w.t+' (part of the piece — stays)');
+      }
+      box.appendChild(sp);
+    });
+  }
+  function dropWord(i){
+    if(DRAFT[i].lock||DRAFT[i].cutNow) return;
+    DRAFT[i].cutNow=true; cut.push(i);
+    addScrap(DRAFT[i].t);
+    renderDraft(); updateClimb();
+  }
+  function addScrap(t){
+    var pile=$('pile'); var none=pile.querySelector('.none'); if(none) pile.removeChild(none);
+    var s=document.createElement('span'); s.className='scrap new'; s.textContent=t; pile.appendChild(s);
+    setTimeout(function(){ s.classList.remove('new'); },520);
+  }
+  $('undo').addEventListener('click',function(){
+    if(!cut.length) return;
+    var i=cut.pop(); DRAFT[i].cutNow=false;
+    var pile=$('pile'); if(pile.lastChild) pile.removeChild(pile.lastChild);
+    if(!cut.length) pile.innerHTML='<span class="none">nothing dropped yet</span>';
+    renderDraft(); updateClimb();
+  });
+  var lifted=false;
+  function updateClimb(){
+    var n=cut.length;
+    var remaining=totalCut-n;
+    var frac=Math.min(n/LIFT_AT,1.15);
+    var px=Math.round(frac*150);
+    $('ball').style.bottom=(6+px)+'px';
+    $('weightline').textContent = (remaining>0)
+      ? ('Carrying '+remaining+' extra word'+(remaining===1?'':'s')+'. '+(n>0?'Lighter already.':'Drop the dead weight.'))
+      : ('Stripped to the spine. It is flying.');
+    $('altnum').textContent = n===0 ? 'on the ground' : (frac>=1 ? 'airborne' : 'rising');
+    $('liveStat').textContent = 'Dropped '+n+' words. '+(frac>=1?'The balloon has lifted off.':'Balloon rising.');
+    if(frac>=1 && !lifted){
+      lifted=true;
+      $('liftMsg').hidden=false;
+      $('liftText').textContent='Liftoff. The piece is light enough to fly. You can keep trimming, or fly it as it is.';
+      $('toReveal').disabled=false;
+      $('hintbox').innerHTML='<b>You hit the line.</b> Notice you didn\u2019t need to reach zero \u2014 you needed to reach lean. Stop here, or shed a little more.';
+    }
+    if(frac<1 && lifted){
+      lifted=false; $('liftMsg').hidden=true; $('toReveal').disabled=true;
+    }
+  }
+  $('toReveal').addEventListener('click',function(){
+    var out=''; DRAFT.forEach(function(w){ if(!w.cutNow){ out += (w.glue?'':' ')+w.t; } });
+    $('finalPiece').textContent=out.trim();
+    show('reveal');
+  });
+  function carryOut(title,pairs){
+    var L=[title,'']; pairs.forEach(function(p){ var v=(p[1]||'').toString().trim(); if(v) L.push(p[0]+': '+v); });
+    L.push(''); L.push('(I chose to share this. Nothing was sent automatically.)'); return L.join('\n');
+  }
+  $('buildCarry').addEventListener('click',function(){
+    var piece=$('finalPiece').textContent;
+    var txt=carryOut('Ballast — my flash compression',[
+      ['The piece that flew', piece],
+      ['Words dropped', String(cut.length)],
+      ['What cutting taught me', $('learned').value],
+      ['What I kept and why', $('kept').value]
+    ]);
+    $('carry').value=txt;
+  });
+  $('copyCarry').addEventListener('click',function(){
+    var box=$('carry'); if(!box.value){ $('copiedMsg').textContent='Build it first.'; return; }
+    box.removeAttribute('readonly'); box.select(); box.setSelectionRange(0,99999);
+    try{document.execCommand('copy');}catch(e){} box.setAttribute('readonly','');
+    if(navigator.clipboard){ navigator.clipboard.writeText(box.value).then(function(){},function(){}); }
+    $('copiedMsg').textContent='Copied — paste it into a Doc, an email, or your portfolio.';
+  });
+  $('replay').addEventListener('click',function(){
+    DRAFT.forEach(function(w){ w.cutNow=false; }); cut=[]; lifted=false;
+    $('pile').innerHTML='<span class="none">nothing dropped yet</span>';
+    $('liftMsg').hidden=true; $('toReveal').disabled=true;
+    $('learned').value=''; $('kept').value=''; $('carry').value=''; $('copiedMsg').textContent='';
+    renderDraft(); updateClimb(); show('play');
+  });
+  renderDraft(); updateClimb();
+})();
+</script>
+
+<!-- STUDIO EYES (Comfort Kernel v2) -->
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  var back=document.getElementById('seBack'); if(back) back.addEventListener('click',function(){ history.back(); });
+})();
+</script>
+
+<!-- TSP shared mobile nav + device adaptation -->
+<script>window.TSP_MOBILE = { home:"index.html", nav:false };</script>
+<!-- TSP-MOBILE (inlined from tsp-mobile.js — single-file-offline law) -->
+<script>
+/* Tight Spiral Studios — shared mobile controls + Home/Back nav.
+   Source & docs: tsp-mobile.js. Edit there, then re-inline. */
+(function () {
+  "use strict";
+
+  var d = document, root = d.documentElement, cfg = window.TSP_MOBILE || {};
+
+  /* ---- Device detection --------------------------------------------------- */
+  var hasTouch = ("ontouchstart" in window) ||
+                 (navigator.maxTouchPoints > 0) ||
+                 (navigator.msMaxTouchPoints > 0);
+  var coarse   = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  var narrow   = Math.min(screen.width || 9999, screen.height || 9999) < 820;
+  var isMobile = hasTouch && (coarse || narrow);
+
+  root.classList.add(hasTouch ? "tsp-touch" : "tsp-no-touch");
+  if (isMobile) root.classList.add("tsp-mobile");
+
+  /* ---- Synthetic keyboard dispatch --------------------------------------- */
+  // Games listen on window (or document) for keydown/keyup and read e.key.
+  var evTarget = (cfg.target === "document") ? d : window;
+
+  function dispatchKey(type, key) {
+    var ev;
+    try {
+      ev = new KeyboardEvent(type, {
+        key: key, code: codeFor(key),
+        bubbles: true, cancelable: true, view: window
+      });
+    } catch (e) {
+      // Legacy fallback
+      ev = d.createEvent("Event");
+      ev.initEvent(type, true, true);
+      try { ev.key = key; } catch (_) {}
+    }
+    evTarget.dispatchEvent(ev);
+  }
+
+  function codeFor(key) {
+    switch (key) {
+      case "ArrowLeft":  return "ArrowLeft";
+      case "ArrowRight": return "ArrowRight";
+      case "ArrowUp":    return "ArrowUp";
+      case "ArrowDown":  return "ArrowDown";
+      case " ":          return "Space";
+      case "Enter":      return "Enter";
+      case "Shift":      return "ShiftLeft";
+      default:
+        if (key && key.length === 1) return "Key" + key.toUpperCase();
+        return "";
+    }
+  }
+
+  /* ---- Styles (injected once) -------------------------------------------- */
+  function injectStyles() {
+    if (d.getElementById("tsp-mobile-style")) return;
+    var css = [
+      /* Navigation chip — always available, subtle on desktop */
+      ".tsp-nav{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));",
+        "z-index:2147483000;display:flex;gap:8px;font-family:'Helvetica Neue',Arial,sans-serif}",
+      ".tsp-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.4em;text-decoration:none;",
+        "padding:.5em .85em;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.04em;",
+        "color:#f4f1e8;background:rgba(20,18,15,.66);border:1px solid rgba(255,207,90,.45);",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1;",
+        "box-shadow:0 4px 14px rgba(0,0,0,.35);transition:background .15s,border-color .15s,transform .08s}",
+      ".tsp-nav a:hover,.tsp-nav a:focus-visible{background:rgba(40,34,24,.9);border-color:#ffcf5a;outline:none}",
+      ".tsp-nav a:active{transform:translateY(1px)}",
+      "@media (min-width:900px) and (pointer:fine){.tsp-nav{opacity:.55}.tsp-nav:hover{opacity:1}}",
+
+      /* Nav integrated into the studio's shared .topbar (no overlap) */
+      ".tsp-barnav{display:inline-flex;align-items:center;gap:.35rem;margin-right:.25rem;flex:none}",
+      ".tsp-barnav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.3em;text-decoration:none;color:inherit;",
+        "font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.02em;line-height:1;",
+        "padding:.4em .7em;border-radius:999px;border:1px solid currentColor;opacity:.85;",
+        "background:transparent;white-space:nowrap;transition:opacity .12s,background .12s}",
+      ".tsp-barnav a:hover,.tsp-barnav a:focus-visible{opacity:1;background:rgba(127,127,127,.18);outline:none}",
+      ".tsp-barnav a:active{transform:translateY(1px)}",
+      /* Keep the shared bar on one row once Home/Back are added: title ellipsizes */
+      ".tsp-touch .topbar{gap:.4rem}",
+      ".tsp-touch .topbar .wm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto}",
+
+      /* Gamepad — only rendered on touch devices */
+      ".tsp-pad{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;",
+        "display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;",
+        "padding:0 max(14px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));",
+        "font-family:'Helvetica Neue',Arial,sans-serif;touch-action:none}",
+      ".tsp-cluster{display:flex;gap:12px;pointer-events:none;align-items:flex-end;flex-wrap:wrap;max-width:46vw}",
+      ".tsp-cluster.right{justify-content:flex-end}",
+      ".tsp-btn{pointer-events:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;",
+        "touch-action:none;min-width:62px;min-height:62px;padding:0 14px;border-radius:16px;",
+        "display:flex;align-items:center;justify-content:center;text-align:center;",
+        "font-size:15px;font-weight:700;letter-spacing:.03em;color:#f4f1e8;",
+        "background:rgba(24,20,15,.6);border:1.5px solid rgba(255,207,90,.5);",
+        "-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);",
+        "box-shadow:0 6px 18px rgba(0,0,0,.4);transition:background .06s,transform .06s;cursor:pointer}",
+      ".tsp-btn.big{min-width:82px;min-height:82px;font-size:16px}",
+      ".tsp-btn:active,.tsp-btn.on{background:rgba(255,207,90,.9);color:#1a0d09;transform:scale(.94)}",
+      /* Hide gamepad on non-touch so desktop keeps keyboard feel */
+      ".tsp-no-touch .tsp-pad{display:none}",
+
+      /* Rotate-for-more-room hint — canvas games only, portrait phones only */
+      ".tsp-rot{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top));",
+        "z-index:2147482500;display:none;align-items:center;gap:.55em;padding:.5em .55em .5em .9em;",
+        "border-radius:999px;background:rgba(24,20,15,.86);color:#f4f1e8;",
+        "border:1px solid rgba(255,207,90,.5);white-space:nowrap;",
+        "font:600 12px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.4)}",
+      ".tsp-rot .rk{font-size:14px;color:#ffcf5a}",
+      ".tsp-rot button{background:none;border:none;color:inherit;font-size:16px;line-height:1;",
+        "padding:0 .15em;margin:0;cursor:pointer;opacity:.65}",
+      ".tsp-rot button:active{opacity:1}",
+      "@media (orientation:portrait){.tsp-touch .tsp-rot{display:inline-flex}}",
+      ".tsp-rot-dismissed .tsp-rot{display:none!important}"
+    ].join("");
+    var s = d.createElement("style");
+    s.id = "tsp-mobile-style";
+    s.textContent = css;
+    d.head.appendChild(s);
+  }
+
+  /* ---- Navigation (Home / Back) ------------------------------------------ */
+  function makeLink(href, label, aria) {
+    var a = d.createElement("a");
+    a.href = href; a.innerHTML = label;
+    a.setAttribute("aria-label", aria);
+    return a;
+  }
+
+  function buildNav() {
+    if (cfg.nav === false) return;
+    if (d.querySelector(".tsp-nav, .tsp-barnav")) return;
+
+    var home = cfg.home === undefined ? "index.html" : cfg.home;
+    var links = [];
+    if (cfg.back) links.push(makeLink(cfg.back, "‹ Back", "Back"));
+    if (home)     links.push(makeLink(home, "⌂ Home", "Home"));
+    if (!links.length) return;
+
+    // Prefer integrating into the studio's shared sticky header if present —
+    // avoids overlapping page titles and matches each page's palette.
+    var bar = cfg.floatNav ? null : d.querySelector(".topbar");
+    if (bar) {
+      var wrap = d.createElement("span");
+      wrap.className = "tsp-barnav";
+      links.forEach(function (l) { wrap.appendChild(l); });
+      bar.insertBefore(wrap, bar.firstChild);
+      return;
+    }
+
+    // Otherwise: floating chip, and reserve top space on scrollable pages so
+    // it never covers the header/title.
+    var nav = d.createElement("nav");
+    nav.className = "tsp-nav";
+    nav.setAttribute("aria-label", "Site navigation");
+    links.forEach(function (l) { nav.appendChild(l); });
+    d.body.appendChild(nav);
+    reserveTopSpace();
+  }
+
+  function reserveTopSpace() {
+    if (!hasTouch) return;                 // desktop keeps its exact layout
+    // Skip full-viewport apps (canvas games, fixed overlays) — the chip sits
+    // in their letterbox margin and body padding would distort them.
+    var cs = getComputedStyle(d.body);
+    if (cs.overflowY === "hidden" || cs.overflowX === "hidden") return;
+    var scrolls = root.scrollHeight > (window.innerHeight + 4);
+    if (!scrolls) return;
+    var pad = parseFloat(cs.paddingTop) || 0;
+    d.body.style.paddingTop = (pad + 58) + "px";
+  }
+
+  /* ---- Gamepad ------------------------------------------------------------ */
+  function buildPad() {
+    if (!hasTouch) return;                       // keyboard devices skip it
+    if (!cfg.controls || !cfg.controls.length) return;
+    if (d.querySelector(".tsp-pad")) return;
+
+    var pad = d.createElement("div");
+    pad.className = "tsp-pad";
+    var left  = d.createElement("div"); left.className  = "tsp-cluster left";
+    var right = d.createElement("div"); right.className = "tsp-cluster right";
+    pad.appendChild(left); pad.appendChild(right);
+
+    cfg.controls.forEach(function (c) {
+      var btn = d.createElement("button");
+      btn.type = "button";
+      btn.className = "tsp-btn" + (c.big ? " big" : "");
+      btn.innerHTML = c.label || "";
+      btn.setAttribute("aria-label", c.aria || c.label || c.key);
+      bindButton(btn, c);
+      (c.side === "left" ? left : right).appendChild(btn);
+    });
+
+    d.body.appendChild(pad);
+  }
+
+  function bindButton(btn, c) {
+    var key = c.key, held = false;
+
+    function press(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (c.hold) {
+        if (held) return;
+        held = true;
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+      } else {
+        // tap: quick down/up so edge-triggered actions (fire/rotate/drop) fire once
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+        setTimeout(function () { dispatchKey("keyup", key); }, 24);
+        setTimeout(function () { btn.classList.remove("on"); }, 90);
+      }
+    }
+    function release(e) {
+      if (e) e.preventDefault();
+      if (c.hold && held) {
+        held = false;
+        btn.classList.remove("on");
+        dispatchKey("keyup", key);
+      }
+    }
+
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", function (e) {
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+        press(e);
+      });
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointercancel", release);
+      btn.addEventListener("lostpointercapture", release);
+    } else {
+      btn.addEventListener("touchstart", press, { passive: false });
+      btn.addEventListener("touchend", release);
+      btn.addEventListener("touchcancel", release);
+      btn.addEventListener("mousedown", press);
+      btn.addEventListener("mouseup", release);
+      btn.addEventListener("mouseleave", release);
+    }
+    // Safety: releasing a held key if the page loses focus
+    window.addEventListener("blur", release);
+  }
+
+  /* ---- Rotate hint -------------------------------------------------------- */
+  function buildRotateHint() {
+    if (!hasTouch) return;
+    if (cfg.rotateHint === false) return;
+    if (!cfg.controls || !cfg.controls.length) return;   // canvas games only
+    if (d.querySelector(".tsp-rot")) return;
+    var hint = d.createElement("div");
+    hint.className = "tsp-rot";
+    hint.setAttribute("role", "note");
+    hint.innerHTML = '<span class="rk">↻</span>' +
+      '<span>Turn sideways for more room</span>' +
+      '<button type="button" aria-label="Dismiss">×</button>';
+    hint.querySelector("button").addEventListener("click", function () {
+      root.classList.add("tsp-rot-dismissed");
+    });
+    d.body.appendChild(hint);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    injectStyles();
+    buildNav();
+    buildPad();
+    buildRotateHint();
+  }
+
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose a tiny API for pages that want to toggle the pad (e.g. hide on menus)
+  window.TSPMobile = {
+    isTouch: hasTouch,
+    isMobile: isMobile,
+    press: function (key) { dispatchKey("keydown", key); dispatchKey("keyup", key); },
+    showPad: function (v) {
+      var p = d.querySelector(".tsp-pad");
+      if (p) p.style.display = v === false ? "none" : "";
+    }
+  };
+})();
+</script>
+</body>
+</html>
