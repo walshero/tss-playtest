@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="tsp:surface" content="hub">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tight Spiral Productions — instruments that make the constraint visible</title>
+<meta name="description" content="An instrument shop. We build things that show you the rules while they are being run on you. Games, assessment tools, and client instruments — all single-file, all offline, all accessibility-gated.">
+
+<!-- tsp:source        studio corpus, git ls-tree origin/main 2026-07-14 (33 files, counted not remembered)
+     tsp:last-verified 2026-07-14
+     tsp:canon         raw.githubusercontent.com/walshero/TIGHT-SPIRAL-STUDIOS/main/index.html
+     tsp:floor         single-file · offline · zero external hosts · contrast-gated · no emoji
+     PLAYTEST INTAKE writes to Supabase. That is the ONE network call on this page and it
+     fires ONLY when a person taps send. Nothing is collected by loading this page. -->
+
+<style>
+:root{
+  /* GROUND */
+  --paper:      #fbfaf7;   /* never pure white — it blooms on an RP retina */
+  --paper-2:    #f1eee6;
+  --rule:       #d8d2c4;
+
+  /* INK — text tokens. These are TEXT and nothing else. Token-role law. */
+  --ink:        #14181d;   /* 15.9:1 on paper */
+  --ink-2:      #3d4652;   /*  8.1:1 on paper */
+  --ink-3:      #5c6675;   /*  5.3:1 on paper — the floor for body text */
+
+  /* ACCENT — each has an INK form (safe on paper) and a FILL form (a ground, never text) */
+  --brass-ink:  #6a4d12;   /*  6.2:1 on paper  — TEXT */
+  --brass-fill: #d9a441;   /*                  — GROUND ONLY */
+  --cool-ink:   #274063;   /*  9.3:1 on paper  — TEXT */
+  --cool-fill:  #c3d2e6;   /*                  — GROUND ONLY */
+  --live-ink:   #1d5c3f;   /*  6.7:1 on paper  — TEXT */
+  --slab:       #12161b;   /* dark ground */
+  --slab-ink:   #f4f1e8;   /* 16.4:1 on slab   — TEXT */
+
+  /* DECORATION forms — token-role law: these appear ONLY in border/outline/shadow,
+     never in `color:`. Same values as their ink siblings, split so no token is both. */
+  --edge:       #14181d;   /* ink as a line (borders) */
+  --ring:       #274063;   /* focus ring — cool, visible */
+  --brass-line: #6a4d12;   /* brass ink as a hairline (chips) */
+  --brass-edge: #d9a441;   /* brass fill as a hairline/outline on dark */
+  --live-line:  #1d5c3f;   /* live ink as a hairline (chips) */
+  --cool-line:  #274063;   /* cool ink as a hairline (lab chips) */
+
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:calc(17px * var(--fs)); line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1060px; margin:0 auto; padding:0 22px 90px}
+
+/* ── COMFORT KERNEL (mounted 2026-07-14). Day/Dusk/Night + toggles, harvested from
+   the studio's own tsp-home ladder. Remaps THIS face's tokens per light level — the
+   design is unchanged, only the ground shifts. Night is warm charcoal, never pure black
+   (RP halation floor). Control lives BOTTOM-RIGHT, clear of the title. No storage. ── */
+:root{ --fs:1; }
+
+html[data-light="dusk"]{
+  --paper:#f2ead9; --paper-2:#e7ddc6; --rule:#cdbf9f;
+  --ink:#1b190f; --ink-2:#3b3823; --ink-3:#50492d;
+  --brass-ink:#5c4210; --cool-ink:#22364f; --live-ink:#184a32;
+}
+html[data-light="night"]{
+  --paper:#1c1a16; --paper-2:#262219; --rule:#443d30;
+  --ink:#f4ecd8; --ink-2:#d8cdb0; --ink-3:#b4a888;
+  --brass-ink:#e6bf6a; --brass-fill:#d9a441; --cool-ink:#a6c0de; --cool-fill:#2b3a4a;
+  --live-ink:#84cca0; --slab:#141019; --slab-ink:#f4f1e8;
+  /* the hairline tokens travel with their ink siblings, or a chip border goes
+     dark-on-dark and the chip loses its edge in night */
+  --brass-line:#e6bf6a; --live-line:#84cca0; --cool-line:#a6c0de;
+}
+html[data-light="night"] .rooms .room{ --card:#262219; --acc:#e6bf6a; }
+html[data-light="night"] .bench-top{ background:#26313e; }
+html[data-light="night"] .bench-top p{ color:#dbe6f1; }
+html[data-light="night"] .out.bad{ color:#f2a6ad; }
+
+html.se-contrast:not([data-light="night"]){ --paper:#fbfaf7; --paper-2:#f2efe7; --ink:#0f1216; --ink-2:#2b323b; --ink-3:#474f5b; }
+html.se-contrast[data-light="night"]{ --paper:#0e0d0b; --paper-2:#171410; --ink:#fff8e8; --ink-2:#e8dcbe; --ink-3:#cbbf9c; }
+html.se-reduce *{ animation:none!important; transition:none!important; }
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+
+/* ═══ RESERVED CHROME — Home · teaspoon brand · Studio Eyes. Own grid row, never overlaps. ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
+  padding:9px 16px; background:var(--paper); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; z-index:100; }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:44px;
+  padding:8px 13px; border:1.5px solid var(--rule); border-radius:6px; background:var(--paper-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--brass-ink); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; color:var(--ink); }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:44px;
+  padding:8px 14px; border:2px solid transparent; border-radius:6px; background:var(--slab);
+  color:var(--slab-ink); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--ring); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right. Remaps THIS face's tokens. ═══ */
+.se-panel{ position:fixed; right:14px; top:64px; z-index:101; width:min(320px,calc(100vw - 28px));
+  background:var(--paper); color:var(--ink); border:2px solid var(--ink); border-radius:6px; padding:15px;
+  box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h4{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:700; margin:0 0 8px; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:44px; padding:8px 4px; border:1.5px solid var(--rule); border-radius:4px; background:var(--paper-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--slab); color:var(--slab-ink); border-color:var(--slab); }
+.se-btn:focus-visible{ outline:3px solid var(--ring); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px; min-height:44px; padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--rule); border-radius:4px; background:var(--paper-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--ink); }
+.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-3); }
+.se-tog[aria-pressed="true"] .st{ color:var(--live-ink); font-weight:700; }
+.se-tog:focus-visible{ outline:3px solid var(--ring); outline-offset:2px; }
+.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:22px; border-top:1.5px solid var(--rule); }
+.se-rail a,.se-rail button{ min-height:44px; padding:10px 18px; border:1.5px solid var(--rule); border-radius:6px; background:var(--paper-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--ring); outline-offset:2px; }
+
+.face-updated{ font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--ink-3); margin:2px 0 18px; display:flex; align-items:center; gap:7px; }
+.face-updated::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--live-ink); flex:0 0 auto; }
+
+@media (max-width:640px){ .se-panel{ right:8px } }
+
+/* ── THE STAGE. Scene first. No wall, no preference gate, no modal. ───────── */
+.stage{padding:70px 0 44px; border-bottom:2px solid var(--ink)}
+.mark{
+  font-family:var(--mono); font-size:11.5px; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--brass-ink); font-weight:700; margin:0 0 20px;
+}
+h1{
+  font-family:var(--serif); font-size:clamp(calc(34px * var(--fs)),6.4vw,calc(60px * var(--fs))); line-height:1.06;
+  margin:0 0 22px; letter-spacing:-.015em; font-weight:400; max-width:15ch;
+}
+h1 em{font-style:italic; color:var(--cool-ink)}
+.lede{font-size:clamp(calc(18px * var(--fs)),2.5vw,calc(21px * var(--fs))); line-height:1.5; color:var(--ink-2); max-width:58ch; margin:0 0 14px}
+.lede b{color:var(--ink); font-weight:600}
+.tag{font-family:var(--mono); font-size:12.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin:26px 0 0}
+
+/* ── THE COUNT. Truth in advertising, as arithmetic. ─────────────────────── */
+.count{
+  display:flex; flex-wrap:wrap; gap:0; margin:34px 0 0;
+  border:1.5px solid var(--rule); border-radius:2px; overflow:hidden;
+}
+.count div{flex:1 1 130px; padding:14px 16px; border-right:1.5px solid var(--rule); background:var(--paper-2)}
+.count div:last-child{border-right:0}
+.count b{display:block; font-family:var(--mono); font-size:calc(23px * var(--fs)); color:var(--ink); font-weight:700; line-height:1.2}
+.count span{display:block; font-family:var(--mono); font-size:10.5px; letter-spacing:.11em; text-transform:uppercase; color:var(--ink-3); margin-top:3px}
+
+/* ── SECTIONS ────────────────────────────────────────────────────────────── */
+section{padding:56px 0 0}
+h2{
+  font-family:var(--mono); font-size:calc(12px * var(--fs)); letter-spacing:.2em; text-transform:uppercase;
+  color:var(--brass-ink); font-weight:700; margin:0 0 6px;
+}
+.sub{font-size:calc(16px * var(--fs)); color:var(--ink-2); margin:0 0 26px; max-width:64ch}
+.sub b{color:var(--ink); font-weight:600}
+
+/* ── ROOM CARDS ──────────────────────────────────────────────────────────── */
+.rooms{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px}
+.room{
+  display:block; padding:22px 22px 20px; border:2px solid var(--rule); border-top-width:6px; border-radius:3px;
+  border-top-color:var(--acc,var(--rule));
+  background:var(--card,var(--paper-2)); text-decoration:none; color:var(--ink);
+  transition:border-color .12s, transform .12s, box-shadow .12s;
+}
+.room:hover{transform:translateY(-2px); box-shadow:0 4px 0 var(--acc,var(--rule))}
+.room:focus-visible{outline:3px solid var(--ring); outline-offset:3px}
+.room h3{font-family:var(--serif); font-size:calc(23px * var(--fs)); margin:0 0 8px; font-weight:400; line-height:1.2}
+.room p{margin:0; font-size:calc(15px * var(--fs)); color:var(--ink-2); line-height:1.5}
+
+  /* ── PER-CARD COLOR (added 2026-07-19) — each square its own hue.
+     --acc paints the icon + 6px top stripe; --card is a light tint the dark
+     ink still clears AA on (verified: worst body text 8.1:1, labels 4.9:1). ── */
+  .rooms .room:nth-of-type(8n+1){--acc:#2f7d5b; --card:#e8f2ec}   /* pine    */
+  .rooms .room:nth-of-type(8n+2){--acc:#2b5fc7; --card:#e7edfb}   /* cobalt  */
+  .rooms .room:nth-of-type(8n+3){--acc:#c0392b; --card:#fbeae7}   /* crimson */
+  .rooms .room:nth-of-type(8n+4){--acc:#a86a00; --card:#f7efdb}   /* amber   */
+  .rooms .room:nth-of-type(8n+5){--acc:#6f42c1; --card:#efe9fa}   /* violet  */
+  .rooms .room:nth-of-type(8n+6){--acc:#0f7d79; --card:#e3f2f0}   /* teal    */
+  .rooms .room:nth-of-type(8n+7){--acc:#b0357f; --card:#fbe8f3}   /* magenta */
+  .rooms .room:nth-of-type(8n+8){--acc:#37607f; --card:#e8eef4}   /* steel   */
+.chips{margin-top:11px; display:flex; gap:6px; flex-wrap:wrap}
+.chip{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase;
+  padding:2.5px 7px; border-radius:2px; font-weight:700;
+}
+.c-live{background:var(--paper); color:var(--live-ink); border:1px solid var(--live-line)}
+.c-work{background:var(--paper); color:var(--brass-ink); border:1px solid var(--brass-line)}
+.c-note{background:var(--paper); color:var(--ink-3); border:1px solid var(--rule)}
+/* LAB — founder ruling 2026-08-27. An experiment on the bench, shown on purpose,
+   not a finished game. Dashed edge so the status reads without the colour. */
+.c-lab{background:var(--paper); color:var(--cool-ink); border:1px dashed var(--cool-line)}
+
+/* ── THE ENTERPRISE SLAB ─────────────────────────────────────────────────── */
+.slab{background:var(--slab); color:var(--slab-ink); margin:56px 0 0; padding:46px 22px 44px}
+.slab .in{max-width:1060px; margin:0 auto}
+.slab h2{color:var(--brass-fill)}          /* on the DARK slab this clears 8.4:1 */
+.slab .sub{color:#cdd4dd}                  /* 11.2:1 on slab */
+.slab .sub b{color:var(--slab-ink)}
+.work{display:grid; grid-template-columns:repeat(auto-fill,minmax(288px,1fr)); gap:14px}
+.job{
+  display:block; padding:19px; border:1.5px solid #333c48; border-radius:2px;
+  background:#1a1f27; text-decoration:none; color:var(--slab-ink);
+  transition:border-color .12s;
+}
+.job:hover{border-color:var(--brass-edge)}
+.job:focus-visible{outline:3px solid var(--brass-edge); outline-offset:3px}
+.job .who{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass-fill); font-weight:700; margin-bottom:6px}
+.job h3{font-family:var(--serif); font-size:calc(21px * var(--fs)); margin:0 0 7px; font-weight:400}
+.job p{margin:0; font-size:calc(14.5px * var(--fs)); color:#c3cad4; line-height:1.45}  /* 10.1:1 on #1a1f27 */
+
+/* ── THE PLAYTEST INTAKE ─────────────────────────────────────────────────── */
+.bench{border:2px solid var(--edge); border-radius:2px; padding:0; overflow:hidden; margin-top:26px}
+.bench-top{background:var(--cool-fill); padding:22px 22px 20px}
+.bench-top h3{font-family:var(--serif); font-size:calc(26px * var(--fs)); margin:0 0 9px; font-weight:400; color:var(--ink)}
+.bench-top p{margin:0 0 8px; font-size:calc(15.5px * var(--fs)); color:#22313f; line-height:1.5; max-width:62ch}  /* 8.9:1 on cool-fill */
+.bench-top p:last-child{margin:0}
+.bench-top b{color:var(--ink)}
+
+.teach{padding:22px; border-bottom:1.5px solid var(--rule); background:var(--paper-2)}
+.teach .h{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--brass-ink); font-weight:700; margin:0 0 12px}
+.teach ol{margin:0; padding-left:20px}
+.teach li{font-size:calc(15px * var(--fs)); color:var(--ink-2); margin-bottom:9px; line-height:1.5}
+.teach li:last-child{margin-bottom:0}
+.teach li b{color:var(--ink)}
+
+.form{padding:22px}
+.f{margin-bottom:16px}
+label{display:block; font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:700; margin-bottom:6px}
+input[type=text], input[type=email], textarea, select{
+  width:100%; font-family:var(--sans); font-size:16px; min-height:44px; padding:11px 12px;
+  border:1.5px solid var(--rule); border-radius:2px; background:var(--paper); color:var(--ink);
+}
+textarea{min-height:78px; resize:vertical; line-height:1.5}
+input:focus-visible, textarea:focus-visible, select:focus-visible{outline:3px solid var(--ring); outline-offset:2px; border-color:var(--edge)}
+
+.opts{display:flex; flex-wrap:wrap; gap:7px}
+.opt{
+  font-family:var(--sans); font-size:14.5px; min-height:44px; padding:8px 13px; border:1.5px solid var(--rule);
+  border-radius:2px; background:var(--paper); color:var(--ink-2); cursor:pointer; font-weight:500;
+}
+.opt[aria-pressed="true"]{background:var(--slab); color:var(--slab-ink); border-color:var(--slab); font-weight:600}
+.opt:focus-visible{outline:3px solid var(--ring); outline-offset:2px}
+
+.consent{
+  margin:4px 0 16px; padding:13px 15px; border-left:4px solid var(--ring);
+  background:var(--paper-2); font-size:14.5px; color:var(--ink-2); line-height:1.5;
+}
+.consent b{color:var(--ink)}
+
+.send{
+  font-family:var(--sans); font-size:16.5px; font-weight:600; padding:13px 24px;
+  background:var(--slab); color:var(--slab-ink); border:0; border-radius:2px; cursor:pointer;
+}
+.send:hover{background:#232b35}
+.send:focus-visible{outline:3px solid var(--ring); outline-offset:3px}
+.send[disabled]{opacity:.55; cursor:default}
+.out{margin:13px 0 0; font-size:15px; font-weight:600; color:var(--live-ink); min-height:1.2em}
+.out.bad{color:#8c2f39}   /* 6.6:1 on paper */
+
+/* ── HOW IT WORKS ────────────────────────────────────────────────────────── */
+.floor-list{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:13px; margin-top:22px}
+.fl{padding:15px 16px; border:1.5px solid var(--rule); border-radius:2px; background:var(--paper-2)}
+.fl b{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:var(--brass-ink); margin-bottom:6px}
+.fl p{margin:0; font-size:calc(14.5px * var(--fs)); color:var(--ink-3); line-height:1.45}
+
+footer{margin-top:64px; padding-top:24px; border-top:1.5px solid var(--rule); font-size:calc(14.5px * var(--fs)); color:var(--ink-3)}
+footer a{color:var(--cool-ink); font-weight:600; display:inline-block; min-height:44px; padding:11px 2px}
+/* Every link gets a visible focus ring (cards/jobs override with their own). */
+a:focus-visible{outline:3px solid var(--ring); outline-offset:2px; border-radius:2px}
+footer p{margin:0 0 7px}
+
+@media (max-width:640px){
+  .stage{padding:44px 0 32px}
+  .slab{margin:44px 0 0; padding:36px 22px}
+}
+
+/* ── INSTRUMENT MARKS. Glyphs inherit card ink via currentColor (token-role safe). ── */
+.gmark{width:50px; height:50px; display:block; color:var(--brass-ink); margin-bottom:14px; flex:0 0 auto}
+.room .gmark{color:var(--acc-ink,var(--brass-ink))}
+.job .gmark{color:var(--brass-fill)}            /* on dark slab */
+
+/* ── DIFFERENT-COLORED GAME BOXES. Each card carries a green-free accent (--acc),
+   applied to its border, top strip, and glyph. Text stays --ink/--ink-3 on the
+   gated paper ground — the accent is decoration only (token-role safe, RP: no green). */
+.rooms .room{border-color:var(--acc,var(--rule))}
+  /* --acc is DECORATION (stripe/border/shadow); --acc-ink is the glyph TEXT form.
+     Same value per card, split so neither token is ever both roles. */
+.rooms .room:nth-child(8n+1){--acc:#6a4d12; --acc-ink:#6a4d12}   /* brass   */
+.rooms .room:nth-child(8n+2){--acc:#274063; --acc-ink:#274063}   /* cool    */
+.rooms .room:nth-child(8n+3){--acc:#8a2f22; --acc-ink:#8a2f22}   /* oxblood */
+.rooms .room:nth-child(8n+4){--acc:#5a3a6e; --acc-ink:#5a3a6e}   /* plum    */
+.rooms .room:nth-child(8n+5){--acc:#8f4a08; --acc-ink:#8f4a08}   /* burnt   */
+.rooms .room:nth-child(8n+6){--acc:#343a86; --acc-ink:#343a86}   /* indigo  */
+.rooms .room:nth-child(8n+7){--acc:#2f4a5c; --acc-ink:#2f4a5c}   /* steel   */
+.rooms .room:nth-child(8n+8){--acc:#8a3a1c; --acc-ink:#8a3a1c}   /* clay    */
+.room h3, .job h3{display:flex; align-items:center; gap:0}
+.hero-mark{width:clamp(160px,40vw,480px); height:auto; color:var(--brass-ink); flex:0 0 auto}
+.stage-row{display:flex; align-items:flex-start; gap:clamp(20px,4vw,44px); justify-content:space-between}
+.stage-copy{flex:1 1 auto; min-width:0}
+.banner-mark{height:34px; width:auto; color:var(--brass-ink); display:block; margin-bottom:10px}
+.slab .banner-mark{color:var(--brass-fill)}
+/* Portrait: the mark stays VISIBLE and is now the largest thing painted on
+   entry, first in source order - an image shown in landscape must show in
+   portrait too, and here it must show FIRST, not shrunk and pushed after
+   all the hero text the way the old dial was. */
+@media (max-width:640px){
+  .stage-row{flex-direction:column; gap:20px; align-items:center}
+  .hero-mark{display:block; width:min(78vw,340px); margin:0 auto}
+}
+
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes. Its own row; never overlaps the title. -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">Tight Spiral</span>
+  </span>
+</header>
+
+
+<main class="wrap">
+
+<!-- THE STAGE. Content on load. No gate, no wall, no ask. -->
+<div class="stage">
+<div class="stage-row">
+<!-- 2026-08-08: the studio's own identity mark, first position, per
+     art-doctrine.md ("The logo is the tight spiral. Identity mark, first
+     position, unchanged") - same spiral drawn for cliche-cabinet.html,
+     ported here rather than redrawn (one mark, one source of truth).
+     Founder's call over the abstract dial icon this replaced: "go with
+     the tight spiral logo." Sized to actually read as a scene, not an
+     icon - the mobile rule below was shrinking the OLD mark to 92px and
+     placing it after all the hero text, so it never painted inside the
+     first-screen viewport on phone at all. Now first in source order and
+     the largest thing on entry at phone width. -->
+<svg class="hero-mark" viewBox="0 0 100 100" fill="none" aria-label="Tight Spiral Studios" role="img">
+  <path d="M50 6
+           A44 44 0 1 1 6 50
+           A38 38 0 1 1 82 50
+           A32 32 0 1 1 18 50
+           A26 26 0 1 1 74 50
+           A20 20 0 1 1 30 50
+           A14 14 0 1 1 66 50"
+        stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>
+  <circle cx="50" cy="50" r="4.5" fill="currentColor"/>
+</svg>
+<div class="stage-copy">
+  <p class="mark">Tight Spiral Productions</p>
+  <h1>We build instruments that show you the rules <em>while they are being run on you.</em></h1>
+  <p class="face-updated"><time id="faceUpdated">Last updated&hellip;</time> <span class="se-version" style="font:inherit;opacity:.85">&middot; v49 <span style="opacity:.75">e63e3b7</span></span> </span> </span> </span> </span> </span> </span> </span></p>
+  <!-- 2026-08-08: one real room card promoted above the fold, founder's call
+       (asked for "an easy splash fix" rather than trimming the lede). Flok is
+       the literal embodiment of the sentence in the h1 above it - same claim,
+       concrete instance - so it doubles as the page's one primary invitation,
+       not a second one competing with the grid below (that gate: exactly one
+       invitation on entry). Removed from .rooms below so it lives in one place. -->
+  <a class="room" href="the-console.html" style="display:block;margin:0 0 1.1rem">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="10" y1="14" x2="10" y2="38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="14" r="3.4" fill="currentColor"/><line x1="24" y1="10" x2="24" y2="38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="20" r="3.4" fill="currentColor"/><line x1="38" y1="16" x2="38" y2="38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="38" cy="30" r="3.4" fill="currentColor"/><line x1="6" y1="38" x2="42" y2="38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Flok</h3>
+      <p>You take a growth job at a social app and pull the levers yourself &mdash; the streak, the batch,
+         the infinite feed. Then it shows you your own telemetry.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Dark patterns</span></div>
+    </a>
+
+  <p class="lede">Most software hides its machinery. Ours hands it to you and lets you turn it.
+    <b>You pull the levers, then the seat turns around and shows you your own telemetry.</b></p>
+  <p class="lede">Some of these are games. Some are assessment tools designed for a college.
+    One is designed for a Manhattan relocation firm. <b>They are the same engine wearing different
+    clothes: make the invisible constraint visible, and let the person find it rather than be told.</b></p>
+  <p class="tag">Play &nbsp;&middot;&nbsp; Notice &nbsp;&middot;&nbsp; Design</p>
+
+  <!-- The count is COMPUTED from the shelf, not remembered. Truth in advertising as arithmetic. -->
+  </div>
+</div>
+<div class="count">
+    <div><b>33</b><span>builds, live</span></div>
+    <div><b>0</b><span>servers required</span></div>
+    <div><b>0</b><span>trackers</span></div>
+    <div><b>4.5:1</b><span>contrast floor, gated</span></div>
+  </div>
+</div>
+
+<!-- ═══ THE GAMES ═══ -->
+<section>
+  <svg class="banner-mark" viewBox="0 0 120 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="6" y="8" width="18" height="26" rx="1.5"/><rect x="10" y="12" width="10" height="8"/><rect x="30" y="8" width="18" height="26" rx="1.5"/><rect x="34" y="12" width="10" height="8"/><rect x="54" y="8" width="18" height="26" rx="1.5"/><rect x="58" y="12" width="10" height="8"/></g><g fill="currentColor"><circle cx="12" cy="27" r="2"/><circle cx="36" cy="27" r="2"/><circle cx="60" cy="27" r="2"/></g><line x1="84" y1="20" x2="114" y2="20" stroke="currentColor" stroke-width="1" stroke-dasharray="1 5"/></svg><h2>The games</h2>
+  <p class="sub">Every one opens straight into the scene. <b>No tutorial, no menu, no account.</b>
+    You learn the rules by running into them.</p>
+
+  <div class="rooms">
+    <a class="room" href="old-problems-at-new-speed.html">
+      <h3>Borges Was Here</h3>
+      <p>Five rooms for the five problems Borges already solved &mdash; branching, text, memory, vision,
+         documentation. You feel each one from the inside, then watch it come back faster.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Art piece</span></div>
+    </a>
+
+    <a class="room" href="choose-your-leader-v7.html">
+      <h3>Choose Your Leader &mdash; The Descent</h3>
+      <p>Six presidents, sixty years, one household. A real quote, your read, then the dated record &mdash;
+         and between addresses you walk a house whose rooms drift apart by the altitude you spent.
+         Not politics. Wealth, power, and the floor under a family.</p>
+      <div class="chips"><span class="chip c-live">Live &middot; v7</span><span class="chip c-note">Full six &middot; the felt drop</span></div>
+    </a>
+
+    <a class="room" href="choose-your-leader-full.html">
+      <h3>Choose Your Leader &mdash; The Broadcast</h3>
+      <p>October 22, 1962, heard before it is seen. Turn on the set. The full game begins here &mdash;
+         Act 1 live, three more acts building on the same spine.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Audio first</span></div>
+    </a>
+
+    <a class="room" href="choose-your-leader-v6.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 40 L24 26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 26 L12 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 26 L36 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3.6" fill="currentColor"/><circle cx="36" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="42" r="2.6" fill="currentColor"/></svg>
+      <h3>Choose Your Leader</h3>
+      <p>October 22, 1962. One room where the call gets made — a desk, a map, a phone, an empty chair.
+         Decide in the fog, then meet the record. The gap is the lesson.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Judgment under uncertainty</span></div>
+    </a>
+
+    <a class="room" href="reading-the-fireground.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M7 42 L15 26 L21 34 L27 22 L35 42 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M33 22 Q30 16 35 12 Q40 8 36 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M41 20 Q45 15 42 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Reading the Fireground</h3>
+      <p>Two cases in one trainer &mdash; <b>Under Load</b> (structural collapse) and <b>Reading the Smoke</b>
+         (fire behavior). Commit a read under uncertainty, then meet the record. Calibration, not
+         certification. Includes a facilitator mode for crew debrief.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">2 cases</span><span class="chip c-note">Calibration</span></div>
+    </a>
+
+    <a class="room" href="the-tell.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="20" r="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="28" y1="28" x2="40" y2="40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="15" y1="20" x2="25" y2="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="20" r="2" fill="currentColor"/></svg>
+      <h3>The Tell</h3>
+      <p>Reading the moment a text gives itself away. Ten moves, and the reader-test for each.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Craft</span></div>
+    </a>
+
+    <a class="room" href="found.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="28" rx="2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><rect x="12" y="16" width="14" height="4" fill="currentColor"/><rect x="29" y="16" width="8" height="4" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="12" y="23" width="7" height="4" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="22" y="23" width="15" height="4" fill="currentColor"/><rect x="12" y="30" width="19" height="4" fill="currentColor"/></svg>
+      <h3>Found</h3>
+      <p>Pick three sources and put them in an order. Keep the words you want and black out
+         everything else. The poem was in there before you got here.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">14 sources</span><span class="chip c-note">No wrong answer</span></div>
+    </a>
+
+    <a class="room" href="cliche-hunter.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="12" width="32" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><rect x="8" y="23" width="32" height="7" rx="1" fill="currentColor"/><rect x="8" y="34" width="22" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M42 23 L44 21 M42 30 L44 32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <h3>Clich&eacute; Hunter</h3>
+      <p>A clich&eacute; is a printing term first: a plate cast once so a phrase could drop into
+         any poem at all. Six real poems came back with plates in them. Pull them, and set the
+         poet&rsquo;s own type back.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">6 poems</span><span class="chip c-note">No clock</span></div>
+    </a>
+
+    <a class="room" href="cliche-cowpaths.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40 Q16 24 24 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 40 Q24 24 24 8" stroke-dasharray="3 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 40 Q30 24 24 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="8" r="2.4" fill="currentColor"/></svg>
+      <h3>Clich&eacute; Cowpaths</h3>
+      <p>Nobody chose these roads. Everybody walks them. Three rooms of worn language — the city,
+         the field, the line.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">3 rooms</span><span class="chip c-note">Experiment, not a finished game</span></div>
+    </a>
+
+    <a class="room" href="soundings-TRUNK-v03-2026-07-26.html">
+      <h3>Soundings</h3>
+      <p>Fourteen places across Croatia and Greece, one chart, four hands &mdash; Jen, Matt, Evan, Rory.
+         Everyone marks each card; the depth chart adds it up. April 2027 decides itself.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Family consensus</span></div>
+    </a>
+
+    <a class="room" href="behind-this-door.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="9" width="18" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M30 11 L38 14 L38 39 L30 39" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="27" cy="25" r="1.6" fill="currentColor"/></svg>
+      <h3>Behind This Door</h3>
+      <p>A noticing game, one door at a time. First deck: Ireland's writers.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+
+    <a class="room" href="dad-energy.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M16 9 L24 15 L32 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 16 L27 16 L26 21 L28 34 L24 40 L20 34 L22 21 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Dad Energy</h3>
+      <p>A Father&rsquo;s Day game &mdash; five short scenes, about three minutes, no wrong moves.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Father&rsquo;s Day</span></div>
+    </a>
+
+    <a class="room" href="funny-boneys-factory.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="19" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="24" r="2.4" fill="currentColor"/><circle cx="33" cy="30" r="5.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="33" cy="30" r="1.8" fill="currentColor"/><path d="M30 12 L32 8 L33 13 L36 10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Funny Boney's Factory</h3>
+      <p>Where the jokes get made, and you can see the machine that makes them.</p>
+      <div class="chips"><span class="chip c-work">In build</span></div>
+    </a>
+
+    <a class="room" href="warriors-fantasy-arcade.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="12" width="30" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="19" y1="12" x2="19" y2="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="29" y1="12" x2="29" y2="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="9" y1="24" x2="39" y2="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="10" y="13" width="8" height="10" fill="currentColor"/></svg>
+      <h3>Warriors Fantasy Arcade</h3>
+      <p>The draft board as a reading exercise. What you're allowed to see shapes who you pick.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+
+    <a class="room" href="how-an-idea-travels.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="11" cy="24" r="3.4" fill="currentColor"/><circle cx="37" cy="24" r="3.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 24 Q20 16 24 24 T33 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 30 l1.5 4 M28 30 l1 3.5 M20 30 l-1 3.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>How an Idea Travels</h3>
+      <p>Watch a thought move from a person, through a medium, into someone else — and lose things
+         on the way.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+
+    <a class="room" href="the-compound-capstone.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="8.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="3" fill="currentColor"/></svg>
+      <h3>The Compound Capstone</h3>
+      <p>Where the whole system comes together. Long-form, and it expects you to have played the rest.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Long</span></div>
+    </a>
+
+    <a class="room" href="arcade.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="8" width="24" height="32" rx="2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="16" y="12" width="16" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="31" r="2" fill="currentColor"/><line x1="26" y1="29" x2="32" y2="29" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="26" y1="33" x2="32" y2="33" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>The Arcade</h3>
+      <p>Everything, in one place. The full cabinet.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Index</span></div>
+    </a>
+
+    <a class="room" href="funnybonies/">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="18" cy="30" r="8" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="18" cy="30" r="2.4" fill="currentColor"/><line x1="28" y1="12" x2="38" y2="22" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="40" cy="24" r="3" fill="currentColor"/><path d="M8 14 l3 -7 l3 5 z" fill="currentColor"/><path d="M18 14 l3 -7 l3 5 z" fill="currentColor"/><circle cx="16" cy="17" r="5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+      <h3>Funny Boney's Factory</h3>
+      <p>Build a chain reaction out of things on your table. Guess which part gets the laugh, then hand the phone to a real person and find out how far off you were.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+
+    <a class="room" href="fys_fys-treasure-trove.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 22 L10 38 L38 38 L38 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 22 Q24 12 40 22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="24" y1="27" x2="24" y2="33" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="24" r="1.8" fill="currentColor"/></svg>
+      <h3>Treasure Trove</h3>
+      <p>First-year seminar. A room full of things worth noticing, and a reason to look twice.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ THE CLASSROOM ═══ -->
+<section>
+  <svg class="banner-mark" viewBox="0 0 120 40" aria-hidden="true"><line x1="6" y1="30" x2="90" y2="30" stroke="currentColor" stroke-width="2"/><g fill="none" stroke="currentColor" stroke-width="2"><path d="M14 30 L18 20 L26 20 L22 30"/><path d="M38 30 L42 20 L50 20 L46 30"/><path d="M62 30 L66 20 L74 20 L70 30"/></g><rect x="98" y="10" width="16" height="12" fill="none" stroke="currentColor" stroke-width="2"/><line x1="101" y1="14" x2="111" y2="14" stroke="currentColor" stroke-width="1.5"/><line x1="101" y1="18" x2="108" y2="18" stroke="currentColor" stroke-width="1.5"/></svg><h2>The classroom</h2>
+  <p class="sub">Built for students who are actually in the room, at a community college, this term.
+    <b>Not a demo. These ran.</b></p>
+
+  <div class="rooms">
+    <a class="room" href="islo-hub.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="2.2"/><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="24" y1="24" x2="24" y2="11"/><line x1="24" y1="24" x2="35" y2="17"/><line x1="24" y1="24" x2="36" y2="29"/><line x1="24" y1="24" x2="29" y2="37"/><line x1="24" y1="24" x2="19" y2="37"/><line x1="24" y1="24" x2="12" y2="29"/><line x1="24" y1="24" x2="13" y2="17"/></g><circle cx="24" cy="24" r="3" fill="currentColor"/></svg>
+      <h3>The iSLO Suite</h3>
+      <p>Every game, sorted by the seven skills MassBay measures at graduation &mdash; each paired with the
+         actual rubric that scores it, faculty measure-side tools, and a lane on using AI in writing honestly.
+         All seven outcomes now built.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Hub &middot; 7 outcomes &middot; build + measure</span></div>
+    </a>
+    <a class="room" href="en195.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="14" y="9" width="20" height="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29" cy="24" r="1.8" fill="currentColor"/><path d="M14 9 L24 4 L34 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>EN195 &mdash; What Counts Now</h3>
+      <p>The flash fiction unit. The front door to the whole course.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Course</span></div>
+    </a>
+    <a class="room" href="en195-hub.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="4" fill="currentColor"/><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="24" y1="20" x2="24" y2="10"/><line x1="24" y1="28" x2="24" y2="38"/><line x1="20" y1="24" x2="10" y2="24"/><line x1="28" y1="24" x2="38" y2="24"/><line x1="21" y1="21" x2="14" y2="14"/><line x1="27" y1="27" x2="34" y2="34"/></g><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="9" r="2.4"/><circle cx="24" cy="39" r="2.4"/><circle cx="9" cy="24" r="2.4"/><circle cx="39" cy="24" r="2.4"/><circle cx="13" cy="13" r="2.4"/><circle cx="35" cy="35" r="2.4"/></g></svg>
+      <h3>The Course Hub</h3>
+      <p>Every door in the course, in one place. Six rooms, all live.</p>
+      <div class="chips"><span class="chip c-live">Live</span></div>
+    </a>
+    <a class="room" href="en195-arcade.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="11" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M17 21 L21 27 M24 19 L24 27 M31 21 L27 27" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><rect x="12" y="33" width="24" height="6" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+      <h3>The EN195 Arcade</h3>
+      <p>Pick up the coin. The Semester Machine always pays, and the Workshop Vending Machine (studio exception, live backend) mints a coin for every draft fed to it, four cabinets, one per workshop.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Course &middot; live backend exception</span></div>
+    </a>
+    <a class="room" href="enjambment.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="14" width="32" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="13" y1="21" x2="26" y2="21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="31" y1="14" x2="31" y2="28" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="15" y1="28" x2="15" y2="36" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="33" y1="28" x2="33" y2="36" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <h3>Enjambment</h3>
+      <p>A poem comes down the belt as one unbroken line and you cut it into verse while it speeds up. The belt jams where the poem turns, and the silence you earn is where the stanza lands. Frost, a bass line matched to the meter, and two honest readings of the same six syllables.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Course &middot; playtest v1</span></div>
+    </a>
+    <a class="room" href="enjambment-skins.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="12" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="26" y="12" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="7" y="27" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="26" y="27" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+      <h3>Enjambment skins</h3>
+      <p>Four rough blockouts of the same machine, for a founder call on the art skin: the factory floor, Times Square, the woods that exist today, and the grown machine. Rough on purpose, because a rejected blockout costs minutes and a rejected finished skin costs a day.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Review &middot; awaiting founder call</span></div>
+    </a>
+    <a class="room" href="repos.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="10" width="28" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="10" y="21" width="28" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="10" y="32" width="28" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>
+      <h3>Repos</h3>
+      <p>Every repo on this account, one always-live link. Public repos link to the live site or the repo page; private repos link to GitHub's own sign-in-gated page, nothing personal shown here.</p>
+      <div class="chips"><span class="chip c-live">Live</span></div>
+    </a>
+    <a class="room" href="sandbags.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M16 16 Q16 12 24 12 Q32 12 32 16 L34 36 L14 36 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="22" x2="38" y2="22" stroke-dasharray="3 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M36 20 l3 -2 M36 24 l3 2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Sandbags</h3>
+      <p>Cut the weight your sentence is carrying and see what it was hiding.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+    <a class="room" href="workshop-wall.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="11" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="27" y="11" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="9" y="27" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="27" y="27" width="12" height="12" fill="currentColor"/></svg>
+      <h3>The Workshop Wall</h3>
+      <p>Peer review as a public act. What you say about someone's draft is a draft too.</p>
+      <div class="chips"><span class="chip c-live">Live</span></div>
+    </a>
+    <a class="room" href="review-bench.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="8" y1="22" x2="40" y2="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="22" x2="12" y2="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="36" y1="22" x2="36" y2="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="24" y1="22" x2="24" y2="36" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="15" r="2.4" fill="currentColor"/></svg>
+      <h3>The Review Bench</h3>
+      <p>Sit with a piece before you speak about it.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+    <a class="room" href="course-river.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 16 Q18 22 16 28 T24 40" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 14 Q26 20 24 28 T34 38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="20" cy="26" r="3" fill="currentColor"/></svg>
+      <h3>The Course River</h3>
+      <p>The semester as a current. Where you are, what fed in, what is downstream.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+    <a class="room" href="flash-ballast.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><path d="M12 20 L36 20 L32 34 L16 34 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="14" y1="27" x2="34" y2="27" stroke-dasharray="2 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="24" y1="20" x2="24" y2="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="10" r="2" fill="currentColor"/></svg>
+      <h3>Flash Ballast</h3>
+      <p>What a very short story can and cannot carry.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+    <a class="room" href="play-the-semester.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="12" cy="34" r="3" fill="currentColor"/><circle cx="22" cy="20" r="3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="34" cy="30" r="3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="36" cy="14" r="3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 34 L22 20 L34 30 L36 14" stroke-dasharray="2 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Play the Semester</h3>
+      <p>The whole term, as a board you can see.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span></div>
+    </a>
+    <a class="room" href="workshop-in-a-box.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="16" width="28" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 16 L24 8 L38 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="24" y1="8" x2="24" y2="36" stroke-dasharray="2 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Workshop in a Box</h3>
+      <p>Everything a writing workshop needs, packed flat. Take it and run it anywhere.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">For teachers</span></div>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══ THE ENTERPRISE SLAB — the lane that was never advertised ═══ -->
+<div class="slab">
+  <div class="in">
+    <svg class="banner-mark" viewBox="0 0 120 40" aria-hidden="true"><line x1="6" y1="20" x2="114" y2="20" stroke="currentColor" stroke-width="2"/><path d="M30 12 L20 20 L30 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M90 12 L100 20 L90 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="52" y="14" width="16" height="12" fill="currentColor"/></svg><h2>Client work</h2>
+    <p class="sub">The same engine, pointed at a real problem someone is paying to solve.
+      <b>An instrument that shows a client the constraint they are actually standing in.</b></p>
+
+    <div class="work">
+      <a class="job" href="confluence-TRUNK.html">
+        <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="9" width="30" height="30" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.8"/><g stroke="currentColor" stroke-width="1.4"><line x1="19" y1="9" x2="19" y2="39"/><line x1="29" y1="9" x2="29" y2="39"/><line x1="9" y1="19" x2="39" y2="19"/><line x1="9" y1="29" x2="39" y2="29"/></g><rect x="10" y="30" width="8" height="8" rx="1" fill="currentColor"/><circle cx="34" cy="14" r="2" fill="currentColor"/></svg>
+      <div class="who">MassBay Community College</div>
+        <h3>Confluence</h3>
+        <p>Institutional assessment. Norms the raters before they score, then maps courses against
+           outcomes and <b>shows the dry cells</b> — the places nobody is teaching what everybody
+           is measuring.</p>
+      </a>
+
+      <a class="job" href="advantage-intake.html">
+        <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="8" y1="24" x2="40" y2="24" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="8" y1="19" x2="8" y2="29" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><line x1="40" y1="19" x2="40" y2="29" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><g stroke="currentColor" stroke-width="1.2"><line x1="16" y1="21" x2="16" y2="27"/><line x1="24" y1="20" x2="24" y2="28"/><line x1="32" y1="21" x2="32" y2="27"/></g><rect x="26" y="18" width="6" height="12" rx="1.5" fill="currentColor"/><line x1="12" y1="34" x2="36" y2="34" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3"/></svg>
+      <div class="who">Advantage Relocation &middot; Manhattan</div>
+        <h3>The Tension Bar</h3>
+        <p>A relocating executive sets their terms; the market answers. It does not show apartments.
+           It shows what a doorman actually costs — <b>about $18,400 a year</b> — before anyone
+           books a tour.</p>
+      </a>
+
+      <a class="job" href="tight-spiral-runbook.html">
+        <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="7" width="24" height="34" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.8"/><g stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M16 15 l2 2 l4 -4"/><path d="M16 24 l2 2 l4 -4"/><path d="M16 33 l2 2 l4 -4"/></g><g stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="26" y1="15" x2="32" y2="15"/><line x1="26" y1="24" x2="32" y2="24"/><line x1="26" y1="33" x2="32" y2="33"/></g></svg>
+      <div class="who">The studio itself</div>
+        <h3>The Runbook</h3>
+        <p>How this shop actually runs: the gates, the ticks, the refusals. Published because
+           <b>a studio that hides its method is selling magic.</b></p>
+      </a>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ═══ THE WHOLE STUDIO — the OS, the map, the ways in, the college it runs inside ═══ -->
+<section>
+  <svg class="banner-mark" viewBox="0 0 120 40" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="10" width="20" height="20"/><rect x="50" y="8" width="16" height="24"/><rect x="88" y="12" width="24" height="16"/></g><line x1="28" y1="20" x2="50" y2="20" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 3"/><line x1="66" y1="20" x2="88" y2="20" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 3"/><circle cx="18" cy="20" r="2.5" fill="currentColor"/><circle cx="58" cy="20" r="2.5" fill="currentColor"/><circle cx="100" cy="20" r="2.5" fill="currentColor"/></svg><h2>The whole studio</h2>
+  <p class="sub">The games and the classroom are two lanes. Here is the rest of it: <b>the machine that
+    refuses a bad build</b>, the map of how the pieces connect, a door you can walk, and the college it
+    already runs inside. <b>The iSLO Suite is one module in one lane — not the studio.</b></p>
+
+  <div class="rooms">
+    <a class="room" href="tight-spiral-runbook.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><rect x="12" y="8" width="24" height="32" rx="1.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 16 l2 2 l4 -4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 24 l2 2 l4 -4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 32 l2 2 l4 -4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><line x1="26" y1="16" x2="32" y2="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="26" y1="24" x2="32" y2="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="26" y1="32" x2="32" y2="32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <h3>The Runbook &amp; the Gates</h3>
+      <p>How the shop actually runs: the gates, the ticks, the refusals. Contrast, structure, canon and
+         navigation are enforced by scripts on every ship &mdash; not by a person remembering.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">The OS</span></div>
+    </a>
+
+    <a class="room" href="studio/tight-spiral-system-map.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="30" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="36" cy="30" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="24" cy="40" r="3" fill="currentColor"/><line x1="22" y1="14" x2="14" y2="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="26" y1="14" x2="34" y2="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="15" y1="32" x2="21" y2="38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="33" y1="32" x2="27" y2="38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      <h3>The System Map</h3>
+      <p>Every piece and how it connects &mdash; games, classroom tools, client work, and the floor
+         underneath them. The studio as a diagram you can trace.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Map</span></div>
+    </a>
+
+    <a class="room" href="studio/play-the-studio.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="16" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M20 16 L33 24 L20 32 Z" fill="currentColor"/></svg>
+      <h3>Play the Studio</h3>
+      <p>Run the pipeline yourself in a few moves &mdash; finish a sentence, catch a problem, ship it.
+         By the end you have run the studio, not read about it.</p>
+      <div class="chips"><span class="chip c-lab">Lab</span><span class="chip c-note">Playable</span></div>
+    </a>
+
+    <a class="room" href="studio/what-this-is.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><line x1="12" y1="14" x2="36" y2="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="22" x2="36" y2="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><line x1="12" y1="30" x2="28" y2="30" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="1 6"/></svg>
+      <h3>What This Is</h3>
+      <p>The one-paragraph version. The same thing, three ways &mdash; what all of this is, and why it is
+         built the way it is.</p>
+      <div class="chips"><span class="chip c-note">Manifesto</span></div>
+    </a>
+
+    <a class="room" href="islo-hub.html">
+      <svg class="gmark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="2.2"/><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="24" y1="24" x2="24" y2="11"/><line x1="24" y1="24" x2="35" y2="17"/><line x1="24" y1="24" x2="36" y2="29"/><line x1="24" y1="24" x2="29" y2="37"/><line x1="24" y1="24" x2="19" y2="37"/><line x1="24" y1="24" x2="12" y2="29"/><line x1="24" y1="24" x2="13" y2="17"/></g><circle cx="24" cy="24" r="3" fill="currentColor"/></svg>
+      <h3>For MassBay</h3>
+      <p>The studio already runs inside the college: <b>Confluence</b> norms the raters, and <b>the iSLO
+         Suite</b> builds and measures the seven graduation competencies. The full pilot proposal is
+         shared privately.</p>
+      <div class="chips"><span class="chip c-live">Live</span><span class="chip c-note">Education lane</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ═══ THE PLAYTEST BENCH — the intake ═══ -->
+<section id="bench">
+  <svg class="banner-mark" viewBox="0 0 120 40" aria-hidden="true"><line x1="10" y1="26" x2="86" y2="26" stroke="currentColor" stroke-width="2"/><line x1="16" y1="26" x2="16" y2="36" stroke="currentColor" stroke-width="2"/><line x1="80" y1="26" x2="80" y2="36" stroke="currentColor" stroke-width="2"/><rect x="34" y="14" width="28" height="12" fill="none" stroke="currentColor" stroke-width="2"/><line x1="40" y1="20" x2="56" y2="20" stroke="currentColor" stroke-width="1.5"/><path d="M98 14 l3 3 l6 -6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><h2>The bench</h2>
+  <p class="sub">Every game here needs someone who has never seen it to walk in cold and get stuck
+    in a way I did not predict. <b>That is the whole job, and it is the most useful thing anyone
+    can give this studio.</b></p>
+
+  <div class="bench">
+    <div class="bench-top">
+      <h3>Sit the bench</h3>
+      <p>You play one build. You get stuck, or bored, or you find the thing nobody meant to leave in.
+        <b>Then you tell me where it happened.</b></p>
+      <p>No experience needed. <b>Not knowing what you are doing is the qualification</b> — you are
+        the only person who can see the game the way a stranger sees it, and you can only do it once.</p>
+    </div>
+
+    <div class="teach">
+      <p class="h">How to playtest — the whole method, in four moves</p>
+      <ol>
+        <li><b>Play it cold.</b> Do not read about it first. Do not ask me what it does. The confusion
+          is the data — if you smooth it away by preparing, you have destroyed the thing I need.</li>
+        <li><b>Notice the exact moment you stall.</b> Not "it was confusing." <b>"I clicked the amber
+          bar and nothing happened and I did not know if I had broken it."</b> The timestamp of your
+          confusion is worth more than your opinion of the game.</li>
+        <li><b>Say what you EXPECTED to happen.</b> This is the one thing only you have. I already
+          know what it does. I need to know what you thought it would do — <b>the gap between those
+          two is the bug.</b></li>
+        <li><b>Tell me where you quit, and why.</b> Boredom is a finding. Quitting is a finding.
+          <b>"I stopped because I did not care what happened next" is the most valuable sentence
+          you can send me</b>, and the one people are too polite to write.</li>
+      </ol>
+    </div>
+
+    <div class="form">
+      <div class="f">
+        <label for="pt-name">What should I call you</label>
+        <input type="text" id="pt-name" autocomplete="name" placeholder="First name is plenty">
+      </div>
+
+      <div class="f">
+        <label for="pt-email">Where to send the build</label>
+        <input type="email" id="pt-email" autocomplete="email" placeholder="you@example.com">
+      </div>
+
+      <div class="f">
+        <label id="l-what">What do you want to test</label>
+        <div class="opts" id="what" role="group" aria-labelledby="l-what">
+          <button class="opt" data-v="games"   aria-pressed="true">The games</button>
+          <button class="opt" data-v="class"   aria-pressed="false">Classroom tools</button>
+          <button class="opt" data-v="client"  aria-pressed="false">Client instruments</button>
+          <button class="opt" data-v="any"     aria-pressed="false">Whatever needs eyes</button>
+        </div>
+      </div>
+
+      <div class="f">
+        <label id="l-how">How do you read a screen</label>
+        <div class="opts" id="how" role="group" aria-labelledby="l-how">
+          <button class="opt" data-v="typical"  aria-pressed="true">Typically</button>
+          <button class="opt" data-v="lowvis"   aria-pressed="false">Low vision</button>
+          <button class="opt" data-v="screenrd" aria-pressed="false">Screen reader</button>
+          <button class="opt" data-v="kb"       aria-pressed="false">Keyboard only</button>
+        </div>
+      </div>
+
+      <div class="f">
+        <label for="pt-note">Anything I should know</label>
+        <textarea id="pt-note" placeholder="Optional. What you teach, what you build, what you're curious about, what you'd break."></textarea>
+      </div>
+
+      <div class="consent">
+        <b>What happens to this.</b> It goes to me and to nobody else. No tracker fires when you load
+        this page &mdash; <b>this form is the only thing on this site that ever touches a network,
+        and it only fires when you tap the button.</b> No cookies, no analytics, no ad tech, no
+        third party. You can ask me to delete it any time and I will.
+      </div>
+
+      <button class="send" id="send">Sit the bench</button>
+      <p class="out" id="out" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <!-- ═══ THE EASEL — the open chair for artists ═══ -->
+  <div class="bench" style="margin-top:26px">
+    <div class="bench-top">
+      <h3>The easel</h3>
+      <p>Every image in this studio is scaffolding &mdash; machine-roughed by <b>Super Sketchy
+        Graphics</b>, our machine imprint (the teaspoon marks its work), hand-traced,
+        gated for contrast. <b>None of it is precious.</b></p>
+      <p>If you draw, any mark here is an open chair. Take one over, make it yours, and
+        <b>your name stands in the file.</b> The contrast floors stay; the art inside them
+        is the artist&rsquo;s.</p>
+      <svg viewBox="0 0 320 88" role="img" aria-label="The measure ladder: a teaspoon, a tablespoon, a cup — small truths compound into bigger vessels." style="display:block;max-width:320px;margin:14px 0 2px">
+        <g fill="none" stroke="var(--brass-ink)" stroke-width="2.4" stroke-linecap="round">
+          <ellipse cx="42" cy="58" rx="17" ry="11"/>
+          <ellipse cx="42" cy="58" rx="8" ry="4.5" stroke-width="1.2"/>
+          <path d="M59 56 L86 50"/>
+          <ellipse cx="140" cy="54" rx="24" ry="15"/>
+          <ellipse cx="140" cy="54" rx="12" ry="6.5" stroke-width="1.2"/>
+          <path d="M164 51 L188 46"/>
+          <path d="M232 30 L286 30 L280 76 Q259 84 238 76 Z"/>
+          <path d="M286 36 Q300 40 296 52 Q293 60 283 58" stroke-width="1.8"/>
+          <path d="M240 44 L278 44" stroke-width="1.2" stroke-dasharray="3 4"/>
+        </g>
+      </svg>
+      <!-- Labels are HTML, not <text> in the viewBox: SVG text is frozen at the scale the
+           viewBox picks, so it rendered at 11.3px and broke the 18px floor. As HTML it rides
+           the page's own --fs control and the reader's zoom. Columns centre each label under
+           its vessel (tsp 13%, tbsp 44%, cup 81% of the 320-wide drawing).
+           --cool-ink, not --ink-3: this sits on .bench-top's --cool-fill ground, where
+           --ink-3 is 3.79:1. As SVG text that was invisible to the render gate. -->
+      <div style="display:grid; grid-template-columns:26.2% 35.1% 38.7%; max-width:320px; text-align:center; font-family:var(--mono); font-size:calc(18px * var(--fs)); color:var(--cool-ink); margin:0 0 4px">
+        <span>tsp</span><span>tbsp</span><span>cup</span>
+      </div>
+      <p><b>Small truths first.</b> A teaspoon, then a tablespoon, then a cup.
+        Mail the studio: <a href="mailto:walshero@gmail.com" style="color:inherit;text-decoration:underline;text-underline-offset:2px">walshero@gmail.com</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW THE STUDIO WORKS ═══ -->
+<section>
+  <svg class="banner-mark" viewBox="0 0 120 40" aria-hidden="true"><rect x="10" y="10" width="20" height="22" fill="none" stroke="currentColor" stroke-width="2"/><line x1="30" y1="21" x2="46" y2="21" stroke="currentColor" stroke-width="2"/><path d="M40 15 l6 6 l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M92 16 l4 4 l8 -8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><h2>How the studio works</h2>
+  <p class="sub">Published, not because it is impressive, but because <b>a shop that hides its
+    method is asking you to trust it instead of check it.</b></p>
+
+  <div class="floor-list">
+    <div class="fl">
+      <b>Single file</b>
+      <p>Every build is one HTML file. Save it, mail it, put it on a stick. It has no dependencies
+        and it cannot rot.</p>
+    </div>
+    <div class="fl">
+      <b>Offline</b>
+      <p>No external hosts. It runs on a plane, on campus wifi, in a building with no signal.
+        Enforced by a check, not a promise.</p>
+    </div>
+    <div class="fl">
+      <b>Contrast is arithmetic</b>
+      <p>I have retinitis pigmentosa. Every text colour is computed against its background before
+        anything ships. <b>4.5:1 or it does not go out.</b> A gate refuses it on the server — not a
+        person remembering.</p>
+    </div>
+    <div class="fl">
+      <b>No dark patterns</b>
+      <p>No streaks, no infinite scroll, no manufactured urgency. One game here is <i>about</i>
+        those patterns. It would be strange to use them.</p>
+    </div>
+    <div class="fl">
+      <b>Scene first</b>
+      <p>No splash, no settings wall, no "choose your experience." The first thing you see is the
+        thing itself.</p>
+    </div>
+    <div class="fl">
+      <b>Sources named</b>
+      <p>Where a build asserts a fact, it says where the fact came from and when it was checked.
+        A number with no provenance is a rumour.</p>
+    </div>
+  </div>
+</section>
+
+<style>#full-shelf .shelf-cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px 28px}#full-shelf .shelf-h{font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin:.2rem 0 .5rem}#full-shelf .shelf-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}#full-shelf .shelf-list a{display:block;min-height:44px;display:flex;align-items:center;padding:.4em .5em;border-radius:8px;text-decoration:none;color:inherit;border-bottom:1px solid rgba(127,127,127,.14)}#full-shelf .shelf-list a:hover{background:rgba(127,127,127,.12)}#full-shelf .shelf-list a:focus-visible{background:rgba(127,127,127,.12);outline:3px solid var(--ring);outline-offset:-3px}#full-shelf .lab-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--cool-ink);border:1px dashed var(--cool-line);border-radius:2px;padding:2px 6px;margin-left:.5em;flex:none}</style>
+<section id="full-shelf">
+  <h2>The full shelf</h2>
+  <p class="sub">Everything in the studio, linked so nothing gets lost — drafts, slices, tools, and pages not yet promoted into a section above. Rough edges expected.</p>
+  <div class="shelf-cols">
+    <div class="shelf-col"><h3 class="shelf-h">Pages &amp; playables</h3>
+    <ul class="shelf-list">
+      <li><a href="choose-your-leader-nixon-slice.html">Choose Your Leader — November 3, 1969</a></li>
+      <li><a href="choose-your-leader-v5-slice.html">Choose Your Leader — October 22, 1962</a></li>
+      <li><a href="choose-your-leader-v5.html">Choose Your Leader — The Receiver&#x27;s Game</a></li>
+      <li><a href="choose-your-leader-v5-b.html">Choose Your Leader — Design B, the Confrontation (playtest · face-forward)</a></li>
+      <li><a href="cliche-cabinet.html">The Cliché Cabinet — Tight Spiral Studios (all-in-one) <span class="lab-tag">Lab</span></a></li>
+      <li><a href="cliche-city.html">Cliché City — Tight Spiral Studios <span class="lab-tag">Lab</span></a></li>
+      <li><a href="cliche-field.html">Cliché Field — Tight Spiral Studios <span class="lab-tag">Lab</span></a></li>
+      <li><a href="cliche-line.html">Cliché Line — Tight Spiral Studios <span class="lab-tag">Lab</span></a></li>
+      <li><a href="comfort-control.html">comfort-control.html</a></li>
+      <li><a href="en195-last-week.html">What Counts Now — EN195</a></li>
+      <li><a href="en195-what-counts-now.html">What Counts Now — EN195</a></li>
+      <li><a href="leeder-intake.html">Leeder Management — Project Intake · Tight Spiral Productions</a></li>
+      <li><a href="floor-specimen.html">18 vs 16 — and why that is the wrong question (type-floor specimen)</a></li>
+      <li><a href="motion-specimen.html">Motion Specimen · Tight Spiral Studios</a></li>
+      <li><a href="play-the-semester-flash.html">Play the Semester — EN195 Flash</a></li>
+      <li><a href="sticker-price.html">Sticker Price — every number is a headline. Read the fine print. · Tig</a></li>
+      <li><a href="table-four.html">Table Four</a></li>
+      <li><a href="the-viscosity.html">The Viscosity</a></li>
+      <li><a href="trail-notes.html">Trail Notes — Nantahala with Evan</a></li>
+      <li><a href="tsp-intake.html">TSP Game Intake — Name it before you build it</a></li>
+      <li><a href="tsp-opportunity-bridge.html">TSP Opportunity Bridge</a></li>
+      <li><a href="tsp-spiral-studio.html">TSP Spiral Studio</a></li>
+      <li><a href="your-rp-world.html">Your RP World — a noticing game</a></li>
+      <li><a href="confluence-massbay-assessment.html">Confluence — Where Student Work Meets the World</a></li>
+      <li><a href="ai-resilient-assignment.html">Make the assignment AI-resilient — audit &amp; redraft</a></li>
+      <li><a href="close-the-loop.html">Close the Loop — annual ISLO assessment report</a></li>
+      <li><a href="real-cost.html">Real Cost — the small number, at the size of a whole semester</a></li>
+      <li><a href="rubric-forge.html">Rubric Forge — draft a rubric worth norming</a></li>
+      <li><a href="score-the-room.html">Score the Room — read a delivery, not just a transcript</a></li>
+      <li><a href="scorer-norming.html">The Norming Table — where a &#x22;3&#x22; learns to mean the same thing</a></li>
+      <li><a href="update-the-model.html">Update the Model — how sure are you, and what would change your mind?</a></li>
+      <li><a href="who-holds-the-room.html">Who Holds the Room — one scene, on the college&#x27;s DEI rubric</a></li>
+      <li><a href="whose-draft.html">Whose Draft — where AI extends your thinking, and where it replaces it</a></li>
+    </ul></div>
+    <div class="shelf-col"><h3 class="shelf-h">Studio workbench</h3>
+    <ul class="shelf-list">
+      <li><a href="studio/assignment-auditor.html">The Assignment Auditor — on-ramp to Confluence</a></li>
+      <li><a href="studio/canary-regression.html">canary-regression.html</a></li>
+      <li><a href="studio/confluence-console.html">The Confluence Console — Flash Fiction</a></li>
+      <li><a href="studio/convergence-card-engine.html">The Convergence Card — a machine-assisted, human-verified research eng</a></li>
+      <li><a href="studio/dark-stop-lab.html">Dark-Stop Lab — Tight Spiral Productions</a></li>
+      <li><a href="studio/elves-house.html">The Elves&#x27; House — Tight Spiral Studios</a></li>
+      <li><a href="studio/en195-playtest-instructions.html">EN195 Playtest — How to Play &amp;amp; Log</a></li>
+      <li><a href="studio/flash-compression-game-intake.html">Flash Compression Game — Intake + Session Capture</a></li>
+      <li><a href="studio/founder-compass.html">The Founder Compass</a></li>
+      <li><a href="studio/funny-boneys-oops.html">Funny Boney&#x27;s Factory — Playtest</a></li>
+      <li><a href="studio/group-foreman.html">Group Foreman — EN195 Workshop Yard</a></li>
+      <li><a href="studio/laughter-foundry-spec-and-log.html">The Laughter Foundry — Spec and Conversation Log</a></li>
+      <li><a href="studio/legibility-optimizer.html">The Legibility Optimizer — Tight Spiral Studios</a></li>
+      <li><a href="studio/massbay-hub.html">MassBay Degrees — Tight Spiral</a></li>
+      <li><a href="studio/network-strategy-spec.html">Network Strategy Spec — Tight Spiral Studios</a></li>
+      <li><a href="studio/open-house-strategic-plan.html">Open House — Strategic Plan · Tight Spiral Studios</a></li>
+      <li><a href="studio/palette-chooser.html">Pick the new palette — green is gone</a></li>
+      <li><a href="studio/paper-craft-ceiling.html">Paper Craft Ceiling</a></li>
+      <li><a href="studio/play-tight-spiral.html">Play Tight Spiral — learning games you can play right now</a></li>
+      <li><a href="studio/props-room.html">Props Room — the Carry-Out</a></li>
+      <li><a href="studio/provenance-ledger.html">The Provenance Ledger — Tight Spiral Studios</a></li>
+      <li><a href="studio/recursion-ledger.html">The Recursion Ledger — the studio correcting itself, below the wall</a></li>
+      <li><a href="studio-aleph.html">The Aleph &mdash; every room at once (playtest status board)</a></li>
+      <li><a href="studio/studio-eyes-auditor.html">The ship-gate enforcer (reading-comfort auditor)</a></li>
+      <li><a href="studio/studio-eyes-canary.html">studio-eyes-canary.html</a></li>
+      <li><a href="studio/studio-intake.html">Studio Intake — Tight Spiral Studios</a></li>
+      <li><a href="studio/studio-river.html">Tight Spiral Studios — The River</a></li>
+      <li><a href="studio/the-bridge.html">The Bridge — start here</a></li>
+      <li><a href="studio/the-village.html">Tight Spiral Productions — the studio</a></li>
+      <li><a href="studio/tight-spiral-studio-face.html">The Tight Spiral Studio — Work Desk</a></li>
+      <li><a href="studio/timing-belt.html">The Timing Belt — Tight Spiral Studios</a></li>
+      <li><a href="studio/ts-hin-v1.html">TS-HIN v1.0 — Human Intelligence Network</a></li>
+      <li><a href="studio/tsp-home.html">The Tight Spiral — enter the valley</a></li>
+      <li><a href="studio/studio-tour-for-massbay.html">The Studio, Played — for MassBay</a></li>
+      <li><a href="art-pitches.html">TSP Art Direction — three pitches</a></li>
+      <li><a href="comfort-kernel.html">TSP Comfort Kernel — reference &amp; demo</a></li>
+      <li><li><a href="comfort-v3.html" style="font-size:18px">Comfort v3 - the studio standard: font size, contrast, warm and dark, motion stop, screen reader</a></li>
+<li>      <a href="comfort-kernel-v2.html">TSP Comfort Kernel v2 — the comfort chrome, reserved row</a></li>
+      <li><a href="floor-status.html">Floor Status (draft)</a></li>
+      <li><a href="_confluence-v48-canon.html">Confluence Calibration — Assessment Hub (v48 canon snapshot)</a></li>
+    </ul></div>
+  </div>
+</section>
+<footer>
+  <p><b>Tight Spiral Productions.</b> A one-person studio. Everything here was made by hand, with a
+    machine in the room and a person deciding.</p>
+  <p><a href="mailto:walshero@gmail.com">walshero@gmail.com</a> &nbsp;&middot;&nbsp; Boston</p>
+  <p style="margin-top:11px; font-family:var(--mono); font-size:12px; color:var(--ink-3);">
+    Last deployed <time id="deployed" datetime="">local copy — not the live site</time>
+    &middot; build <span id="deployed-sha">local</span>
+    &middot; shelf counted from the repo, not remembered</p>
+</footer>
+
+</main>
+
+<!-- BOTTOM NAV RAIL — Back + Home. index.html is the studio hub, so Back is history. -->
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()" aria-label="Back">Back</button>
+  <a href="index.html" aria-label="Home">Home</a>
+</nav>
+
+<script>
+// Freshness stamp. The deploy writes datetime="<UTC>" into #deployed; here we
+// render it in the viewer's own timezone with a relative "X ago". Offline-safe:
+// Date only, no fetch/storage. On a stale cached bookmark the baked time is old,
+// so "X ago" grows — that IS the staleness tell.
+(function(){
+  var t=document.getElementById('deployed'); if(!t) return;
+  var iso=t.getAttribute('datetime'); if(!iso) return;   // local copy: leave the fallback text
+  var d=new Date(iso); if(isNaN(d.getTime())) return;
+  var mins=Math.max(0,Math.round((Date.now()-d.getTime())/60000));
+  var ago = mins<1?'just now' : mins<60?mins+' min ago'
+          : mins<1440?Math.round(mins/60)+' h ago'
+          : Math.round(mins/1440)+' d ago';
+  var local=d.toLocaleString(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  t.textContent=local+' ('+ago+')';
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     THE PLAYTEST INTAKE.
+
+     THE ONE NETWORK CALL ON THIS PAGE. It fires only on tap. Loading this page
+     sends nothing, anywhere, ever. No analytics, no cookies, no third party.
+
+     It writes to Supabase — a real table, so the studio can actually see who
+     signed up, cohort them, and follow up. The anon key below is a PUBLIC key
+     by design: it is safe to ship in client code PROVIDED Row Level Security is
+     on and the only policy is INSERT. That is the whole security model:
+
+         RLS ON. INSERT allowed to anon. SELECT allowed to NOBODY.
+
+     Anyone can drop a card in the box. Nobody can open the box but Matt.
+     If SELECT were open, the anon key would leak the whole signup list.
+     ───────────────────────────────────────────────────────────────────────── */
+
+  var SUPABASE_URL = "PASTE_PROJECT_URL_HERE";   /* https://xxxx.supabase.co */
+  var SUPABASE_KEY = "PASTE_ANON_KEY_HERE";      /* the anon/public key */
+
+  var S = { what: "games", how: "typical" };
+
+  function group(id, key){
+    var g = document.getElementById(id);
+    g.addEventListener("click", function(e){
+      var b = e.target.closest(".opt");
+      if(!b) return;
+      var kids = g.querySelectorAll(".opt");
+      for(var i=0; i<kids.length; i++) kids[i].setAttribute("aria-pressed","false");
+      b.setAttribute("aria-pressed","true");
+      S[key] = b.getAttribute("data-v");
+    });
+  }
+  group("what","what");
+  group("how","how");
+
+  var out  = document.getElementById("out");
+  var send = document.getElementById("send");
+
+  function say(msg, bad){
+    out.textContent = msg;
+    out.className = bad ? "out bad" : "out";
+  }
+
+  send.addEventListener("click", function(){
+    var name  = document.getElementById("pt-name").value.trim();
+    var email = document.getElementById("pt-email").value.trim();
+    var note  = document.getElementById("pt-note").value.trim();
+
+    /* An error is a moment for DIRECTION, not for mood. Say what to do next. */
+    if(!email || email.indexOf("@") < 1 || email.indexOf(".") < 0){
+      say("I need an email to send you a build — that is the only way this works.", true);
+      document.getElementById("pt-email").focus();
+      return;
+    }
+
+    if(SUPABASE_URL.indexOf("PASTE_") === 0){
+      /* NOT CONFIGURED. Never pretend a signup landed. A false confirmation is
+         worse than an error — the person walks away believing they are on a list
+         that does not exist. Fall back to mail, which always works. */
+      say("Signup is not wired up yet — opening your mail app instead.", true);
+      window.location.href = "mailto:walshero@gmail.com"
+        + "?subject=" + encodeURIComponent("Playtest bench — " + (name || email))
+        + "&body=" + encodeURIComponent(
+            "Name: " + (name || "(none)") + "\n" +
+            "Email: " + email + "\n" +
+            "Wants to test: " + S.what + "\n" +
+            "Reads the screen: " + S.how + "\n\n" +
+            (note || "(no note)") + "\n");
+      return;
+    }
+
+    send.disabled = true;
+    say("Sending…");
+
+    fetch(SUPABASE_URL + "/rest/v1/playtesters", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({
+        name: name || null,
+        email: email,
+        wants: S.what,
+        reads: S.how,
+        note: note || null,
+        source: "studio-face"
+      })
+    })
+    .then(function(r){
+      if(r.ok){
+        say("You're on the bench. I'll send you a build and the four moves above — play it cold.");
+        send.textContent = "Done";
+        return;
+      }
+      /* VERIFY, NEVER TRUST THE RECEIPT. A non-2xx is a FAILURE and must be
+         reported as one. Silently swallowing it and showing a checkmark is the
+         hollow-claim failure, and it is the one this studio keeps making. */
+      throw new Error("HTTP " + r.status);
+    })
+    .catch(function(err){
+      send.disabled = false;
+      say("That did not send (" + err.message + "). Mail me directly: walshero@gmail.com", true);
+    });
+  });
+
+  if(window.scrollTo) window.scrollTo(0,0);
+})();
+</script>
+
+<script>
+(function(){
+  var root=document.documentElement, sr=document.getElementById('seSr');
+  /* Last-updated: computed from the file's real last-modified time (updates every deploy).
+     NOT a typed date — a typed 'last updated' is a hollow claim by construction. */
+  (function(){ var fu=document.getElementById('faceUpdated'); if(!fu) return;
+    var d=new Date(document.lastModified);
+    if(isNaN(d.getTime())){ fu.textContent='Last updated recently'; return; }
+    fu.setAttribute('datetime', d.toISOString().slice(0,10));
+    fu.textContent='Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+  /* Light: remaps this face's tokens via html[data-light] (dusk/night). Warm-dark, never pure black. */
+  /* Text size A / A+ / A++ drives this face's --fs multiplier. */
+})();
+</script>
+</body>
+</html>
