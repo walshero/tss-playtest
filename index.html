@@ -3,35 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dessert Tray v11.0</title>
+<title>Dessert Tray v11.1</title>
 <meta name="description" content="Stack the dessert tray. The chef wants it higher. The waiter has to carry it.">
 <meta name="spec-source" content="funnybonies/SPEC-LINK-v11.md">
 <meta name="audience" content="kids, grades 3 to 6">
 <style>
 /* ===========================================================
-   Dessert Tray  ·  Funnybonies v11.0
+   Dessert Tray  ·  Funnybonies v11.1
    Spec: funnybonies/SPEC-LINK-v11.md
    Audience: kids, grades 3 to 6.
 
-   v11 RE-SPINE, founder-called 2026-08-29:
-     "Funnybonies isn't quite intuitive enough, and it's not funny."
-     "It's a legit rotate and place and change view puzzle game with a
-      funny lose state and a funny win state."
+   v11.1 SEATS THE PANEL. v11.0 named the register and consulted nobody,
+   and both seats would have caught the founder's own two complaints.
 
-   The Goldberg machine is POSTPONED, not cancelled. v10 was a demo with
-   no jeopardy, and comedy needs jeopardy. So: Jenga, at a restaurant.
+   HORVATH (learning scientist, seated): "Difficulty should live in the
+   judgment, never in the joystick." v11.0 broke this twice.
+     1. ROTATE was a coin flip. You could not see the axis you were
+        changing, so there was nothing to judge with. FIXED: the PLAN
+        INSET, a bird's eye of the tray, shows both footprints at once.
+     2. A RANDOM DRIFT nudged every piece on the axis you were not
+        watching. That is difficulty in the DICE, one level below the
+        joystick, and it made failure arbitrary. His other ruling,
+        "failure is funny, never punishing," was broken by it.
+        FIXED: the drift is GONE. Nothing unseen ever moves a piece.
+        Each dessert now ARRIVES at a fixed offset you can read in the
+        plan, and correcting it is the game.
 
-   THREE VERBS. Rotate swaps a dessert's footprint. Place drops it.
-   TURN THE TRAY is the actual puzzle: you only ever see one axis, and
-   the stack drifts on the axis you are not watching.
+   HITCHCOCK (suspense, seated): the bomb under the table. Suspense is
+   the audience knowing what the character does not. v11.0 shipped a
+   SURPRISE instead: you learned the stack was doomed as it fell.
+     FIXED: the tray LEANS as the centre of mass creeps toward the
+     edge, and it leans for the piece you have NOT placed yet. The
+     waiter braces. You can see it going and place it anyway.
 
-   THE CHEF wants it higher, always, forever. THE WAITER has to carry
-   this and never says a word about it. Amanita register: eyebrows,
-   shoulders, one exhausted arm.
+   CLEESE (opening thirty seconds, seated): v11.0 opened cold on a
+   control panel. FIXED: it opens with a tray already going over,
+   before the player touches anything.
 
-   COLOUR, per founder call. The kraft and cocoa motif of v8 to v10 is
-   dead. Patisserie brights. No green anywhere, standing floor.
-   Nothing depends on sound. Nothing is stored.
+   COLOUR per founder call. No green. Nothing depends on sound.
+   Nothing is stored.
    =========================================================== */
 :root{
   color-scheme: light dark;
@@ -80,9 +90,7 @@ h1{font-size:21px; line-height:1.15; margin:12px 0 8px; letter-spacing:-.2px}
 }
 .stage svg{display:block; width:100%; height:auto}
 
-.say{
-  margin:12px 0 8px; font-size:21px; font-weight:700; min-height:29px;
-}
+.say{margin:12px 0 8px; font-size:21px; font-weight:700; min-height:29px}
 .pad{display:grid; grid-template-columns:1fr 1fr 1fr; gap:9px; margin-bottom:9px}
 button{font:inherit; cursor:pointer}
 .b{
@@ -94,27 +102,23 @@ button{font:inherit; cursor:pointer}
 .b:disabled{opacity:.4; cursor:default}
 .b.wide{grid-column:1 / -1}
 .b.turn{background:var(--berry); color:var(--cream); border-color:var(--line)}
-.b.go{
-  background:var(--hot); color:var(--onhot); border-color:var(--line);
-  font-size:24px; min-height:66px;
-}
+.b.go{background:var(--hot); color:var(--onhot); border-color:var(--line);
+  font-size:24px; min-height:66px}
 .b:focus-visible{outline:4px solid var(--hot-ink); outline-offset:3px}
 .tiny{font-size:18px; color:var(--soft); margin:10px 0 0}
 footer{margin-top:16px; border-top:2px solid var(--soft); padding-top:9px}
-@media (prefers-reduced-motion: reduce){
-  .anim{transition:none !important}
-}
+@media (prefers-reduced-motion: reduce){ .anim{transition:none !important} }
 </style>
 </head>
 <body>
 
 <div class="wrap">
 
-<h1>Dessert Tray <span class="ver">v11.0</span> <span class="tsp-lab" title="Lab: an experiment on the bench, not a finished game">Lab</span></h1>
+<h1>Dessert Tray <span class="ver">v11.1</span> <span class="tsp-lab" title="Lab: an experiment on the bench, not a finished game">Lab</span></h1>
 
 <div class="stage" id="stage">
-<svg id="scene" viewBox="0 0 360 430" role="img"
-     aria-label="A restaurant pass. A chef on the left holds his hand at a height he wants. A waiter on the right waits. A silver tray sits between them.">
+<svg id="scene" viewBox="0 0 360 500" role="img"
+     aria-label="A restaurant pass. A chef on the left holds a hand at the height he wants. A waiter on the right waits. A silver tray between them, and below it a small plan of the tray seen from above.">
   <defs>
     <radialGradient id="lamp" cx="50%" cy="0%" r="80%">
       <stop offset="0%" stop-color="var(--lemon)" stop-opacity=".40"/>
@@ -125,26 +129,23 @@ footer{margin-top:16px; border-top:2px solid var(--soft); padding-top:9px}
       <stop offset="0%" stop-color="var(--tray)"/>
       <stop offset="100%" stop-color="var(--tray2)"/>
     </linearGradient>
-    <clipPath id="clipall"><rect x="0" y="0" width="360" height="430"/></clipPath>
+    <clipPath id="cliproom"><rect x="0" y="0" width="360" height="398"/></clipPath>
   </defs>
 
-  <g clip-path="url(#clipall)">
-    <rect x="0" y="0" width="360" height="430" fill="var(--wall)"/>
-    <rect x="0" y="0" width="360" height="430" fill="url(#lamp)"/>
-    <!-- tiled back wall, the only straight lines in the room -->
+  <g clip-path="url(#cliproom)">
+    <rect x="0" y="0" width="360" height="398" fill="var(--wall)"/>
+    <rect x="0" y="0" width="360" height="398" fill="url(#lamp)"/>
     <g stroke="var(--wall2)" stroke-width="3" opacity=".9">
       <line x1="0" y1="86" x2="360" y2="86"/>
       <line x1="0" y1="150" x2="360" y2="150"/>
       <line x1="0" y1="214" x2="360" y2="214"/>
     </g>
 
-    <!-- ============ THE CHEF, left. He wants it higher. ============ -->
+    <!-- ============ THE CHEF. He wants it higher. ============ -->
     <g id="chef">
-      <!-- toque -->
       <path d="M22 176 q0 -30 14 -30 q4 -16 20 -16 q16 0 20 16 q14 0 14 30 z"
             fill="var(--cream)" stroke="var(--line)" stroke-width="3"/>
       <rect x="24" y="176" width="66" height="15" rx="4" fill="var(--cream)" stroke="var(--line)" stroke-width="3"/>
-      <!-- face -->
       <rect x="32" y="191" width="50" height="44" rx="16" fill="var(--apricot)" stroke="var(--line)" stroke-width="3"/>
       <g id="chefBrow">
         <rect x="40" y="200" width="14" height="4" rx="2" fill="var(--line)"/>
@@ -153,20 +154,16 @@ footer{margin-top:16px; border-top:2px solid var(--soft); padding-top:9px}
       <circle cx="47" cy="211" r="4" fill="var(--line)"/>
       <circle cx="67" cy="211" r="4" fill="var(--line)"/>
       <path id="chefMouth" d="M46 224 q11 8 22 0" fill="none" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>
-      <!-- body -->
       <rect x="26" y="235" width="62" height="80" rx="12" fill="var(--cream)" stroke="var(--line)" stroke-width="3"/>
       <path d="M46 235 v80 M68 235 v80" stroke="var(--line)" stroke-width="2" opacity=".35"/>
       <g id="chefArm">
-        <path id="armOut" d="M84 258 L92 200" stroke="var(--line)" stroke-width="20"
-              stroke-linecap="round" fill="none"/>
-        <path id="armIn" d="M84 258 L92 200" stroke="var(--cream)" stroke-width="13"
-              stroke-linecap="round" fill="none"/>
-        <circle id="chefHand" cx="92" cy="200" r="12" fill="var(--apricot)"
-                stroke="var(--line)" stroke-width="3"/>
+        <path id="armOut" d="M84 258 L92 200" stroke="var(--line)" stroke-width="20" stroke-linecap="round" fill="none"/>
+        <path id="armIn"  d="M84 258 L92 200" stroke="var(--cream)" stroke-width="13" stroke-linecap="round" fill="none"/>
+        <circle id="chefHand" cx="92" cy="200" r="12" fill="var(--apricot)" stroke="var(--line)" stroke-width="3"/>
       </g>
     </g>
 
-    <!-- ============ THE WAITER, right. He has to carry this. ============ -->
+    <!-- ============ THE WAITER. He has to carry this. ============ -->
     <g id="waiter">
       <g id="waiterHead">
         <rect x="288" y="188" width="48" height="46" rx="17" fill="var(--apricot)" stroke="var(--line)" stroke-width="3"/>
@@ -185,43 +182,44 @@ footer{margin-top:16px; border-top:2px solid var(--soft); padding-top:9px}
         <rect x="306" y="234" width="12" height="10" fill="var(--rasp)"/>
       </g>
       <g id="waiterArm">
-        <path d="M286 248 L274 298" stroke="var(--cream)" stroke-width="19"
-              stroke-linecap="round" fill="none" opacity=".9"/>
-        <path d="M286 248 L274 298" stroke="var(--line)" stroke-width="13"
-              stroke-linecap="round" fill="none"/>
+        <path d="M286 248 L274 298" stroke="var(--cream)" stroke-width="19" stroke-linecap="round" fill="none" opacity=".9"/>
+        <path d="M286 248 L274 298" stroke="var(--line)" stroke-width="13" stroke-linecap="round" fill="none"/>
         <circle cx="273" cy="302" r="11" fill="var(--apricot)" stroke="var(--line)" stroke-width="3"/>
       </g>
-      <!-- what lands on him when it all goes wrong -->
       <g id="splat" opacity="0"></g>
     </g>
 
-    <!-- ============ the chef's demand, a line in the air ============ -->
+    <!-- the chef's demand, a line in the air -->
     <g id="targetG">
       <line id="targetLine" x1="96" y1="200" x2="266" y2="200"
             stroke="var(--hot)" stroke-width="4" stroke-dasharray="10 8" stroke-linecap="round"/>
       <path id="targetArrow" d="M96 200 l14 -9 v18 z" fill="var(--hot)"/>
     </g>
 
-    <!-- ============ the counter and the tray ============ -->
     <rect x="90" y="352" width="180" height="14" rx="4" fill="var(--wall2)" stroke="var(--line)" stroke-width="3"/>
-    <rect x="118" y="366" width="124" height="64" fill="var(--wall2)" opacity=".55"/>
-    <ellipse id="trayTop" cx="180" cy="348" rx="72" ry="12" fill="url(#trayg)" stroke="var(--line)" stroke-width="3"/>
+    <rect x="118" y="366" width="124" height="32" fill="var(--wall2)" opacity=".55"/>
+    <ellipse cx="180" cy="348" rx="72" ry="12" fill="url(#trayg)" stroke="var(--line)" stroke-width="3"/>
 
-    <!-- the stack, and the piece in the air -->
-    <g id="stackG"></g>
+    <!-- THE LEAN LIVES HERE. Everything on the tray tips together. -->
+    <g id="stackWrap"><g id="stackG"></g></g>
     <g id="curG"></g>
+  </g>
 
-    <!-- which way we are looking -->
-    <g id="viewTag">
-      <rect x="120" y="382" width="120" height="30" rx="8" fill="var(--panel)" stroke="var(--line)" stroke-width="3"/>
-      <text id="viewText" x="180" y="403" text-anchor="middle"
-            font-family="ui-monospace,Menlo,monospace" font-size="19" font-weight="700" fill="var(--ink)">FRONT</text>
-    </g>
+  <!-- ============ THE PLAN. The tray from above. ============
+       Horvath's fix: rotate and turn are only judgments if the player can
+       SEE both footprints at once. This is that instrument. -->
+  <rect x="0" y="398" width="360" height="102" fill="var(--panel)"/>
+  <line x1="0" y1="398" x2="360" y2="398" stroke="var(--line)" stroke-width="3"/>
+  <g id="planG"></g>
+  <g id="viewTag">
+    <rect x="178" y="427" width="130" height="36" rx="9" fill="var(--wall)" stroke="var(--line)" stroke-width="3"/>
+    <text id="viewText" x="243" y="452" text-anchor="middle"
+          font-family="ui-monospace,Menlo,monospace" font-size="20" font-weight="700" fill="var(--ink)">FRONT</text>
   </g>
 </svg>
 </div>
 
-<p class="say" id="say">Slide it. Turn the tray to check the other side. Then place it.</p>
+<p class="say" id="say">Watch.</p>
 
 <div class="pad">
   <button class="b" id="left" aria-label="Slide left">&#9664;</button>
@@ -233,7 +231,7 @@ footer{margin-top:16px; border-top:2px solid var(--soft); padding-top:9px}
 </div>
 
 <footer>
-  <p class="tiny" id="hud">Round 1. Nothing is saved.</p>
+  <p class="tiny" id="hud">Nothing is saved.</p>
 </footer>
 
 </div>
@@ -246,9 +244,8 @@ var NS = "http://www.w3.org/2000/svg";
 var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 var CX = 180, TRAY_Y = 344, TRAY_R = 66;
+var PLAN = { cx: 86, cy: 444, r: 44, s: 44 / 70 };
 
-/* Every dessert is a rectangle with a DIFFERENT width and depth, so rotating
-   always changes something. A square piece would make the verb a lie. */
 var KINDS = [
   { n:"eclair",  w:76, d:26, h:22, fill:"var(--cocoa)",   top:"var(--gold)"   },
   { n:"slice",   w:52, d:34, h:42, fill:"var(--plum)",    top:"var(--cream)"  },
@@ -258,13 +255,15 @@ var KINDS = [
   { n:"tart",    w:58, d:40, h:20, fill:"var(--lemon)",   top:"var(--berry)"  }
 ];
 
-var stack = [];        /* placed pieces, bottom first */
-var cur = null;        /* the one in the air */
-var view = "front";    /* front reads x, side reads z */
-var round = 1;
-var target = 152;      /* how high the chef wants it, in scene units */
-var mode = "play";     /* play | falling | won */
-var queue = 0;
+/* Every dessert is slid in from the pass, so it ARRIVES crooked. NOT random.
+   A fixed rota, identical for every player every time, and every offset is
+   legible in the plan before anything is committed. Horvath: the difficulty
+   is reading it and fixing it, never guessing what a dice roll did. */
+var ENTRY = [ {x: 12, z:-9}, {x:-10, z: 13}, {x: 15, z: 8},
+              {x:-13, z:-11}, {x: 9, z:-15}, {x:-16, z: 6} ];
+
+var stack = [], cur = null, view = "front";
+var round = 1, target = 152, mode = "intro", served = 0;
 
 function wOf(p){ return p.rot ? p.k.d : p.k.w; }
 function dOf(p){ return p.rot ? p.k.w : p.k.d; }
@@ -272,246 +271,290 @@ function spanOf(p){ return view === "front" ? wOf(p) : dOf(p); }
 function posOf(p){ return view === "front" ? p.x : p.z; }
 function setPos(p, v){ if (view === "front") p.x = v; else p.z = v; }
 function perpOf(p){ return view === "front" ? p.z : p.x; }
-function stackH(){ var t = 0; for (var i=0;i<stack.length;i++) t += stack[i].k.h; return t; }
-
-/* ---------- drawing ---------- */
+function heightOf(a){ var t=0; for (var i=0;i<a.length;i++) t += a[i].k.h; return t; }
 function el(n, a){ var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); return e; }
+function clear(g){ while (g.firstChild) g.removeChild(g.firstChild); }
 
+/* ---------- the honest physics, and the warning it gives off ---------- */
+function mass(p){ return (p.k.w * p.k.d * p.k.h) / 900; }
+function comOf(arr, k){
+  var mx=0, mz=0, m=0;
+  for (var i=k;i<arr.length;i++){ var q = mass(arr[i]); m+=q; mx+=arr[i].x*q; mz+=arr[i].z*q; }
+  return { x: mx/m, z: mz/m };
+}
+/* 0 is dead steady, 1 is the edge, over 1 it is already gone.
+   HITCHCOCK: this number is shown to the player BEFORE they commit, as a lean
+   in the tray and a brace in the waiter. That is the bomb under the table. */
+function dangerOf(arr){
+  var worst = 0;
+  for (var k=0;k<arr.length;k++){
+    var c = comOf(arr, k), d;
+    if (k === 0){ d = Math.sqrt(c.x*c.x + c.z*c.z) / TRAY_R; }
+    else { var s = arr[k-1];
+      d = Math.max(Math.abs(c.x - s.x) / (wOf(s)/2), Math.abs(c.z - s.z) / (dOf(s)/2)); }
+    if (d > worst) worst = d;
+  }
+  return worst;
+}
+function failingLevel(arr){
+  for (var k=0;k<arr.length;k++){
+    var c = comOf(arr, k);
+    if (k === 0){ if (Math.sqrt(c.x*c.x + c.z*c.z) > TRAY_R) return 0; }
+    else { var s = arr[k-1];
+      if (Math.abs(c.x - s.x) > wOf(s)/2) return k;
+      if (Math.abs(c.z - s.z) > dOf(s)/2) return k; }
+  }
+  return -1;
+}
+function preview(){ return cur ? stack.concat([cur]) : stack; }
+
+/* ---------- the tray from the side ---------- */
 function drawPiece(p, yTop, ghost){
   var g = el("g", {"class":"anim"});
-  var sp = spanOf(p), x = CX + posOf(p) - sp/2, per = perpOf(p);
-  /* depth cue: a sliver of the side face, leaning the way the piece sits on the
-     axis you CANNOT see. It hints. It is never enough to be sure. */
-  var lean = Math.max(-9, Math.min(9, per * 0.16));
+  var sp = spanOf(p), x = CX + posOf(p) - sp/2;
+  var lean = Math.max(-9, Math.min(9, perpOf(p) * 0.16));
   if (!ghost){
-    g.appendChild(el("path", {
-      d:"M"+(x+sp)+" "+yTop+" l"+lean+" -6 v"+(p.k.h)+" l"+(-lean)+" 6 z",
+    g.appendChild(el("path", { d:"M"+(x+sp)+" "+yTop+" l"+lean+" -6 v"+p.k.h+" l"+(-lean)+" 6 z",
       fill:"var(--line)", opacity:".26" }));
   }
   g.appendChild(el("rect", {x:x, y:yTop, width:sp, height:p.k.h, rx:7,
-    fill:p.k.fill, stroke:"var(--line)", "stroke-width":"3",
-    opacity: ghost ? ".55" : "1"}));
-  /* a little icing so a stack of blocks reads as a stack of puddings */
+    fill:p.k.fill, stroke:"var(--line)", "stroke-width":"3", opacity: ghost ? ".55" : "1"}));
   g.appendChild(el("rect", {x:x+5, y:yTop+4, width:Math.max(8, sp-10), height:7, rx:3.5,
     fill:p.k.top, opacity: ghost ? ".5" : ".95"}));
-  if (p.k.n === "sundae"){
-    g.appendChild(el("circle", {cx:x+sp/2, cy:yTop-2, r:6, fill:"var(--rasp)",
-      stroke:"var(--line)", "stroke-width":"3"}));
-  }
-  if (p.k.n === "jelly"){
-    g.appendChild(el("path", {d:"M"+(x+4)+" "+(yTop+p.k.h-6)+" q"+(sp/4)+" 7 "+(sp/2)+" 0 q"+(sp/4)+" -7 "+(sp/2-4)+" 0",
-      fill:"none", stroke:"var(--line)", "stroke-width":"2", opacity:".5"}));
-  }
+  if (p.k.n === "sundae") g.appendChild(el("circle", {cx:x+sp/2, cy:yTop-2, r:6,
+    fill:"var(--rasp)", stroke:"var(--line)", "stroke-width":"3"}));
   return g;
 }
 
+/* ---------- the tray from ABOVE, which is the whole fix ---------- */
+function planPt(x, z){ return { x: PLAN.cx + x*PLAN.s, y: PLAN.cy + z*PLAN.s }; }
+function drawPlan(){
+  var g = $("planG"); clear(g);
+  g.appendChild(el("circle", {cx:PLAN.cx, cy:PLAN.cy, r:TRAY_R*PLAN.s,
+    fill:"var(--tray)", stroke:"var(--line)", "stroke-width":"3"}));
+
+  var arr = preview();
+  for (var i=0;i<arr.length;i++){
+    var p = arr[i], isCur = (p === cur), c = planPt(p.x, p.z);
+    g.appendChild(el("rect", {
+      x: c.x - wOf(p)*PLAN.s/2, y: c.y - dOf(p)*PLAN.s/2,
+      width: wOf(p)*PLAN.s, height: dOf(p)*PLAN.s, rx:2,
+      fill: isCur ? "none" : p.k.fill,
+      opacity: isCur ? "1" : String((0.34 + 0.52 * (i/Math.max(1, arr.length-1))).toFixed(2)),
+      stroke: isCur ? "var(--hot)" : "var(--line)",
+      "stroke-width": isCur ? "3" : "1.5",
+      "stroke-dasharray": isCur ? "5 4" : "none" }));
+  }
+  /* where the weight actually is. It leaves the ring before the tray goes. */
+  if (arr.length){
+    var com = comOf(arr, 0), d = planPt(com.x, com.z);
+    g.appendChild(el("circle", {cx:d.x, cy:d.y, r:5, fill:"var(--hot)",
+      stroke:"var(--line)", "stroke-width":"2"}));
+  }
+  /* where you are standing. Wordless, and it moves when you turn the tray. */
+  var m = view === "front"
+    ? "M"+PLAN.cx+" "+(PLAN.cy+PLAN.r+5)+" l-10 9 h20 z"
+    : "M"+(PLAN.cx+PLAN.r+5)+" "+PLAN.cy+" l9 -10 v20 z";
+  g.appendChild(el("path", {d:m, fill:"var(--ink)"}));
+}
+
+function zoomOf(){
+  var need = heightOf(stack) + (cur ? cur.k.h + 44 : 44);
+  return Math.min(1, 296 / Math.max(1, need));
+}
+
 function render(){
-  var sg = $("stackG"); while (sg.firstChild) sg.removeChild(sg.firstChild);
+  var z = zoomOf();
+  var zt = "translate("+CX+","+TRAY_Y+") scale("+z.toFixed(3)+") translate("+(-CX)+","+(-TRAY_Y)+")";
+
+  var sg = $("stackG"); clear(sg);
   var y = TRAY_Y;
-  for (var i=0;i<stack.length;i++){
-    y -= stack[i].k.h;
-    stack[i]._y = y;
-    sg.appendChild(drawPiece(stack[i], y, false));
-  }
-  var cg = $("curG"); while (cg.firstChild) cg.removeChild(cg.firstChild);
+  for (var i=0;i<stack.length;i++){ y -= stack[i].k.h; sg.appendChild(drawPiece(stack[i], y, false)); }
+  $("stackWrap").setAttribute("transform", zt);
+
+  var cg = $("curG"); clear(cg);
   if (cur && mode === "play"){
-    var cy = y - 30 - cur.k.h;
-    cur._y = cy;
-    cg.appendChild(drawPiece(cur, cy, true));
-    /* a dropline, so a low vision player can see where it will land */
-    var lx = CX + posOf(cur);
-    cg.appendChild(el("line", {x1:lx, y1:cy + cur.k.h, x2:lx, y2:y,
+    var holder = el("g", {transform: zt});
+    var topY = TRAY_Y - heightOf(stack);
+    var cy = topY - cur.k.h - 34;
+    holder.appendChild(drawPiece(cur, cy, true));
+    holder.appendChild(el("line", {x1: CX + posOf(cur), y1: cy + cur.k.h,
+      x2: CX + posOf(cur), y2: topY,
       stroke:"var(--hot)", "stroke-width":"3", "stroke-dasharray":"5 6", opacity:".85"}));
+    cg.appendChild(holder);
   }
+
+  /* THE LEAN. It previews the piece you have not placed yet. */
+  var dg = Math.min(1.2, dangerOf(preview()));
+  var w = $("stackWrap");
+  w.style.transformOrigin = CX + "px " + TRAY_Y + "px";
+  w.style.transition = REDUCED ? "none" : "transform 260ms ease-out";
+  if (mode === "play" || mode === "intro"){
+    w.style.transform = "rotate(" + (dg * 6).toFixed(2) + "deg)";
+    brace(dg);
+  }
+
   $("viewText").textContent = view === "front" ? "FRONT" : "SIDE";
   var ty = TRAY_Y - target;
   $("targetLine").setAttribute("y1", ty); $("targetLine").setAttribute("y2", ty);
   $("targetArrow").setAttribute("d", "M96 "+ty+" l14 -9 v18 z");
-  var hy = Math.max(24, ty);
+  var hy = Math.max(20, ty);
   $("armOut").setAttribute("d", "M84 258 L92 " + hy);
   $("armIn").setAttribute("d",  "M84 258 L92 " + hy);
   $("chefHand").setAttribute("cy", hy);
-  $("hud").textContent = "Round " + round + ". Height " + Math.round(stackH()) +
-    " of " + target + ". Nothing is saved.";
+  $("hud").textContent = (mode === "intro") ? "Nothing is saved."
+    : "Round " + round + ". Height " + Math.round(heightOf(stack)) + " of " + target + ". Nothing is saved.";
+  drawPlan();
 }
 
-/* ---------- faces ---------- */
-function chefFace(kind){
-  $("chefMouth").setAttribute("d", kind === "glad" ? "M44 220 q13 14 26 0" : "M46 224 q11 8 22 0");
-  $("chefBrow").setAttribute("transform", kind === "glad" ? "translate(0,-4)" : "translate(0,0)");
+/* ---------- faces, and the brace ---------- */
+function chefFace(k){
+  $("chefMouth").setAttribute("d", k === "glad" ? "M44 220 q13 14 26 0" : "M46 224 q11 8 22 0");
+  $("chefBrow").setAttribute("transform", k === "glad" ? "translate(0,-4)" : "translate(0,0)");
 }
-function waiterFace(kind){
+function waiterFace(k){
   var m = $("wMouth"), b = $("wBrow");
-  if (kind === "grump"){ m.setAttribute("d", "M302 227 q10 -7 20 0"); b.setAttribute("transform","translate(0,3) rotate(-4 311 202)"); }
-  else if (kind === "flat"){ m.setAttribute("d", "M302 226 h20"); b.setAttribute("transform","translate(0,5)"); }
-  else if (kind === "proud"){ m.setAttribute("d", "M303 223 q9 6 18 0"); b.setAttribute("transform","translate(0,-3)"); }
-  else { m.setAttribute("d", "M302 225 q10 -5 20 0"); b.setAttribute("transform","translate(0,0)"); }
+  if (k === "grump"){ m.setAttribute("d","M302 227 q10 -7 20 0"); b.setAttribute("transform","translate(0,3)"); }
+  else if (k === "flat"){ m.setAttribute("d","M302 226 h20"); b.setAttribute("transform","translate(0,5)"); }
+  else if (k === "brace"){ m.setAttribute("d","M304 229 q7 -7 14 0"); b.setAttribute("transform","translate(0,-6)"); }
+  else if (k === "proud"){ m.setAttribute("d","M303 223 q9 6 18 0"); b.setAttribute("transform","translate(0,-3)"); }
+  else { m.setAttribute("d","M302 225 q10 -5 20 0"); b.setAttribute("transform","translate(0,0)"); }
 }
-/* the grumble. Same shape every round, a little worse each time. */
-function grumble(){
-  var n = Math.min(6, stack.length);
+/* he can see it coming too, and he starts getting ready well before it goes */
+function brace(d){
   var arm = $("waiterArm"), body = $("waiterBody");
-  waiterFace("grump");
-  arm.style.transition = REDUCED ? "none" : "transform 260ms cubic-bezier(.3,1.5,.5,1)";
+  arm.style.transition = REDUCED ? "none" : "transform 240ms ease-out";
+  body.style.transition = REDUCED ? "none" : "transform 240ms ease-out";
   arm.style.transformOrigin = "286px 250px";
-  arm.style.transform = "rotate(" + (-14 - n*4) + "deg)";
-  body.style.transition = REDUCED ? "none" : "transform 260ms ease-out";
-  body.style.transform = "translateY(-" + (2 + n) + "px)";
-  setTimeout(function(){
+  if (d > 0.72){
+    arm.style.transform = "rotate(" + (-20 - (d-0.72)*95).toFixed(1) + "deg)";
+    body.style.transform = "translate(6px,-3px)";
+    waiterFace("brace");
+  } else {
     arm.style.transform = "rotate(0deg)";
-    body.style.transform = "translateY(0)";
-    waiterFace("flat");
-  }, 620);
-}
-
-/* ---------- the honest physics ---------- */
-function mass(p){ return (p.k.w * p.k.d * p.k.h) / 900; }
-/* the running centre of mass of everything from level k up must sit over the
-   thing holding it. No fudge factor. This is the whole game. */
-function comFrom(k){
-  var mx=0, mz=0, m=0;
-  for (var i=k;i<stack.length;i++){
-    var q = mass(stack[i]); m += q; mx += stack[i].x*q; mz += stack[i].z*q;
+    body.style.transform = "translate(0,0)";
+    waiterFace(d > 0.45 ? "grump" : "flat");
   }
-  return {x: mx/m, z: mz/m};
-}
-function failingLevel(){
-  for (var k=0;k<stack.length;k++){
-    var c = comFrom(k);
-    if (k === 0){
-      if (Math.sqrt(c.x*c.x + c.z*c.z) > TRAY_R) return 0;
-    } else {
-      var s = stack[k-1];
-      if (Math.abs(c.x - s.x) > wOf(s)/2) return k;
-      if (Math.abs(c.z - s.z) > dOf(s)/2) return k;
-    }
-  }
-  return -1;
 }
 
 /* ---------- turns ---------- */
 function nextPiece(){
-  var k = KINDS[(queue++ * 3 + round) % KINDS.length];
-  var top = stack.length ? stack[stack.length-1] : null;
-  cur = { k:k, rot:0, x: top ? top.x : 0, z: top ? top.z : 0 };
+  var k = KINDS[(served * 3 + round) % KINDS.length];
+  var e = ENTRY[served % ENTRY.length];
+  var top = stack.length ? stack[stack.length-1] : {x:0, z:0};
+  served++;
+  cur = { k:k, rot:0, x: top.x + e.x, z: top.z + e.z };
   render();
 }
 
 function place(){
   if (mode !== "play" || !cur) return;
-  var p = cur;
-  /* it settles a little crooked on the axis you were NOT watching.
-     This is why the third verb exists: drift you cannot see accumulates. */
-  var drift = (Math.random() - 0.5) * (5 + stackH() / 26);
-  if (view === "front") p.z += drift; else p.x += drift;
-  stack.push(p); cur = null;
+  stack.push(cur); cur = null;
   render();
-
-  var lvl = failingLevel();
+  var lvl = failingLevel(stack);
   if (lvl >= 0){ collapse(lvl); return; }
-
-  if (stackH() >= target){ win(); return; }
-
-  grumble();
-  say(pick([
-    "The waiter has seen this before.",
-    "It holds. Nobody is happy about it.",
-    "That one is going to matter later.",
-    "The chef would like it higher."
-  ]));
+  if (heightOf(stack) >= target){ win(); return; }
+  say(pick(["It holds. Nobody is happy about it.",
+            "The waiter has seen this before.",
+            "That one is going to matter later.",
+            "The chef would like it higher."]));
   nextPiece();
 }
-
 function say(t){ $("say").textContent = t; }
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
 
-/* ---------- the lose state, which is the best animation in here ---------- */
+/* ---------- the lose state ---------- */
 function collapse(lvl){
-  mode = "falling";
-  buttons(false);
-  chefFace("glad");
-  waiterFace("flat");
-  say("");
-
+  mode = "falling"; buttons(false); chefFace("glad"); say("");
   var gs = $("stackG").childNodes;
-  /* BEAT ONE: the lean. Everything above the bad level tips, slowly. */
   for (var i=lvl;i<gs.length;i++){
     (function(g,i){
       g.style.transition = REDUCED ? "none" : "transform 520ms cubic-bezier(.4,0,.6,1)";
       g.style.transformOrigin = CX + "px " + TRAY_Y + "px";
-      g.style.transform = "rotate(" + (2 + (i-lvl)*1.4) + "deg)";
+      g.style.transform = "rotate(" + (3 + (i-lvl)*1.6) + "deg)";
     })(gs[i], i);
   }
-  /* BEAT TWO: the pause. It might hold. It will not. */
-  setTimeout(function(){
-    say("...");
-  }, 560);
-  /* BEAT THREE: all of it, at once, onto the waiter. */
+  setTimeout(function(){ say("..."); }, 540);
   setTimeout(function(){
     for (var i=lvl;i<gs.length;i++){
-      (function(g,i){
-        var spin = 60 + Math.random()*220;
-        var dx = 60 + Math.random()*120, dy = 120 + Math.random()*90;
-        g.style.transition = REDUCED ? "none" : "transform 760ms cubic-bezier(.3,.1,.7,1), opacity 760ms linear";
-        g.style.transform = "translate(" + dx + "px," + dy + "px) rotate(" + spin + "deg)";
-      })(gs[i], i);
+      (function(g){
+        g.style.transition = REDUCED ? "none" : "transform 760ms cubic-bezier(.3,.1,.7,1)";
+        g.style.transform = "translate(" + (60+Math.random()*120) + "px," +
+          (120+Math.random()*90) + "px) rotate(" + (60+Math.random()*220) + "deg)";
+      })(gs[i]);
     }
     splat();
-  }, 1180);
-  /* BEAT FOUR: he wipes one eye. He looks at you. He keeps looking. */
+  }, 1160);
   setTimeout(function(){
     var arm = $("waiterArm");
     arm.style.transition = "transform 340ms ease-in-out";
-    arm.style.transformOrigin = "286px 250px";
     arm.style.transform = "rotate(-108deg)";
-    setTimeout(function(){ arm.style.transform = "rotate(0deg)"; }, 700);
-  }, 2000);
+    setTimeout(function(){ arm.style.transform = "rotate(0deg)"; }, 720);
+  }, 1980);
   setTimeout(function(){
-    waiterFace("flat");
-    say("The waiter is looking at you.");
-    $("again").hidden = false;
-    $("again").focus();
-  }, 2900);
-
-  if (REDUCED){
-    splat();
-    say("It all came down. The waiter is looking at you.");
-    $("again").hidden = false;
-  }
+    waiterFace("flat"); say("The waiter is looking at you.");
+    $("again").hidden = false; $("again").focus();
+  }, 2880);
+  if (REDUCED){ splat(); say("It all came down. The waiter is looking at you."); $("again").hidden = false; }
 }
 function splat(){
-  var s = $("splat"); while (s.firstChild) s.removeChild(s.firstChild);
+  var s = $("splat"); clear(s);
   var cols = ["var(--rasp)","var(--lemon)","var(--apricot)","var(--plum)","var(--cream)"];
   for (var i=0;i<9;i++){
-    s.appendChild(el("circle", {
-      cx: 286 + Math.random()*52, cy: 190 + Math.random()*120,
+    s.appendChild(el("circle", {cx: 286 + Math.random()*52, cy: 190 + Math.random()*120,
       r: 5 + Math.random()*11, fill: cols[i % cols.length],
-      stroke:"var(--line)", "stroke-width":"2.5" }));
+      stroke:"var(--line)", "stroke-width":"2.5"}));
   }
   s.setAttribute("opacity","1");
 }
 
 /* ---------- the win state ---------- */
 function win(){
-  mode = "won";
-  buttons(false);
-  chefFace("glad");
-  waiterFace("proud");
-  var arm = $("chefArm");
-  arm.style.transition = "transform 220ms ease-out";
+  mode = "won"; buttons(false); chefFace("glad"); waiterFace("proud");
   say("The chef is happy. Briefly.");
   setTimeout(function(){
-    waiterFace("flat");
-    round += 1;
-    target += 68;
+    waiterFace("flat"); round += 1; target += 68;
     say("He wants it higher.");
     setTimeout(function(){
-      stack = []; mode = "play";
+      stack = []; cur = null; mode = "play";
       $("splat").setAttribute("opacity","0");
       buttons(true); nextPiece(); render();
-      say("Slide it. Turn the tray to check. Then place it.");
+      say("Read the plan. Turn the tray. Then place it.");
     }, 1100);
   }, 1500);
+}
+
+/* ---------- CLEESE: it falls over before you touch anything ---------- */
+function intro(){
+  stack = [
+    { k:KINDS[5], rot:0, x:  2, z: 0 },
+    { k:KINDS[1], rot:0, x: 14, z: 6 },
+    { k:KINDS[0], rot:0, x: 34, z: 4 },
+    { k:KINDS[4], rot:0, x: 54, z: 8 }
+  ];
+  cur = null; render();
+  if (REDUCED){ startPlay(); return; }
+  setTimeout(function(){ say("..."); }, 900);
+  setTimeout(function(){
+    var gs = $("stackG").childNodes;
+    for (var i=0;i<gs.length;i++){
+      (function(g,i){
+        g.style.transition = "transform 700ms cubic-bezier(.3,.1,.7,1)";
+        g.style.transformOrigin = CX + "px " + TRAY_Y + "px";
+        g.style.transform = "translate(" + (70+i*22) + "px," + (130+i*14) + "px) rotate(" + (70+i*60) + "deg)";
+      })(gs[i], i);
+    }
+    splat(); chefFace("glad");
+    setTimeout(function(){ say("Your turn."); }, 900);
+  }, 1500);
+  setTimeout(startPlay, 4200);
+}
+function startPlay(){
+  stack = []; cur = null; mode = "play"; round = 1; target = 152; served = 0; view = "front";
+  $("splat").setAttribute("opacity","0");
+  chefFace("normal"); waiterFace("normal"); clear($("stackG"));
+  buttons(true); nextPiece(); render();
+  say("Read the plan. Turn the tray. Then place it.");
 }
 
 /* ---------- input ---------- */
@@ -519,57 +562,39 @@ function buttons(on){
   ["left","right","rot","turn","place"].forEach(function(id){ $(id).disabled = !on; });
   $("again").hidden = on;
 }
-function nudge(d){
-  if (!cur || mode !== "play") return;
-  setPos(cur, posOf(cur) + d);
-  render();
-}
-$("left").addEventListener("click", function(){ nudge(-7); });
-$("right").addEventListener("click", function(){ nudge(7); });
+function nudge(d){ if (cur && mode === "play"){ setPos(cur, posOf(cur) + d); render(); } }
+$("left").addEventListener("click", function(){ nudge(-6); });
+$("right").addEventListener("click", function(){ nudge(6); });
 $("rot").addEventListener("click", function(){
   if (!cur || mode !== "play") return;
   cur.rot = cur.rot ? 0 : 1; render();
-  say(view === "front" ? "Wider one way, deeper the other." : "Same piece, turned.");
+  say("Look at the plan. It turned.");
 });
 $("turn").addEventListener("click", function(){
   if (mode !== "play") return;
-  view = (view === "front") ? "side" : "front";
-  render();
-  say(view === "side" ? "Now you can see the other axis. Anything hanging off?"
-                      : "Back to the front.");
+  view = (view === "front") ? "side" : "front"; render();
+  say(view === "side" ? "The other side. Anything hanging off?" : "Back to the front.");
 });
 $("place").addEventListener("click", place);
-$("again").addEventListener("click", function(){
-  stack = []; mode = "play"; round = 1; target = 152;
-  $("splat").setAttribute("opacity","0");
-  chefFace("normal"); waiterFace("normal");
-  var gs = $("stackG"); while (gs.firstChild) gs.removeChild(gs.firstChild);
-  buttons(true); nextPiece(); render();
-  say("Slide it. Turn the tray to check. Then place it.");
-});
+$("again").addEventListener("click", startPlay);
 
-/* drag on the scene, because buttons are slow and kids drag */
 (function(){
   var st = $("stage"), dragging = false;
-  function toScene(ev){
-    var r = st.getBoundingClientRect();
-    return ((ev.clientX - r.left) / r.width) * 360;
-  }
+  function toScene(ev){ var r = st.getBoundingClientRect(); return ((ev.clientX - r.left)/r.width)*360; }
   st.addEventListener("pointerdown", function(ev){
     if (!cur || mode !== "play") return;
     dragging = true; st.setPointerCapture(ev.pointerId);
-    setPos(cur, toScene(ev) - CX); render();
+    setPos(cur, (toScene(ev) - CX) / zoomOf()); render();
   });
   st.addEventListener("pointermove", function(ev){
-    if (!dragging || !cur) return;
-    setPos(cur, toScene(ev) - CX); render();
+    if (dragging && cur){ setPos(cur, (toScene(ev) - CX) / zoomOf()); render(); }
   });
   st.addEventListener("pointerup", function(){ dragging = false; });
   st.addEventListener("pointercancel", function(){ dragging = false; });
 })();
 
-chefFace("normal"); waiterFace("normal");
-nextPiece(); render();
+chefFace("normal"); waiterFace("normal"); buttons(false);
+intro();
 })();
 </script>
 </body>
