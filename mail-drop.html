@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mail Drop v1.0</title>
+<!-- TSP-META {"file": "mail-drop.html", "stage": "lab 2026-08-30, v1.0. Playable end to end, gates green, no human has played it, which under the 2026-08-27 ladder is Lab and not Live. Founder brief, 2026-08-30: 'I want to do a Mail Drop filtering typed game where the player is an irritable and amused animata like creature that likes original distinct writing, especially sensory images, and is disgusted by cliche.' ANIMATA IS AMANITA, and it is already this studio's art direction: the 2026-08-09 handoff cites Samorost and Amanita Design, and the founder's own words that night were 'Feed those animated beings!!!!' This is the first build that literally does that. THE PLAYER IS NOT THE CREATURE. The brief describes the creature and the founder then chose the sorting mechanic, which puts the player at the chute and Nib on the mound: you are the first reader, Nib is the appetite you are reading for. That is a real writerly identity the arcade did not have, and it is Osterweil's third freedom, trying on an identity, which the corpus had nobody covering.", "operative": true, "assets": "12 letters, ALL written in the studio for this game. None is a student's work (the 2026-08-10 FERPA ruling) and none is the founder's, which matters more than usual here: a slush pile judges writing badly on purpose, and putting a real person's draft in one would be a different and worse game. THREE CLASSES. 5 borrowed, carrying phrasing Nib has eaten before; 4 alive, carrying a concrete sensory detail and no borrowed phrase; 3 odd, carrying neither. Art is hand-cut inline SVG marked data-art-class studio-cut and proved by art-execution-gate.py, plus five hand-cut faces for Nib. No raster plates, no generated art, no external hosts.", "design": "THE THIRD CLASS IS THE WHOLE DESIGN, and without it this is Cliche Hunter with a mailbag. The founder was offered a sorting game and warned that sorting repeats the identify-the-plate half of a build he had just moved to Lab for being samey. He chose sorting anyway, so the job was to make sorting NOT be that. The lever is the verdict ruling he made in the same breath: Nib should admit what it cannot judge. An admission that costs the game nothing is decoration, so the admission became a CLASS OF MAIL instead. A quarter of the sack has no right answer, the reveal says so in as many words, and the tally refuses to grade it. WHAT A MACHINE CAN AND CANNOT DO, made mechanical: borrowed phrasing is a LITERAL STRING MATCH against a list the file keeps, so Nib can point at it, and the reveal underlines the exact phrases rather than asserting a verdict. Freshness is not matchable at all, offline and single-file, with no model in the page. So Nib says the one true thing it can say, that nothing in here is secondhand, and refuses the rest. For a course that already ships ai-resilient-assignment.html, a game whose creature is explicit about the boundary between what a machine detects and what only a reader judges is on the nose in the right way. NO SCORE, NO CLOCK, NO FAIL STATE. You can mulch the whole sack and Nib just gets hungry. The one consequence in the build is a pang: mulch a live letter and Nib tells you what you threw away, and the tally counts those without scoring them.", "founder-open": ["the creature is called Nib, which is a temp name the way Cliche Hunter was. Does it keep it?", "twelve letters in a sack: right length for one sitting, or does it want to be shorter and repeatable?", "the odd class is a quarter of the sack. Does the refusal to grade read as honest, or as the game ducking?", "Nib is rude to the borrowed letters. Is it rude enough to be funny, or rude enough to be a problem in a classroom?", "the letters are studio-written slush. Would real published nonfiction openings be better mail, the way found.html went nonfiction?", "sorting only, per your call. Does it want the typing half later as a second beat, or does that make it two games?"], "harvest": "the honest limit was the mechanic. It started as a line of dialogue the creature says, which is decoration, and became a third class of mail with no right answer, which is design. When a build has to admit something about itself, admitting it in the CONTENT is a note; admitting it in the RULES is a game. The same move is probably available to every build in this studio that currently apologises for a limit in prose.", "founder-playtested": "not yet. Lab, per the 2026-08-27 ladder: a build no human has played cannot claim Live and this one does not."} -->
+<script>
+/* PRE-PAINT COMFORT BOOT — lifted from en195-arcade.html. Runs before first paint
+   so a reader who chose Warm dark never sees a flash of daylight. No try/catch
+   swallowing beyond storage itself; a storage failure falls through to defaults. */
+(function(){
+  var d = document.documentElement, s = null;
+  try { s = JSON.parse(localStorage.getItem('tsp.comfort.v1') || 'null'); } catch(e){ s = null; }
+  if (!s || typeof s !== 'object') {
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    s = { light: dark ? 'night' : 'day', size: 0, contrast: 0, motion: 0, cues: 0, reader: 0, motionSet: 0 };
+  }
+  if (s.light !== 'night') s.light = 'day'; /* dusk retired 2026-08-09 */
+  d.setAttribute('data-light', s.light);
+  d.classList.toggle('c-a1', s.size === 1);
+  d.classList.toggle('c-a2', s.size === 2);
+  d.classList.toggle('c-contrast', !!s.contrast);
+  d.classList.toggle('c-still',    !!(s.motionSet && s.motion));
+  if (s.motionSet && !s.motion) d.setAttribute('data-motion', 'go');
+  d.classList.toggle('c-cues',     !!s.cues);
+  d.classList.toggle('c-reader',   !!s.reader);
+  window.__comfort = s;
+})();
+</script>
+<style>
+/* ═══ COMFORT v3.1 — lifted from en195-arcade.html, same tokens, same ladder.
+   The belt stage is its own fixed-night scene (the sign has to glow against
+   something), exactly as the arcade's puppet stage is. Comfort governs the
+   chrome and every reading surface around it. ═══ */
+:root{
+  font-size:100%;   /* THE READER SETS THE BASE. rem multipliers do the rest. */
+  --paper:#f4efe6; --ink:#211a12; --ink2:#211a12;
+  --gold:#6e4700; --rust:#a34a2a; --slate:#3f5666; --kraft:#b08d57;
+  --card:#fdfaf3; --edge:#3a2f22; --glow:#f5c97b;
+  --focus:#6e4700;
+  --surface:#fdfaf3; --surface-2:#efe6d2;
+  --ink-2:#211a12;
+  --line:#b08d57;
+  --control-edge:#3a2f22;
+  --accent-strong:#3f5666; --on-accent:#ffffff;
+  --r:10px; --tap:48px;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+  --motion:.18s;
+  color-scheme: light;
+}
+html[data-light="night"]{
+  --paper:#262019; --ink:#f0dcb8; --ink2:#f0dcb8;
+  --gold:#f5c97b; --card:#332a1f; --edge:#f0dcb8;
+  --rust:#d4744e; --slate:#7d9ab0; --kraft:#cfa96e; --focus:#f5c97b;
+  --surface:#332a1f; --surface-2:#3f362a;
+  --ink-2:#dccba2; --line:#5a5140; --control-edge:#f0dcb8;
+  --accent-strong:#a9bcd0; --on-accent:#141109;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#262019; --ink:#f0dcb8; --ink2:#f0dcb8;
+    --gold:#f5c97b; --card:#332a1f; --edge:#f0dcb8;
+    --rust:#d4744e; --slate:#7d9ab0; --kraft:#cfa96e; --focus:#f5c97b;
+    --surface:#332a1f; --surface-2:#3f362a;
+    --ink-2:#dccba2; --line:#5a5140; --control-edge:#f0dcb8;
+    --accent-strong:#a9bcd0; --on-accent:#141109;
+    color-scheme: dark;
+  }
+}
+html[data-light="day"]{
+  --paper:#f4efe6; --ink:#211a12; --ink2:#211a12;
+  --gold:#6e4700; --rust:#a34a2a; --slate:#3f5666; --kraft:#b08d57;
+  --card:#fdfaf3; --edge:#3a2f22; --focus:#6e4700;
+  --surface:#fdfaf3; --surface-2:#efe6d2;
+  --ink-2:#211a12; --line:#b08d57; --control-edge:#3a2f22;
+  --accent-strong:#3f5666; --on-accent:#ffffff;
+  color-scheme: light;
+}
+html.c-contrast:not([data-light="night"]){
+  --paper:#fffdf8; --card:#fffdf8; --surface:#fffdf8; --surface-2:#f2ede1;
+  --ink:#100d07; --ink2:#100d07; --ink-2:#241d10;
+  --edge:#241d10; --control-edge:#241d10; --line:#7d6a44;
+  --accent-strong:#1d2f3d;
+}
+html.c-contrast[data-light="night"]{
+  --paper:#0a0908; --card:#141210; --surface:#141210; --surface-2:#201d18;
+  --ink:#fff9ec; --ink2:#fff9ec; --ink-2:#f0e3c6;
+  --edge:#f0e3c6; --control-edge:#f0e3c6;
+  --accent-strong:#c3d4e6; --gold:#ffd77a;
+}
+html.c-a1{ font-size:112.5%; }
+html.c-a2{ font-size:125%; }
+/* MOTION STOP — two rules, never merged. An @media block cannot sit inside a
+   selector list; merged, the parser discards the whole declaration. */
+/* WHAT MOTION STOP ACTUALLY MEANS. Founder ruling 2026-08-14: the motionless
+   version should still have animation and learning-science design. He is right,
+   and the blanket kill was over-broad on its own terms. Reduced motion is about
+   VESTIBULAR triggers: things that travel, scroll, parallax, zoom or spin. It was
+   never about removing feedback. Killing every transition took the cues with the
+   motion and left the accessible reader a worse-taught game, which is the exact
+   inversion of an accessibility-first studio.
+   So: everything still stops by default, and elements marked .mo-safe keep a
+   narrow, non-vestibular vocabulary. The allow-list is enforced below rather than
+   trusted, so a .mo-safe element CANNOT animate a transform even by accident. */
+html.c-still *:not(.mo-safe){
+  animation:none !important; transition:none !important; scroll-behavior:auto !important;
+}
+@media (prefers-reduced-motion:reduce){
+  html:not([data-motion="go"]) *:not(.mo-safe){
+    animation:none !important; transition:none !important; scroll-behavior:auto !important;
+  }
+}
+/* The whole permitted vocabulary: light and colour, never position or scale. */
+html.c-still .mo-safe, html:not([data-motion="go"]) .mo-safe{
+  animation:none !important;
+  transition-property:opacity, color, background-color, border-color, box-shadow !important;
+  transition-duration:.15s !important;
+  transition-timing-function:ease !important;
+}
+html.c-cues a{ text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:2px; }
+
+*{box-sizing:border-box;}
+/* An author display: rule outranks the UA's [hidden]{display:none}, so .cutbtn's
+   display:block kept painting a hidden button. State this once, loudly. */
+[hidden]{display:none !important;}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:Georgia,'Times New Roman',serif;
+  font-size:1.125rem; line-height:1.6;
+  min-height:100vh;
+  transition:background var(--motion) ease, color var(--motion) ease;
+}
+main{max-width:680px; margin:0 auto; padding:16px 16px 48px;}
+h1,h2,h3{font-weight:700; line-height:1.25;}
+h1{font-size:1.5rem; margin:0 0 .4rem;}
+h2{font-size:1.25rem; margin:0 0 .5rem;}
+h3{font-size:1.125rem; margin:0 0 .4rem;}
+p{margin:0 0 .9rem; max-width:68ch;}
+button{
+  font-family:inherit; font-size:1.125rem; line-height:1.4;
+  min-height:48px; min-width:48px;
+  padding:12px 20px; margin:6px 4px;
+  background:var(--card); color:var(--ink);
+  border:3px solid var(--edge); border-radius:10px;
+  cursor:pointer; text-align:left;
+}
+button:hover{border-color:var(--gold);}
+button:focus-visible{outline:4px solid var(--focus); outline-offset:3px;}
+.big{display:block; width:100%; font-size:1.1875rem; font-weight:700; text-align:center;}
+.screen{display:none;}
+.screen.on{display:block;}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+.skiplink{
+  position:absolute; left:-9999px; top:0; z-index:99;
+  background:var(--card); color:var(--ink); padding:12px 18px;
+  border:3px solid var(--edge); border-radius:0 0 10px 0; font-weight:700;
+}
+.skiplink:focus{left:0;}
+
+/* ═══ TOP CHROME — NAVIGATION, and only navigation.
+   The comfort wall came out under the 2026-08-29 ruling: no build asks the player
+   about their preferences. The KERNEL stays — the pre-paint boot script above, the
+   data-light palettes and the contrast classes still honour whatever the player set
+   before they got here — but nothing on this page offers to set it, so the default
+   has to be right on its own. What is universal is the absence of a wall.
+   The bar carries Studio and Cabinet; the rail at the bottom carries Back and Home,
+   because a player who opened this from a bookmark has never seen the face. ═══ */
+.se-chrome{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; row-gap:6px;
+  background:var(--paper); border-bottom:3px solid var(--edge);
+  padding:5px 16px;
+  position:sticky; top:0; z-index:20;
+  transition:transform .22s ease;
+}
+.se-chrome.tucked{transform:translateY(-110%);}
+.barlabel{font-size:1.125rem; font-weight:700; white-space:nowrap; margin-right:auto;}
+
+/* FURNITURE IS NOT THE ACTION, and it must not be dressed like it.
+   one-thing-gate counts a primary invitation by SIZE AND WEIGHT, so navigation set
+   in the same bold as the one thing you came here to do reads to the gate - and to
+   a player - as five equal offers. It is a real defect and the gate named it: five
+   co-equal invitations on entry. Nav keeps the 44px tap target and the 18px floor,
+   and gives up the weight. The only bold control on the entry screen is the one
+   that starts the game. */
+.se-home{
+  margin:0; padding:8px 16px; white-space:nowrap;
+  min-height:44px; min-width:44px;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:2px solid var(--control-edge); border-radius:999px; background:transparent;
+  color:var(--ink); font-family:var(--sans); font-weight:500; font-size:1.125rem;
+  letter-spacing:.02em; text-decoration:none;
+}
+
+/* ═══ THE RAIL. Hidden on the entry screen the way the footer is: the bar above
+   already carries Studio and Cabinet, so entry stays one scene and one invitation.
+   The rail is still in the DOM on every screen, which is the navigation floor
+   one-thing-gate asks for ("present in DOM, even if hidden on the home screen"). ═══ */
+.se-rail{
+  display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
+  padding:20px 16px calc(20px + env(safe-area-inset-bottom));
+  border-top:2px solid var(--line); background:var(--paper);
+}
+body[data-screen="entry"] .se-rail{display:none;}
+.se-rail a, .se-rail button{
+  margin:0; min-height:44px; padding:10px 18px;
+  display:inline-flex; align-items:center; justify-content:center;
+  border:2px solid var(--control-edge); border-radius:999px;
+  background:var(--surface-2); color:var(--ink);
+  font-family:var(--sans); font-weight:500; font-size:1.125rem;
+  text-decoration:none; cursor:pointer;
+}
+/* The comfort kernel ships main{max-width:680px}, right for a document and wrong
+   for a room. Reading width moves to .wrap; the scene gets the page. */
+main{max-width:none; margin:0; padding:0;}
+
+/* ═══ THE MAIL ROOM ═══
+   The Stereotype Room hangs its lamp overhead and the light table lights from
+   below. This room has ONE lamp on a bent stalk, held low and off to the left, so
+   the whole scene leans. That is what separates it on sight from the other two.
+
+   PALETTE PER GAME, and this game's palette is the kernel's. The tokens are lifted
+   unchanged because they are contrast-proven across six blocks (day, night, the
+   two high-contrast variants and the prefers-dark media query), and re-tuning six
+   blocks to get a mossier button is a bad trade. Mail Drop's character is carried
+   where it costs nothing to be certain: the scene, the two marks, and Nib's face. */
+.stage{
+  position:relative; background:#0b0a08; border-bottom:3px solid var(--edge);
+  padding:0; overflow:hidden;
+}
+/* NARROW: a taller frame, sliced and anchored to the bottom edge, so a phone gets
+   the mound and the creature on it. What a narrow screen loses is the far wall.
+   WIDE: a framed picture on its own ground, uncropped. */
+.stage{height:46vh; min-height:300px; max-height:440px;}
+.stage svg{display:block; width:100%; height:100%; margin:0 auto;}
+@media (min-width:760px){
+  .stage{background:#090807; height:auto; max-height:none;}
+  .stage svg{width:min(100%, 640px); height:auto;}
+}
+.stagetext{
+  position:absolute; left:50%; transform:translateX(-50%);
+  width:min(100%, 640px); top:0; padding:16px 20px 30px;
+  background:linear-gradient(to bottom, rgba(9,8,7,.95) 52%, rgba(9,8,7,0));
+}
+.stagetext h1{
+  margin:0; font-family:var(--sans); font-size:1.75rem; line-height:1.15; color:#f6efe0;
+}
+.stagetext .kick{
+  margin:7px 0 0; font-size:1.125rem; line-height:1.45; color:#e7dcc6; max-width:34em;
+}
+.ver{
+  display:inline-block; font-size:1.25rem; font-weight:700; letter-spacing:.06em;
+  color:#f3c675; border:2px solid #f3c675; border-radius:3px;
+  padding:.08em .32em; margin-left:.4em; vertical-align:.12em; white-space:nowrap;
+}
+/* LAB on the build, not only on the face, per the 2026-08-27 ladder. */
+.tsp-lab{
+  display:inline-block; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:1.25rem; line-height:1; font-weight:700; letter-spacing:.09em;
+  text-transform:uppercase; color:currentColor;
+  border:2px dashed currentColor; border-radius:3px;
+  padding:.16em .42em; margin-left:.4em; vertical-align:.1em; white-space:nowrap;
+}
+
+.wrap{max-width:46rem; margin:0 auto; padding:20px 18px 40px;}
+h2.step{font-family:var(--sans); font-size:1.375rem; margin:0 0 10px; color:var(--ink);}
+.stepnote{font-size:1.125rem; line-height:1.5; color:var(--ink2); margin:0 0 16px;}
+.sackpos{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:1.125rem; font-weight:700; color:var(--ink2); margin:0 0 12px;
+  letter-spacing:.04em;
+}
+
+/* ═══ THE LETTER ═══ */
+.letter{
+  background:var(--card); border:2px solid var(--line); border-radius:8px;
+  padding:16px 16px 6px; margin:0 0 18px;
+  box-shadow:0 3px 0 rgba(0,0,0,.10);
+}
+.lfrom{
+  font-family:var(--sans); font-size:1.125rem; color:var(--ink2); font-weight:700;
+  margin:0 0 10px; padding:0 0 10px; border-bottom:2px solid var(--line);
+  display:flex; flex-wrap:wrap; gap:4px 12px;
+}
+.lgenre{font-weight:400;}
+.ltext{
+  font-family:var(--serif, Georgia, 'Iowan Old Style', serif);
+  font-size:1.1875rem; line-height:1.7; color:var(--ink); margin:0 0 12px;
+}
+/* THE TWO MARKS. Nib shows its work rather than asserting a verdict.
+   BORROWED is a literal string match against a list it keeps, so it can be pointed
+   at. ALIVE is the sensory detail, lit the way a kept word is lit in Found. There
+   is deliberately no third mark, because there is nothing certain to point at in an
+   ODD letter and inventing a mark for it would be the machine faking a judgement. */
+.mark{border-radius:3px; padding:1px 2px;}
+.mark.borrowed{
+  background:var(--surface-2);
+  border-bottom:3px double var(--rust);
+}
+.mark.alive{background:var(--glow); color:#191309; font-weight:700;}
+
+/* ═══ NIB ═══ */
+.verdict{
+  background:var(--surface-2); border:2px solid var(--line); border-radius:8px;
+  padding:14px 16px; margin:0 0 8px;
+}
+.nibrow{display:flex; gap:12px; align-items:flex-start;}
+.nibface{flex:0 0 auto; width:64px; height:64px; display:block;}
+.nibface svg{width:64px; height:64px; display:block;}
+.nibsays{
+  font-family:var(--serif, Georgia, 'Iowan Old Style', serif);
+  font-size:1.1875rem; line-height:1.5; color:var(--ink); margin:0;
+}
+.showwork{
+  font-size:1.125rem; line-height:1.5; color:var(--ink2); margin:12px 0 0;
+  border-top:2px solid var(--line); padding-top:11px;
+}
+
+/* ═══ THE TALLY. Rows, not a score. ═══ */
+.platebox{margin:0 0 20px;}
+.prow{
+  display:flex; gap:12px; align-items:baseline;
+  padding:12px 0; border-bottom:2px solid var(--line);
+}
+.pn{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:1.375rem; font-weight:700; color:var(--ink); flex:0 0 2.2em;
+}
+.pwhat{font-size:1.125rem; line-height:1.5; color:var(--ink2); flex:1 1 auto;}
+.pwhat b{color:var(--ink);}
+.limitbox{
+  background:var(--surface-2); border:2px dashed var(--line); border-radius:8px;
+  padding:14px 16px; margin:0 0 18px;
+}
+.limithead{font-family:var(--sans); font-size:1.125rem; margin:0 0 8px; color:var(--ink2);}
+.limit{
+  font-family:var(--serif, Georgia, 'Iowan Old Style', serif);
+  font-size:1.1875rem; line-height:1.55; color:var(--ink); margin:0;
+}
+
+.acts{display:flex; flex-wrap:wrap; gap:10px; margin:8px 0 0;}
+.acts button{flex:1 1 14rem;}
+.press{background:var(--accent-strong); color:var(--on-accent); border-color:var(--edge);}
+.press:hover{border-color:var(--glow);}
+/* The mulch is not the lesser button, it is the other one. Same size, same tap
+   floor, plainer paint, because binning a letter has to feel like a real move and
+   not like giving up on one. */
+.bin{background:var(--card); color:var(--ink); border-color:var(--edge);}
+.bin:hover{border-color:var(--rust);}
+
+/* The footer is not entry paint. Three builds tripped one-thing-gate because an
+   attribution block at the bottom counted as prose read before acting. */
+body[data-screen="entry"] #foot{display:none;}
+#foot{border-top:2px solid var(--line); margin-top:26px; padding-top:16px;}
+</style>
+</head>
+<body data-screen="entry">
+
+<a class="skiplink" href="#main">Skip to the game</a>
+
+<header class="se-chrome" id="coinbar">
+  <span class="barlabel">Mail Drop</span>
+  <a class="se-home" href="index.html">Studio</a>
+  <a class="se-home" href="arcade.html">Cabinet</a>
+</header>
+
+<p class="sr" id="say" role="status" aria-live="polite"></p>
+
+<main id="main">
+
+<!-- ══ ENTRY. Scene first, one invitation. ══ -->
+<section class="screen on" id="s-entry" aria-label="Start">
+  <div class="stage" data-scene="mail-room">
+    <svg viewBox="0 0 800 470" preserveAspectRatio="xMidYMax slice" role="img" data-art-class="studio-cut"
+         aria-label="A mail room at night, grown rather than built. A brass chute has rooted through the wall and is spilling letters down onto a mound of composted paper. A creature with a domed cap, one large half-lidded eye and a pen-nib beak sits on the mound, reaching toward the falling letters. A lamp on a bent stalk leans in from the left, and a snail sits on the mound doing no sorting at all.">
+      <!-- SAMOROST GRADE, per the 2026-08-09 handoff: organic surrealism, small creatures
+           living in found textures, machines GROWN rather than built. The chute is not
+           bolted to the wall, it has rooted through it. The mound Nib sits on is every
+           borrowed sentence ever mailed here, composted.
+    
+           THE PHONE SAFE BOX, and this is the reusable part.
+           The stage uses preserveAspectRatio slice, which scales to COVER, so a 390px
+           phone at 46vh crops this art to x 164..636 and hides the top ~182 units under
+           the title gradient. That is arithmetic, not taste: cover-scale is
+           max(390/800, 388/470) = 0.826, so 164 units fall off each side.
+           Everything a player must SEE therefore lives inside x 180..620, y 150..470.
+           The lamp stalk, the chute roots and the far wall run outside it on purpose:
+           they are what a wide screen gains, never what a phone needs.
+           Two earlier cuts of this scene failed exactly here, once by spending 140px of
+           height on an empty floor and once by putting the lamp and the snail in the
+           band the phone throws away. No gate in this studio can see either fault. The
+           only way to catch it is to render it at 390px and look.
+    
+           THE LIGHT: one lamp on a bent stalk, leaning in from the left, so the room
+           tilts toward it. That is what separates this scene on sight from the
+           Stereotype Room, lit from overhead, and the light table, lit from below. -->
+      <rect x="0" y="0" width="800" height="470" fill="#0d0b09"/>
+    
+      <!-- ══ THE WALL. Damp board, and the moss has got into the seams. ══ -->
+      <g>
+        <rect x="0" y="0" width="800" height="316" fill="#191510"/>
+        <g fill="#241f17">
+          <rect x="0" y="78" width="800" height="3"/><rect x="0" y="208" width="800" height="3"/>
+        </g>
+        <g fill="#221d15">
+          <rect x="118" y="0" width="4" height="316"/><rect x="392" y="0" width="4" height="316"/>
+          <rect x="674" y="0" width="4" height="316"/>
+        </g>
+        <g fill="#2d3a22">
+          <rect x="196" y="202" width="34" height="10"/><rect x="240" y="204" width="16" height="8"/>
+          <rect x="330" y="72" width="30" height="11"/><rect x="368" y="74" width="14" height="9"/>
+          <rect x="560" y="204" width="26" height="9"/><rect x="600" y="206" width="14" height="8"/>
+          <rect x="60" y="74" width="34" height="11"/>
+        </g>
+        <g fill="#3a4a2b">
+          <rect x="198" y="194" width="24" height="8"/><rect x="332" y="64" width="18" height="8"/>
+          <rect x="562" y="196" width="18" height="8"/>
+        </g>
+      </g>
+    
+      <!-- ══ THE LAMP. Head inside the safe box; the stalk runs out of frame. ══ -->
+      <g>
+        <path d="M28 0 L44 0 L96 84 L166 150 L154 162 L82 94 Z" fill="#2b2318"/>
+        <path d="M148 146 L214 136 L228 180 L158 192 Z" fill="#3d3120"/>
+        <path d="M154 152 L206 144 L218 174 L164 184 Z" fill="#67501f"/>
+        <ellipse cx="186" cy="180" rx="30" ry="11" fill="#b39146"/>
+        <ellipse cx="186" cy="179" rx="17" ry="6" fill="#cfab55"/>
+        <!-- the fall of light: flat layers, no blur filter -->
+        <path d="M158 189 L216 189 L312 470 L82 470 Z" fill="#cfab55" opacity=".06"/>
+        <path d="M170 191 L204 191 L268 452 L124 452 Z" fill="#cfab55" opacity=".06"/>
+      </g>
+    
+      <!-- ══ THE CHUTE. Brass, rooted THROUGH the board rather than fixed to it. ══ -->
+      <g>
+        <path d="M446 62 L648 42 L664 152 L460 174 Z" fill="#3a2f1c"/>
+        <path d="M458 74 L636 56 L650 142 L472 162 Z" fill="#5c4824"/>
+        <path d="M470 86 L624 70 L636 132 L482 150 Z" fill="#7d612c"/>
+        <path d="M470 86 L624 70 L628 100 L474 116 Z" fill="#9c7936"/>
+        <!-- the throat, opening down and to the left, toward Nib -->
+        <path d="M460 174 L664 152 L678 268 L436 292 Z" fill="#2b2316"/>
+        <path d="M472 186 L652 166 L664 256 L452 278 Z" fill="#4a3a1e"/>
+        <path d="M488 200 L638 184 L650 244 L470 264 Z" fill="#151109"/>
+        <!-- roots gone into the board, outside the safe box on purpose -->
+        <g fill="#4a3a1e">
+          <path d="M446 66 L390 42 L382 56 L444 80 Z"/>
+          <path d="M454 132 L384 142 L386 156 L456 146 Z"/>
+          <path d="M648 46 L706 26 L714 40 L652 60 Z"/>
+          <path d="M660 134 L730 144 L728 158 L658 148 Z"/>
+        </g>
+        <g fill="#332918">
+          <path d="M390 42 L352 28 L348 40 L388 54 Z"/>
+          <path d="M706 26 L756 8 L760 20 L710 38 Z"/>
+          <path d="M730 144 L784 152 L782 164 L728 156 Z"/>
+        </g>
+      </g>
+    
+      <!-- ══ THE MOUND. Every borrowed sentence ever mailed here, composted. ══ -->
+      <g>
+        <path d="M0 366 L96 322 L236 296 L396 288 L546 302 L686 330 L800 366 L800 470 L0 470 Z" fill="#2a251d"/>
+        <path d="M76 346 L226 312 L392 304 L542 318 L670 346 L682 370 L64 370 Z" fill="#3a342a"/>
+        <path d="M186 322 L346 310 L472 314 L516 334 L172 336 Z" fill="#4a4235"/>
+        <g fill="#5c5343">
+          <rect x="118" y="354" width="34" height="6"/><rect x="170" y="344" width="24" height="6"/>
+          <rect x="222" y="332" width="38" height="6"/><rect x="282" y="324" width="22" height="6"/>
+          <rect x="338" y="318" width="30" height="6"/><rect x="402" y="320" width="26" height="6"/>
+          <rect x="464" y="326" width="34" height="6"/><rect x="532" y="334" width="24" height="6"/>
+          <rect x="594" y="344" width="30" height="6"/><rect x="660" y="356" width="22" height="6"/>
+        </g>
+        <g fill="#79705c">
+          <rect x="146" y="366" width="20" height="5"/><rect x="252" y="350" width="18" height="5"/>
+          <rect x="372" y="334" width="22" height="5"/><rect x="502" y="344" width="16" height="5"/>
+          <rect x="622" y="358" width="20" height="5"/>
+        </g>
+      </g>
+    
+      <!-- ══ LETTERS, coming down out of the throat, inside the safe box. ══ -->
+      <g>
+        <path d="M474 254 L556 242 L566 294 L484 306 Z" fill="#d8ccac"/>
+        <path d="M474 254 L556 242 L520 278 Z" fill="#b3a888"/>
+        <path d="M540 300 L622 292 L628 344 L546 352 Z" fill="#e6dbbc"/>
+        <path d="M540 300 L622 292 L577 326 Z" fill="#c2b695"/>
+        <path d="M448 320 L524 312 L530 358 L454 366 Z" fill="#cdc2a2"/>
+        <path d="M448 320 L524 312 L485 344 Z" fill="#aa9f81"/>
+      </g>
+    
+      <!-- ══ NIB, on the mound, reaching toward what is falling. ══ -->
+      <g>
+        <ellipse cx="304" cy="440" rx="128" ry="24" fill="#221d16"/>
+        <!-- body: a soft domed cap, three values so it turns away from the lamp -->
+        <path d="M198 316 L300 280 L398 322 L410 404 L372 438 L228 442 L188 406 Z" fill="#54432f"/>
+        <path d="M198 316 L300 280 L386 316 L214 362 Z" fill="#755c3f"/>
+        <path d="M228 442 L372 438 L366 458 L236 460 Z" fill="#382c1c"/>
+        <!-- gills under the cap: direction and interval, never a grid -->
+        <g fill="#2e2417">
+          <rect x="232" y="398" width="6" height="32"/><rect x="256" y="396" width="6" height="36"/>
+          <rect x="280" y="394" width="6" height="38"/><rect x="304" y="393" width="6" height="38"/>
+          <rect x="328" y="394" width="6" height="36"/><rect x="352" y="397" width="6" height="31"/>
+        </g>
+        <!-- the pen-nib beak, pointed at the chute -->
+        <path d="M364 296 L432 266 L452 308 L384 340 Z" fill="#9c7936"/>
+        <path d="M364 296 L432 266 L440 286 L372 316 Z" fill="#bd9442"/>
+        <path d="M406 298 L432 286 L440 306 L414 318 Z" fill="#1a1409"/>
+        <path d="M422 278 L436 272 L440 282 L426 288 Z" fill="#131009"/>
+        <!-- ONE LARGE EYE, half-lidded. Irritable, and paying attention anyway. -->
+        <ellipse cx="272" cy="350" rx="55" ry="48" fill="#ece2c6"/>
+        <path d="M217 340 Q272 290 327 344 L327 354 L217 354 Z" fill="#41331f"/>
+        <circle cx="277" cy="362" r="25" fill="#1d1810"/>
+        <circle cx="267" cy="353" r="8" fill="#cfab55"/>
+        <path d="M215 326 Q272 280 329 326 L329 336 Q272 292 215 336 Z" fill="#2e2417"/>
+        <!-- an arm, mid-reach -->
+        <path d="M406 372 L456 354 L466 378 L416 398 Z" fill="#54432f"/>
+        <path d="M452 350 L494 334 L506 362 L464 380 Z" fill="#6a543a"/>
+        <!-- spores, because everything in here is slightly alive -->
+        <g fill="#7d6a42">
+          <circle cx="352" cy="238" r="4"/><circle cx="384" cy="210" r="3"/>
+          <circle cx="328" cy="202" r="3"/><circle cx="410" cy="238" r="3"/>
+          <circle cx="366" cy="174" r="3"/><circle cx="300" cy="232" r="2"/>
+        </g>
+      </g>
+    
+      <!-- ══ A SNAIL, on the mound, doing no sorting whatsoever. ══ -->
+      <g>
+        <path d="M528 400 L572 396 L578 420 L530 424 Z" fill="#4e3d26"/>
+        <circle cx="554" cy="400" r="21" fill="#77603a"/>
+        <circle cx="554" cy="400" r="13" fill="#55442a"/>
+        <circle cx="554" cy="400" r="6" fill="#77603a"/>
+        <path d="M527 415 L508 400 L513 393 L532 408 Z" fill="#77603a"/>
+        <path d="M508 400 L501 387 L507 384 L514 397 Z" fill="#77603a"/>
+        <circle cx="503" cy="384" r="4" fill="#cfab55"/>
+      </g>
+    </svg>
+    <div class="stagetext">
+      <h1>Mail Drop <span class="ver">v1.0</span>
+        <span class="tsp-lab" title="Lab: an experiment on the bench, not a finished game">Lab</span></h1>
+      <p class="kick">Nib reads the slush. It has eaten every worn sentence in the world
+        and it is still hungry for one real thing. Sort the sack.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="acts">
+      <button type="button" class="big press" id="beginBtn">Open the chute</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ THE SACK. One letter at a time. Bin it or feed it. ══ -->
+<section class="screen" id="s-sort" aria-label="The sack">
+  <div class="wrap">
+    <p class="sackpos"><span id="posNow">1</span> of <span id="posAll">12</span> in the sack</p>
+
+    <article class="letter" id="letterBox">
+      <p class="lfrom"><span id="lFrom"></span><span class="lgenre" id="lGenre"></span></p>
+      <p class="ltext" id="lText"></p>
+    </article>
+
+    <div class="acts" id="choiceActs">
+      <button type="button" class="big bin" id="binBtn">To the mulch</button>
+      <button type="button" class="big press" id="feedBtn">Feed it to Nib</button>
+    </div>
+
+    <div class="verdict" id="verdictBox" hidden>
+      <div class="nibrow">
+        <span class="nibface" id="nibFace" aria-hidden="true"></span>
+        <p class="nibsays" id="nibSays"></p>
+      </div>
+      <p class="showwork" id="showWork"></p>
+      <div class="acts">
+        <button type="button" class="big press" id="nextBtn">Next letter</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ THE TALLY. Not a score. What Nib ate, and what it will not grade. ══ -->
+<section class="screen" id="s-tally" aria-label="What Nib ate">
+  <div class="wrap">
+    <h2 class="step">What Nib ate</h2>
+    <div class="platebox" id="plateBox"></div>
+    <div class="limitbox">
+      <h3 class="limithead">What Nib cannot tell you</h3>
+      <p class="limit" id="limitText"></p>
+    </div>
+    <div class="acts">
+      <button type="button" class="big press" id="againBtn">Another sack</button>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap" id="foot">
+  <p class="stepnote">All twelve letters are written in the studio for this game. None is a
+    student's work and none is the founder's. Nib can be certain about borrowed phrasing,
+    because that is a literal match against a list it keeps; it cannot be certain whether
+    anything is good, and it will not say it can. Nothing on this page is stored or sent
+    anywhere. It runs in memory and forgets you when you close it.</p>
+</footer>
+</main>
+
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()">Back</button>
+  <a href="en195-arcade.html">EN195 Arcade</a>
+  <a href="index.html">Home</a>
+</nav>
+
+<script>
+/* ═══ CHROME. Furniture only.
+   Comfort v3.1's WALL used to live in this block — a light row, a size row and four
+   toggles. It came out under the 2026-08-29 ruling. The KERNEL did not: it is the
+   boot script in the head and the CSS, neither of which this file touches, so a
+   player arriving with warm dark set still gets warm dark. ═══ */
+(function(){
+  var bar = document.getElementById('coinbar');
+  if (!bar) return;
+  /* the bar tucks on scroll-down and returns on scroll-up */
+  var last = 0;
+  window.addEventListener('scroll', function(){
+    var y = window.scrollY || 0;
+    bar.classList.toggle('tucked', y > 70 && y > last);
+    last = y;
+  }, {passive:true});
+})();
+</script>
+
+<script>
+/* ═══ THE SACK ═══
+   Twelve letters, all written in the studio for this game. None of them is the
+   founder's work and none is a student's, which matters here more than usual: a
+   slush pile is a place where writing is judged badly on purpose, and putting a
+   real person's draft in it would be a different and worse game.
+
+   THREE CLASSES, and the third one is the whole design.
+
+     BORROWED  carries phrasing Nib has eaten before. This is the ONLY class a
+               machine can be certain about, because it is a literal string match
+               against a list. Nib is rude and Nib is right.
+     ALIVE     carries a concrete sensory detail and no borrowed phrase. Nib can be
+               certain it is not secondhand. It CANNOT be certain it is good, and it
+               says exactly that.
+     ODD       no borrowed phrase, no sensory anchor. Clever, or flat, or strange.
+               NEITHER ANSWER IS WRONG. Nib is amused and admits it cannot call it.
+
+   Why ODD exists: without it this is Cliche Hunter with a mailbag, a quiz where
+   every bin is objectively correct. The founder's own ruling on the verdict was
+   that Nib should admit what it cannot judge, and an admission that never costs
+   the game anything is decoration. So the admission is a class of mail instead.
+   A third of the sack has no right answer and the tally refuses to grade it.
+
+   `marks` are EXACT substrings of `text`. The highlighting is a literal match and
+   nothing here infers, guesses or scores. When Nib underlines a borrowed phrase it
+   is showing its work, not giving a verdict it invented. */
+
+var SACK = [
+  { id:'m1', cls:'BORROWED', from:'R. Halloran', genre:'Romance, chapter one',
+    text:"Her heart skipped a beat when their eyes met across the crowded room. Time stood still. She knew, in that moment, that her life would never be the same.",
+    marks:["heart skipped a beat","eyes met across the crowded room","Time stood still","life would never be the same"],
+    fed:"I have eaten that heart four hundred times. It tastes of the envelope.",
+    binned:"Good. All four of those arrived here already chewed." },
+
+  { id:'m2', cls:'BORROWED', from:'name withheld', genre:'Nature essay',
+    text:"The rain fell like tears from an angry sky. Mother Nature was weeping for what we had done to her. It was a sight to behold.",
+    marks:["like tears","angry sky","Mother Nature","a sight to behold"],
+    fed:"Weeping sky, weeping sky. If the sky wept I would like to know what it sounded like, and nobody ever says.",
+    binned:"Yes. Nothing in there was looked at. It was only remembered." },
+
+  { id:'m3', cls:'BORROWED', from:'D. Prewitt', genre:'Thriller, opening page',
+    text:"It was a dark and stormy night. Little did she know that the man in the shadows was watching her every move, waiting with bated breath.",
+    marks:["dark and stormy night","Little did she know","the man in the shadows","bated breath"],
+    fed:"Bated breath. I am holding mine. It is not helping.",
+    binned:"Correct. A dark and stormy night is not a night. It is a coupon for one." },
+
+  { id:'m4', cls:'BORROWED', from:'J. Okoro', genre:'Memoir',
+    text:"At the end of the day, I learned that home is where the heart is. Losing the house was a blessing in disguise. Everything happens for a reason.",
+    marks:["At the end of the day","home is where the heart is","blessing in disguise","Everything happens for a reason"],
+    fed:"Something did happen to this person and they have buried it under four sayings.",
+    binned:"Yes, and be gentle about it. Somebody real is under there in borrowed clothes." },
+
+  { id:'m5', cls:'BORROWED', from:'T. Vance', genre:'Sports column',
+    text:"He gave one hundred and ten percent and left it all on the field. In this day and age, that kind of heart is few and far between.",
+    marks:["one hundred and ten percent","left it all on the field","In this day and age","few and far between"],
+    fed:"One hundred and ten percent of nothing.",
+    binned:"Straight down. That column has been running since before I got here." },
+
+  { id:'m6', cls:'ALIVE', sense:'sound', from:'M. Ferro', genre:'Flash nonfiction',
+    text:"The freezer case at the gas station hummed a note just under a B flat. I stood in front of it until my forearms went numb, holding a bag of peas I did not want.",
+    marks:["hummed a note just under a B flat","my forearms went numb","a bag of peas I did not want"],
+    fed:"Just under a B flat. That is a sound somebody actually stood in.",
+    binned:"That one had a sound in it. It is soil now. Your call, but I noticed." },
+
+  { id:'m7', cls:'ALIVE', sense:'smell', from:'L. Bright', genre:'Memoir',
+    text:"My grandmother's kitchen smelled like scorched milk and the inside of a purse. She kept the radio on a station that only read out the weather, all day, for nobody.",
+    marks:["scorched milk","the inside of a purse","only read out the weather"],
+    fed:"The inside of a purse. I can smell it from here. Filthy and exact.",
+    binned:"You composted a smell. Do you know how rarely a smell comes down that chute?" },
+
+  { id:'m8', cls:'ALIVE', sense:'smell', from:'P. Adeyemi', genre:'Domestic comedy',
+    text:"The dog rolled in something down by the fence and came back smelling like a wet rug left in a hot car. He was delighted with himself. We were not consulted.",
+    marks:["a wet rug left in a hot car","We were not consulted"],
+    fed:"A wet rug left in a hot car. Revolting. Perfect. More of that.",
+    binned:"You binned the dog. I am not angry. I am simply going to mention it later." },
+
+  { id:'m9', cls:'ALIVE', sense:'sight and sound', from:'S. Kovach', genre:'Place writing',
+    text:"Under the overpass the pigeons had worn the concrete ledge smooth and grey green, and the whole underside of the bridge ticked whenever a truck went over.",
+    marks:["worn the concrete ledge smooth and grey green","ticked whenever a truck went over"],
+    fed:"The bridge ticked. That is somebody who stood still long enough to hear a thing.",
+    binned:"Smooth and grey green, and gone. Fine. It is your bag." },
+
+  { id:'m10', cls:'ODD', from:'V. Strand', genre:'Aphorism',
+    text:"I have decided that Tuesday is a lie agreed upon by people who need somewhere to put their disappointment.",
+    marks:[],
+    fed:"Amusing. Is it good? I have no idea. It is not borrowed, and that is the whole of what I can tell you.",
+    binned:"You may well be right. It is clever and it shows me nothing. I could not have called it either." },
+
+  { id:'m11', cls:'ODD', from:'A. Reyes', genre:'Lyric essay',
+    text:"Loss is not a room you leave. It is a change in the pressure of the room you were already standing in.",
+    marks:[],
+    fed:"A change in pressure. Nothing in there is secondhand. Whether it earns that, I cannot taste.",
+    binned:"Reasonable. It is a figure rather than a thing seen. I hold no opinion and I am the wrong creature to ask." },
+
+  { id:'m12', cls:'ODD', from:'no name given', genre:'Fragment',
+    text:"There were four of us and then there were three, and nobody said anything about it for eleven years.",
+    marks:[],
+    fed:"There is nothing to smell in that one and it still made me sit up. I cannot explain it and I will not pretend to.",
+    binned:"Possibly right. No image anywhere in it. Something is going on underneath, though. You and I both guessed." }
+];
+
+/* ═══ NIB'S FACE ═══
+   Five states, hand-cut, aria-hidden because the words beside them say the same
+   thing. The eye is the whole performance: how much lid is down, and where it is
+   looking. Nothing here animates, so motion stop has nothing to take away. */
+var FACE = {};
+FACE.wait =
+ '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
+ '<path d="M8 26 L34 18 L56 30 L52 56 L14 58 Z" fill="#4a3b2c"/>' +
+ '<path d="M8 26 L34 18 L52 28 L12 38 Z" fill="#66513a"/>' +
+ '<path d="M36 14 L52 8 L58 20 L42 26 Z" fill="#8a6c31"/>' +
+ '<ellipse cx="27" cy="36" rx="14" ry="13" fill="#e6dcc0"/>' +
+ '<path d="M13 32 Q27 20 41 33 L41 37 L13 37 Z" fill="#3b2e20"/>' +
+ '<circle cx="28" cy="39" r="7" fill="#1b1610"/>' +
+ '<circle cx="26" cy="37" r="2" fill="#c0a04c"/></svg>';
+FACE.lit =
+ '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
+ '<path d="M8 26 L34 18 L56 30 L52 56 L14 58 Z" fill="#4a3b2c"/>' +
+ '<path d="M8 26 L34 18 L52 28 L12 38 Z" fill="#66513a"/>' +
+ '<path d="M36 12 L52 6 L58 18 L42 24 Z" fill="#a3873f"/>' +
+ '<ellipse cx="27" cy="36" rx="15" ry="15" fill="#f3ead0"/>' +
+ '<circle cx="28" cy="37" r="8" fill="#1b1610"/>' +
+ '<circle cx="25" cy="34" r="3" fill="#f5c97b"/>' +
+ '<path d="M10 20 L16 26 M27 16 L27 24 M44 20 L38 26" stroke="#c0a04c" stroke-width="3" fill="none"/></svg>';
+FACE.sick =
+ '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
+ '<path d="M8 28 L34 22 L56 32 L52 58 L14 58 Z" fill="#3f3427"/>' +
+ '<path d="M8 28 L34 22 L52 30 L12 39 Z" fill="#574833"/>' +
+ '<path d="M36 18 L52 12 L58 24 L42 30 Z" fill="#6b5326"/>' +
+ '<path d="M14 36 Q27 30 40 36" stroke="#e6dcc0" stroke-width="5" fill="none"/>' +
+ '<path d="M18 46 Q27 42 36 46" stroke="#2a2016" stroke-width="4" fill="none"/>' +
+ '<path d="M46 40 L54 44 M46 46 L54 42" stroke="#5c4a35" stroke-width="3"/></svg>';
+FACE.pang =
+ '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
+ '<path d="M8 28 L34 20 L56 31 L52 57 L14 58 Z" fill="#463828"/>' +
+ '<path d="M8 28 L34 20 L52 29 L12 38 Z" fill="#5f4c37"/>' +
+ '<path d="M36 16 L52 10 L58 22 L42 28 Z" fill="#7a5f2c"/>' +
+ '<ellipse cx="27" cy="38" rx="14" ry="11" fill="#ddd2b6"/>' +
+ '<path d="M13 34 Q27 24 41 35 L41 40 L13 40 Z" fill="#3b2e20"/>' +
+ '<circle cx="27" cy="43" r="6" fill="#1b1610"/>' +
+ '<path d="M14 52 Q27 56 40 51" stroke="#2a2016" stroke-width="3" fill="none"/></svg>';
+FACE.shrug =
+ '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
+ '<path d="M8 27 L34 19 L56 30 L52 56 L14 58 Z" fill="#4a3b2c"/>' +
+ '<path d="M8 27 L34 19 L52 28 L12 38 Z" fill="#66513a"/>' +
+ '<path d="M36 13 L52 7 L58 19 L42 25 Z" fill="#8a6c31"/>' +
+ '<ellipse cx="27" cy="36" rx="14" ry="13" fill="#e6dcc0"/>' +
+ '<path d="M13 30 Q27 22 41 31 L41 35 L13 35 Z" fill="#3b2e20"/>' +
+ '<circle cx="35" cy="38" r="7" fill="#1b1610"/>' +
+ '<circle cx="33" cy="36" r="2" fill="#c0a04c"/>' +
+ '<path d="M44 50 L56 46" stroke="#5c4a35" stroke-width="3"/></svg>';
+
+/* ═══ THE ROUND ═══ */
+var $ = function(id){ return document.getElementById(id); };
+function say(m){ var s = $('say'); if (s) s.textContent = m; }
+
+var order = [], at = 0, log = [];
+
+/* A MARK THAT DOES NOT MATCH IS A LIE ABOUT WHAT NIB CAN SEE, so it is never
+   swallowed. markUp records every miss here, and the self-check below runs the
+   whole sack at load, which means a mistyped mark is discoverable without playing
+   twelve letters to find it. This repo's belt cannot see inside a string bank; the
+   bank has to check itself. */
+var MARK_MISSES = [];
+window.__markSelfCheck = function(){
+  MARK_MISSES = [];
+  for (var i = 0; i < SACK.length; i++){
+    var L = SACK[i];
+    if (L.marks && L.marks.length) markUp(L.text, L.marks, 'borrowed');
+  }
+  return MARK_MISSES.slice();
+};
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Mark the letter by LITERAL substring. Nothing here infers or guesses: a phrase is
+   marked because it is in the letter's own marks list, character for character.
+   Longest first, so a mark that contains another cannot be cut in half by it. */
+function markUp(text, marks, cls){
+  var out = esc(text);
+  var ms = marks.slice().sort(function(a,b){ return b.length - a.length; });
+  for (var i = 0; i < ms.length; i++){
+    var m = esc(ms[i]);
+    var j = out.indexOf(m);
+    if (j < 0){ MARK_MISSES.push(ms[i]); continue; }   /* loud, not silent: see below */
+    out = out.slice(0, j) + '<span class="mark ' + cls + '">' + m + '</span>' + out.slice(j + m.length);
+  }
+  return out;
+}
+
+function shuffle(a){
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function show(id){
+  var s = document.querySelectorAll('.screen');
+  for (var i = 0; i < s.length; i++) s[i].classList.toggle('on', s[i].id === id);
+  document.body.setAttribute('data-screen', id === 's-entry' ? 'entry' : 'play');
+  window.scrollTo(0, 0);
+}
+
+function newSack(){
+  order = shuffle(SACK.slice());
+  at = 0; log = [];
+  $('posAll').textContent = String(order.length);
+  paintLetter();
+  show('s-sort');
+}
+
+function paintLetter(){
+  var L = order[at];
+  $('posNow').textContent = String(at + 1);
+  $('lFrom').textContent = 'From ' + L.from;
+  $('lGenre').textContent = L.genre;
+  $('lText').textContent = L.text;                 /* plain until a choice is made */
+  $('verdictBox').hidden = true;
+  $('choiceActs').hidden = false;
+  say('Letter ' + (at + 1) + ' of ' + order.length + ', from ' + L.from + '.');
+}
+
+function choose(fed){
+  var L = order[at];
+  log.push({ id:L.id, cls:L.cls, fed:fed });
+
+  /* the letter now shows its work, and only what can be pointed at literally */
+  if (L.cls === 'BORROWED')   $('lText').innerHTML = markUp(L.text, L.marks, 'borrowed');
+  else if (L.cls === 'ALIVE') $('lText').innerHTML = markUp(L.text, L.marks, 'alive');
+
+  var face = 'shrug';
+  if (L.cls === 'BORROWED') face = fed ? 'sick' : 'wait';
+  else if (L.cls === 'ALIVE') face = fed ? 'lit' : 'pang';
+  $('nibFace').innerHTML = FACE[face];
+  $('nibSays').textContent = fed ? L.fed : L.binned;
+
+  var work;
+  if (L.cls === 'BORROWED'){
+    work = 'Nib is certain about this one. Every marked phrase is a literal match against '
+         + 'the list it keeps, so it can point at them. That is the only kind of certainty '
+         + 'a page like this honestly has.';
+  } else if (L.cls === 'ALIVE'){
+    work = 'Nib is certain this one is not borrowed, and that is the whole of what it is '
+         + 'certain of. The lit words are the ones you could reach with a sense: ' + L.sense + '.';
+  } else {
+    work = 'Nib cannot call this one, and neither can this page. Nothing in it is borrowed '
+         + 'and nothing in it is anchored to a sense. Feeding it and mulching it are both '
+         + 'real answers, and it kept no score of which you picked.';
+  }
+  $('showWork').textContent = work;
+
+  $('choiceActs').hidden = true;
+  $('verdictBox').hidden = false;
+  $('nextBtn').textContent = (at + 1 >= order.length) ? 'See what Nib ate' : 'Next letter';
+  say((fed ? 'Fed. ' : 'Mulched. ') + (fed ? L.fed : L.binned));
+}
+
+function next(){
+  at++;
+  if (at >= order.length){ paintTally(); show('s-tally'); return; }
+  paintLetter();
+  show('s-sort');
+}
+
+function count(cls, fed){
+  var n = 0;
+  for (var i = 0; i < log.length; i++) if (log[i].cls === cls && log[i].fed === fed) n++;
+  return n;
+}
+
+function row(n, html){
+  return '<div class="prow"><span class="pn">' + n + '</span><span class="pwhat">' + html + '</span></div>';
+}
+
+function paintTally(){
+  var af = count('ALIVE', true),  am = count('ALIVE', false);
+  var bf = count('BORROWED', true), bm = count('BORROWED', false);
+  var of_ = count('ODD', true),    om = count('ODD', false);
+
+  var h = '';
+  h += row(af, af === 1 ? 'live letter fed to Nib. <b>It could taste that one.</b>'
+                        : 'live letters fed to Nib. <b>It could taste those.</b>');
+  h += row(bf, bf === 1 ? 'borrowed letter fed to Nib, which it chewed and did not enjoy.'
+                        : 'borrowed letters fed to Nib, which it chewed and did not enjoy.');
+  h += row(bm, bm === 1 ? 'borrowed letter to the mulch, where borrowed language turns into soil.'
+                        : 'borrowed letters to the mulch, where borrowed language turns into soil.');
+  h += row(am, am === 1 ? 'live letter mulched. <b>That one had something in it you could reach.</b>'
+                        : 'live letters mulched. <b>Those had something in them you could reach.</b>');
+  h += row(of_ + om, 'letters Nib could not call either way. It sorted <b>none</b> of them for you, '
+                   + 'and it is not going to start now.');
+  $('plateBox').innerHTML = h;
+
+  /* THE PROMISE KEPT. Nib said it would mention the dog later. Nib mentions the dog. */
+  var dog = null;
+  for (var i = 0; i < log.length; i++) if (log[i].id === 'm8') dog = log[i];
+  var mention = (dog && !dog.fed)
+    ? 'You binned the dog. I said I would mention it later. It is later. '
+    : '';
+
+  var t = mention
+    + 'I can smell borrowed language because I keep a list and I check it against every '
+    + 'letter that comes down that chute. That is a machine trick and you should not be '
+    + 'impressed by it. Whether the live ones were any GOOD is a different question, and I '
+    + 'have no equipment for it. Neither does anything else on this page. ';
+  t += (am > 0)
+    ? 'You put ' + am + ' of them in the mulch and I let you, because that was never my call to make.'
+    : 'That part was always going to be yours.';
+  $('limitText').textContent = t;
+  say('The sack is empty.');
+}
+
+$('beginBtn').addEventListener('click', newSack);
+$('binBtn').addEventListener('click', function(){ choose(false); });
+$('feedBtn').addEventListener('click', function(){ choose(true); });
+$('nextBtn').addEventListener('click', next);
+$('againBtn').addEventListener('click', newSack);
+</script>
+</body>
+</html>
