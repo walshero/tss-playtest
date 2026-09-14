@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" data-light="day">
+<!--
+  THE WORKSHOP WALL — a Richard Scarry-style inventory of writerly moves.
+  Tight Spiral Studios · walshero@gmail.com · EN195 Creative Writing.
+
+  STAGE PLACEMENT (founder-locked): this is the bridge BETWEEN Stage 1 (cutting /
+  "Ballast") and a future Stage 2 (apply a named move to the piece that flew). The
+  cutting stage is great as the first move; this wall NAMES the moves so the next
+  stage has tools to pick up. Cutting (the shears) anchors the shelf.
+
+  RICHARD SCARRY METHOD (studied, not copied — NO Scarry art reproduced): every thing
+  on the wall is a LABELED OBJECT. The label names the move; the object IS the move so
+  it lands faster than the word; a one-line "what it does"; a tiny LIVE example you can
+  flip from heavy -> lean. Cross-section workshop shelf, busy-but-legible, line-first.
+
+  MNEMONIC ICONOGRAPHER [HALT, owns this build]: each icon must EXPRESS its move and
+  beat the word to the eye, or it's decoration and fails. Icons chosen on that test:
+   - The Cut = open shears (the Stage-1 tool)
+   - Implication = iceberg (most under the water)
+   - The Concrete Noun = a single nailed-down object (a key)
+   - The Late Turn = a door swinging open at the end of a hall
+   - Compression = the sandbag rig (links to Ballast)
+   - The Unflinching Line = a plumb bob on a line (straight down, no waver)
+
+  ART (Medium Gate: cut-paper SVG wins): brass-tag labels, riveted shelf, torn-paper
+  cards, thin edge-shadow under each layer. No raster needed; built in-session.
+
+  COMFORT GATE (locked 2026-06-29): screen ZERO is a live-swatch palette choice before
+  content renders. VISIBILITY (locked): --ink2 == --ink; accents are STRUCTURAL only,
+  never body text; GREEN-FREE (slate-B placeholder pending the A/B/C pick); gold labels
+  darkened for AA. FLOOR: single-file, offline, in-memory; 3-stop comfort (never
+  #000/#fff); large type; 44px+; keyboard; visible focus; reduced-motion safe;
+  scroll-reset; shape+label not color alone; no emoji; phone-width.
+
+  This wall is a PROPS ROOM asset: a reusable labeled-inventory component.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="tsp:surface" content="tool">
+<title>The Workshop Wall — writerly moves, labeled</title>
+<style>
+/* STUDIO EYES v2 — Light: Default(day) / Dusk / Warm-dark(night) via html[data-light]. */
+:root{ color-scheme: light; }
+html[data-light="night"]{ color-scheme: dark; }
+
+/* ---- LIGHT: DEFAULT (day) ---- */
+:root{
+  --bg:#f3ead8; --surface:#fffaf0; --ink:#1f1b12; --ink2:#1f1b12; --ink-fill:#1f1b12;
+  --line:#d8caa8; --line2:#c2b288;
+  --accent:#3a4654; --accent2:#2b3540;          /* slate-B placeholder, GREEN-FREE */
+  --brass:#8a6a2b; --brass-d:#6e4700;
+  --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
+  --rust:#8a3a1c; --rust-ink:#8a3a1c;  /* -ink=text, -no-suffix=decoration */
+  --focus:#c8900a; --on-accent:#ffffff; --tap:44px;
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+/* ---- LIGHT: DUSK ---- */
+html[data-light="dusk"]{ --bg:#e0d5bd; --surface:#ece2cb; --ink:#2c2618; --ink2:#2c2618; --ink-fill:#2c2618; --line:#d0c19c; --line2:#c0ad84; --on-accent:#ffffff; }
+/* ---- LIGHT: WARM-DARK (night) — warm charcoal, never pure black ---- */
+html[data-light="night"]{ --bg:#1c1a16; --surface:#26231d; --ink:#f3e4c0; --ink2:#f3e4c0; --ink-fill:#f3e4c0; --line:#4a4230; --line2:#5e553e;
+  --accent:#8fa6bd; --accent2:#9fb6cd; --brass:#d8b25a; --brass-d:#f0c357;
+  --gold:#f0c357; --gold-br:#f0c357; --gold-pale:#332c1a; --rust:#e8a07c; --rust-ink:#e8a07c; --on-accent:#141109; }
+/* ---- TOGGLE: high contrast ---- */
+html.se-contrast:not([data-light="night"]){ --bg:#fbfaf7; --surface:#ffffff; --ink:#141109; --ink2:#141109; --ink-fill:#141109; --line2:#8a7844; }
+html.se-contrast[data-light="night"]{ --bg:#0d0c0a; --surface:#171510; --ink:#fff7e6; --ink2:#fff7e6; --ink-fill:#fff7e6; }
+/* ---- TOGGLE: text size ---- */
+html.se-a1{ zoom:1.15; } html.se-a2{ zoom:1.3; }
+/* ---- TOGGLE: reduce motion ---- */
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+/* ---- TOGGLE: colorblind cues ---- */
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+*{box-sizing:border-box;} html,body{margin:0;}
+body{ font-family:var(--serif); background:var(--bg); color:var(--ink); line-height:1.55; font-size:19px; -webkit-text-size-adjust:100%; }
+
+/* ═══ RESERVED CHROME — grid header, reserves its own row, never overlaps ═══ */
+.se-chrome{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; padding:.55rem .9rem; background:var(--surface); border-bottom:2px solid var(--line2); position:sticky; top:0; z-index:100; font-family:var(--sans); }
+.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap); padding:.5rem .8rem; border:2px solid var(--line2); border-radius:9px; background:var(--bg); color:var(--ink); font-weight:800; font-size:.82rem; text-decoration:none; }
+.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent2); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:1rem; letter-spacing:.01em; white-space:nowrap; }
+.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap); padding:.5rem .85rem; border:2px solid var(--accent2); border-radius:9px; background:var(--accent2); color:var(--on-accent); font-family:var(--sans); font-weight:800; font-size:.82rem; cursor:pointer; }
+.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:520px){ .se-brand .wm{ display:none; } }
+
+/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
+.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 16px); z-index:101; width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink); border:2px solid var(--accent2); border-radius:14px; padding:15px; box-shadow:0 10px 34px rgba(0,0,0,.28); display:none; font-family:var(--sans); }
+.se-panel[data-open="1"]{ display:block; }
+.se-panel h2{ font:800 .66rem/1 var(--sans); letter-spacing:.12em; text-transform:uppercase; color:var(--ink2); margin:0 0 8px; }
+.se-row{ display:flex; gap:6px; margin-bottom:14px; }
+.se-btn{ flex:1; min-height:var(--tap); padding:8px 4px; border:2px solid var(--line2); border-radius:8px; background:var(--bg); color:var(--ink); font:800 .78rem/1 var(--sans); cursor:pointer; }
+.se-btn[aria-pressed="true"]{ background:var(--accent2); color:var(--on-accent); border-color:var(--accent2); }
+.se-btn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px; min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:2px solid var(--line2); border-radius:8px; background:var(--bg); color:var(--ink); font:600 .88rem/1.2 var(--sans); cursor:pointer; text-align:left; }
+.se-tog[aria-pressed="true"]{ border-color:var(--accent2); }
+.se-tog .st{ font:700 .7rem/1 var(--sans); color:var(--ink2); }
+.se-tog[aria-pressed="true"] .st{ color:var(--accent); font-weight:800; }
+.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:1.2rem; margin-top:1.4rem; border-top:2px solid var(--line2); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:.6rem 1.1rem; border:2px solid var(--line2); border-radius:9px; background:var(--bg); color:var(--ink); font:800 .82rem/1 var(--sans); text-decoration:none; cursor:pointer; display:inline-flex; align-items:center; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+a:focus-visible{ outline:3px solid var(--focus) !important; outline-offset:2px; }
+.updated{ font:700 .72rem/1.2 var(--sans); color:var(--ink2); margin:.1rem 0 .9rem; display:flex; align-items:center; gap:7px; }
+.updated::before{ content:""; width:8px; height:8px; border-radius:50%; background:var(--accent); flex:0 0 auto; }
+
+.wrap{ max-width:680px; margin:0 auto; padding:1.1rem 1rem 5rem; }
+.screen{ display:none; } .screen.on{ display:block; animation:fade .25s ease; }
+@keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.where{ font:800 .72rem/1 var(--sans); letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin-bottom:.6rem; }
+h1{ font-size:1.7rem; line-height:1.16; color:var(--ink); margin:.2rem 0 .5rem; }
+p{ margin:0 0 .9rem; } .lead{ font-size:1.1rem; } .beat{ font-style:italic; color:var(--ink2); }
+
+.go{ display:block; width:100%; font:800 1.04rem/1.2 var(--sans); cursor:pointer; min-height:56px; padding:.9rem 1rem; border:none; border-radius:13px; background:var(--accent); color:var(--on-accent); margin:.45rem 0; text-align:center; }
+.go:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; }
+
+/* the shelf */
+.shelfnote{ font:400 .96rem/1.45 var(--sans); background:var(--surface); border:2px solid var(--line2); border-radius:12px; padding:.7rem .9rem; margin:0 0 1.1rem; }
+.shelf{ display:flex; flex-direction:column; gap:1rem; }
+.tool{ border:3px solid var(--line2); border-radius:16px; background:var(--surface); overflow:hidden; }
+.tool .head{ display:flex; align-items:center; gap:.7rem; padding:.7rem .85rem; background:var(--bg); border-bottom:2px solid var(--line2); }
+.tool .obj{ width:62px; height:62px; flex:none; }
+.tool .tag{ flex:1; }
+.tool .brasstag{ display:inline-block; font:800 .66rem/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--on-accent); background:var(--brass-d); border:2px solid var(--brass-d); border-radius:6px; padding:.28rem .45rem; }
+.tool .name{ font:800 1.22rem/1.15 var(--serif); color:var(--ink); margin:.25rem 0 0; }
+.tool .body{ padding:.7rem .85rem .9rem; }
+.tool .does{ font:600 .98rem/1.4 var(--sans); margin:0 0 .55rem; }
+.tool .stage1{ display:inline-block; font:800 .62rem/1 var(--sans); letter-spacing:.05em; text-transform:uppercase; color:var(--rust-ink); border:2px solid var(--rust); border-radius:5px; padding:.22rem .4rem; margin-left:.4rem; vertical-align:middle; }
+
+.ex{ border:2px solid var(--line); border-radius:11px; background:var(--bg); padding:.6rem .7rem; }
+.ex .exh{ font:800 .64rem/1 var(--sans); letter-spacing:.06em; text-transform:uppercase; color:var(--ink2); margin-bottom:.35rem; }
+.ex .line{ font-size:1.02rem; line-height:1.5; }
+.ex .heavy{ color:var(--ink); }
+.ex .lean{ color:var(--ink); font-weight:600; }
+.ex .flip{ margin-top:.5rem; min-height:44px; font:800 .82rem/1 var(--sans); cursor:pointer; background:var(--surface); color:var(--ink); border:2px solid var(--ink-fill); border-radius:9px; padding:.5rem .7rem; }
+.ex .flip:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.ex .state{ font:800 .68rem/1 var(--sans); letter-spacing:.05em; text-transform:uppercase; color:var(--ink2); margin-left:.5rem; }
+
+.foot{ margin-top:1.6rem; padding:1rem; background:var(--accent); color:var(--on-accent); border-radius:12px; font-family:var(--sans); font-size:.8rem; }
+.foot a{ color:var(--on-accent); }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+@media (max-width:520px){ body{font-size:18px;} h1{font-size:1.46rem;} .wrap{padding:1rem .8rem 5rem;} .tool .obj{width:54px;height:54px;} }
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<!-- RESERVED CHROME -->
+<header class="se-chrome">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
+    <span class="wm">The Workshop Wall</span>
+  </span>
+</header>
+
+
+<div class="wrap">
+
+  <!-- THE WALL -->
+  <section class="screen on" id="wall" aria-labelledby="wallh">
+    <div class="where">The workshop wall</div>
+    <h1 id="wallh">Every move has a name and a hook.</h1>
+    <p class="updated" id="seUpdated">Last updated&hellip;</p> <span class="se-version" style="font:inherit;opacity:.85">&middot; v15 <span style="opacity:.75">75e938c</span></span> </span>
+    <div class="shelfnote">You already used the first tool — <b>the shears</b>, when you cut the balloon light. Here's the rest of the rack. Each one is a thing on the wall: its label names the move, the object shows it, and the card flips a heavy line into a lean one so you can see the move work. <b>Next stage, you pick one off the wall and use it on the piece that flew.</b></div>
+    <div class="shelf" id="shelf"><!-- tools injected --></div>
+    <button class="go" id="done" style="margin-top:1.1rem;">I know the rack — back to the top</button>
+  </section>
+
+  <div class="foot">
+    Tight Spiral Studios · <a href="mailto:walshero@gmail.com">walshero@gmail.com</a> — <b>The Workshop Wall</b>, a labeled inventory of writerly moves for EN195. The bridge between cutting (Stage 1) and applying a named move (Stage 2). Single file, offline, nothing leaves the page. Examples are original studio lines. Green-free slate placeholder pending the palette pick.<br>
+    <b>How this was made:</b> founder called for a Richard Scarry-style inventory — every move a labeled object. Mnemonic Iconographer held the HALT: each icon must beat its word to the eye. Studied Scarry's method (label-the-thing, busy-but-legible); no Scarry art reproduced.
+  </div>
+
+  <!-- BOTTOM NAV RAIL -->
+  <nav class="se-rail" aria-label="Page navigation">
+    <a href="arcade.html" aria-label="Back">&#8249; Back</a>
+    <a href="index.html" aria-label="Home">&#8962; Home</a>
+  </nav>
+</div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+
+  /* ---- Studio Eyes (reserved chrome) ---- */
+  var root=document.documentElement, sr=$('seSr');
+  /* last-updated — computed, not typed */
+  (function(){ var u=$('seUpdated'); if(!u) return; var d=new Date(document.lastModified);
+    u.textContent = isNaN(d.getTime()) ? 'Last updated recently'
+      : 'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}); })();
+
+  /* back-to-top for the rack (keeps the page's own button, no gate) */
+  var doneBtn=$('done'); if(doneBtn) doneBtn.addEventListener('click',function(){ window.scrollTo(0,0); var h=$('wallh'); if(h){ h.setAttribute('tabindex','-1'); h.focus(); } });
+
+  /* ---- the inventory. each icon EXPRESSES its move (Iconographer HALT). ---- */
+  var I={
+    shears:'<svg class="obj" viewBox="0 0 64 64" aria-hidden="true"><circle cx="20" cy="44" r="8" fill="none" stroke="var(--ink)" stroke-width="3"/><circle cx="44" cy="44" r="8" fill="none" stroke="var(--ink)" stroke-width="3"/><path d="M24 39 L52 14 M40 39 L12 14" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="33" r="2.4" fill="var(--rust)"/></svg>',
+    iceberg:'<svg class="obj" viewBox="0 0 64 64" aria-hidden="true"><path d="M4 28 H60" stroke="var(--accent2)" stroke-width="2" stroke-dasharray="4 4"/><path d="M22 28 L32 10 L42 28 Z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.4"/><path d="M16 28 L48 28 L40 56 L24 56 Z" fill="var(--bg)" stroke="var(--ink)" stroke-width="2.4" opacity=".9"/></svg>',
+    key:'<svg class="obj" viewBox="0 0 64 64" aria-hidden="true"><circle cx="20" cy="22" r="11" fill="none" stroke="var(--ink)" stroke-width="3.4"/><circle cx="20" cy="22" r="3" fill="var(--rust)"/><path d="M28 30 L52 54 M44 46 L50 40 M38 40 L44 34" stroke="var(--ink)" stroke-width="3.4" stroke-linecap="round"/></svg>',
+    door:'<svg class="obj" viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="8" width="30" height="48" fill="none" stroke="var(--ink)" stroke-width="2.6"/><path d="M40 12 L56 18 L56 50 L40 56 Z" fill="var(--bg)" stroke="var(--ink)" stroke-width="2.6"/><circle cx="45" cy="34" r="2.2" fill="var(--rust)"/></svg>',
+    sandbag:'<svg class="obj" viewBox="0 0 64 64" aria-hidden="true"><path d="M22 6 L42 6 L40 14 L24 14 Z" fill="var(--bg)" stroke="var(--ink)" stroke-width="2.4"/><path d="M24 14 C16 22 16 50 22 56 L42 56 C48 50 48 22 40 14 Z" fill="var(--surface)" stroke="var(--ink)" stroke-width="2.6"/><path d="M26 26 H38 M25 36 H39 M26 46 H38" stroke="var(--ink)" stroke-width="2" opacity=".55"/></svg>',
+    plumb:'<svg class="obj" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 V40" stroke="var(--ink)" stroke-width="2.6"/><circle cx="32" cy="6" r="3" fill="var(--ink)"/><path d="M26 40 L38 40 L34 52 L32 58 L30 52 Z" fill="var(--rust)" stroke="var(--ink)" stroke-width="2.2"/></svg>'
+  };
+
+  var MOVES=[
+    { ic:'shears', tag:'Move 01', name:'The Cut', stage1:true,
+      does:'Drop a word and the piece rises. Keep only what carries weight.',
+      heavy:'The last bus of the entire night pulled slowly away just as she finally reached the curb.',
+      lean:'The last bus pulled away as she reached the curb.' },
+    { ic:'iceberg', tag:'Move 02', name:'Implication',
+      does:'Say less; let the unsaid do the lifting. Most of the story stays under the water.',
+      heavy:'He never came back, and she was very sad about it for a long time afterward.',
+      lean:'He never came back. She kept his coffee cup.' },
+    { ic:'key', tag:'Move 03', name:'The Concrete Noun',
+      does:'Carry the feeling in an object the reader can hold, not in a word for the feeling.',
+      heavy:'Their marriage had become distant and full of unspoken tension over the years.',
+      lean:'Two toothbrushes. One had gone stiff.' },
+    { ic:'door', tag:'Move 04', name:'The Late Turn',
+      does:'The change arrives last — and only lands because the earlier lines set it up.',
+      heavy:'She realized at the start that she would forgive him no matter what happened.',
+      lean:'She rehearsed the speech all week. At the door, she said: okay.' },
+    { ic:'sandbag', tag:'Move 05', name:'Compression', stage1:true,
+      does:'Same story, fewer sandbags. Cut the rig down until the piece flies.',
+      heavy:'In the early hours of the cold and quiet morning, the snow was beginning to fall.',
+      lean:'By morning, snow.' },
+    { ic:'plumb', tag:'Move 06', name:'The Unflinching Line',
+      does:'State the hard thing plainly, then follow it straight down. No hedging, no drama.',
+      heavy:'It was, in a certain sense, perhaps the kind of thing one might call a goodbye.',
+      lean:'It was a goodbye. She just didn\u2019t use the word.' }
+  ];
+
+  var shelf=$('shelf');
+  MOVES.forEach(function(m,idx){
+    var t=document.createElement('div'); t.className='tool';
+    t.innerHTML =
+      '<div class="head">'+I[m.ic]+
+        '<div class="tag"><span class="brasstag">'+m.tag+'</span>'+
+        '<div class="name">'+m.name+(m.stage1?'<span class="stage1">used in Stage 1</span>':'')+'</div></div>'+
+      '</div>'+
+      '<div class="body">'+
+        '<p class="does">'+m.does+'</p>'+
+        '<div class="ex">'+
+          '<div class="exh">See it work</div>'+
+          '<div class="line" id="line'+idx+'"><span class="heavy">'+m.heavy+'</span></div>'+
+          '<button class="flip" id="flip'+idx+'" aria-pressed="false">Show the lean version<span class="state" id="st'+idx+'"> · heavy</span></button>'+
+        '</div>'+
+      '</div>';
+    shelf.appendChild(t);
+  });
+  MOVES.forEach(function(m,idx){
+    var lean=false;
+    $('flip'+idx).addEventListener('click',function(){
+      lean=!lean;
+      $('line'+idx).innerHTML = lean ? '<span class="lean">'+m.lean+'</span>' : '<span class="heavy">'+m.heavy+'</span>';
+      this.setAttribute('aria-pressed', lean?'true':'false');
+      this.firstChild.textContent = lean ? 'Show the heavy version' : 'Show the lean version';
+      $('st'+idx).textContent = lean ? ' · lean' : ' · heavy';
+    });
+  });
+})();
+</script>
+
+<!-- TSP shared mobile nav + device adaptation -->
+<script>window.TSP_MOBILE = { home:"index.html", back:"arcade.html", nav:false };</script>
+<!-- TSP-MOBILE (inlined from tsp-mobile.js — single-file-offline law) -->
+<script>
+/* Tight Spiral Studios — shared mobile controls + Home/Back nav.
+   Source & docs: tsp-mobile.js. Edit there, then re-inline. */
+(function () {
+  "use strict";
+
+  var d = document, root = d.documentElement, cfg = window.TSP_MOBILE || {};
+
+  /* ---- Device detection --------------------------------------------------- */
+  var hasTouch = ("ontouchstart" in window) ||
+                 (navigator.maxTouchPoints > 0) ||
+                 (navigator.msMaxTouchPoints > 0);
+  var coarse   = !!(window.matchMedia && matchMedia("(pointer: coarse)").matches);
+  var narrow   = Math.min(screen.width || 9999, screen.height || 9999) < 820;
+  var isMobile = hasTouch && (coarse || narrow);
+
+  root.classList.add(hasTouch ? "tsp-touch" : "tsp-no-touch");
+  if (isMobile) root.classList.add("tsp-mobile");
+
+  /* ---- Synthetic keyboard dispatch --------------------------------------- */
+  // Games listen on window (or document) for keydown/keyup and read e.key.
+  var evTarget = (cfg.target === "document") ? d : window;
+
+  function dispatchKey(type, key) {
+    var ev;
+    try {
+      ev = new KeyboardEvent(type, {
+        key: key, code: codeFor(key),
+        bubbles: true, cancelable: true, view: window
+      });
+    } catch (e) {
+      // Legacy fallback
+      ev = d.createEvent("Event");
+      ev.initEvent(type, true, true);
+      try { ev.key = key; } catch (_) {}
+    }
+    evTarget.dispatchEvent(ev);
+  }
+
+  function codeFor(key) {
+    switch (key) {
+      case "ArrowLeft":  return "ArrowLeft";
+      case "ArrowRight": return "ArrowRight";
+      case "ArrowUp":    return "ArrowUp";
+      case "ArrowDown":  return "ArrowDown";
+      case " ":          return "Space";
+      case "Enter":      return "Enter";
+      case "Shift":      return "ShiftLeft";
+      default:
+        if (key && key.length === 1) return "Key" + key.toUpperCase();
+        return "";
+    }
+  }
+
+  /* ---- Styles (injected once) -------------------------------------------- */
+  function injectStyles() {
+    if (d.getElementById("tsp-mobile-style")) return;
+    var css = [
+      /* Navigation chip — always available, subtle on desktop */
+      ".tsp-nav{position:absolute;top:max(10px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));",
+        "z-index:2147483000;display:flex;gap:8px;font-family:'Helvetica Neue',Arial,sans-serif}",
+      ".tsp-nav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.4em;text-decoration:none;",
+        "padding:.5em .85em;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:.04em;",
+        "color:#f4f1e8;background:rgba(20,18,15,.66);border:1px solid rgba(255,207,90,.45);",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1;",
+        "box-shadow:0 4px 14px rgba(0,0,0,.35);transition:background .15s,border-color .15s,transform .08s}",
+      ".tsp-nav a:hover,.tsp-nav a:focus-visible{background:rgba(40,34,24,.9);border-color:#ffcf5a;outline:none}",
+      ".tsp-nav a:active{transform:translateY(1px)}",
+      "@media (min-width:900px) and (pointer:fine){.tsp-nav{opacity:.55}.tsp-nav:hover{opacity:1}}",
+
+      /* Nav integrated into the studio's shared .topbar (no overlap) */
+      ".tsp-barnav{display:inline-flex;align-items:center;gap:.35rem;margin-right:.25rem;flex:none}",
+      ".tsp-barnav a{display:inline-flex;align-items:center;min-height:44px;box-sizing:border-box;gap:.3em;text-decoration:none;color:inherit;",
+        "font-family:inherit;font-weight:800;font-size:.82rem;letter-spacing:.02em;line-height:1;",
+        "padding:.4em .7em;border-radius:999px;border:1px solid currentColor;opacity:.85;",
+        "background:transparent;white-space:nowrap;transition:opacity .12s,background .12s}",
+      ".tsp-barnav a:hover,.tsp-barnav a:focus-visible{opacity:1;background:rgba(127,127,127,.18);outline:none}",
+      ".tsp-barnav a:active{transform:translateY(1px)}",
+      /* Keep the shared bar on one row once Home/Back are added: title ellipsizes */
+      ".tsp-touch .topbar{gap:.4rem}",
+      ".tsp-touch .topbar .wm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1 1 auto}",
+
+      /* Gamepad — only rendered on touch devices */
+      ".tsp-pad{position:fixed;left:0;right:0;bottom:0;z-index:2147482000;",
+        "display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none;",
+        "padding:0 max(14px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-right));",
+        "font-family:'Helvetica Neue',Arial,sans-serif;touch-action:none}",
+      ".tsp-cluster{display:flex;gap:12px;pointer-events:none;align-items:flex-end;flex-wrap:wrap;max-width:46vw}",
+      ".tsp-cluster.right{justify-content:flex-end}",
+      ".tsp-btn{pointer-events:auto;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;",
+        "touch-action:none;min-width:62px;min-height:62px;padding:0 14px;border-radius:16px;",
+        "display:flex;align-items:center;justify-content:center;text-align:center;",
+        "font-size:15px;font-weight:700;letter-spacing:.03em;color:#f4f1e8;",
+        "background:rgba(24,20,15,.6);border:1.5px solid rgba(255,207,90,.5);",
+        "-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);",
+        "box-shadow:0 6px 18px rgba(0,0,0,.4);transition:background .06s,transform .06s;cursor:pointer}",
+      ".tsp-btn.big{min-width:82px;min-height:82px;font-size:16px}",
+      ".tsp-btn:active,.tsp-btn.on{background:rgba(255,207,90,.9);color:#1a0d09;transform:scale(.94)}",
+      /* Hide gamepad on non-touch so desktop keeps keyboard feel */
+      ".tsp-no-touch .tsp-pad{display:none}",
+
+      /* Rotate-for-more-room hint — canvas games only, portrait phones only */
+      ".tsp-rot{position:fixed;left:50%;transform:translateX(-50%);top:calc(72px + env(safe-area-inset-top));",
+        "z-index:2147482500;display:none;align-items:center;gap:.55em;padding:.5em .55em .5em .9em;",
+        "border-radius:999px;background:rgba(24,20,15,.86);color:#f4f1e8;",
+        "border:1px solid rgba(255,207,90,.5);white-space:nowrap;",
+        "font:600 12px/1 'Helvetica Neue',Arial,sans-serif;letter-spacing:.02em;",
+        "-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.4)}",
+      ".tsp-rot .rk{font-size:14px;color:#ffcf5a}",
+      ".tsp-rot button{background:none;border:none;color:inherit;font-size:16px;line-height:1;",
+        "padding:0 .15em;margin:0;cursor:pointer;opacity:.65}",
+      ".tsp-rot button:active{opacity:1}",
+      "@media (orientation:portrait){.tsp-touch .tsp-rot{display:inline-flex}}",
+      ".tsp-rot-dismissed .tsp-rot{display:none!important}"
+    ].join("");
+    var s = d.createElement("style");
+    s.id = "tsp-mobile-style";
+    s.textContent = css;
+    d.head.appendChild(s);
+  }
+
+  /* ---- Navigation (Home / Back) ------------------------------------------ */
+  function makeLink(href, label, aria) {
+    var a = d.createElement("a");
+    a.href = href; a.innerHTML = label;
+    a.setAttribute("aria-label", aria);
+    return a;
+  }
+
+  function buildNav() {
+    if (cfg.nav === false) return;
+    if (d.querySelector(".tsp-nav, .tsp-barnav")) return;
+
+    var home = cfg.home === undefined ? "index.html" : cfg.home;
+    var links = [];
+    if (cfg.back) links.push(makeLink(cfg.back, "‹ Back", "Back"));
+    if (home)     links.push(makeLink(home, "⌂ Home", "Home"));
+    if (!links.length) return;
+
+    // Prefer integrating into the studio's shared sticky header if present —
+    // avoids overlapping page titles and matches each page's palette.
+    var bar = cfg.floatNav ? null : d.querySelector(".topbar");
+    if (bar) {
+      var wrap = d.createElement("span");
+      wrap.className = "tsp-barnav";
+      links.forEach(function (l) { wrap.appendChild(l); });
+      bar.insertBefore(wrap, bar.firstChild);
+      return;
+    }
+
+    // Otherwise: floating chip, and reserve top space on scrollable pages so
+    // it never covers the header/title.
+    var nav = d.createElement("nav");
+    nav.className = "tsp-nav";
+    nav.setAttribute("aria-label", "Site navigation");
+    links.forEach(function (l) { nav.appendChild(l); });
+    d.body.appendChild(nav);
+    reserveTopSpace();
+  }
+
+  function reserveTopSpace() {
+    if (!hasTouch) return;                 // desktop keeps its exact layout
+    // Skip full-viewport apps (canvas games, fixed overlays) — the chip sits
+    // in their letterbox margin and body padding would distort them.
+    var cs = getComputedStyle(d.body);
+    if (cs.overflowY === "hidden" || cs.overflowX === "hidden") return;
+    var scrolls = root.scrollHeight > (window.innerHeight + 4);
+    if (!scrolls) return;
+    var pad = parseFloat(cs.paddingTop) || 0;
+    d.body.style.paddingTop = (pad + 58) + "px";
+  }
+
+  /* ---- Gamepad ------------------------------------------------------------ */
+  function buildPad() {
+    if (!hasTouch) return;                       // keyboard devices skip it
+    if (!cfg.controls || !cfg.controls.length) return;
+    if (d.querySelector(".tsp-pad")) return;
+
+    var pad = d.createElement("div");
+    pad.className = "tsp-pad";
+    var left  = d.createElement("div"); left.className  = "tsp-cluster left";
+    var right = d.createElement("div"); right.className = "tsp-cluster right";
+    pad.appendChild(left); pad.appendChild(right);
+
+    cfg.controls.forEach(function (c) {
+      var btn = d.createElement("button");
+      btn.type = "button";
+      btn.className = "tsp-btn" + (c.big ? " big" : "");
+      btn.innerHTML = c.label || "";
+      btn.setAttribute("aria-label", c.aria || c.label || c.key);
+      bindButton(btn, c);
+      (c.side === "left" ? left : right).appendChild(btn);
+    });
+
+    d.body.appendChild(pad);
+  }
+
+  function bindButton(btn, c) {
+    var key = c.key, held = false;
+
+    function press(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      if (c.hold) {
+        if (held) return;
+        held = true;
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+      } else {
+        // tap: quick down/up so edge-triggered actions (fire/rotate/drop) fire once
+        btn.classList.add("on");
+        dispatchKey("keydown", key);
+        setTimeout(function () { dispatchKey("keyup", key); }, 24);
+        setTimeout(function () { btn.classList.remove("on"); }, 90);
+      }
+    }
+    function release(e) {
+      if (e) e.preventDefault();
+      if (c.hold && held) {
+        held = false;
+        btn.classList.remove("on");
+        dispatchKey("keyup", key);
+      }
+    }
+
+    if (window.PointerEvent) {
+      btn.addEventListener("pointerdown", function (e) {
+        try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+        press(e);
+      });
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointercancel", release);
+      btn.addEventListener("lostpointercapture", release);
+    } else {
+      btn.addEventListener("touchstart", press, { passive: false });
+      btn.addEventListener("touchend", release);
+      btn.addEventListener("touchcancel", release);
+      btn.addEventListener("mousedown", press);
+      btn.addEventListener("mouseup", release);
+      btn.addEventListener("mouseleave", release);
+    }
+    // Safety: releasing a held key if the page loses focus
+    window.addEventListener("blur", release);
+  }
+
+  /* ---- Rotate hint -------------------------------------------------------- */
+  function buildRotateHint() {
+    if (!hasTouch) return;
+    if (cfg.rotateHint === false) return;
+    if (!cfg.controls || !cfg.controls.length) return;   // canvas games only
+    if (d.querySelector(".tsp-rot")) return;
+    var hint = d.createElement("div");
+    hint.className = "tsp-rot";
+    hint.setAttribute("role", "note");
+    hint.innerHTML = '<span class="rk">↻</span>' +
+      '<span>Turn sideways for more room</span>' +
+      '<button type="button" aria-label="Dismiss">×</button>';
+    hint.querySelector("button").addEventListener("click", function () {
+      root.classList.add("tsp-rot-dismissed");
+    });
+    d.body.appendChild(hint);
+  }
+
+  /* ---- Boot --------------------------------------------------------------- */
+  function boot() {
+    injectStyles();
+    buildNav();
+    buildPad();
+    buildRotateHint();
+  }
+
+  if (d.readyState === "loading") {
+    d.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+
+  // Expose a tiny API for pages that want to toggle the pad (e.g. hide on menus)
+  window.TSPMobile = {
+    isTouch: hasTouch,
+    isMobile: isMobile,
+    press: function (key) { dispatchKey("keydown", key); dispatchKey("keyup", key); },
+    showPad: function (v) {
+      var p = d.querySelector(".tsp-pad");
+      if (p) p.style.display = v === false ? "none" : "";
+    }
+  };
+})();
+</script>
+</body>
+</html>
