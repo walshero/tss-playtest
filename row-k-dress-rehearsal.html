@@ -1730,4 +1730,163 @@
       b.addEventListener("click", function(){
         state.picked[cat] = (state.picked[cat]===c.id) ? null : c.id;
         render();
-        var again
+        var again = stage.querySelectorAll(".cardbtn")[idx];
+        if(again) again.focus({preventScroll:true});
+      });
+      bank.appendChild(b);
+    });
+    stage.appendChild(bank);
+
+    if(state.picked[cat]){
+      var card = cardById(cat, state.picked[cat]);
+      var fran = el("div","franbox");
+      fran.setAttribute("aria-live","polite");
+      fran.appendChild(el("span","who","FRAN, STAGE MANAGER, ON HEADSET"));
+      var fp = el("p", null, "");
+      fp.innerHTML = FRAN[state.sceneIdx][cat][card.kind];
+      fran.appendChild(fp);
+      stage.appendChild(fran);
+    }
+
+    var row = el("div","advance-row");
+    var next = el("button","bigbtn", state.fromReview ? "BACK TO CURTAIN"
+                 : cat==="LINE" ? "TO THE REVIEW" : "NEXT");
+    next.type = "button";
+    next.disabled = !state.picked[cat];
+    next.addEventListener("click", function(){
+      if(state.fromReview){ state.fromReview = false; go("review"); }
+      else go(cat==="OBJECT" ? "MOVE" : cat==="MOVE" ? "LINE" : "review");
+    });
+    row.appendChild(next);
+    stage.appendChild(row);
+  }
+
+  function renderReview(){
+    state.fromReview = false;
+    stage.appendChild(head("YOUR STAGING"));
+    stage.appendChild(sceneStrip());
+    CATS.forEach(function(cat){
+      var card = cardById(cat, state.picked[cat]);
+      var item = el("div","review-item");
+      var head = el("div","cathead");
+      head.appendChild(icon(cat));
+      head.appendChild(el("span","cat", cat==="OBJECT" ? "THE OBJECT" : cat==="MOVE" ? "THE MOVE" : "THE LINE"));
+      item.appendChild(head);
+      item.appendChild(el("p", null, card.text));
+      var swap = el("button","swap","CHANGE THIS");
+      swap.type = "button";
+      swap.setAttribute("aria-label","Change the "+cat.toLowerCase()+" choice");
+      swap.addEventListener("click", function(){ state.fromReview = true; go(cat); });
+      item.appendChild(swap);
+      stage.appendChild(item);
+    });
+    var row = el("div","advance-row");
+    var b = el("button","bigbtn","CURTAIN");
+    b.type = "button";
+    b.addEventListener("click", function(){ go("verdict"); });
+    row.appendChild(b);
+    stage.appendChild(row);
+  }
+
+  function renderVerdict(){
+    stage.appendChild(head("THE VERDICT: "+scene().name));
+    var kinds = CATS.map(function(cat){ return cardById(cat, state.picked[cat]).kind; });
+    var shows = kinds.filter(function(k){ return k==="SHOW"; }).length;
+    var tells = kinds.filter(function(k){ return k==="TELL"; }).length;
+
+    // The house answers the night you gave it, floored at your best night for
+    // that scene. A first bad staging still empties seats - the lesson has to
+    // cost something the first time. A RE-staging cannot take back ground you
+    // have already won, so a player who wants to see what the announced
+    // version looks like is not charged for the curiosity.
+    var net = shows*PER_SHOW - tells*PER_TELL;
+    var was = state.scored[state.sceneIdx];
+    if(!was || net > was.shows*PER_SHOW - was.tells*PER_TELL){
+      state.scored[state.sceneIdx] = { shows: shows, tells: tells };
+    }
+
+    var key = shows===3 ? "win" : tells===3 ? "seminar"
+            : kinds.indexOf("INVISIBLE")>=0 ? "invisible" : "told";
+    var vd = VERDICTS[key];
+    var ban = el("div","banner "+vd.cls);
+    ban.appendChild(el("span","head",vd.head));
+    ban.appendChild(el("p",null, key==="win" ? scene().winBody
+      : (scene().verdicts && scene().verdicts[key]) || vd.body));
+    stage.appendChild(ban);
+
+    // The room answers before the critics explain it.
+    stage.appendChild(houseBlock(true));
+
+    CATS.forEach(function(cat){
+      var card = cardById(cat, state.picked[cat]);
+      var r = scene().react[cat][card.kind];
+      var div = el("div","row-react");
+      var head = el("div","cathead");
+      head.appendChild(icon(cat));
+      head.appendChild(el("span","cat", cat==="OBJECT" ? "YOUR OBJECT" : cat==="MOVE" ? "YOUR MOVE" : "YOUR LINE"));
+      div.appendChild(head);
+      div.appendChild(el("p","staged", card.text));
+      div.appendChild(el("span","who", r.who));
+      div.appendChild(el("p",null,r.say));
+      stage.appendChild(div);
+    });
+
+    stage.appendChild(el("p","houselights",
+      "From the workshop: if the audience doesn't see it or hear it, they won't know it."));
+
+    var row = el("div","advance-row");
+    var again = el("button","bigbtn","RESTAGE");
+    again.type = "button";
+    again.addEventListener("click", function(){ go("review"); });
+    var nextScene = el("button","bigbtn", state.sceneIdx < SCENES.length-1 ? "NEXT SCENE" : "SCENE ONE");
+    nextScene.type = "button";
+    nextScene.addEventListener("click", function(){
+      state.sceneIdx = (state.sceneIdx+1) % SCENES.length;
+      state.picked = {OBJECT:null, MOVE:null, LINE:null};
+      go("secret");
+    });
+    row.appendChild(again); row.appendChild(nextScene);
+    stage.appendChild(row);
+    stage.appendChild(aboutButton());
+  }
+
+  function resetAll(){
+    state.sceneIdx = 0;
+    state.fromReview = false;
+    state.picked = {OBJECT:null, MOVE:null, LINE:null};
+    state.scored = [null,null,null];
+    state.shownTaken = SEATS_AT_RISE;
+    go("lobby");
+  }
+
+  document.getElementById("homeBtn").addEventListener("click", resetAll);
+  document.getElementById("backBtn").addEventListener("click", function(){
+    if(state.step==="about"){ go(state.aboutFrom==="verdict" ? "verdict" : "lobby"); return; }
+    var i = ORDER.indexOf(state.step);
+    if(i>0) go(ORDER[i-1]);
+  });
+  document.getElementById("comfortBtn").addEventListener("click", function(){
+    var b = document.body;
+    var c = parseInt(b.getAttribute("data-comfort"),10);
+    b.setAttribute("data-comfort", String(c===3 ? 1 : c+1));
+  });
+
+  // each plate line learns its own length, so the draw-on lands on the beat
+  (function(){
+    try { SCENES.forEach(function(sc){ sc.plate = INK.measure(sc.plate); }); } catch(e){}
+    INK.done();
+  })();
+
+  // DARK HOST LAW: on a dark-preferring device the whole comfort ladder runs on
+  // the dark side (warm dark, deep dark, black), so no stop is ever a light
+  // palette and no host repaint can produce white-on-white. COMFORT still
+  // cycles three visibly distinct stops.
+  if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.setAttribute("data-scheme","dark");
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
