@@ -1893,6 +1893,14 @@
            + ' stroke-width="'+(1.5 + wob(s.seed*19.1 + 5)*0.5).toFixed(2)+'"/>');
     });
 
+    // the boxes come after the house seats, so seat indices stay aligned
+    BOOTHS.forEach(function(b){
+      p.push(boothFrame(b));
+      var on = b.keep || from >= HOUSE_SEATS;
+      p.push('<path class="seat'+(b.keep ? '' : ' booth-open')+(on ? ' here' : '')+'" d="'+seatPath(b)+'"'
+           + ' stroke-linejoin="round" stroke-width="1.8"/>');
+    });
+
     var box = el("section","housebox");
     var svgWrap = el("div","house-svg");
     svgWrap.innerHTML = '<svg viewBox="0 8 360 168" role="img">'+p.join("")+'</svg>';
