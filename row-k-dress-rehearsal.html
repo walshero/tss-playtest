@@ -1921,6 +1921,12 @@
           nodes[i].style.setProperty("--d", Math.round(k * step) + "ms");
           nodes[i].classList.toggle("here", seat.order < taken);
         });
+        // the empty boxes fill last, after the final seat, and only at a sell-out
+        var last = Math.round((hi - lo) * step);
+        Array.prototype.forEach.call(svgWrap.querySelectorAll(".booth-open"), function(n){
+          n.style.setProperty("--d", (last + 160) + "ms");
+          n.classList.toggle("here", taken >= HOUSE_SEATS);
+        });
       };
       requestAnimationFrame(function(){ requestAnimationFrame(apply); });
     }
