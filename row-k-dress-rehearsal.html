@@ -1525,4 +1525,209 @@
 
   // The scene and its secret, carried onto every screen where the player is
   // working on them. Answers SPLIT-ATTENTION (the secret was held in memory
-  // across three screens) and lifts the 
+  // across three screens) and lifts the image share on the text-heaviest
+  // screens in the game at no authoring cost.
+  function sceneStrip(){
+    var strip = el("section","scenestrip");
+    var sp = el("div","strip-plate");
+    sp.innerHTML = '<svg viewBox="0 0 240 160" aria-hidden="true" focusable="false">'+scene().plate+'</svg>';
+    strip.appendChild(sp);
+    var ss = el("p","strip-secret");
+    ss.appendChild(el("span","tag","THE SECRET"));
+    ss.appendChild(el("strong","fact",scene().secret));
+    strip.appendChild(ss);
+    return strip;
+  }
+
+  /* ---------- screens ---------- */
+
+  function renderLobby(){
+    stage.appendChild(head("TONIGHT'S PROGRAM", true));
+    stage.appendChild(el("p","lobby-note","Three scenes. Three secrets. Choose one and stage it."));
+    SCENES.forEach(function(sc, i){
+      var b = el("button","lobbybtn");
+      b.type = "button";
+      b.style.borderLeftColor = sc.tint.rim;
+      b.setAttribute("aria-label","Scene "+(i+1)+": "+sc.name);
+
+      var tile = document.createElement("span");
+      tile.innerHTML = sceneTile(sc);
+      b.appendChild(tile.firstChild);
+
+      var txt = el("span");
+      txt.appendChild(document.createTextNode("SCENE "+(i+1)));
+      txt.appendChild(el("span","sname",sc.name));
+      if(state.scored[i]) txt.appendChild(el("span","done","staged"));
+      b.appendChild(txt);
+
+      b.addEventListener("click", function(){
+        state.sceneIdx = i;
+        state.fromReview = false;
+        state.picked = {OBJECT:null, MOVE:null, LINE:null};
+        go("secret");
+      });
+      stage.appendChild(b);
+    });
+    stage.appendChild(houseBlock(false));
+    stage.appendChild(aboutButton());
+  }
+
+  // v35: full names live here; the footer keeps surnames only (v19 ruling).
+  var CREDITS = [
+    {name:"David Mamet", note:"Drama is what the character does. Evidence at body scale."},
+    {name:"George Saunders", note:"The reader's mind steered line by line. Weight arrives sideways, through the concrete object."},
+    {name:"Nick Fore", note:"Stagecraft."},
+    {name:"Heather Sellers", note:"Stagecraft."},
+    {name:"Matt Walsh", note:"Stagecraft contributor. Founder, Tight Spiral Studios."}
+  ];
+
+  function aboutButton(){
+    var b = el("button","aboutbtn","ABOUT ROW K");
+    b.type = "button";
+    b.addEventListener("click", function(){
+      state.aboutFrom = state.step;
+      go("about");
+    });
+    return b;
+  }
+
+  function renderAbout(){
+    var box = el("div","about");
+    box.appendChild(head("ABOUT ROW K", true));
+    box.appendChild(el("p",null,"Row K: Dress Rehearsal is a staging game. You get a secret and three choices, and the house tells you whether it saw the secret or was told it."));
+    box.appendChild(el("h3",null,"STAGECRAFT AFTER"));
+    var ul = el("ul");
+    CREDITS.forEach(function(c){
+      var li = el("li");
+      li.appendChild(el("strong",null,c.name));
+      li.appendChild(el("span",null,c.note));
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+    box.appendChild(el("h3",null,"MADE FOR"));
+    box.appendChild(el("p",null,"EN195 Creative Writing."));
+    box.appendChild(el("h3",null,"MADE BY"));
+    box.appendChild(el("p",null,"Tight Spiral Studios. Play. Notice. Design."));
+    stage.appendChild(box);
+    var row = el("div","advance-row");
+    var back = el("button","bigbtn", state.aboutFrom==="verdict" ? "BACK TO THE VERDICT" : "BACK TO THE PROGRAM");
+    back.type = "button";
+    back.addEventListener("click", function(){ go(state.aboutFrom==="verdict" ? "verdict" : "lobby"); });
+    row.appendChild(back);
+    stage.appendChild(row);
+  }
+
+  function renderSecret(){
+    stage.appendChild(head("SCENE "+(state.sceneIdx+1)+" OF "+SCENES.length+": "+scene().name));
+
+    var nav = el("div","scenenav");
+    SCENES.forEach(function(sc, i){
+      var b = el("button","scenebtn");
+      b.type = "button";
+      var tile = document.createElement("span");
+      tile.innerHTML = sceneTile(sc);
+      b.appendChild(tile.firstChild);
+      b.appendChild(document.createTextNode("SCENE "+(i+1)));
+      b.setAttribute("aria-pressed", i===state.sceneIdx ? "true" : "false");
+      b.setAttribute("aria-label","Go to scene "+(i+1)+": "+sc.name);
+      b.addEventListener("click", function(){
+        if(i===state.sceneIdx) return;
+        state.sceneIdx = i;
+        state.fromReview = false;
+        state.picked = {OBJECT:null, MOVE:null, LINE:null};
+        go("secret");
+      });
+      nav.appendChild(b);
+    });
+    stage.appendChild(nav);
+
+    // The proscenium: curtains hauled open to reveal the scene's ink plate.
+    // Fold lines are irregular curves so the fabric bunches naturally when gathered.
+    var FOLDS_L = '<svg viewBox="0 0 100 160" preserveAspectRatio="none" aria-hidden="true">'
+      +'<path d="M9 0 C 5 46, 13 98, 8 160 M22 0 C 27 38, 18 112, 24 160 M33 0 C 29 62, 38 118, 32 160'
+      +' M48 0 C 53 44, 44 104, 50 160 M62 0 C 58 56, 67 116, 60 160 M77 0 C 82 48, 73 102, 79 160'
+      +' M90 0 C 87 64, 94 122, 88 160" fill="none" stroke="#8E4237" stroke-width="2.6"/>'
+      +'<path d="M13 0 C 9 50, 17 100, 12 160 M52 0 C 57 46, 48 106, 54 160 M81 0 C 86 50, 77 104, 83 160"'
+      +' fill="none" stroke="#EBB3A4" stroke-width="1.3"/></svg>';
+    var FOLDS_R = '<svg viewBox="0 0 100 160" preserveAspectRatio="none" aria-hidden="true">'
+      +'<path d="M11 0 C 15 52, 7 108, 13 160 M25 0 C 21 44, 30 114, 23 160 M39 0 C 44 58, 35 120, 41 160'
+      +' M53 0 C 49 40, 58 100, 51 160 M68 0 C 72 54, 63 112, 70 160 M82 0 C 78 46, 87 106, 80 160'
+      +' M93 0 C 96 60, 90 124, 95 160" fill="none" stroke="#8E4237" stroke-width="2.6"/>'
+      +'<path d="M18 0 C 22 52, 14 108, 20 160 M58 0 C 54 44, 63 104, 56 160 M87 0 C 91 50, 83 110, 89 160"'
+      +' fill="none" stroke="#EBB3A4" stroke-width="1.3"/></svg>';
+
+    var pros = el("div","proscenium");
+    var inner = el("div","pros-inner");
+    var pw = el("div","plate-wrap");
+    pw.innerHTML = '<svg viewBox="0 0 240 160" aria-hidden="true" focusable="false">'+scene().plate+'</svg>';
+    inner.appendChild(pw);
+    pros.appendChild(inner);
+    var cl = el("div","curtain cl"); cl.innerHTML = FOLDS_L;
+    var cr = el("div","curtain cr"); cr.innerHTML = FOLDS_R;
+    pros.appendChild(cl);
+    pros.appendChild(cr);
+    pros.appendChild(el("div","valance"));
+    stage.appendChild(pros);
+
+    // The house watches the curtain go up and THEN reads the room, which is
+    // the order a theatre gives you. v12 put the at-rise line above the stage
+    // and v13 the secret above that; both are below it now, so nothing is
+    // asking to be read while the curtain is still moving.
+    stage.appendChild(el("p","scene-line",scene().scene));
+
+    // Only the fact is underlined. The charge after it is the same every night.
+    var sec = el("div","secret");
+    sec.appendChild(el("span","tag","THE SECRET"));
+    var body = el("p","body");
+    body.appendChild(el("strong","fact",scene().secret));
+    body.appendChild(document.createTextNode(" "+SECRET_RULE));
+    sec.appendChild(body);
+    stage.appendChild(sec);
+
+    // No auto-scroll any more: the proscenium now sits directly under the
+    // scene picker and is already in view at phone height, so the old
+    // scrollIntoView would only yank the viewport out from under the reader.
+
+    var icons = el("div","iconrow");
+    [["OBJECT","they see it"],["MOVE","they watch it"],["LINE","they hear it"]].forEach(function(pair){
+      var chip = el("div","iconchip");
+      chip.appendChild(icon(pair[0]));
+      chip.appendChild(document.createTextNode("ONE "+pair[0]));
+      chip.appendChild(el("span","sense",pair[1]));
+      icons.appendChild(chip);
+    });
+    stage.appendChild(icons);
+
+    var row = el("div","advance-row");
+    var b = el("button","bigbtn","TO THE STAGE");
+    b.type = "button";
+    b.addEventListener("click", function(){ go("OBJECT"); });
+    row.appendChild(b);
+    stage.appendChild(row);
+  }
+
+  function renderChoice(cat){
+    var p = PROMPTS[cat];
+    stage.appendChild(head("CHOICE "+p.n+" OF 3"));
+    stage.appendChild(icon(cat,"choice-icn"));
+    var ask = (cat==="OBJECT") ? "Put one OBJECT on the stage."
+            : (cat==="MOVE") ? "Give "+scene().who+" one MOVE."
+            : "Give "+scene().who+" one LINE.";
+    stage.appendChild(el("p","prompt",ask));
+    var sub = (cat==="OBJECT") ? "Something the audience can see."
+            : (cat==="MOVE") ? "Something the audience watches "+scene().who+" do."
+            : "Something the audience can hear.";
+    stage.appendChild(el("p","subprompt",sub));
+
+    stage.appendChild(sceneStrip());
+
+    var bank = el("div","bank");
+    scene().cards[cat].forEach(function(c, idx){
+      var b = el("button","cardbtn",c.text);
+      b.type = "button";
+      b.setAttribute("aria-pressed", state.picked[cat]===c.id ? "true" : "false");
+      if(state.picked[cat]===c.id) b.appendChild(el("span","onstage","ON STAGE"));
+      b.addEventListener("click", function(){
+        state.picked[cat] = (state.picked[cat]===c.id) ? null : c.id;
+        render();
+        var again
