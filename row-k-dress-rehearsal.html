@@ -1299,4 +1299,230 @@
   // Every screen's title is an h2 that can hold focus. Two findings at once:
   // assistive tech was handed an empty outline exactly where the player stood
   // (no heading below the site h1), and rebuilding main by innerHTML dropped
-  // focus to BODY on every transition, so a keyboard or voice r
+  // focus to BODY on every transition, so a keyboard or voice reader restarted
+  // from the top of the document at each of seven steps.
+  function head(text, plain){
+    var h = document.createElement("h2");
+    h.className = "stepline";
+    h.setAttribute("tabindex","-1");
+    h.textContent = text;
+    if(!plain) h.style.setProperty("--tint", scene().tint.field);
+    return h;
+  }
+
+  function el(tag, cls, text){
+    var e = document.createElement(tag);
+    if(cls) e.className = cls;
+    if(text) e.textContent = text;
+    return e;
+  }
+
+  function cardById(cat, id){
+    return scene().cards[cat].filter(function(c){ return c.id===id; })[0];
+  }
+
+  var SVGNS = "http://www.w3.org/2000/svg";
+
+  /* ---------- the ink ----------
+     v23: the roughener is gone. The founder: "Forget the rough. It's too
+     weird. Just not perfect SVG." The drawings are what was drawn, as drawn.
+     The one thing kept from that pass is the measurement: each plate line
+     carries its own dash length inline, so a short line and a long line
+     both take their whole beat to draw on instead of sharing one guess. */
+  var INK = (function(){
+    var padSvg = null;
+    function pad(){
+      if(!padSvg){
+        padSvg = document.createElementNS(SVGNS,"svg");
+        padSvg.setAttribute("aria-hidden","true");
+        padSvg.setAttribute("focusable","false");
+        padSvg.style.cssText = "position:absolute;left:-9999px;top:0;width:300px;height:300px;";
+        document.body.appendChild(padSvg);
+      }
+      return padSvg;
+    }
+    return {
+      measure: function(src){
+        try {
+          var tmp = document.createElementNS(SVGNS,"svg");
+          tmp.innerHTML = src;
+          pad().appendChild(tmp);
+          Array.prototype.forEach.call(
+            tmp.querySelectorAll("path,rect,circle,ellipse,line,polyline,polygon"),
+            function(el){
+              try {
+                var L = Math.ceil(el.getTotalLength()) + 2;
+                el.setAttribute("style","stroke-dasharray:"+L+";stroke-dashoffset:"+L+";");
+              } catch(e){}
+            });
+          var out = tmp.innerHTML;
+          pad().removeChild(tmp);
+          return out || src;
+        } catch(e){ return src; }
+      },
+      done: function(){ if(padSvg){ padSvg.parentNode.removeChild(padSvg); padSvg = null; } }
+    };
+  })();
+
+  function icon(cat, cls){
+    var s = document.createElementNS(SVGNS,"svg");
+    s.setAttribute("class","icn"+(cls?" "+cls:""));
+    s.setAttribute("aria-hidden","true");
+    s.setAttribute("focusable","false");
+    var u = document.createElementNS(SVGNS,"use");
+    u.setAttribute("href","#i-"+cat.toLowerCase());
+    s.appendChild(u);
+    return s;
+  }
+
+  // Scene plate: cream drawing on the scene's emotional color, bright rim.
+  function sceneTile(sc){
+    return '<svg class="tile" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'
+      + '<rect x="1.7" y="1.7" width="60.6" height="60.6" rx="13" fill="'+sc.tint.field
+      + '" stroke="'+sc.tint.rim+'" stroke-width="3.2"/>'
+      + '<g fill="none" stroke="#FAF6EE" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'
+      + sc.mark + '</g></svg>';
+  }
+
+  function go(step){
+    state.step = step;
+    render();
+    window.scrollTo(0,0);
+    // hand the reader the new screen instead of the top of the document
+    var h = stage.querySelector(".stepline");
+    if(h) h.focus({preventScroll:true});
+  }
+
+  function render(){
+    stage.innerHTML = "";
+    // the page wears the scene's colour; the lobby wears the studio's
+    document.body.className = (state.step==="lobby" || state.step==="about") ? "" : "scene-"+scene().mood;
+    if(state.step==="lobby") renderLobby();
+    else if(state.step==="about") renderAbout();
+    else if(state.step==="secret") renderSecret();
+    else if(CATS.indexOf(state.step)>=0) renderChoice(state.step);
+    else if(state.step==="review") renderReview();
+    else renderVerdict();
+  }
+
+  /* ---------- the house ---------- */
+
+  // Deterministic hash: the same seat wobbles the same way every render, so
+  // the drawing is hand-made rather than merely random.
+  function wob(n){ var x = Math.sin(n*127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+
+  // Seats fan back from the stage in concentric arcs, chamber-map style.
+  // Arc seat counts run with arc length, so spacing stays even front to back.
+  var HOUSE = (function(){
+    var cx = 180, cy = 12, a0 = 22*Math.PI/180, a1 = 158*Math.PI/180;
+    var arcs = [[44,6],[62,9],[80,11],[98,14],[116,16],[134,19],[152,21]];
+    var seats = [], id = 0;
+    arcs.forEach(function(arc, ai){
+      var r = arc[0], n = arc[1];
+      for(var k=0; k<n; k++){
+        var t  = (k + 0.5) / n;
+        var th = a0 + (a1-a0)*t;
+        var rr = r  + (wob(id*3.1 + 1) - 0.5) * 4.2;      // off the arc
+        var tt = th + (wob(id*7.7 + 2) - 0.5) * 0.020;    // off its mark
+        seats.push({
+          x: cx + rr*Math.cos(tt),
+          y: cy + rr*Math.sin(tt),
+          rad: 6.3 + (wob(id*5.3 + 3) - 0.5) * 1.8,
+          seed: id,
+          // Who sits first: front before back, middle before the edges, and a
+          // healthy dose of nobody-does-what-you-expect so the crowd that
+          // gathers has a shape instead of a wavefront.
+          pref: ai + Math.abs(t - 0.5)*4.2 + wob(id*11.9 + 4)*1.7
+        });
+        id++;
+      }
+    });
+    seats.slice().sort(function(a,b){ return a.pref - b.pref; })
+         .forEach(function(s,i){ s.order = i; });
+    return seats;
+  })();
+
+  // A lumpy closed polygon, not a circle. Round joins soften it into something
+  // drawn rather than plotted.
+  function seatPath(s){
+    var n = 10, d = "";
+    for(var i=0; i<n; i++){
+      var th = (i/n) * Math.PI * 2;
+      var rr = s.rad * (0.84 + wob(s.seed*13.3 + i*4.7) * 0.30);
+      d += (i ? "L" : "M") + (s.x + rr*Math.cos(th)).toFixed(1)
+         + " " + (s.y + rr*Math.sin(th)).toFixed(1) + " ";
+    }
+    return d + "Z";
+  }
+
+  // The stage: a wide, shallow, hand-drawn apron across the front, bowing the
+  // same way the rows do. Drawn at the hemicycle's focus it would be a dot,
+  // which is true of a debating chamber and false of a theatre - so it is
+  // struck wider than the first row instead, the way a seating plan draws it.
+  // That is the whole label. No word needed.
+  var STAGE_LIP = (function(){
+    var d = "";
+    for(var i=0; i<=30; i++){
+      var t = i/30;
+      var x = 95 + 170*t + (wob(i*17.3 + 9) - 0.5) * 1.6;
+      var y = 15 + 3*Math.sin(Math.PI*t) + (wob(i*23.9 + 7) - 0.5) * 1.7;
+      d += (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1) + " ";
+    }
+    return d.trim();
+  })();
+
+  function seatsTaken(){
+    var n = SEATS_AT_RISE;
+    state.scored.forEach(function(sc){
+      if(sc) n += sc.shows*PER_SHOW - sc.tells*PER_TELL;
+    });
+    return Math.max(SEATS_FLOOR, Math.min(HOUSE_SEATS, n));
+  }
+
+  function houseBlock(animate){
+    var taken = seatsTaken();
+    // Render at the count the player last SAW, then move to the true count so
+    // the change is witnessed. Painting the answer pre-filled was the whole of
+    // GAME-FEEL-DISPLACED: two rounds of work on this meter and nobody ever
+    // saw a seat arrive.
+    var from = animate ? state.shownTaken : taken;
+
+    var p = ['<path d="'+STAGE_LIP+'" fill="none" stroke="currentColor" stroke-width="3.8"'
+           + ' stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>'];
+    HOUSE.forEach(function(s){
+      // Seats carry their state as a class, so taking one is a transition
+      // rather than a repaint.
+      p.push('<path class="seat'+(s.order < from ? " here" : "")+'" d="'+seatPath(s)+'"'
+           + ' stroke-linejoin="round"'
+           + ' stroke-width="'+(1.5 + wob(s.seed*19.1 + 5)*0.5).toFixed(2)+'"/>');
+    });
+
+    var box = el("section","housebox");
+    var svgWrap = el("div","house-svg");
+    svgWrap.innerHTML = '<svg viewBox="0 8 360 168" role="img">'+p.join("")+'</svg>';
+    svgWrap.firstChild.setAttribute("aria-label",
+      "The house, seen from the stage: "+taken+" of "+HOUSE_SEATS+" seats taken.");
+    box.appendChild(svgWrap);
+
+    if(from !== taken){
+      var lo = Math.min(from, taken), hi = Math.max(from, taken);
+      var step = Math.min(55, 620 / Math.max(1, hi - lo));
+      var apply = function(){
+        var nodes = svgWrap.querySelectorAll(".seat");
+        HOUSE.forEach(function(seat, i){
+          if(seat.order < lo || seat.order >= hi) return;
+          // arriving, they fill from the front; leaving, they go from the back
+          var k = (taken > from) ? (seat.order - lo) : (hi - 1 - seat.order);
+          nodes[i].style.setProperty("--d", Math.round(k * step) + "ms");
+          nodes[i].classList.toggle("here", seat.order < taken);
+        });
+      };
+      requestAnimationFrame(function(){ requestAnimationFrame(apply); });
+    }
+    state.shownTaken = taken;
+    return box;
+  }
+
+  // The scene and its secret, carried onto every screen where the player is
+  // working on them. Answers SPLIT-ATTENTION (the secret was held in memory
+  // across three screens) and lifts the 
