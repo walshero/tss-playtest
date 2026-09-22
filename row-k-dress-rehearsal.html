@@ -724,4 +724,196 @@
   .draw.d3{ animation-delay:1s; }
   @keyframes drawon{ to{ stroke-dashoffset:0; } }
   @media (prefers-reduced-motion: reduce){
-    /* !important is load-bearing: sin
+    /* !important is load-bearing: since v15 each plate line carries its own
+       measured dash length as an INLINE style, and inline beats a plain rule.
+       Without this the reduced-motion reader gets an empty proscenium. */
+    .draw{ animation:none !important; stroke-dashoffset:0 !important; }
+  }
+
+  /* THE SCENE STRIP (L5 SPLIT-ATTENTION, L3 TEXT-WALL, L4 IMAGE-FLOOR).
+     The secret used to be shown once and then judged across three screens the
+     player could not see it from, so the only load-bearing sentence in the
+     game was held in working memory while the work happened. The plate rides
+     along with it: the choice screens measured 1.6% image against a 50% floor,
+     and the scene the player is staging was not on screen while they staged
+     it. One element answers all three findings. */
+  .scenestrip{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+    justify-content:center; margin:6px 0 18px;
+    background:var(--secret-bg); color:var(--secret-ink);
+    border:2px solid var(--frame); border-radius:12px;
+    padding:12px 16px;
+  }
+  .strip-plate{ flex:1 1 200px; min-width:180px; color:var(--secret-ink); }
+  .strip-plate svg{ width:100%; height:auto; max-height:132px; display:block; }
+  /* the plate has already drawn itself on the scene screen; here it is simply
+     present. Inline dash values beat a plain rule, hence !important - the same
+     lesson the reduced-motion override taught in v15. */
+  .strip-plate .draw{ animation:none !important; stroke-dashoffset:0 !important; }
+  .strip-secret{ flex:1 1 230px; min-width:200px; line-height:1.85; padding-bottom:6px; }
+  .strip-secret .tag{
+    display:block; font-family:Verdana,Arial,sans-serif; font-size:18px;
+    font-weight:bold; letter-spacing:2px; margin-bottom:4px;
+  }
+  .strip-secret .fact{
+    font-weight:bold; text-decoration:underline;
+    text-decoration-thickness:3px; text-underline-offset:6px;
+  }
+
+  .prompt{ text-align:center; font-size:22px; margin:20px 0 6px; }
+  .subprompt{ text-align:center; font-style:italic; margin-bottom:18px; }
+
+  .bank{ display:flex; flex-direction:column; gap:14px; }
+  /* v34: THE HAND OF CARDS, from the Paper House (founder pick). Each card
+     is a sheet of paper set down by hand: uneven corners, a paper shadow for
+     depth only, alternate cards tipped a third of a degree. The border still
+     carries the scene's colour and every tappable keeps its 2px ink-weight
+     edge - the shadow is never the affordance. */
+  .bank{ gap:16px; }
+  .cardbtn{
+    background:var(--card); border:2px solid var(--frame); padding:16px 18px;
+    text-align:left; font-size:20px; width:100%;
+    border-radius:6px 12px 9px 13px;
+    box-shadow:0 2px 0 var(--shade), 0 6px 14px var(--shadow);
+  }
+  .bank .cardbtn:nth-child(odd){ transform:rotate(-0.3deg); }
+  .bank .cardbtn:nth-child(even){ transform:rotate(0.3deg); border-radius:6px 11px 8px 12px; }
+  .cardbtn[aria-pressed="true"]{
+    background:var(--amber-soft); border-width:3px; font-weight:bold;
+  }
+  /* The ON STAGE rubber stamp: the selected state said in words, never by
+     style alone. Studio teal - the job v17 said the teal was still missing.
+     Measured on every pressed-card fill: 5.47:1 worst by day (#0F5F5A),
+     6.04:1 worst on the dark side (#8FD6CC). */
+  .cardbtn .onstage{
+    display:inline-block; font-family:Verdana,Arial,sans-serif; font-size:18px;
+    font-weight:bold; letter-spacing:2px; margin-top:10px; margin-left:4px;
+    color:var(--stamp); border:2px solid var(--stamp);
+    border-radius:6px 9px 5px 8px; padding:3px 12px;
+    transform:rotate(-2.5deg);
+  }
+
+  .franbox{
+    margin-top:16px; background:var(--card); border:2px dashed var(--frame);
+    border-radius:12px; padding:14px 18px;
+  }
+  .franbox .who{
+    font-family:Verdana,Arial,sans-serif; font-size:18px; font-weight:bold;
+    letter-spacing:1px; display:block; margin-bottom:4px;
+  }
+  .franbox p{ font-style:italic; }
+
+  .advance-row{
+    display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:26px 0 8px;
+  }
+  .bigbtn{
+    background:var(--ink); color:var(--paper); border:3px solid var(--ink);
+    font-family:Verdana,Arial,sans-serif; font-size:22px; font-weight:bold;
+    letter-spacing:3px; padding:14px 44px;
+  }
+  .bigbtn[disabled]{ opacity:0.55; cursor:not-allowed; }
+
+  .review-item{
+    background:var(--card); border:2px solid var(--frame); border-radius:12px;
+    padding:14px 18px; margin-bottom:14px;
+  }
+  .review-item .cat{
+    font-family:Verdana,Arial,sans-serif; font-size:18px; font-weight:bold;
+    letter-spacing:2px;
+  }
+  .review-item .swap{
+    margin-top:10px; background:var(--card); border:2px solid var(--ink);
+    padding:8px 16px; font-family:Verdana,Arial,sans-serif; font-size:18px;
+    font-weight:bold;
+  }
+
+  .row-react{
+    background:var(--card); border:2px solid var(--frame); border-radius:12px;
+    padding:14px 18px; margin-bottom:12px;
+  }
+  .row-react .who{
+    font-family:Verdana,Arial,sans-serif; font-size:18px; font-weight:bold;
+    letter-spacing:1px; display:block; margin-bottom:2px;
+  }
+  .row-react .staged{
+    background:var(--amber-soft); border-radius:8px; padding:10px 14px;
+    margin:6px 0 12px;
+  }
+  .banner{
+    border:3px solid var(--ink); border-radius:12px; padding:18px 20px;
+    text-align:center; margin:18px 0;
+    background:var(--amber); color:#1F1B16;
+  }
+  .banner.win{ background:var(--good); color:var(--goodink); border-color:var(--good); }
+  .banner .head{
+    font-family:Verdana,Arial,sans-serif; font-size:22px; font-weight:bold;
+    letter-spacing:2px; display:block; margin-bottom:6px;
+  }
+  .houselights{ text-align:center; font-style:italic; margin:16px 0 22px; }
+  .hidden{ display:none; }
+
+  /* THE HOUSE. A hemicycle, the way a chamber seating map is drawn: concentric
+     arcs of seats fanning back from the stage. Ink only - a seat is taken or it
+     is not, and nothing else is encoded, so there is no key to read and no
+     legend to hunt for. Every seat is drawn by hand: jittered off its ideal
+     position, jittered in size, and outlined as a lumpy polygon rather than a
+     true circle, because a perfect grid of perfect discs reads as a parking
+     lot. The wobble is deterministic, seeded per seat, so the house does not
+     twitch between renders.
+     It carries NO text. The house is the one thing on this page that shows
+     instead of telling, which is the whole lesson - explaining it in a caption
+     would be the game losing its own argument. */
+  .housebox{
+    margin:24px auto 6px; background:var(--card); border:2px solid var(--frame);
+    border-radius:12px; padding:16px 12px 12px;
+  }
+  .house-svg{ color:var(--ink); }
+  .house-svg svg{ width:100%; height:auto; display:block; }
+  /* Seats are classed rather than painted, so a seat taken or given up is a
+     state change that can be watched. They arrive in sequence over about six
+     tenths of a second - people sitting down, not a chart repainting. The
+     reduced-motion rule above kills the transition and leaves the same
+     end state. */
+  .house-svg .seat{
+    fill:currentColor; fill-opacity:0;
+    stroke:currentColor; stroke-opacity:0.46;
+    transition:fill-opacity .34s ease var(--d,0s), stroke-opacity .34s ease var(--d,0s);
+  }
+  .house-svg .seat.here{ fill-opacity:1; stroke-opacity:1; }
+
+  /* Mnemonic icons: eye = OBJECT (seen), footprints = MOVE (watched), speech = LINE (heard) */
+  .icn{ display:block; color:var(--ink); }
+  .iconrow{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin:22px 0 10px; }
+  .iconchip{
+    text-align:center; background:var(--card); border:2px solid var(--frame);
+    border-top:6px solid var(--amber); border-radius:12px; padding:12px 18px 14px;
+    min-width:130px;
+    font-family:Verdana,Arial,sans-serif; font-size:18px; font-weight:bold;
+    letter-spacing:1px;
+  }
+  .iconchip .icn{ width:44px; height:44px; margin:0 auto 8px; }
+  .iconchip .sense{ display:block; font-family:Georgia,serif; font-weight:normal;
+    font-style:italic; letter-spacing:0; margin-top:4px; }
+  .choice-icn{ width:60px; height:60px; margin:16px auto 0; }
+  .cathead{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .cathead .icn{ width:28px; height:28px; }
+  .who-row{ display:flex; align-items:flex-start; gap:10px; margin-bottom:4px; }
+  .who-row .icn{ width:26px; height:26px; flex:none; margin-top:2px; }
+
+  /* v35 ABOUT. Plain paper, real text, one name per row. */
+  .aboutbtn{
+    display:block; margin:28px auto 4px; background:var(--card);
+    border:2px solid var(--ink); padding:8px 20px;
+    font-family:Verdana,Arial,sans-serif; font-size:18px; font-weight:bold;
+    letter-spacing:2px;
+  }
+  .about h3{
+    font-family:Verdana,Arial,sans-serif; font-size:18px; letter-spacing:2px;
+    margin:26px 0 10px;
+  }
+  .about ul{ list-style:none; padding:0; margin:0; }
+  .about li{
+    background:var(--card); border:2px solid var(--ink); border-radius:10px;
+    padding:12px 16px; margin-bottom:10px;
+  }
+  .about li strong{ display:block;
