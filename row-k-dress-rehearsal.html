@@ -1823,6 +1823,21 @@
     return seats;
   })();
 
+  // v37 THE BOXES. Two theatre boxes on the right are always taken, an
+  // homage to the two regulars in the Muppet theatre box. The two opposite
+  // stay empty until the house sells out, and then they fill last.
+  var BOOTHS = [
+    {x:341, y:28, keep:true}, {x:341, y:52, keep:true},
+    {x:19,  y:28, keep:false}, {x:19,  y:52, keep:false}
+  ].map(function(b, i){ b.rad = 6.3; b.seed = 300 + i*7; return b; });
+  function boothFrame(b){
+    // the rail sits on the side that faces the middle of the house
+    var inner = b.x > 180 ? -1 : 1, w = 13, h = 10, rx = b.x + inner*w;
+    return '<path d="M'+(b.x - inner*w)+' '+(b.y-h)+' H'+rx+' V'+(b.y+h)+' H'+(b.x - inner*w)+' Z"'
+         + ' fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" opacity="0.7"/>'
+         + '<path d="M'+rx+' '+(b.y-h+1)+' V'+(b.y+h-1)+'" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/>';
+  }
+
   // A lumpy closed polygon, not a circle. Round joins soften it into something
   // drawn rather than plotted.
   function seatPath(s){
