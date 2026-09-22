@@ -276,4 +276,136 @@
      proscenium. Reading order is the order a theatre gives you: the curtain
      opens, then you take in the room, then you learn the job. This reverses
      v12 (at-rise above the stage) and v13 (secret above that) - both were
-     putting text in front
+     putting text in front of a reader while the curtain was still moving.
+  3. AUTO-SCROLL REMOVED with it. The proscenium now sits directly under the
+     scene picker and is fully in view at phone height, so the old 1.1s
+     scrollIntoView had nothing left to reveal and would only yank the
+     viewport out from under the reader. Verified in the gate: the curtain is
+     wholly on screen at 390px with scrollY still zero.
+  4. THE HAND SCALES TO THE SHAPE. The v15 wobble was a flat amplitude per
+     drawing, so within one ink plate a 130px elevator door and an 8px call
+     button took the same displacement - 2% of the door, 20% of the button.
+     The door looked drawn; the button turned into a hook. Amplitude is now
+     capped at 2% of each shape's own path length, with the per-drawing figure
+     as the ceiling. Big shapes are unchanged, small ones stop melting.
+
+  --- v17 (the aleph run of 2026-09-19, worked in the seats' own order) ---
+  Five lenses found 2 blockers, 8 major, 5 minor. Findings file:
+  convening/ROW-K-CONVENING.md. This is items 1-6 of the order they set.
+
+  1. FOCUS - both blockers and a major, all in one small place.
+     - FOCUS-LOST. Every screen change rebuilds main by innerHTML, which
+       destroys the focused element; activeElement measured BODY after each
+       transition. A keyboard or voice reader restarted from the top of the
+       document at every one of seven steps. Each screen's title is now an h2
+       with tabindex -1 and go() moves focus to it. Picking a card also
+       re-renders, so that handler puts focus back on the card just pressed.
+     - FOCUS-INVISIBLE. Nothing authored a focus style at all; the UA default
+       measured outline 1px rgb(16,16,16) against 2px near-black borders. The
+       ring is now built from --ink on --paper, the one pair the comfort ladder
+       already audits at every stop, so it inherits that guarantee instead of
+       needing its own; an amber-soft halo widens it without carrying contrast
+       load. Teal was the Studio Voice's suggestion for the ring and it does
+       not survive measurement - #0F5F5A on the black stop is 2.6:1.
+     - OUTLINE-BROKEN. No screen carried a heading, so assistive tech got an
+       empty outline exactly where the player stood. The same h2 fixes it, and
+       the verdict gained a title it never had.
+     - aria-live came OFF main in the same pass. With innerHTML replacement it
+       announced an entire screen on every change. Focus management replaces
+       it; Fran, the one thing that updates without a screen change, is now
+       the only live region.
+  2. THE GATE GREW THE TOOTH IT WAS MISSING. About 90 checks passed while two
+     focus blockers sat in the build - a suite that passes everything and
+     never looks at focus manufactures confidence. It now asserts an authored
+     focus style, a ring of 3px or more, a heading on every screen, focus
+     never on BODY across the whole walkthrough, and prints image share.
+  3. THE SCENE STRIP - three findings, one element. The plate and the secret
+     now ride the choice and review screens, so the secret is present while it
+     is being served instead of held in memory across three screens.
+  4. THE HOUSE ANSWERS WHERE IT CAN BE SEEN. It sat at top 1432px in an 844px
+     viewport at the instant it updated - two rounds of work on a meter nobody
+     ever watched move. It now sits under the verdict banner, above the
+     critics, and seats arrive in sequence over about 620ms rather than being
+     painted pre-filled. Leaving is staggered too, from the back.
+  5. A BEST-RUN FLOOR. v14 scored the most recent staging, so replaying a
+     scene to see the announced version cost 33 seats. A first bad staging
+     still empties the room - the lesson must cost something once - but a
+     restage can no longer take back ground already won.
+  6. PROVENANCE. The closing craft claim said "the workshop" and nothing else;
+     the footer names the lineage now, and the competency is mapped above.
+
+  STILL OPEN after v17, honestly:
+  - IMAGE-FLOOR is improved, not met. Measured at 390px: choice 1.6 -> 14.5%,
+    review 0.9 -> 12.4%, verdict 8.4%, lobby 25%, scene 34.8%. Canon C7 is 50%.
+    The real fix is what Mamet asked for - a drawing on each of the 27 cards,
+    so a card shows the staging it proposes instead of describing it. That is
+    an authoring job, not a refactor, and it is quoted to the founder rather
+    than guessed at here.
+  - COMFORT still stands against the 2026-08-29 no-walls ruling, and the teal
+    still has no job. Both are founder calls, item 7 of the seats' order.
+
+  --- v18 (founder notes on Vera) ---
+  1. VERA'S OBJECT was "spine uncracked, price sticker still on the cover" - a
+     detail to be noticed, not a thing done. Now the book is still sealed in
+     shrink-wrap and she has to pick it open with a thumbnail while the club
+     waits. Mamet's own test, applied to a card that had been passing on a
+     technicality: drama is what the character DOES, and the old card only
+     asked the audience to squint at a cover. Marge's reaction and the scene's
+     win line follow the change; the verdict prints the staged card directly
+     above the reaction, so a stale critic would have been visible.
+  2. VERA'S TELL was shaking her head NO at the house - a semaphore nobody
+     would stage. Now she sneaks out her phone and googles what happens in the
+     book. The point of a TELL card is that it must TEMPT (Saunders: the trap
+     has to be attractive), and a phone is a genuinely plausible piece of
+     blocking, which makes it a far better trap than a head-shake. It is still
+     a tell: it hands the house the whole secret on sight and leaves them no
+     work to do. Dev's note now says exactly that, so the player learns why it
+     failed rather than just that it did.
+  3. UNDERLINE SPACING. The secret's underline sits 6px off the baseline, and
+     at the old 1.45 line-height the rule ran into the next line of the same
+     paragraph - worst on Scene 3, whose fact wraps to four underlined lines.
+     Line-height 1.85 on the secret body and on the strip, plus padding under
+     the strip's fact.
+
+  --- v26 (founder: fills black, colour as accent; scene 1 blues too close) ---
+  Box fills are neutral again: white by day, near-black on a dark phone.
+  The frame, the title box, the secret box and the pressed card carry the
+  scene's colour. Ernesto's navy card and navy secret were one colour apart;
+  with the card gone black, the secret is the only navy on the screen.
+
+  --- v25 (founder: "the secret box one color and the options a different color") ---
+  The secret box and the strip that carries it onto the choice screens wear
+  the scene's deep field with the cream mark; the option cards stay on the
+  pale tint. The plate inside the strip is drawn in cream so it survives the
+  dark ground. Same in both schemes: the secret is the one element that is
+  the scene's true colour wherever it is seen.
+
+  --- v24 (founder: colour the boxes, not the screen; clarify two sets) ---
+  1. THE BOXES WEAR THE SCENE. v21 tinted the whole page and that was too
+     much. The paper and ink are the studio's again on every screen; the
+     cards, the secret box, Fran's box, the strip, the review, the critics
+     and the proscenium frame take the scene's colour, on a --frame token.
+  2. VERA'S TABLE: the book is bigger and lies flat with its sheen, the mug
+     and the wine glass are drawn at a size that reads, and the bowl is gone.
+  3. FRANK'S BASEMENT: five things and no more. Door on its hinge with the
+     notice, the wrench at its foot, the broom against the boiler, the boiler
+     with gauge and hatch and one pipe, and the cat looking out from behind it
+     with both ears up. The bulb and the side pipe are gone.
+
+  --- v23 (founder: "Forget the rough. It's too weird. Just not perfect SVG.") ---
+  THE ROUGHENER IS GONE. Icons, tiles, plates and the spiral render as
+  drawn. The house keeps its own seeded jitter, which the founder liked and
+  which was never the roughener. What survives of v15 is the measurement:
+  each plate line still carries its own dash length inline, so the draw-on
+  takes its whole beat on a short line and a long one alike.
+
+  --- v22 (founder: the good can opener is not viewable from Row K; sets) ---
+  1. FRANK'S OBJECT failed its own test. "The good can opener" is a detail
+     nobody past Row C can see, so it was a tell in a show's clothing. Now the
+     blanket bed sits under a shelf of tuna cans stacked in a pyramid, labels
+     out: care you can read from the back row. Marge and Fran follow.
+  2. THE SETS. Each scene's ink plate was three or four shapes. Each is now a
+     set, still in the one hand: Ernesto's lobby has the small elevator with
+     its dial and call button, the stairwell door with push bar and exit box,
+     the wedge on the floor and a plant; Vera's living room has the coffee
+     table with the sealed book (sheen and all), a cup, a wine glas
