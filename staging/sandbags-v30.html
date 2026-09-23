@@ -899,3 +899,202 @@ html{ background:var(--bg); }
     e=e||0;
     var dy=d*RAKE, mx=x+w/2, ap=y-g, ey=y+e*g/(w/2), bb=Math.max(2.2,w*.07);
     return P('M'+x+' '+y+' h'+w+' v'+h+' h-'+w+' z', wall)
+         + P('M'+(x+w)+' '+y+' l'+d+' -'+dy.toFixed(1)+' v'+h+' l-'+d+' '+dy.toFixed(1)+' z', wallS)
+         + P('M'+x+' '+y+' L'+mx+' '+ap+' L'+(x+w)+' '+y+' z', wall)
+         + P('M'+mx+' '+ap+' l'+d+' -'+dy.toFixed(1)+' L'+(x+w+e+d)+' '+(ey-dy).toFixed(1)+' L'+(x+w+e)+' '+ey.toFixed(1)+' z', roof)
+         + '<g class="noedge">'+ln('M'+(x-e)+' '+ey.toFixed(1)+' L'+mx+' '+ap+' L'+(x+w+e)+' '+ey.toFixed(1), roofS, bb)+'</g>';
+  }
+  // a house with its eaves to the street: front wall, then the roof plane
+  // rising away from us to a ridge, and the gable end turned to the side.
+  function eaves(x,y,w,h,r,d,wall,wallS,roof,roofS,e){
+    e=e||0;
+    var dy=(d*RAKE), rx=x+d/2, ry=y-r-dy/2;
+    return P('M'+x+' '+y+' h'+w+' v'+h+' h-'+w+' z', wall)
+         + P('M'+(x+w)+' '+y+' l'+d+' -'+dy.toFixed(1)+' v'+h+' l-'+d+' '+dy.toFixed(1)+' z', wallS)
+         + P('M'+(x+w)+' '+y+' L'+(x+w+d/2)+' '+ry.toFixed(1)+' L'+(x+w+d)+' '+(y-dy).toFixed(1)+' z', wallS)
+         + P('M'+(x-e)+' '+(y+e*.4)+' L'+(x+w+e)+' '+(y+e*.4)+' L'+(x+w+d/2)+' '+ry.toFixed(1)+' L'+rx+' '+ry.toFixed(1)+' z', roof)
+         + rc(rx-1,ry-1.4,w+2,2.4,roofS,' rx="1"');
+  }
+  function win(x,y,cols,rows,w,h,gx,gy,skipN){
+    var o='',k=0;
+    for(var j=0;j<rows;j++) for(var i=0;i<cols;i++){
+      k++; if(skipN && k%skipN===0) continue;
+      o+='<rect x="'+(x+i*(w+gx))+'" y="'+(y+j*(h+gy))+'" width="'+w+'" height="'+h+'" rx=".6"/>';
+    }
+    return o;
+  }
+  function fence(x,y,n,h,gap,f){
+    var o='';
+    for(var i=0;i<n;i++) o+=rc(x+i*gap,y,4,h,f,' rx=".8"');
+    return o+rc(x-2,y+h*0.26,n*gap,3,f)+rc(x-2,y+h*0.66,n*gap,3,f);
+  }
+  function wires(y,pts,f){
+    var o='';
+    for(var i=0;i<pts.length-1;i++){
+      var m=(pts[i]+pts[i+1])/2;
+      o+=ln('M'+pts[i]+' '+y+' Q'+m+' '+(y+7)+' '+pts[i+1]+' '+y, f, 1.3);
+    }
+    return o;
+  }
+  /* Aerial perspective is HAZE ADDED, never colour replaced. A veil of the
+     sky's own tone between the layers pushes them back while every object
+     keeps the paper it was cut from. */
+  function haze(op){
+    return '<g class="noedge"><rect x="-10" y="-6" width="420" height="212" fill="url(#hazeG)" opacity="'+op+'"/></g>';
+  }
+  /* ---------- period props, one per line of the shot list ---------- */
+  // dark-stained timber frame over pale plaster: posts, sill, mid-rail
+  function timber(x,y,w,h,f){
+    var o=rc(x-1,y,2.4,h,f)+rc(x+w-1.4,y,2.4,h,f)+rc(x-1,y,w+2,2.4,f)+rc(x-1,y+h*.6,w+2,1.4,f);
+    for(var px=x+3;px<x+w-2;px+=3.2) o+=rc(px,y+h*.62,1.1,h*.38,f);
+    return '<g class="noedge">'+o+'</g>';
+  }
+  // the gangi: a covered wooden arcade along the street front so the town can
+  // walk under three metres of snow. Shed roof, posts every 16, shade beneath.
+  function gangi(x,y,w,inner){
+    var o=P('M'+x+' '+y+' h'+w+' l8 -4.4 h-'+w+' z','var(--p-char-d)')
+        + rc(x,y,w,3,'var(--p-char)')
+        + '<g class="noedge">'+rc(x,y+3,w,12,'rgba(18,14,10,.34)')+'</g>'+(inner||'');
+    for(var px=x+6;px<x+w;px+=16) o+=rc(px,y+3,3,21,'var(--p-timber)');
+    return o+rc(x,y+24,w,4,'var(--p-kraft-d)');
+  }
+  // a split curtain over a shop door
+  function noren(x,y,w,f){
+    var pw=(w-4)/3, o='';
+    for(var i=0;i<3;i++) o+=rc(x+i*(pw+2),y,pw,11,f,' rx=".5"');
+    return o+rc(x-1,y-1.5,w+2,2,'var(--p-timber)');
+  }
+  // a villager in kimono under a wagasa, by outline and posture only. y is
+  // the ground, s the height. Robe widens to the hem, sleeves hang, an obi
+  // bands the waist, the umbrella is a shallow ribbed dome. No face, ever.
+  function villager(x,y,s,robe,obi,gasa,ribs,felt){
+    var r=s*.5, yu=y-s-2, sh=y-s*.76, o='<g class="noedge">', fe=FELT[felt||'cyan'];
+    o+='<ellipse cx="'+x+'" cy="'+y+'" rx="'+(s*.34)+'" ry="1.8" fill="rgba(18,14,10,.32)"/>';
+    o+='<path d="M'+(x-s*.14)+' '+sh+' L'+(x+s*.14)+' '+sh+' L'+(x+s*.22)+' '+y+' L'+(x-s*.22)+' '+y+' z" fill="'+robe+'"/>';
+    o+=rc(x-s*.31,sh+s*.06,s*.16,s*.30,robe,' rx="'+(s*.03)+'"')+rc(x+s*.15,sh+s*.06,s*.16,s*.30,robe,' rx="'+(s*.03)+'"');
+    o+='<path d="M'+(x-s*.07)+' '+sh+' L'+x+' '+(sh+s*.12)+' L'+(x+s*.07)+' '+sh+' z" fill="var(--p-cream)"/>';
+    o+=rc(x-s*.155,sh+s*.32,s*.31,s*.09,obi);
+    o+='<circle cx="'+x+'" cy="'+(sh-s*.1)+'" r="'+(s*.09)+'" fill="'+fe[0]+'"/>';
+    o+=P('M'+(x-s*.09)+' '+(sh-s*.1)+' a'+(s*.09)+' '+(s*.09)+' 0 0 1 '+(s*.18)+' 0 q-'+(s*.09)+' -'+(s*.03)+' -'+(s*.18)+' 0 z','var(--p-char-d)');
+    o+=rc(x-.6,yu,1.2,s*.3,'var(--p-timber)');
+    o+='<circle cx="'+x+'" cy="'+(sh+s*.02)+'" r="'+(s*.05)+'" fill="'+fe[1]+'"/>';
+    o+='<path d="M'+(x-r)+' '+yu+' a'+r+' '+(r*.42)+' 0 0 1 '+(2*r)+' 0 z" fill="'+gasa+'"/>';
+    o+=ln('M'+x+' '+(yu-r*.42)+' L'+(x-r*.72)+' '+(yu-r*.12)+' M'+x+' '+(yu-r*.42)+' L'+(x-r*.3)+' '+(yu-r*.02)+' M'+x+' '+(yu-r*.42)+' L'+(x+r*.3)+' '+(yu-r*.02)+' M'+x+' '+(yu-r*.42)+' L'+(x+r*.72)+' '+(yu-r*.12),ribs,.7,.7);
+    o+='<circle cx="'+x+'" cy="'+(yu-r*.42)+'" r=".9" fill="'+ribs+'"/>';
+    return o+'</g>';
+  }
+  // a triple-decker: three stacked porches on the street face, flat roof,
+  // cornice, a bay of windows beside the porches. The Massachusetts vernacular.
+  function decker(x,y,w,d,clap,clapS,trim,dark){
+    var h=66, pw=Math.round(w*.5), o=box(x,y,w,h,d,clap,clapS,'var(--p-char-d)');
+    o+=rc(x-2,y-5,w+4,5.5,trim);
+    for(var k=0;k<3;k++){
+      var py=y+k*22, b='';
+      o+='<g class="noedge">'+rc(x+2,py+3,pw-4,16,dark)+'</g>';
+      for(var bx=x+5;bx<x+pw-4;bx+=3.4) b+=rc(bx,py+12.5,1.2,6,trim);
+      o+='<g class="noedge">'+b+'</g>';
+      o+=rc(x+2,py+3,2.4,16,trim)+rc(x+pw/2-1.2,py+3,2.4,16,trim)+rc(x+pw-4.4,py+3,2.4,16,trim);
+      o+=rc(x+2,py+11.5,pw-4,1.6,trim)+rc(x,py+19,pw+2,3.5,trim);
+    }
+    o+=box(x+pw+5,y+4,w-pw-10,h-4,3,clap,clapS,trim);
+    o+='<g class="noedge" fill="'+dark+'">'+win(x+pw+8,y+8,2,3,6,11,3.5,11)+'</g>';
+    return o;
+  }
+  // a wooden utility pole: crossarm at the top, a bracket arm, a cobrahead
+  function pole(x,y,h,armL,lit){
+    var hx=x+4+armL+3;
+    var o=rc(x,y,4,h,'var(--p-kraft-d)')+rc(x-8,y+5,20,2.4,'var(--p-kraft-d)')
+        + rc(x+4,y+15,armL,2,'var(--p-steel-d)')
+        + '<ellipse cx="'+hx+'" cy="'+(y+16.5)+'" rx="7" ry="3" fill="var(--p-steel-d)"/>';
+    if(lit) o+='<g class="lit glow"><ellipse cx="'+hx+'" cy="'+(y+19)+'" rx="6" ry="2.2"/></g>';
+    return o;
+  }
+  // a boxy sedan of the late seventies, parked at the curb
+  function sedan(x,y,f,fS){
+    return rc(x,y+9,72,11,f,' rx="1.5"')
+      + P('M'+(x+16)+' '+(y+9)+' l6 -9 h30 l7 9 z',fS)
+      + '<g class="noedge">'+rc(x+24,y+2,10,6,'var(--p-slate-d)',' rx=".6"')+rc(x+38,y+2,12,6,'var(--p-slate-d)',' rx=".6"')
+      + rc(x-2,y+17,76,2,'var(--p-granite)')+'</g>'
+      + '<circle cx="'+(x+16)+'" cy="'+(y+20)+'" r="4.6" fill="var(--p-char)"/><circle cx="'+(x+57)+'" cy="'+(y+20)+'" r="4.6" fill="var(--p-char)"/>'
+      + '<g class="noedge"><circle cx="'+(x+16)+'" cy="'+(y+20)+'" r="1.6" fill="var(--p-bone)"/><circle cx="'+(x+57)+'" cy="'+(y+20)+'" r="1.6" fill="var(--p-bone)"/></g>';
+  }
+  // a granite curb, which is what Massachusetts curbs are made of
+  function curb(x,y,w,h){
+    var o=rc(x,y,w,h,'var(--p-granite)'), j='';
+    for(var px=x+34;px<x+w;px+=52) j+=rc(px,y,1.2,h,'var(--p-granite-d)');
+    return o+'<g class="noedge">'+j+'</g>';
+  }
+  // a brick sidewalk, which Jamaica Plain has
+  function brickwalk(x,y,w,h){
+    var o=rc(x,y,w,h,'var(--p-brick-d)'), j='<g class="noedge">';
+    for(var yy=y+3;yy<y+h;yy+=3.2) j+=ln('M'+x+' '+yy+' h'+w,'var(--p-brick)',.7,.55);
+    return o+j+'</g>';
+  }
+  // shutters either side of a window
+  function shutter(x,y,w,h,f){ return rc(x-3,y,2.4,h,f)+rc(x+w+.6,y,2.4,h,f); }
+  // a cape: storey and a half, two dormers in the roof, a chimney
+  function cape(x,y,w,d,wall,wallS,roof,roofS){
+    var o=eaves(x,y,w,26,26,d,wall,wallS,roof,roofS,4);
+    o+=rc(x+w*.68,y-36,9,16,'var(--p-brick)');
+    [x+w*.2, x+w*.62].forEach(function(dx){
+      o+=hut(dx,y-14,12,10,6,4,wall,wallS,roof,roofS);
+    });
+    return o;
+  }
+  // a colonial: two full storeys under a side-gabled roof, chimney at the end
+  function colonial(x,y,w,d,wall,wallS,roof,roofS){
+    var o=eaves(x,y,w,44,18,d,wall,wallS,roof,roofS,4);
+    return o+rc(x+w*.84,y-30,9,18,'var(--p-brick)');
+  }
+  // the bulkhead: angled steel double doors over the cellar stair, at the
+  // foot of the foundation. He was made to sleep beside it.
+  function bulkhead(x,y){
+    return P('M'+x+' '+y+' h36 l7 -13 h-36 z','var(--p-steel)')
+      + P('M'+(x+36)+' '+y+' l7 -13 v10.6 z','var(--p-steel-d)')
+      + '<g class="noedge">'+P('M'+(x+18)+' '+y+' l7 -13 h1.6 l-7 13 z','var(--p-steel-d)')
+      + rc(x+1,y-1.4,35,1.6,'var(--p-steel-d)')+'</g>';
+  }
+  // a low-rise brick storefront: cornice, upper windows with lintels, a shop
+  // window and a door under a sign band. floors counts the storeys above.
+  function shop(x,y,w,floors,d,brick,brickS,trim,litUp){
+    var h=floors*18+26, o=box(x,y,w,h,d,brick,brickS,'var(--p-char-d)');
+    o+=rc(x-2,y-4,w+4,4.5,trim)+rc(x-1,y-1,w+2,1.6,brickS);
+    var cols=Math.max(2,Math.floor((w-8)/13));
+    o+='<g class="noedge" fill="var(--p-char-d)">'+win(x+6,y+5,cols,floors,7,10,6,8)+'</g>';
+    if(litUp) o+='<g class="lit glow">'+win(x+6+litUp*13,y+5,1,1,7,10,0,0)+'</g>';
+    o+=rc(x+2,y+h-25,w-4,4,trim);
+    o+='<g class="lit glow">'+lr(x+4,y+h-20,w*.58,18)+'</g>';
+    o+=rc(x+w*.58+8,y+h-20,w*.3,20,'var(--p-timber)',' rx=".6"');
+    return o;
+  }
+  // a pedestal payphone of the nineties: post, three-sided hood, handset. not a booth.
+  function payphone(x,y){
+    return rc(x+6,y+15,4,25,'var(--p-char)')
+      + box(x,y,16,16,5,'var(--p-steel)','var(--p-steel-d)','var(--p-steel-d)')
+      + '<g class="noedge">'+rc(x+2,y+2,12,12,'var(--p-char-d)')+rc(x+9.5,y+4,3,8,'var(--p-bone)',' rx="1"')+'</g>';
+  }
+  // an MBTA stop: a pole, a white sign, the black roundel. no lettering.
+  function busstop(x,y){
+    return rc(x,y,3,56,'var(--p-char)')+rc(x-7,y,17,12,'var(--p-white)',' rx=".8"')
+      + '<g class="noedge"><circle cx="'+(x+1.5)+'" cy="'+(y+6)+'" r="3.6" fill="var(--p-char-d)"/></g>';
+  }
+  // Children's Hospital, 300 Longwood, the 1914 pavilion: a columned marble
+  // front under a green dome on a drum. Shepley, Rutan and Coolidge.
+  function pavilion(x,y,w,d){
+    var h=44, o=box(x,y-h,w,h,d,'var(--p-white)','var(--p-white-d)','var(--p-granite)');
+    o+=rc(x-2,y-h-5,w+4,5.5,'var(--p-white-d)')+rc(x-1,y-h-1,w+2,1.6,'var(--p-granite)');
+    o+=rc(x,y-4,w,4,'var(--p-granite)');
+    var n=Math.floor(w/14), c='';
+    for(var i=0;i<=n;i++) c+=rc(x+4+i*((w-10)/n),y-h+2,3.4,h-6,'var(--p-white-d)');
+    o+='<g class="noedge">'+c+rc(x+6,y-h+30,w-12,1.4,'var(--p-granite)')+'</g>';
+    o+='<g class="noedge" fill="var(--p-char-d)">'+win(x+9,y-h+8,n,1,6,14,(w-10)/n-6,0)+'</g>';
+    var cx=x+w/2, dw=w*.34;
+    o+=rc(cx-dw/2,y-h-20,dw,16,'var(--p-white)')+rc(cx-dw/2-2,y-h-21,dw+4,3,'var(--p-white-d)');
+    o+='<g class="noedge" fill="var(--p-char-d)">'+win(cx-dw/2+4,y-h-17,3,1,4,10,(dw-8-12)/2,0)+'</g>';
+    o+='<path d="M'+(cx-dw/2-3)+' '+(y-h-21)+' a'+(dw/2+3)+' '+(dw*.62)+' 0 0 1 '+(dw+6)+' 0 z" fill="var(--p-moss)"/>';
+    o+='<path d="M'+(cx-dw/2-3)+' '+(y-h-21)+' a'+(dw/2+3)+' '+(dw*.62)+' 0 0 1 '+(dw/2+3)+' -'+(dw*.62)+' l0 '+(dw*.62)+' z" fill="var(--p-moss-d)"/>';
+    o+=rc(cx-2,y-h-21-dw*.62-7,4,8,'var(--p-white)')+'<circle cx="'+cx+'" cy="'+(y-h-21-dw*.62-8)+'" r="1.8" fill="var(--p-moss-d)"/>';
+    return o;
+  }
+  // a seventies hospital slab: concrete, ribbon windows
+  function slab(x,y,w,h,d){
