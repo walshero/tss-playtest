@@ -1098,3 +1098,156 @@ html{ background:var(--bg); }
   }
   // a seventies hospital slab: concrete, ribbon windows
   function slab(x,y,w,h,d){
+    var o=box(x,y,w,h,d,'var(--p-granite)','var(--p-granite-d)','var(--p-char-d)'), b='';
+    for(var yy=y+8;yy<y+h-8;yy+=12) b+=rc(x+4,yy,w-8,5,'var(--p-steel-d)');
+    return o+'<g class="noedge">'+b+'</g>';
+  }
+  // a traffic signal on a mast arm, red showing
+  function signal(x,y,arm){
+    var hx=x+2+arm;
+    return rc(x,y,4,72,'var(--p-steel-d)')+rc(x+2,y+2,arm,2.4,'var(--p-steel-d)')
+      + rc(hx-4,y+4,8,20,'var(--p-gold-d)',' rx="1.5"')
+      + '<g class="noedge"><circle cx="'+hx+'" cy="'+(y+8)+'" r="2.2" fill="var(--p-verm)"/><circle cx="'+hx+'" cy="'+(y+14)+'" r="2.2" fill="var(--p-char-d)"/><circle cx="'+hx+'" cy="'+(y+20)+'" r="2.2" fill="var(--p-char-d)"/></g>'
+      + '<g class="lit glow"><circle cx="'+hx+'" cy="'+(y+8)+'" r="1.6" style="fill:var(--p-verm)"/></g>';
+  }
+  // a seventies ambulance: a white van with a red stripe and a light bar
+  function ambulance(x,y){
+    return rc(x,y+4,62,18,'var(--p-white)',' rx="2"')
+      + P('M'+(x+44)+' '+(y+4)+' l5 -0 l8 8 l0 10 l-13 0 z','var(--p-white-d)')
+      + '<g class="noedge">'+rc(x,y+13,62,3.5,'var(--p-verm)')+rc(x+4,y+7,12,6,'var(--p-slate-d)',' rx=".6"')+rc(x+20,y+7,12,6,'var(--p-slate-d)',' rx=".6"')+rc(x+48,y+7,8,6,'var(--p-slate-d)',' rx=".6"')
+      + rc(x+20,y,14,4,'var(--p-verm)',' rx="1"')+rc(x-2,y+19,66,2,'var(--p-granite)')+'</g>'
+      + '<g class="lit glow"><rect x="'+(x+22)+'" y="'+(y+.5)+'" width="4" height="3" rx=".5" style="fill:var(--p-verm)"/></g>'
+      + '<circle cx="'+(x+14)+'" cy="'+(y+22)+'" r="4.4" fill="var(--p-char)"/><circle cx="'+(x+48)+'" cy="'+(y+22)+'" r="4.4" fill="var(--p-char)"/>'
+      + '<g class="noedge"><circle cx="'+(x+14)+'" cy="'+(y+22)+'" r="1.5" fill="var(--p-bone)"/><circle cx="'+(x+48)+'" cy="'+(y+22)+'" r="1.5" fill="var(--p-bone)"/></g>';
+  }
+  // a bus shelter of the nineties: steel frame, flat roof, glass, the bench inside
+  function shelter(x,y,w,h){
+    var o='<g class="noedge">'+rc(x+2,y-h+3,w-4,h-3,'var(--p-slate)',' opacity=".26"')+'</g>';
+    o+=box(x-2,y-h-3,w+4,4,6,'var(--p-steel-d)','var(--p-char-d)','var(--p-steel)');
+    o+=rc(x,y-h,3,h,'var(--p-steel-d)')+rc(x+w/2-1.5,y-h,3,h,'var(--p-steel-d)')+rc(x+w-3,y-h,3,h,'var(--p-steel-d)');
+    o+='<g class="noedge">'+rc(x+3,y-h*.55,w-6,1.2,'var(--p-steel)')+'</g>';
+    return o;
+  }
+  // a slat bench on iron ends
+  function bench(x,y,w){
+    var o=rc(x+3,y-14,3,14,'var(--p-char)')+rc(x+w-6,y-14,3,14,'var(--p-char)');
+    o+=rc(x,y-16,w,3,'var(--p-kraft)',' rx=".8"')+rc(x,y-11,w,3,'var(--p-kraft)',' rx=".8"');
+    o+=rc(x+1,y-26,w-2,2.6,'var(--p-kraft)',' rx=".8"')+rc(x+1,y-21.5,w-2,2.6,'var(--p-kraft)',' rx=".8"');
+    o+=rc(x+3,y-27,2.4,13,'var(--p-char)')+rc(x+w-5.4,y-27,2.4,13,'var(--p-char)');
+    return o;
+  }
+  function tree(x,y,r,f,fS){
+    return rc(x-2,y-r*.4,4,r*1.6,'var(--p-kraft-d)')
+      + '<g class="noedge"><circle cx="'+x+'" cy="'+(y-r*.5)+'" r="'+r+'" fill="'+f+'"/>'
+      + '<circle cx="'+(x-r*.55)+'" cy="'+(y-r*.1)+'" r="'+(r*.7)+'" fill="'+fS+'"/>'
+      + '<circle cx="'+(x+r*.6)+'" cy="'+(y-r*.15)+'" r="'+(r*.66)+'" fill="'+fS+'"/></g>';
+  }
+
+  /* v29 FELT FIGURES, after Row K v37: every face and hand is one bright felt
+     colour per character - none a human skin tone, no features, ever. Bodies
+     are cut from the same paper drawer as the set. o.dir faces the figure
+     (1 right, -1 left); o.arm is 'hang', 'reach' (held out, open), 'carry'
+     (both forearms forward, a dish on them) or 'watch' (hands in pockets);
+     o.stride opens the legs for a walk or a slide. y is the ground, s the
+     height. The drama is what the body does. */
+  var FELT={ yellow:['#F4C542','#D9A826'], orange:['#F2994A','#D97B2E'], purple:['#A77BD6','#8A5FBD'],
+    pink:['#F28DB2','#DB6F97'], cyan:['#52C3C9','#3AA6AC'], coral:['#FF7F6B','#E0624F'],
+    blue:['#6FA8DC','#528CC2'], magenta:['#E0609E','#C4447F'] };
+  function figure(x,y,s,o){
+    var d=o.dir||1, f=FELT[o.felt], st=o.stride||0, g='<g class="noedge">';
+    var hip=y-s*.46, sh=y-s*.8, hw=s*.12, sw=s*.15, hy=y-s*.9;
+    g+='<ellipse cx="'+x+'" cy="'+(y+.4)+'" rx="'+(s*.26+Math.abs(st)*.5)+'" ry="1.6" fill="rgba(12,8,6,.34)"/>';
+    // legs: back leg, then front leg (the front one carries the stride)
+    g+=P('M'+(x-hw*.2)+' '+hip+' L'+(x-hw*.2-d*st*.4)+' '+y+' l'+(s*.1)+' 0 L'+(x+hw*.5)+' '+hip+' z',o.legsD||o.legs);
+    g+=P('M'+(x-hw*.4)+' '+hip+' L'+(x+d*st)+' '+y+' l'+(s*.1)+' 0 L'+(x+hw*.6)+' '+hip+' z',o.legs);
+    g+=rc(x+d*st-(d<0?s*.04:0),y-s*.035,s*.14,s*.04,o.shoe||'var(--p-char-d)',' rx=".6"');
+    // body: shoulders to hem, a coat or a shirt
+    g+=P('M'+(x-sw)+' '+(sh+s*.03)+' Q'+x+' '+(sh-s*.04)+' '+(x+sw)+' '+(sh+s*.03)+' L'+(x+hw*1.15)+' '+(hip+s*.05)+' L'+(x-hw*1.15)+' '+(hip+s*.05)+' z',o.coat);
+    if(o.coatD) g+=P('M'+(x-d*sw*.1)+' '+(sh+s*.02)+' L'+(x+d*sw)+' '+(sh+s*.03)+' L'+(x+d*hw*1.15)+' '+(hip+s*.05)+' L'+(x-d*hw*.05)+' '+(hip+s*.05)+' z',o.coatD);
+    // neck and head, felt; a profile nub on the facing side; hair
+    g+=rc(x-s*.035,sh-s*.06,s*.07,s*.08,f[1]);
+    g+='<ellipse cx="'+x+'" cy="'+hy+'" rx="'+(s*.085)+'" ry="'+(s*.1)+'" fill="'+f[0]+'"/>';
+    g+='<ellipse cx="'+(x+d*s*.085)+'" cy="'+(hy+s*.01)+'" rx="'+(s*.022)+'" ry="'+(s*.028)+'" fill="'+f[0]+'"/>';
+    if(o.hair) g+=P('M'+(x+d*s*.07)+' '+(hy-s*.07)+' Q'+x+' '+(hy-s*.14)+' '+(x-d*s*.1)+' '+(hy-s*.03)+' L'+(x-d*s*.08)+' '+(hy+s*.05)+' Q'+(x-d*s*.03)+' '+(hy-s*.04)+' '+(x+d*s*.07)+' '+(hy-s*.06)+' z',o.hair);
+    // arms, as cut strips (inline stroke survives the cut-edge rule)
+    var aw=s*.075, ay=sh+s*.04, hx, hy2, arm=o.arm||'hang';
+    if(arm==='watch'){ g+=ln('M'+(x+d*sw*.6)+' '+ay+' L'+(x+d*sw*.95)+' '+(hip-s*.02),o.coatD||o.coat,aw); }
+    else if(arm==='reach'){ hx=x+d*s*.4; hy2=hip+s*.04;
+      g+=ln('M'+(x-d*sw*.5)+' '+ay+' L'+(x-d*sw*.7)+' '+(hip+s*.04),o.coatD||o.coat,aw);
+      g+='<circle cx="'+(x-d*sw*.7)+'" cy="'+(hip+s*.08)+'" r="'+(s*.035)+'" fill="'+f[1]+'"/>';
+      g+=ln('M'+(x+d*sw*.5)+' '+ay+' L'+hx+' '+hy2,o.coat,aw);
+      g+='<ellipse cx="'+(hx+d*s*.03)+'" cy="'+(hy2+s*.01)+'" rx="'+(s*.045)+'" ry="'+(s*.03)+'" fill="'+f[0]+'"/>'; }
+    else if(arm==='carry'){ hx=x+d*s*.3; hy2=hip-s*.08;
+      g+=ln('M'+(x+d*sw*.4)+' '+ay+' L'+(x+d*sw*.6)+' '+(hip-s*.06)+' L'+hx+' '+hy2,o.coat,aw);
+      g+=o.carry(hx+d*s*.02,hy2-s*.03);
+      g+='<circle cx="'+hx+'" cy="'+(hy2+s*.02)+'" r="'+(s*.035)+'" fill="'+f[0]+'"/>'; }
+    else { g+=ln('M'+(x+d*sw*.6)+' '+ay+' L'+(x+d*sw*.75)+' '+(hip+s*.05),o.coatD||o.coat,aw);
+      g+='<circle cx="'+(x+d*sw*.75)+'" cy="'+(hip+s*.09)+'" r="'+(s*.035)+'" fill="'+f[0]+'"/>'; }
+    return g+'</g>';
+  }
+  // the cobbler: a kraft dish, the peach top, a lattice
+  function cobbler(x,y){
+    return '<ellipse cx="'+(x+3)+'" cy="'+(y+1.6)+'" rx="7.4" ry="2.4" fill="var(--p-kraft-d)"/>'
+      + '<ellipse cx="'+(x+3)+'" cy="'+y+'" rx="6.6" ry="2" fill="var(--p-gold)"/>'
+      + ln('M'+(x-2)+' '+(y-.6)+' l3 1.4 M'+(x+2)+' '+(y-1.2)+' l3 1.8 M'+(x+5.5)+' '+(y-1)+' l2.4 1.4','var(--p-terra)',.8);
+  }
+  /* v30 SKY PLATE. A paper cloud is a flat-bottomed sheet: a shaded underside
+     strip, then four round bumps cut from the face stock above it, so the
+     underside shows as a band of the darker paper. Far clouds use the soft
+     sheet (card1), near ones the heavier cut (card2). */
+  function cloud(x,y,w,f,fs){
+    var o=rc(x,y-w*.12,w,w*.12,fs,' rx="'+(w*.06).toFixed(1)+'"');
+    [[.2,.1,.17],[.4,-.02,.24],[.63,0,.21],[.82,.1,.15]].forEach(function(c){
+      o+='<circle cx="'+(x+c[0]*w).toFixed(1)+'" cy="'+(y-w*.14-c[1]*w).toFixed(1)+'" r="'+(c[2]*w).toFixed(1)+'" fill="'+f+'"/>';
+    });
+    return o+rc(x+w*.12,y-w*.2,w*.76,w*.1,f);
+  }
+  // a thin stratus streak: a long lozenge with a darker belly
+  function streak(x,y,w,f,fs){
+    return rc(x,y,w,w*.07,fs,' rx="'+(w*.035).toFixed(1)+'"')+rc(x+w*.08,y-w*.03,w*.8,w*.07,f,' rx="'+(w*.035).toFixed(1)+'"');
+  }
+  // a paper bird: two cut wings
+  function bird(x,y,s,f){
+    return P('M'+x+' '+y+' q'+(-s*.5)+' '+(-s*.45)+' '+(-s)+' '+(-s*.1)+' q'+(s*.55)+' '+(-s*.05)+' '+s+' '+(s*.25)+' z',f)
+         + P('M'+x+' '+y+' q'+(s*.5)+' '+(-s*.45)+' '+s+' '+(-s*.1)+' q'+(-s*.55)+' '+(-s*.05)+' '+(-s)+' '+(s*.25)+' z',f);
+  }
+  function stars(pts,f){
+    return pts.map(function(p){ return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+p[2]+'" fill="'+f+'"/>'; }).join('');
+  }
+  /* Each sky piece is its own small plate, placed in percent of the skybox, so
+     the sky fills at any phone or desktop shape instead of letterboxing. */
+  function plate(x,y,w,body,tier){
+    return '<svg class="sk" viewBox="0 0 100 40" style="left:'+x+'%;top:'+y+'%;width:'+w+'%" aria-hidden="true" focusable="false"><g filter="url(#'+(tier||'card2')+')">'+body+'</g></svg>';
+  }
+  function full(body){
+    return '<svg class="sk skfull" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">'+body+'</svg>';
+  }
+  function C(f,fs){ return cloud(4,36,92,f,fs); }
+  function S(f,fs){ return streak(2,22,96,f,fs); }
+  var STORM1=['#8d958a','#737b71'], STORM2=['#6f7870','#58605a'], STORM3=['#5b645e','#474f4a'];
+  var SKY=[
+   /* 0, the storm deck: low, heavy, three deep over the village, raining */
+   full(ln('M30 60 l-8 40 M80 90 l-8 44 M130 70 l-8 40 M176 100 l-8 44 M222 66 l-8 40 M268 96 l-8 44 M314 72 l-8 40 M360 98 l-8 44 M56 150 l-8 40 M150 160 l-8 40 M246 150 l-8 40 M340 162 l-8 40 M104 200 l-8 36 M296 206 l-8 36','rgba(236,240,228,.5)',1.2))+
+   plate(-10,6,44,C(STORM1[0],STORM1[1]),'card1')+plate(26,3,50,C(STORM1[0],STORM1[1]),'card1')+plate(66,7,46,C(STORM1[0],STORM1[1]),'card1')+
+   plate(-14,16,54,C(STORM2[0],STORM2[1]))+plate(34,14,42,C(STORM2[0],STORM2[1]))+plate(66,18,50,C(STORM2[0],STORM2[1]))+
+   plate(2,26,46,C(STORM3[0],STORM3[1]))+plate(50,28,52,C(STORM3[0],STORM3[1])),
+   /* 1, fair weather: three cumulus clear of the sun, and birds */
+   plate(52,8,20,C('#f4f1e8','#cdd7dd'),'card1')+plate(4,16,32,C('#f6f3ea','#c7d2d9'))+plate(36,30,26,C('#f6f3ea','#c7d2d9'))+
+   plate(64,44,22,C('#f1eee5','#cad4da'),'card1')+
+   plate(14,40,16,bird(30,24,9,'#3e4e5d')+bird(52,30,7,'#3e4e5d')+bird(70,20,6,'#3e4e5d'),'card1'),
+   /* 2, golden hour: long streaks high, clouds lit from below by the low sun */
+   plate(44,6,44,S('#f3d6a4','#d9a36c'),'card1')+plate(2,13,30,S('#f3d6a4','#d9a36c'),'card1')+
+   plate(58,20,34,C('#f7e2b8','#d08f58'))+plate(6,28,28,C('#f7e2b8','#d08f58'))+
+   plate(30,44,22,C('#f5dcac','#cf8d56'),'card1')+
+   plate(60,38,14,bird(34,26,10,'#563526')+bird(60,18,8,'#563526'),'card1'),
+   /* 3, night: stars and a thin band across the moon */
+   full(stars([[22,20,1.3],[58,44,1],[96,14,1.2],[132,58,.9],[168,26,1.4],[214,50,1],[246,12,1.1],[300,40,.9],[330,70,1],[364,24,1.3],[388,64,.9],[112,92,.9],[28,86,1.1],[190,98,.8],[352,110,.9],[70,130,.8],[260,120,.9],[150,140,.7],[44,162,.8],[120,178,1],[208,168,.8],[286,184,.9],[372,150,1],[16,120,.8],[238,86,1],[318,138,.8],[176,64,.9],[92,58,.8],[396,188,.7]],'rgba(246,238,214,.9)'))+
+   plate(56,9,40,S('#4d5070','#35374d'),'card1')+plate(2,22,32,S('#44476a','#303248'),'card1')+plate(34,40,44,S('#3f4262','#2c2e44'),'card1')
+  ];
+
+  function rain(){
+    var c='rgba(236,240,228,.5)';
+    return '<g class="noedge">'
+      +ln('M18 92 l-6 24 M58 74 l-6 24 M98 106 l-6 24 M138 82 l-6 24 M178 114 l-6 24',c,1.1,.5)
+      +ln('M218 88 l-6 24 M258 118 l-6 24 M298 80 l-6 24 M338 110 l-6 24 M378 86 l-6 24',c,1.1,.5)
+      +ln('M38 140 l-6 24 M118 148 l-6 24 M198 156 l-6 24 M238 132 l-6 24 M318 146 l-6 24',c,1.1,.5)
