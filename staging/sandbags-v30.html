@@ -1637,3 +1637,58 @@ html{ background:var(--bg); }
     render(); altitude(false); refocus(i);
   });
   $('nextPiece').addEventListener('click',function(){ startPiece(pi+1); });
+  function startPiece(i){
+    loadPiece(i); window.scrollTo(0,0);
+    var first=$('draft').querySelector('.w:not(.cut)');
+    if(first) first.focus({preventScroll:true});
+  }
+  $('flyNext').addEventListener('click',function(){ startPiece(pi+1); });
+  $('replaySame').addEventListener('click',function(){ startPiece(pi); });
+
+  loadPiece(0);
+})();
+</script>
+
+<!-- STUDIO EYES controller (Comfort Kernel v2) -->
+<script>
+(function(){
+  var root=document.documentElement;
+  /* DARK HOST LAW, retrofitted. This file carries a fully authored night
+     palette - three tuned token sets - and nothing ever set data-light, so it
+     was dead code and the page always rendered light. The switcher that used
+     to set it went out with the comfort panel under the no-walls ruling, and
+     the palette lost its only trigger with it. A dark-preferring phone was
+     therefore being handed a light page for its host to force-darken
+     unmeasured, which is the exact failure Row K's DARK HOST LAW exists to
+     stop. The device asks, and the page answers - no wall, no button. */
+  /* v29, Row K v39: one dark mode button. Opens on the device's setting,
+     remembers the player's choice. It reads the page's ACTUAL paint, not
+     matchMedia, because a mismatch host can answer dark to CSS and light to
+     script - and then the button would lie about what is on screen. */
+  var btn=document.getElementById('darkBtn'), KEY='sandbags-scheme', saved=null;
+  function painted(){
+    var v=getComputedStyle(root).getPropertyValue('--bg').trim().replace('#','');
+    if(v.length===3) v=v.replace(/./g,'$&$&');
+    var n=parseInt(v,16); if(isNaN(n)) return false;
+    return (((n>>16)&255)*.299+((n>>8)&255)*.587+(n&255)*.114) < 110;
+  }
+  function setScheme(dark,save){
+    root.setAttribute('data-light', dark?'night':'day');
+    if(btn) btn.setAttribute('aria-pressed', dark?'true':'false');
+    if(save){ try{ localStorage.setItem(KEY, dark?'dark':'light'); }catch(e){} }
+  }
+  try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(saved) setScheme(saved==='dark',false);
+  else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) setScheme(true,false);
+  else setScheme(painted(),false);   // mismatch host: pin the attribute to what CSS actually painted
+  if(btn) btn.addEventListener('click',function(){ setScheme(!painted(),true); });
+  // last-updated: computed, not typed
+  (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
+    var dt=new Date(document.lastModified);
+    u.textContent = isNaN(dt.getTime()) ? 'Last updated recently'
+      : 'Last updated '+dt.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  })();
+})();
+</script>
+</body>
+</html>
