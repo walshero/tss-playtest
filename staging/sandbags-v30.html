@@ -177,3 +177,180 @@
   Text contrast is unaffected: the filter scales foreground and background
   together, and the two chips inside the sky carry their own backgrounds.
 
+  v21 2026-09-20, four skies, and the flight no longer ends at the line.
+
+  FOUR SKIES, NOT ONE (founder: "the backgrounds are all the same color with
+  hard to see differences"). Correct, and the first pass earned it: it changed
+  the land and the balloon's gore but left every piece under the same pale
+  blue, so four places read as one place with different furniture. Each piece
+  now carries its own light, the whole sky gradient, all three land planes and
+  the gore, with the time of day taken from the piece rather than chosen for
+  variety: Ramen is the grey-green storm that consumes him, Crosswalk an
+  ordinary bright morning, Peach Cobbler a late golden afternoon, Dead Ants
+  night at the bus stop. Each has a night variant, because a noon-blue sky on
+  a dark page is a glowing rectangle at 2am.
+
+  YOU CAN KEEP CUTTING AFTER IT FLIES (founder: "currently it stops even if
+  there is a fattened sentence left"). Liftoff used to freeze every word, so a
+  piece that flew at eight bags with six more still hanging on it could not be
+  trimmed further, the game stopped the player mid-lesson to tell them they
+  had won. Flying is now a state you can enter, keep trimming inside, and fall
+  back out of. The reveal is live, so the piece tightens under you as you cut
+  and the credit line counts how many bags past the line you are. A strut still
+  tears: strike once while up and you drop below the line with the words still
+  live so you can climb back; strike twice and it crashes, which is the honest
+  price of getting greedy after a good flight. Confetti fires once per piece -
+  re-earning the line is worth the colour, not a second faceful of paper.
+
+  v20 2026-09-20, Ramen flies at 8 (founder: "'our' noodles shouldn't be the
+  9th. It works with it. Let it be cuttable but 8 is the win state."). liftAt
+  9 -> 8 on that piece only. "our" was already m:1 and stays m:1 - it drops to
+  the heap, costs nothing and lifts nothing, so it was never the ninth bag; the
+  threshold was. At 9 the game kept asking for one more after the piece had
+  already gone lean, which is the game arguing with its own lesson. Strike math
+  still clears: 14 ballast against a liftAt of 8 leaves 3 spare after a strike.
+
+  v19 2026-09-20, the settings, the night palette, and a win you can see.
+
+  THE SETTING IS IN THE ART. Each piece now flies over its own place, drawn in
+  the same cut-paper hand as the balloon and pitched low enough against the sky
+  that it registers before it is noticed. Three planes of distance (--land-far,
+  --land, --land-near) in both palettes, which is what makes it read as depth
+  rather than three grey shapes.
+    0 Ramen at Echigo Kawaguchi, snow-country ridgelines, steep village roofs,
+      and the rain the piece opens and closes on. Gore: rain blue.
+    1 Black Spots on the Crosswalk, low rooflines, the signal on its pole, the
+      curb they stand at the very edge of, asphalt, the painted bars, and the
+      spots. Gore: signal amber. (The stripes first sat on open sky with no
+      road under them and read as nothing; paint needs a surface.)
+    2 Peach Cobbler, two houses and the fence between them, which is the whole
+      conflict, plus the cellar door he was made to sleep beside. The fence is
+      where the balloon parks, so lifting reveals it. Gore: peach.
+    3 Dead Ants, the corner across from Sparr's: blocks, two old payphones,
+      the sign pole for the 39, one ant on the pavement. Gore: payphone green.
+  preserveAspectRatio is 'meet', not 'slice': slice cropped the outer houses
+  off every scene at phone width.
+
+  DARK HOST LAW, RETROFITTED. This file carried a fully authored night palette
+ , three tuned token sets, and nothing ever set data-light, so it was dead
+  code and the page always rendered light. The switcher that set it went out
+  with the comfort panel under the no-walls ruling and the palette lost its
+  only trigger. A dark-preferring phone was being handed a light page for its
+  host to force-darken unmeasured. Now wired to prefers-color-scheme: the
+  device asks, the page answers, no wall and no button.
+
+  LIFTOFF IS WHERE THE THUMB IS (founder note: "you can't see on phone what's
+  above"). The balloon rises in the skybox and the reveal opens below it, but a
+  player dropping their last sandbag is down in the manifest, the sky is a
+  screen and a half above them. The win was happening entirely off-camera. It
+  now announces itself on the only surface visible at any scroll position: the
+  page warms, the plate takes a gold edge, cut-paper confetti falls over the
+  viewport, and the hint line directly under the player's thumb points down to
+  the lean piece. Nothing scrolls on its own. Confetti is skipped under reduced
+  motion, where the colour change alone carries it, the win is never told by
+  movement only. There is deliberately NO equivalent for a crash: the dignity
+  floor says a crash is never shame, and flashing a screen red is how you make
+  it one.
+
+  The citation also moved out of the skybox. It had been absolutely positioned
+  inside a div marked aria-hidden="true", so the one thing the sourcing floor
+  requires - who wrote this - was the one thing a screen reader could not reach,
+  and at 18px it collided with the balloon's basket. It is a citation, not sky
+  furniture, so it is now a readable line under the sky.
+
+  v18 also fixes a CSS bug this file has carried since it was written: seven
+  rules used `font: 800 <size>/<lh> inherit`, which is an invalid shorthand -
+  `inherit` cannot be the family - so each whole declaration was dropped and the
+  element fell back to the UA default. That is why the buttons rendered at
+  13.33px. Rewritten as longhand.
+
+  v18 2026-09-20, accessibility pass, carrying the teeth the Row K aleph run
+  (2026-09-19) grew. Four findings, all measured in a browser, none of them
+  about the game itself, which plays well and whose liftoff math is sound on
+  all four pieces (ballast minus a strike still clears liftAt with 3-5 to spare):
+    - FOCUS-LOST (blocker). render() rebuilds #draft by innerHTML on every tap,
+      destroying the focused word; activeElement measured BODY after a keyboard
+      drop. In a game whose whole interaction is tapping words in sequence, a
+      keyboard or voice reader was thrown to the top of the document on EVERY
+      word. Words now carry data-i and refocus() puts the reader back on the
+      same word, or the next live one along if theirs was dropped. After a
+      liftoff or a crash focus goes to the result heading instead.
+    - COLOPHON ABOVE THE GAME (blocker for play). The .foot div sat between the
+      chrome and .wrap, so 200px of legal boilerplate rendered before the
+      prompt - measured at y=176 with the game at y=379. Moved to the bottom
+      where a colophon belongs. Its markup also carried two unclosed spans.
+    - OUTLINE-BROKEN. The page had no h1, h2 or h3 at all, so assistive tech
+      got an empty outline. Now: an h1 for the game, h2 on the manifest, the
+      heap and the result panel.
+    - TYPE-FLOOR. Ten rendered sizes under the studio's 18px floor, including
+      the prompt (16.3px), the hint line (14.1px), the scraps (15.2px) and all
+      nav. Raised to 18-19px; the chrome wraps at phone width because two 18px
+      nav buttons and the wordmark will not share a 390px row, and the floor
+      outranks a tidy grid.
+  Contrast and tap targets were already clean at every comfort stop, and there
+  was no sideways scroll. Those are not changed.
+
+  THE GAME (founder-directed): every word is clickable and every word looks the same.
+  THREE HIDDEN ROLES:
+    BALLAST (b:1) , droppable fluff; the balloon rises.
+    MAYBE   (m:1) , defensible either way; drops to the heap, no lift, no harm.
+    LOAD-BEARING  , the meaning hangs on it. STRIKE 1: the balloon PLUMMETS but
+    holds, the word stays, and a WHY card explains what it was carrying.
+    STRIKE 2 on any load word: CRASH. Fly again in one tap.
+  Liftoff = enough ballast shed (minus altitude lost to strikes) without a second tear.
+
+  SOURCE (sourcing floor, attributed in-game): four pieces by Matt Walsh, verbatim
+  excerpts pulled from Google Drive 2026-07-06:
+    "Ramen at Echigo Kawaguchi"     doc 17IPevuwPsp0Y6MICt88PC_pK0v81Mpi0eNcueY5JbQA
+    "Black Spots on the Crosswalk"  doc 1-5T4gwLGDROu3sXt59eXEPLnSxqUnj21ALjuVvI3o2w
+    "Peach Cobbler"                 doc 1G4YQabQySWSNUZMxOLPRn6k43kAYNjowPMgT-KFcg8g
+    "Dead Ants"                     doc 15XlmThncqd8XnEqVGjahIIk_aO02iYLQDhAL3IEsbrE
+  HITL LAYER: inserted padding is marked ins:1; every b / m / why tag is a studio
+  call awaiting the founder's per-word retune. Why-cards are studio craft notes at
+  the 70% voice tier, founder finishes.
+  CHANGELOG:
+    2026-07-06 retune 1, fair-crash rule; fluff thickened; auto-capitalization.
+    2026-07-06 retune 2 (founder), MAYBE role added; two-strike engine (plummet
+    then crash); why-cards on load words; fluff thickened again; strike math keeps
+    liftoff reachable after one strike on every piece.
+
+  DIGNITY FLOOR: neither a strike nor a crash is shame, the word was holding the
+  piece up, and now you know it by feel. A dropped word may fly another day.
+
+  FLOORS: single-file, offline, in-memory. NO GREEN. Landing >50% image. 3-stop
+  comfort knob (never a wall). Explicit dark palette. Fixed-dark chips for
+  white-on-color text. 44px+ targets, keyboard on every word (identical aria-labels
+ , roles never leak), visible focus, reduced-motion instant states, scroll-reset,
+  no emoji. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="spec-source" content="convening/SANDBAGS-CONVENING.md">
+<meta name="audience" content="MassBay EN195 students revising their own flash fiction; the founder as first playtester">
+<title>Sandbags: a flash fiction climb</title>
+<meta name="description" content="A Tight Spiral Studios production for EN195. Tap the words a flash fiction can live without and fly the balloon. Tear the meaning twice and it crashes.">
+<style>
+:root{
+  /* ---- LIGHT: DAY (default), the page's own warm palette ---- */
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --line:#c2b288;
+  --slate:#3a4654; --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
+  --rust:#8a3a1c; --sky:#cdd8e2; --skyhi:#e4ebf1; --focus:#c8900a;
+  /* Three planes of distance for the scenery. Far is nearest the sky, near is
+     furthest from it, in BOTH palettes - that is what makes it read as depth
+     rather than as three grey shapes. */
+  --land-far:#a3b4c4; --land:#6d7f90; --land-near:#4a5a6a; --piece-accent:#c8900a;
+  /* chrome / panel / rail tokens (Comfort Kernel v2) */
+  --surface:#fffaf0; --surface-2:#efe0c4; --ink-2:#4a3d22;
+  --accent:#3a4654; --accent-strong:#2b3540; --on-accent:#ffffff;
+  --r:12px; --tap:48px; --motion:.18s;
+  --serif:Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+/* ---- LIGHT: DAY, chosen explicitly. Repeats :root so a player who picks day
+   on a dark-mode phone gets day; the OS palette below is written to :root. ---- */
+html[data-light="day"]{
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --line:#c2b288;
+  --slate:#3a4654; --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
