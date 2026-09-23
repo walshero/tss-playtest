@@ -2484,11 +2484,29 @@
     var i = ORDER.indexOf(state.step);
     if(i>0) go(ORDER[i-1]);
   });
-  document.getElementById("comfortBtn").addEventListener("click", function(){
-    var b = document.body;
-    var c = parseInt(b.getAttribute("data-comfort"),10);
-    b.setAttribute("data-comfort", String(c===3 ? 1 : c+1));
+  // v39: one tap light, one tap dark, remembered on this device
+  var darkBtn = document.getElementById("darkBtn");
+  function setScheme(dark, save){
+    document.body.setAttribute("data-scheme", dark ? "dark" : "light");
+    document.body.setAttribute("data-comfort", "1");
+    darkBtn.setAttribute("aria-pressed", dark ? "true" : "false");
+    if(save){ try { localStorage.setItem("rowk-scheme", dark ? "dark" : "light"); } catch(e){} }
+  }
+  darkBtn.addEventListener("click", function(){
+    setScheme(document.body.getAttribute("data-scheme") !== "dark", true);
   });
+
+  // v39: sound on or off, remembered; browsers allow sound only after a tap
+  var soundBtn = document.getElementById("soundBtn");
+  soundBtn.setAttribute("aria-pressed", SND.isOn() ? "true" : "false");
+  soundBtn.addEventListener("click", function(){
+    var now = SND.toggle();
+    soundBtn.setAttribute("aria-pressed", now ? "true" : "false");
+    if(now && state.step === "lobby") SND.stage("lobby");
+  });
+  function unlockSound(){ SND.unlock(state.step); }
+  document.addEventListener("pointerdown", unlockSound, true);
+  document.addEventListener("keydown", unlockSound, true);
 
   // each plate line learns its own length, so the draw-on lands on the beat
   (function(){
