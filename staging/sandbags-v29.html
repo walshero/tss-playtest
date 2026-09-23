@@ -315,3 +315,174 @@
 <meta name="spec-source" content="convening/SANDBAGS-CONVENING.md">
 <meta name="audience" content="MassBay EN195 students revising their own flash fiction; the founder as first playtester">
 <title>Sandbags: a flash fiction climb</title>
+<meta name="description" content="A Tight Spiral Studios production for EN195. Tap the words a flash fiction can live without and fly the balloon. Tear the meaning twice and it crashes.">
+<style>
+:root{
+  /* ---- LIGHT: DAY (default), the page's own warm palette ---- */
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --line:#c2b288;
+  --slate:#3a4654; --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
+  --rust:#8a3a1c; --sky:#cdd8e2; --skyhi:#e4ebf1; --focus:#c8900a;
+  /* Three planes of distance for the scenery. Far is nearest the sky, near is
+     furthest from it, in BOTH palettes - that is what makes it read as depth
+     rather than as three grey shapes. */
+  --land-far:#a3b4c4; --land:#6d7f90; --land-near:#4a5a6a; --piece-accent:#c8900a;
+  /* chrome / panel / rail tokens (Comfort Kernel v2) */
+  --surface:#fffaf0; --surface-2:#efe0c4; --ink-2:#4a3d22;
+  --accent:#3a4654; --accent-strong:#2b3540; --on-accent:#ffffff;
+  --r:12px; --tap:48px; --motion:.18s;
+  --serif:Georgia,'Times New Roman',serif;
+  --mono:ui-monospace,'SF Mono',Menlo,monospace;
+  --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+/* ---- LIGHT: DAY, chosen explicitly. Repeats :root so a player who picks day
+   on a dark-mode phone gets day; the OS palette below is written to :root. ---- */
+html[data-light="day"]{
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --line:#c2b288;
+  --slate:#3a4654; --gold:#6e4700; --gold-br:#c8900a; --gold-pale:#fbeec6;
+  --rust:#8a3a1c; --sky:#cdd8e2; --skyhi:#e4ebf1; --focus:#c8900a;
+  --land-far:#a3b4c4; --land:#6d7f90; --land-near:#4a5a6a; --piece-accent:#c8900a;
+  --surface:#fffaf0; --surface-2:#efe0c4; --ink-2:#4a3d22;
+  --accent:#3a4654; --accent-strong:#2b3540; --on-accent:#ffffff;
+}
+/* ---- LIGHT: DUSK, warmer, dimmer daylight ---- */
+html[data-light="dusk"]{
+  --bg:#e6d4b0; --card:#f0e2c2; --ink:#241a10; --line:#bda67c;
+  --slate:#324150; --gold:#5e3d00; --gold-br:#b07d08; --gold-pale:#e9d5a4;
+  --rust:#7e3418; --sky:#c2ccd6; --skyhi:#d6dee6; --focus:#9c4000;
+  --land-far:#97a8b8; --land:#617385; --land-near:#41505f;
+  --surface:#f0e2c2; --surface-2:#e2ca9c; --ink-2:#463a20;
+  --accent:#324150; --accent-strong:#26333f; --on-accent:#ffffff;
+}
+/* ---- LIGHT: WARM-DARK (night), warm charcoal, never pure black ---- */
+html[data-light="night"]{
+  --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --line:#5d543d;
+  --slate:#9ab6c8; --gold:#f0c357; --gold-br:#f0c357; --gold-pale:#2c2614;
+  --rust:#eaa183; --sky:#20242c; --skyhi:#2a2f3a; --focus:#f0c357;
+  --land-far:#181d26; --land:#0f1319; --land-near:#070a0e;
+  --surface:#262019; --surface-2:#33302a; --ink-2:#d8c59a;
+  --accent:#9ab6c8; --accent-strong:#b8cede; --on-accent:#141109;
+}
+/* ═══ LIFTOFF IS WHERE THE THUMB IS ═══
+   The balloon rises in the skybox and the result panel opens below it, but on a
+   phone the player is down in the manifest tapping words when the last sandbag
+   goes - the sky is a screen and a half above them and the reveal is below.
+   The win was happening entirely off-camera. So it announces itself on the one
+   surface that is visible at any scroll position: the page itself warms, the
+   plate takes a gold edge, and cut-paper confetti falls over the viewport.
+   No equivalent for a crash, deliberately. The dignity floor says a crash is
+   never shame, and flashing a screen red is how you make it one. */
+html.flown{ --bg:#f8e9bc; }
+html.flown[data-light="dusk"]{ --bg:#edd8a4; }
+html.flown[data-light="night"]{ --bg:#2b2413; }
+body{ transition:background-color .55s ease; }
+.plate{ transition:border-color .45s ease, box-shadow .45s ease; }
+html.flown .plate{ border-color:var(--gold-br); box-shadow:0 0 0 5px var(--gold-pale); }
+
+.confetti{ position:fixed; inset:0; z-index:200; pointer-events:none; overflow:hidden; }
+.confetti i{ position:absolute; top:-10vh; display:block; border-radius:2px;
+  border:1px solid rgba(31,27,18,.35); animation:fall linear forwards; }
+@keyframes fall{
+  0%{ transform:translate3d(0,0,0) rotate(0deg); opacity:0; }
+  7%{ opacity:1; }
+  100%{ transform:translate3d(calc(var(--sp) * 20vw), 118vh, 0) rotate(700deg); opacity:.85; }
+}
+@media (prefers-reduced-motion: reduce){ .confetti{ display:none; } }
+html.se-reduce .confetti{ display:none; }
+
+/* DARK HOST LAW, in CSS. The night palette used to be applied only by script
+   setting data-light, which left <meta color-scheme="light dark"> promising the
+   OS a dark palette that no static gate could see and no script-less load could
+   honour. The media query carries the default; the attribute remains as an
+   override hook. preship-gate-v4 H-DARK-MISSING / H-DARK-PROMISE. */
+@media (prefers-color-scheme: dark){
+  :root{
+  --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --line:#5d543d;
+  --slate:#9ab6c8; --gold:#f0c357; --gold-br:#f0c357; --gold-pale:#2c2614;
+  --rust:#eaa183; --sky:#20242c; --skyhi:#2a2f3a; --focus:#f0c357;
+  --land-far:#181d26; --land:#0f1319; --land-near:#070a0e;
+  --surface:#262019; --surface-2:#33302a; --ink-2:#d8c59a;
+  --accent:#9ab6c8; --accent-strong:#b8cede; --on-accent:#141109;
+}
+}
+/* ---- TOGGLE: high contrast ---- */
+html.se-contrast:not([data-light="night"]){ --bg:#fbfaf7; --card:#fbfaf7; --surface:#fbfaf7; --surface-2:#f0ece2; --ink:#141109; --ink-2:#2c2517; --line:#b9a06a; }
+html.se-contrast[data-light="night"]{ --bg:#0e0d0b; --card:#161410; --surface:#161410; --ink:#fff7e6; --ink-2:#efe0bc; }
+/* ---- TOGGLE: text size A / A+ / A++ ---- */
+html{ font-size:100%; }
+html.se-a1{ zoom:1.15; }
+html.se-a2{ zoom:1.3; }
+/* ---- TOGGLE: reduce motion ---- */
+html.se-reduce *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+/* ---- TOGGLE: colorblind cues ---- */
+html.se-cb a{ text-decoration:underline; text-underline-offset:2px; }
+*{box-sizing:border-box}
+body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg); color:var(--ink); font-size:19px; line-height:1.55; }
+/* ═══ RESERVED CHROME, grid header, reserves its own row, never overlaps ═══ */
+/* the chrome wraps at phone width now: two 18px nav buttons plus the wordmark
+   do not fit on one 390px row, and the studio floor outranks a tidy grid. */
+.se-chrome{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:10px;
+  padding:9px 14px; background:var(--surface); border-bottom:2px solid var(--ink);
+  position:sticky; top:0; z-index:100; }
+.se-home{ display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
+  padding:8px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2);
+  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:18px; text-decoration:none; }
+.se-brand{ display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
+.se-brand svg{ width:34px; height:20px; color:var(--accent-strong); flex:0 0 auto; }
+.se-brand .wm{ font-family:var(--serif); font-size:18px; letter-spacing:.01em; white-space:nowrap; }
+.se-home:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+@media (max-width:560px){ .se-brand .wm{ display:none; } }
+
+/* The Studio Eyes panel was removed under the 2026-08-29 no-walls ruling; its
+   stylesheet - six declarations under the 18px floor - was not removed with it
+   and sat here as dead rules until preship-gate-v4 found them. Gone. */
+/* ═══ BOTTOM NAV RAIL, Back + Home ═══ */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; border-top:2px solid var(--line); }
+.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line); border-radius:8px;
+  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:18px; text-decoration:none; cursor:pointer; }
+.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+.updated{ font-family:var(--mono); font-size:18px; color:var(--ink-2); margin:.6rem 0 0; }
+.wrap{ max-width:760px; margin:0 auto; padding:.8rem .8rem 4rem; }
+.production{ font-family:var(--mono); font-size:18px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-2); margin:.4rem 0 0; }
+.gametitle{ font-family:var(--serif); font-size:1.9rem; line-height:1.15; margin:.2rem 0 .1rem; }
+.gametitle .sub{ display:block; font-size:19px; font-style:italic; font-weight:400; color:var(--ink-2); margin-top:.2rem; }
+.label:focus-visible,.gametitle:focus-visible{ outline:3px solid var(--focus); outline-offset:4px; }
+.prompt{ text-align:center; font-weight:800; font-size:1.18rem; color:var(--gold); margin:.3rem 0 .5rem; min-height:1.4em; }
+.plate{ background:var(--card); border:3px solid var(--line); border-radius:16px; overflow:hidden; }
+/* THE SETTING IS IN THE ART. Each piece flies over its own place: a horizon,
+   a foreground, and a tint on the balloon's centre gore taken from that story.
+   All of it decorative and aria-hidden - the words carry the meaning, this
+   carries the weather. Kept low-contrast against the sky on purpose; it should
+   register before it is noticed. */
+.skybox{ position:relative; height:56dvh; min-height:320px; overflow:hidden;
+  background:var(--sky-grad, linear-gradient(var(--skyhi), var(--sky))); }
+/* The balloon is art too, and it was drawn out of page tokens - so --rust
+   flipping to a pale peach in the dark palette turned the same balloon into a
+   different balloon. Art colours do not answer the page; they answer the
+   picture. Fixed here, inherited by the SVG below. */
+.skybox{ --art-ink:#241a10; --art-rust:#9a4321; --art-basket:#f2e2b4; --art-bag:#9c7f55; --art-bag-d:#76603f; --art-cream:#efe3c6; --art-rope:#3b2a1c; --art-kraft:#b98f5c; --art-kraft-d:#8f6c43; --art-shade:rgba(20,12,6,.2); }
+/* Cut-paper construction, after the Lumino City school: sheets of card stacked
+   with real air between them, lit by practical bulbs, photographed through the
+   grain of the paper. Four moves, all of them cheap and none of them an asset:
+   cast shadows between planes, displaced (hand-cut) contours, warm windows
+   that actually glow, and a tiled grain over the whole diorama. */
+/* The layers own DEPTH - blur, shadow, cut-edge weight - and nothing else.
+   They used to own colour too, which meant every object inside a layer came
+   out the same tone: a wash, not a scene. Objects now carry their own paper.
+   The fallback fill only catches anything that forgets to state one. */
+#scenery .ly1{ filter:url(#card1); fill:var(--p-bone); }
+#scenery .ly2{ filter:url(#card2); fill:var(--p-bone); }
+#scenery .ly3{ filter:url(#card3); fill:var(--p-bone); }
+/* THE CUT EDGE. Every sheet is stroked in a lighter tone of itself, so the
+   top contour shows the raw fibre inside the card the way a real cut edge
+   catches the light. On the ground planes the bottom runs off the frame, so
+   only the cut side is ever visible - which is exactly what you see in a
+   built set. */
+/* The cut edge is raw fibre, and raw fibre is lighter than whatever the card
+   was dyed. A translucent warm white therefore reads correctly as a cut edge
+   on ANY colour of paper - which is what lets every object keep its own. */
+#scenery .ly1 *{ stroke:rgba(255,248,232,.26); stroke-width:1.3; stroke-linejoin:round; }
+#scenery .ly2 *{ stroke:rgba(255,248,232,.32); stroke-width:1.5; stroke-linejoin:round; }
+#scenery .ly3 *{ stroke:rgba(255,248,232,.36); stroke-width:1.7; stroke-linejoin:round; }
+#scenery .lit, #scenery .lit *{ stroke:none; }
