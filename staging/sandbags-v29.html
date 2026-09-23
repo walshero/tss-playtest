@@ -486,3 +486,170 @@ body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif
 #scenery .ly2 *{ stroke:rgba(255,248,232,.32); stroke-width:1.5; stroke-linejoin:round; }
 #scenery .ly3 *{ stroke:rgba(255,248,232,.36); stroke-width:1.7; stroke-linejoin:round; }
 #scenery .lit, #scenery .lit *{ stroke:none; }
+#scenery .noedge, #scenery .noedge *{ stroke:none; }
+#scenery .lit{ fill:var(--lit,#ffd98a); }
+#scenery .glow{ filter:url(#bulb); }
+
+/* Paper grain, tiled from an inline turbulence tile - no asset, no request.
+   It sits above the diorama because grain is on the surface of the photograph,
+   not inside the scene, and below the chips so it never touches their text. */
+.skybox::after{
+  content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+  opacity:.22; mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:160px 160px;
+}
+/* the diorama sits in a box, and a box has walls */
+.skybox{ box-shadow:inset 0 0 22px rgba(28,20,10,.20), inset 0 5px 12px rgba(28,20,10,.14); }
+
+/* the sun, the moon, the break in the cloud - whatever is lighting this place */
+.skybox::before{ content:''; position:absolute; inset:0; z-index:0;
+  pointer-events:none; background:var(--sky-light, none); }
+.scenery{ z-index:1; }
+
+/* FOUR SKIES, NOT ONE. The first pass changed only the land and the balloon's
+   gore and left every piece under the same pale blue, so four different places
+   read as one place with different furniture. Each piece now carries its own
+   light: the whole sky, the three land planes and the gore. Time of day is
+   taken from the piece itself, not chosen for variety.
+     0 Ramen     , the rainstorm that consumes him. Low, grey-green, no sun.
+     1 Crosswalk , an ordinary bright morning walk to the curb.
+     2 Peach     , late golden afternoon; the walk to the neighbour's door.
+     3 Dead Ants , night at the bus stop, sodium glow off the pavement.
+   Each has a night variant, because the page's own palette can be dark and a
+   noon-blue sky on a dark page is how you get a glowing rectangle at 2am. */
+/* THE PAPER DRAWER. Fixed art colours - a sheet of kraft is a sheet of kraft
+   whatever the page is doing. Each stock has a face and a shade for the side
+   that turns away from the light, which is what gives the boxes volume. */
+.skybox{
+  --p-cream:#efe3c6; --p-cream-d:#cdbf9e;
+  --p-bone:#dcd0b6;  --p-bone-d:#b9ad93;
+  --p-kraft:#b98f5c; --p-kraft-d:#8f6c43;
+  --p-terra:#b06a47; --p-terra-d:#874e33;
+  --p-verm:#b8452e;  --p-verm-d:#8d3221;
+  --p-sage:#8d9a80;  --p-sage-d:#6b7860;
+  --p-moss:#6f7f55;  --p-moss-d:#55633f;
+  --p-slate:#6f8598; --p-slate-d:#516576;
+  --p-steel:#57697a; --p-steel-d:#3e4e5d;
+  --p-char:#414045;  --p-char-d:#2c2b30;
+  --p-plum:#6b4b5b;  --p-plum-d:#503745;
+  --p-white:#f3ede0; --p-white-d:#d2cbbb;
+  --p-brick:#96513f; --p-brick-d:#6f3a2c;
+  --p-granite:#a4a49c; --p-granite-d:#7e7e77;
+  --p-timber:#4b3a2b; --p-timber-d:#34281d;
+  --p-indigo:#2f3f66; --p-indigo-d:#22304d;
+  --p-gold:#d2a13c;  --p-gold-d:#a67a25;
+}
+
+/* PAPER, NOT PIXELS. These are cardstock tones - kraft, sage, dusty blue,
+   ochre, slate - pulled well down in saturation from the first pass, which
+   read as digital gradient. Each sheet carries a lighter --edge for its cut
+   side. The light source is painted separately so it can spill. */
+/* 0, the rainstorm that consumes him. Sage and wet kraft, no sun. */
+.skybox[data-piece="0"]{ --piece-accent:#4a7285; --haze:#bfc2ae;
+  --sky-grad:linear-gradient(#78807a 0%,#949a8e 34%,#b1b5a2 68%,#c9cab6 100%);
+  --sky-light:radial-gradient(ellipse 60% 34% at 66% 26%, rgba(240,242,222,.30), rgba(240,242,222,0) 72%);
+  --land-far:#9aa69c; --edge-far:#b6bdaf;
+  --land:#64716a; --edge:#808c82; --land-near:#333d3a; --edge-near:#4c5751;
+  --lit:#ffd28a; }
+/* 1, an ordinary bright morning. Dusty blue paper and cream. */
+.skybox[data-piece="1"]{ --piece-accent:#b8860f; --haze:#dce8ee;
+  --sky-grad:linear-gradient(#7099bb 0%,#9cbdd4 38%,#c4d9e4 72%,#e3ebee 100%);
+  --sky-light:radial-gradient(circle at 80% 15%, rgba(255,252,236,.85), rgba(255,250,222,.22) 8%, rgba(255,250,222,0) 26%);
+  --land-far:#a6bdc9; --edge-far:#bccfd8; --land:#75919f; --edge:#8da6b2;
+  --land-near:#4b626e; --edge-near:#5f7683; --lit:#f7ead0; }
+/* 2, late golden afternoon. Ochre and terracotta card. */
+.skybox[data-piece="2"]{ --piece-accent:#d9945e; --haze:#d09a6c;
+  --sky-grad:linear-gradient(#b5804a 0%,#cf9c5c 30%,#e0bc85 62%,#d6a271 88%,#bd8050 100%);
+  --sky-light:radial-gradient(circle at 24% 66%, rgba(255,243,206,.80), rgba(255,220,156,.30) 10%, rgba(255,205,126,0) 36%);
+  --land-far:#ae8360; --edge-far:#c1976f; --land:#86583c; --edge:#9b6b4b;
+  --land-near:#563526; --edge-near:#6b4634; --lit:#ffdfa4; }
+/* 3, night at the bus stop. Slate indigo, sodium at street level. */
+.skybox[data-piece="3"]{ --piece-accent:#7d8a5e; --haze:#3a3550;
+  --sky-grad:linear-gradient(#1f2539 0%,#2c3149 40%,#403d55 70%,#6a5145 92%,#8d6b4c 100%);
+  --sky-light:radial-gradient(circle at 74% 18%, rgba(232,238,255,.70), rgba(210,222,255,.14) 5%, rgba(210,222,255,0) 18%);
+  --land-far:#3c3f55; --edge-far:#4a4d64; --land:#2a2c3e; --edge:#383a4e;
+  --land-near:#191a27; --edge-near:#262838; --lit:#ffc978; }
+
+html[data-light="night"] .skybox{ filter:brightness(.78) saturate(1.06); }
+.scenery{ position:absolute; left:0; right:0; bottom:0; width:100%; height:52%;
+  z-index:0; display:block; }
+.altrow,.liftline,.liftlabel{ z-index:3; }
+.liftline{ position:absolute; left:0; right:0; top:64px; border-top:3px dashed var(--rust); }
+.liftlabel{ position:absolute; right:8px; top:66px; font-weight:800; font-size:18px; line-height:1; color:var(--rust); background:var(--card); padding:.15rem .4rem; border-radius:5px; }
+#balloon{ position:absolute; left:50%; bottom:6px; width:140px; margin-left:-70px; z-index:2;
+  filter:url(#cardB);
+  transition:transform 1s cubic-bezier(.3,.6,.3,1); }
+#balloon.falling{ transition:transform .6s cubic-bezier(.6,0,.9,.4); }
+@media (prefers-reduced-motion: reduce){ #balloon, #balloon.falling{ transition:none; } }
+.altrow{ position:absolute; left:8px; top:8px; background:#2b3540; color:#fff; font-weight:800; font-size:18px; line-height:1; padding:.35rem .55rem; border-radius:7px; }
+.srcrow{ margin:0; background:var(--card); color:var(--ink); font-weight:700;
+  font-size:18px; line-height:1.4; padding:.5rem .9rem; border-top:3px solid var(--line); }
+.manifest{ border-top:3px solid var(--line); background:var(--card); padding:.8rem .9rem .6rem; }
+.mtitle{ font-weight:800; font-size:18px; line-height:1.3; letter-spacing:.1em; text-transform:uppercase; color:var(--rust); margin:0 0 .35rem; }
+.draft{ font-family:Georgia,'Times New Roman',serif; font-size:1.22rem; line-height:2.5; }
+/* Hit-area ≠ visual: the words stay prose-sized; each tap box grows to the 44px
+   floor in BOTH dimensions via inline-flex min-sizing (short words like "A"/"to"
+   otherwise fail on width). The paint is the word; the target is the thumb's. */
+.w{ display:inline-flex; align-items:center; justify-content:center;
+    min-width:44px; min-height:44px; padding:0 .3em; border-radius:6px; cursor:pointer; }
+.w:hover{ background:var(--gold-pale); }
+.w:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.w.cut{ display:none; }
+.w.strut{ background:#7a2f14; color:#fff; }
+.whycard{ display:none; background:var(--card); border:3px solid #7a2f14; border-radius:12px; padding:.7rem .9rem; margin:.7rem 0 0; font-size:19px; }
+.whycard.on{ display:block; }
+.whycard b{ color:var(--rust); }
+.heaprow{ border-top:3px solid var(--line); background:var(--card); padding:.6rem .9rem .8rem; min-height:60px; }
+.htitle{ font-weight:800; font-size:18px; line-height:1.3; letter-spacing:.1em; text-transform:uppercase; color:var(--slate); margin:0 0 .35rem; }
+.scrap{ display:inline-block; font-family:Georgia,serif; font-size:19px; background:var(--gold-pale); border:2px solid var(--line); border-radius:4px; padding:.1rem .4rem; margin:.15rem .2rem; transform:rotate(-2deg); }
+.scrap:nth-child(even){ transform:rotate(2.5deg); }
+.scrap.mb{ background:var(--card); border-style:dashed; }
+.none{ font-size:18px; opacity:.85; }
+.hint{ font-size:19px; margin:.6rem .2rem 0; min-height:1.4em; }
+.btnrow{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.8rem; }
+.go{ background:var(--gold-br); color:#1f1b12; border:2px solid #1f1b12; border-radius:11px; padding:.65rem 1rem; font-weight:800; font-size:18px; line-height:1.2; cursor:pointer; min-height:48px; }
+.go:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.go.ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+.after{ display:none; margin-top:1.3rem; }
+.after.on{ display:block; }
+.label{ font-weight:800; font-size:18px; line-height:1.3; letter-spacing:.1em; text-transform:uppercase; color:var(--rust); margin:1.2rem 0 .45rem; padding-bottom:.3rem; border-bottom:2px solid var(--line); }
+.final{ font-family:Georgia,serif; font-size:1.25rem; line-height:1.9; background:var(--card); border:3px solid var(--gold-br); border-radius:14px; padding:1rem 1.1rem; }
+.attr{ font-size:18px; margin:.5rem .1rem 0; }
+.foot{ margin-top:2rem; font-size:18px; border-top:2px solid var(--line); padding-top:.8rem; }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+</style>
+<style>
+/* ===== v29: ROW K AS THE STANDARD ===== */
+:root{ --stamp:#0F5F5A; --shade:#D9CDB6; --shadow:rgba(34,28,19,.16); --tape:rgba(214,190,140,.72); }
+html[data-light="dusk"]{ --shade:#cbb994; }
+html[data-light="night"]{ --stamp:#8FD6CC; --shade:rgba(0,0,0,.5); --shadow:rgba(0,0,0,.45); --tape:rgba(150,130,92,.62); }
+@media (prefers-color-scheme: dark){
+  :root{ --stamp:#8FD6CC; --shade:rgba(0,0,0,.5); --shadow:rgba(0,0,0,.45); --tape:rgba(150,130,92,.62); }
+  html:not([data-light="day"]):not([data-light="dusk"]) .skybox{ filter:brightness(.78) saturate(1.06); }
+  /* MISMATCH HOST: the liftoff warmth was keyed to data-light only, so a host
+     that answers dark to CSS and light to script painted a gold day page under
+     cream night ink - 1.03:1 on the title. The dark flown floor now rides the
+     media query too. */
+  html.flown:not([data-light="day"]):not([data-light="dusk"]){ --bg:#2b2413; }
+}
+html[data-light="day"]{ --stamp:#0F5F5A; --shade:#D9CDB6; --shadow:rgba(34,28,19,.16); --tape:rgba(214,190,140,.72); }
+html{ background:var(--bg); }
+
+/* BACKDROP-AS-ELEMENT: viewers may discard or force body background; the
+   floor under the ink is a real fixed element. */
+#backdrop{ position:fixed; inset:0; background:var(--bg); z-index:0; transition:background-color .55s ease; }
+.wrap, .se-rail{ position:relative; z-index:1; }
+
+/* Dark mode, Row K v39: one round icon, iOS half-filled circle. */
+.iconbtn{ width:48px; height:48px; padding:0; border-radius:50%; display:inline-grid; place-items:center;
+  background:var(--surface-2); color:var(--ink); border:2px solid var(--ink); cursor:pointer; }
+.iconbtn svg{ width:26px; height:26px; display:block; }
+.iconbtn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+
+/* THE CARD HAND (Row K v34): sheets set down by hand. */
+.plate{ border-radius:14px 20px 16px 22px; box-shadow:0 2px 0 var(--shade), 0 10px 22px var(--shadow); }
+.go{ border:2px solid var(--ink); border-radius:6px 12px 9px 13px;
+  box-shadow:0 2px 0 var(--shade), 0 6px 14px var(--shadow); }
+.go.ghost{ background:var(--card); color:var(--ink); border-color:var(--ink); }
+.btnrow .go:nth-child(odd){ transform:rotate(-0.3deg); }
