@@ -139,3 +139,137 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
   <header class="chrome">
     <span class="brand"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>EN195 ARCADE</span>
     <button class="iconbtn" id="darkBtn" type="button" aria-label="Dark mode" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/></svg>
+    </button>
+  </header>
+
+  <section class="hero" aria-labelledby="t">
+    <p class="eyebrow">EN195 Creative Writing · Fall 2026</p>
+    <h1 id="t">Four games, one per workshop.</h1>
+    <p class="lede">Each game practices one move the week before you need it on the page. They are practice: nothing is graded, and nothing you do here leaves your screen.</p>
+
+    <!-- the semester as a paper ribbon: fifteen week tabs, the four workshops,
+         a game pinned where each one opens, and a pin for this week -->
+    <div class="ribbonbox"><svg class="ribbon" id="ribbon" viewBox="0 0 1000 230" aria-hidden="true" focusable="false">
+      <rect width="1000" height="230" fill="#e9dcc0"/>
+      <g filter="url(#soft)">
+        <path d="M-10 150 C120 118 220 176 360 146 C500 116 610 178 760 148 C860 128 930 150 1010 138 L1010 186 C930 198 860 176 760 196 C610 226 500 164 360 194 C220 224 120 166 -10 198 Z" fill="#c9b48a"/>
+      </g>
+      <g filter="url(#cut)">
+        <path d="M-10 140 C120 108 220 166 360 136 C500 106 610 168 760 138 C860 118 930 140 1010 128 L1010 172 C930 184 860 162 760 182 C610 212 500 150 360 180 C220 210 120 152 -10 184 Z" fill="#fffaf0"/>
+      </g>
+      <g id="weekTabs"></g>
+      <g id="pins"></g>
+      <g id="herePin"></g>
+    </svg></div>
+    <p class="now" id="now" aria-live="polite">Loading this week.</p>
+  </section>
+
+  <section class="cabs" aria-label="The four games" id="cabs"></section>
+
+  <p class="note">Every game runs in your browser on a phone or a laptop, with a dark mode button and no sign-in. Questions go to the Ask the Professor board on Blackboard.</p>
+
+  <footer class="foot">
+    <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
+    <div><b>TIGHT SPIRAL STUDIOS</b><i>Play. Notice. Design.</i></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var BASE='https://walshero.github.io/tss-playtest/';
+  /* flip a flag when that game's file lands on the playtest lane and passes the gate */
+  var READY={ kireji:false, lamp:true, rehearsal:true, sandbags:true };
+
+  /* FALL 2026 EN195-700: Week 1 runs Sep 8-13, then Monday-to-Sunday weeks
+     from Sep 14; Week 15 ends Dec 16. */
+  var W1=new Date(2026,8,8), W2=new Date(2026,8,14), END=new Date(2026,11,16,23,59);
+  function weekOf(d){
+    if(d<W1) return 0; if(d>END) return 16;
+    if(d<W2) return 1;
+    return Math.min(15, 2+Math.floor((d-W2)/(7*864e5)));
+  }
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function range(w){
+    if(w===1) return 'Sep 8 to 13';
+    var a=new Date(W2.getTime()+(w-2)*7*864e5), b=new Date(a.getTime()+6*864e5);
+    if(w===15) b=new Date(2026,11,16);
+    return MON[a.getMonth()]+' '+a.getDate()+' to '+(a.getMonth()===b.getMonth()?'':MON[b.getMonth()]+' ')+b.getDate();
+  }
+  var WORKSHOPS=[
+    {name:'Workshop 1: Creative Nonfiction', from:2, to:3},
+    {name:'Workshop 2: Poetry', from:4, to:6},
+    {name:'Workshop 3: 10-Minute Play', from:6, to:9},
+    {name:'Workshop 4: Flash Fiction', from:10, to:12},
+    {name:'Portfolio and artist statement', from:13, to:15}
+  ];
+
+  /* ---------- cut-paper plates, one per game (viewBox 400 x 260) ---------- */
+  function kireji(){ return ''+
+    '<rect width="400" height="260" fill="#EDCDB5"/><rect y="0" width="400" height="60" fill="#D98A78" opacity=".55"/>'+
+    '<circle cx="310" cy="58" r="26" fill="#C8553F"/>'+
+    '<g filter="url(#soft)"><path d="M0 132 L60 96 L110 118 L170 80 L230 116 L290 92 L400 124 L400 170 L0 170 Z" fill="#A2ABA3"/></g>'+
+    '<g filter="url(#cut)"><path d="M-10 150 C80 138 180 146 260 140 C320 136 360 142 410 138 L410 270 L-10 270 Z" fill="#1F3A5F"/>'+
+    '<path d="M-10 196 C90 186 200 196 410 188 L410 270 L-10 270 Z" fill="#3F6A8E"/></g>'+
+    '<g fill="none" stroke="#B7CEDA" stroke-width="2.4" opacity=".85"><ellipse cx="150" cy="205" rx="36" ry="7"/><ellipse cx="150" cy="205" rx="62" ry="12" opacity=".6"/><ellipse cx="150" cy="205" rx="90" ry="17" opacity=".35"/></g>'+
+    '<g filter="url(#cut)"><path d="M232 176 C236 156 262 148 290 152 C318 156 330 170 326 184 C300 192 256 192 232 176 Z" fill="#6f6a5c"/>'+
+    '<path d="M258 154 C262 136 282 128 300 138 C312 146 312 158 302 162 C288 166 266 164 258 154 Z" fill="#7C8C3A"/>'+
+    '<path d="M296 160 C304 164 312 164 316 158 L312 170 C302 172 294 170 290 166 Z" fill="#5F6B34"/>'+
+    '<circle cx="272" cy="136" r="6" fill="#B98A2E"/><circle cx="272" cy="136" r="2.6" fill="#1B1A17"/>'+
+    '<path d="M60 170 C62 130 58 100 66 60" stroke="#5F6B34" stroke-width="5" fill="none"/><path d="M66 60 C58 70 56 84 60 96 C68 84 70 72 66 60 Z" fill="#5F6B34"/>'+
+    '<path d="M84 172 C86 144 84 124 90 100" stroke="#4d5a2a" stroke-width="4" fill="none"/></g>'+
+    '<g filter="url(#cut)"><rect x="350" y="16" width="34" height="34" rx="3" fill="#B23A2A"/><rect x="357" y="23" width="20" height="20" fill="none" stroke="#F8E9DC" stroke-width="3"/></g>';
+  }
+  function lamp(){ return ''+
+    '<rect width="400" height="260" fill="#cfe0e2"/>'+
+    '<g filter="url(#soft)"><rect x="-10" y="196" width="420" height="80" fill="#c9c0ad"/><rect x="-10" y="188" width="420" height="10" fill="#e3dbc6"/></g>'+
+    '<ellipse cx="96" cy="130" rx="92" ry="92" fill="url(#lampglow)"/>'+
+    '<g filter="url(#cut)"><path d="M50 128 L142 128 L122 72 L72 72 Z" fill="#8a6322"/><path d="M72 72 L86 72 L66 128 L50 128 Z" fill="#c99a63"/>'+
+    '<rect x="90" y="128" width="12" height="70" fill="#7e3a22"/><path d="M68 206 q28 -12 56 0 l0 5 -56 0 Z" fill="#7e3a22"/></g>'+
+    '<path d="M160 40 Q270 62 392 36" stroke="#1d232b" stroke-width="2" fill="none"/>'+
+    frame(176,50,-3,'<rect x="10" y="30" width="22" height="34" rx="2" fill="none" stroke="#1d232b" stroke-width="2.4"/><line x1="10" y1="44" x2="32" y2="44" stroke="#1d232b" stroke-width="2.4"/><path d="M38 38 q5 6 0 12" stroke="#1d232b" stroke-width="2.4" fill="none"/>')+
+    frame(250,58,2,'<circle cx="24" cy="26" r="7" fill="none" stroke="#1d232b" stroke-width="2.4"/><path d="M24 33 L24 50 M24 38 L14 46 M24 38 L36 46" stroke="#1d232b" stroke-width="2.4" fill="none"/><path d="M4 56 q10 -5 18 0" stroke="#1d232b" stroke-width="2.4" fill="none"/>')+
+    frame(324,48,-2,'<rect x="4" y="4" width="40" height="52" fill="#ded9c8"/><path d="M2 36 q9 -8 18 -3 q8 -8 16 -2 q6 -3 10 2 l0 24 -44 0 Z" fill="#eae4d4"/><path d="M28 18 a8 8 0 1 1 -6 13" stroke="#3f4a54" stroke-width="2.2" fill="none" opacity=".6"/>');
+  }
+  function frame(x,y,r,inner){ return '<g transform="translate('+x+','+y+') rotate('+r+')" filter="url(#cut)">'+
+    '<line x1="30" y1="-8" x2="30" y2="0" stroke="#1d232b" stroke-width="2"/>'+
+    '<rect x="0" y="0" width="60" height="76" fill="#fdf8ec"/><rect x="5" y="5" width="50" height="58" fill="#c99a63"/>'+
+    '<g transform="translate(6,6)"><rect width="48" height="56" fill="#fdf8ec"/>'+inner+'</g></g>'; }
+  function rehearsal(){ var seats='';
+    for(var i=0;i<9;i++){ var x=18+i*42; seats+='<path d="M'+x+' 214 q0 -22 18 -22 l6 0 q18 0 18 22 l0 20 -42 0 Z" fill="'+(i===4?'#8d3221':'#503745')+'"/>'; }
+    var heads=[['#F4C542',60],['#52C3C9',144],['#F28DB2',228],['#A77BD6',312]].map(function(h){
+      return '<circle cx="'+(h[1]+21)+'" cy="186" r="11" fill="'+h[0]+'"/>'; }).join('');
+    return ''+
+    '<rect width="400" height="260" fill="#2c2b30"/>'+
+    '<g filter="url(#soft)"><rect x="40" y="40" width="320" height="130" fill="#414045"/></g>'+
+    '<path d="M200 20 L120 170 L280 170 Z" fill="url(#spot)"/>'+
+    '<g filter="url(#cut)"><rect x="40" y="150" width="320" height="22" fill="#b98f5c"/><rect x="40" y="168" width="320" height="6" fill="#8f6c43"/>'+
+    '<path d="M20 10 L126 10 C110 60 104 110 96 172 L20 172 Z" fill="#b8452e"/><path d="M40 10 L60 10 C54 70 50 120 48 172 L36 172 Z" fill="#8d3221"/>'+
+    '<path d="M380 10 L274 10 C290 60 296 110 304 172 L380 172 Z" fill="#b8452e"/><path d="M360 10 L340 10 C346 70 350 120 352 172 L364 172 Z" fill="#8d3221"/>'+
+    '<rect x="10" y="0" width="380" height="18" fill="#6f3a2c"/>'+
+    '<circle cx="186" cy="124" r="9" fill="#6FA8DC"/><path d="M176 134 L196 134 L200 150 L172 150 Z" fill="#57697a"/>'+
+    '<circle cx="222" cy="126" r="8" fill="#FF7F6B"/><path d="M213 135 L231 135 L234 150 L210 150 Z" fill="#96513f"/></g>'+
+    '<g filter="url(#cut)">'+heads+'</g>'+
+    '<g filter="url(#cut)">'+seats+'</g>'+
+    '<g filter="url(#cut)"><rect x="186" y="238" width="28" height="18" rx="3" fill="#d2a13c"/></g>'+
+    '<text x="200" y="252" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="14" fill="#2c2b30">K</text>';
+  }
+  function balloon(){ return ''+
+    '<rect width="400" height="260" fill="#cf9c5c"/><rect width="400" height="120" fill="#b5804a" opacity=".6"/>'+
+    '<circle cx="90" cy="200" r="60" fill="#fff3ce" opacity=".35"/>'+
+    '<g filter="url(#soft)">'+cloud(290,70,90,'#f3d6a4','#d9a36c')+cloud(70,52,64,'#f3d6a4','#d9a36c')+'</g>'+
+    '<g filter="url(#cut)"><path d="M0 228 L40 206 L80 214 L120 196 L170 212 L230 200 L280 214 L340 196 L400 210 L400 260 L0 260 Z" fill="#6f7f55"/>'+
+    '<path d="M20 232 L20 212 L44 196 L68 212 L68 232 Z" fill="#6f8598"/><path d="M300 232 L300 206 L352 206 L352 232 Z" fill="#efe3c6"/><path d="M294 208 L326 188 L358 208 Z" fill="#b06a47"/></g>'+
+    '<g filter="url(#cut)" transform="translate(152,40)">'+
+    '<path d="M48 0 C22 0 8 22 8 46 c0 24 20 36 30 52 h20 c10 -16 30 -28 30 -52 0 -24 -14 -46 -40 -46 z" fill="#9a4321"/>'+
+    '<path d="M48 0 c-14 0 -24 22 -24 46 0 24 10 38 17 52 h5 c-4 -16 -11 -30 -11 -52 0 -22 5 -46 13 -46 z" fill="#efe3c6"/>'+
+    '<path d="M48 0 c14 0 24 22 24 46 0 24 -10 38 -17 52 h-5 c4 -16 11 -30 11 -52 0 -22 -5 -46 -13 -46 z" fill="#efe3c6"/>'+
+    '<path d="M48 0 c-8 0 -12 22 -12 46 0 24 6 36 10 52 h5 c3 -16 9 -28 9 -52 0 -24 -4 -46 -12 -46 z" fill="#d9945e"/>'+
+    '<path d="M36 98 h24 l-4 10 h-16 z" fill="#b98f5c"/><path d="M38 106 l-4 14 M58 106 l4 14" stroke="#3b2a1c" stroke-width="1.6"/>'+
+    '<rect x="30" y="120" width="36" height="22" rx="2" fill="#b98f5c"/><rect x="30" y="126" width="36" height="2.4" fill="#8f6c43"/><rect x="30" y="133" width="36" height="2.4" fill="#8f6c43"/>'+
+    '<ellipse cx="24" cy="136" rx="7" ry="9" fill="#9c7f55"/><ellipse cx="72" cy="136" rx="7" ry="9" fill="#9c7f55"/></g>';
+  }
+  function cloud(cx,base,w,face,shade){
+    var b=[[.2,.16],[.42,.26],[.64,.22],[.84,.14]], s='', f='';
+    b.forEach(function(p){ var x=cx-w/2+p[0]*w, r=p[1]*w;
+      s+='<circle cx="'+x.toFixed(1)+'" cy="'+(base-r*.55).toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+shade+'"/>';
