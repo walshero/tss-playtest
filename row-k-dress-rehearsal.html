@@ -2514,13 +2514,15 @@
     INK.done();
   })();
 
-  // DARK HOST LAW: on a dark-preferring device the whole comfort ladder runs on
-  // the dark side (warm dark, deep dark, black), so no stop is ever a light
-  // palette and no host repaint can produce white-on-white. COMFORT still
-  // cycles three visibly distinct stops.
-  if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
-    document.body.setAttribute("data-scheme","dark");
-  }
+  // DARK HOST LAW: a dark-preferring device opens dark, so no host repaint
+  // can produce white-on-white. v39: the player's own choice, once made,
+  // wins on that device.
+  (function(){
+    var saved = null;
+    try { saved = localStorage.getItem("rowk-scheme"); } catch(e){}
+    var osDark = !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    setScheme(saved ? saved === "dark" : osDark, false);
+  })();
 
   render();
 })();
