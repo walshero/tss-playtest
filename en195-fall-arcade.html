@@ -273,3 +273,112 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
     var b=[[.2,.16],[.42,.26],[.64,.22],[.84,.14]], s='', f='';
     b.forEach(function(p){ var x=cx-w/2+p[0]*w, r=p[1]*w;
       s+='<circle cx="'+x.toFixed(1)+'" cy="'+(base-r*.55).toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+shade+'"/>';
+      f+='<circle cx="'+(x+r*.05).toFixed(1)+'" cy="'+(base-r*.65).toFixed(1)+'" r="'+(r*.92).toFixed(1)+'" fill="'+face+'"/>'; });
+    return '<rect x="'+(cx-w/2)+'" y="'+(base-w*.1)+'" width="'+w+'" height="'+(w*.1)+'" rx="'+(w*.05)+'" fill="'+shade+'"/>'+s+f;
+  }
+
+  var GAMES=[
+    {id:'kireji', title:'Kireji Pond', from:4, to:5, again:0, file:'kireji-pond.html', art:kireji,
+     when:'Workshop 2: Poetry · Weeks 4 and 5',
+     what:'Phrases drift down the stream. Catch the fresh image, smash the cliché, let the rest go, and build a three-line poem that turns.',
+     hook:'Play before your Free Verse Poem (#5.2, due Oct 6). Turns and fresh images are what the poetry workshop looks for.'},
+    {id:'lamp', title:'Reading Lamp', from:5, to:5, again:13, file:'reading-lamp.html', art:lamp,
+     when:'Chapter 4: Images · Week 5, again Week 13',
+     what:'Trade overused phrases for things a reader can see, then read the page to the room and watch which photographs develop.',
+     hook:'Goes with Sellers, Chapter 4: Images (#5.1, due Oct 6). Come back before your portfolio: the A criteria ask you to avoid word packages.'},
+    {id:'rehearsal', title:'Dress Rehearsal', from:7, to:9, again:0, file:'row-k-dress-rehearsal.html', art:rehearsal,
+     when:'Workshop 3: 10-Minute Play · Weeks 7 to 9',
+     what:'Each scene hides a secret. Pick the move, the line, or the silence that stages it, and the house tells you whether it saw the secret or was told it.',
+     hook:'Pairs with on-the-nose dialogue (#8.3). Play before you submit your play (#9.1, due Nov 2).'},
+    {id:'sandbags', title:'Sandbags', from:10, to:11, again:13, file:'sandbags.html', art:balloon,
+     when:'Workshop 4: Flash Fiction · Weeks 10 and 11, again Week 13',
+     what:'Every word is a sandbag. Cut the ones a flash piece can fly without. Cut a word the story leans on, twice, and it crashes.',
+     hook:'Play before your flash story (#11.4, due Nov 22), then again while you revise for the portfolio (#14.2, due Dec 10).'}
+  ];
+
+  var today=new Date(), wk=weekOf(today);
+  function live(g){ return (wk>=g.from && wk<=g.to) || (g.again && wk>=g.again && wk<=14); }
+
+  /* cabinets */
+  var cabs=document.getElementById('cabs');
+  GAMES.forEach(function(g){
+    var a=document.createElement('article'); a.className='cab'; a.setAttribute('aria-labelledby','h-'+g.id);
+    var act = READY[g.id]
+      ? '<a class="play" href="'+BASE+g.file+'">Play '+g.title+'</a>'
+      : '<span class="soon">Opens Week '+g.from+', '+range(g.from).split(' to ')[0]+'</span>';
+    a.innerHTML='<svg class="art" viewBox="0 0 400 260" aria-hidden="true" focusable="false">'+g.art()+'</svg>'+
+      '<span class="stampx"'+(live(g)?'':' hidden')+'>THIS WEEK</span>'+
+      '<div class="body"><p class="when">'+g.when+'</p><h2 id="h-'+g.id+'">'+g.title+'</h2>'+
+      '<p class="what">'+g.what+'</p><p class="hook">'+g.hook+'</p>'+act+'</div>';
+    cabs.appendChild(a);
+  });
+
+  /* ribbon: week tabs along the strip, workshops tinted, games pinned */
+  function yAt(x){ /* the ribbon's centre line, sampled from its two curves */
+    var t=x/1000; return 156 + 16*Math.sin(t*Math.PI*2.9+0.35) ; }
+  var tabs='', WS=['#c9b48a','#8d9a80','#6f8598','#b06a47','#d2a13c','#a67a25'];
+  for(var w=1; w<=15; w++){
+    var x=30+(w-1)*67, ws=0;
+    WORKSHOPS.forEach(function(o,i){ if(w>=o.from && w<=o.to) ws=i+1; });
+    var y=yAt(x);
+    tabs+='<g filter="url(#cut)"><rect x="'+(x-18)+'" y="'+(y-20)+'" width="36" height="40" rx="4" fill="'+(ws?WS[ws]:'#e3d6b8')+'"/>'+
+      '<rect x="'+(x-3)+'" y="'+(y-14)+'" width="6" height="'+(w===wk?28:10)+'" rx="3" fill="#1f1b12" opacity="'+(w===wk?1:.35)+'"/></g>';
+  }
+  document.getElementById('weekTabs').innerHTML=tabs;
+  var ICON={
+    kireji:'<circle r="30" fill="#1F3A5F"/><path d="M-16 8 C-14 -6 0 -12 14 -6 C22 -2 22 8 14 10 C2 14 -10 14 -16 8 Z" fill="#7C8C3A"/><circle cx="-6" cy="-6" r="4" fill="#B98A2E"/>',
+    lamp:'<circle r="30" fill="#cfe0e2"/><circle r="22" fill="url(#lampglow)"/><path d="M-14 4 L14 4 L8 -14 L-8 -14 Z" fill="#8a6322"/><rect x="-2" y="4" width="4" height="16" fill="#7e3a22"/>',
+    rehearsal:'<circle r="30" fill="#2c2b30"/><path d="M-26 -18 L-6 -18 C-9 0 -10 12 -12 22 L-26 22 Z M26 -18 L6 -18 C9 0 10 12 12 22 L26 22 Z" fill="#b8452e"/><circle cy="10" r="6" fill="#F4C542"/>',
+    sandbags:'<circle r="30" fill="#cf9c5c"/><path d="M0 -22 C-12 -22 -16 -10 -16 -2 c0 10 8 14 12 20 h8 c4 -6 12 -10 12 -20 0 -8 -4 -20 -16 -20 z" fill="#9a4321"/><path d="M0 -22 c-5 0 -7 10 -7 20 0 10 4 14 5 20 h4 c1 -6 5 -10 5 -20 0 -10 -2 -20 -7 -20 z" fill="#efe3c6"/><rect x="-6" y="20" width="12" height="7" fill="#b98f5c"/>'
+  };
+  var pins='';
+  GAMES.forEach(function(g){
+    var x=30+(g.from-1)*67, y=yAt(x)-78;
+    pins+='<line x1="'+x+'" y1="'+(y+30)+'" x2="'+x+'" y2="'+(yAt(x)-20)+'" stroke="#1f1b12" stroke-width="2.4"/>'+
+      '<g transform="translate('+x+','+y+')" filter="url(#cut)"><circle r="34" fill="#fffaf0"/>'+ICON[g.id]+'</g>';
+  });
+  document.getElementById('pins').innerHTML=pins;
+  if(wk>=1 && wk<=15){
+    var hx=30+(wk-1)*67, hy=yAt(hx)+22;
+    document.getElementById('herePin').innerHTML='<g filter="url(#cut)"><path d="M'+hx+' '+hy+' l-14 26 l28 0 z" fill="#0F5F5A"/></g>';
+  }
+
+  /* this week, in words */
+  var msg;
+  if(wk===0) msg='The semester starts <b>Tuesday, September 8</b>. The first game opens in Week 4.';
+  else if(wk===16) msg='The semester is over. Every game stays open: play any of them again.';
+  else {
+    var ws=WORKSHOPS.filter(function(o){ return wk>=o.from && wk<=o.to; }).map(function(o){ return o.name; }).join(' and ');
+    var on=GAMES.filter(live), next=GAMES.filter(function(g){ return g.from>wk; })[0];
+    msg='<b>Week '+wk+'</b>, '+range(wk)+'.'+(ws?' '+ws+'.':'');
+    if(on.length) msg+=' This week: '+on.map(function(g){ return g.title; }).join(' and ')+'.';
+    else if(next) msg+=' Next game: '+next.title+', Week '+next.from+' ('+range(next.from).split(' to ')[0]+').';
+  }
+  document.getElementById('now').innerHTML=msg;
+})();
+</script>
+
+<!-- dark mode, Row K v39: opens on the device's setting, remembers the choice,
+     reads the page's actual paint so a mismatch host cannot make it lie -->
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('darkBtn'), KEY='en195-arcade-scheme', saved=null;
+  function painted(){
+    var v=getComputedStyle(root).getPropertyValue('--bg').trim().replace('#','');
+    if(v.length===3) v=v.replace(/./g,'$&$&');
+    var n=parseInt(v,16); if(isNaN(n)) return false;
+    return (((n>>16)&255)*.299+((n>>8)&255)*.587+(n&255)*.114) < 110;
+  }
+  function setScheme(dark,save){
+    root.setAttribute('data-light', dark?'night':'day');
+    btn.setAttribute('aria-pressed', dark?'true':'false');
+    if(save){ try{ localStorage.setItem(KEY, dark?'dark':'light'); }catch(e){} }
+  }
+  try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(saved) setScheme(saved==='dark',false);
+  else setScheme(painted(),false);
+  btn.addEventListener('click',function(){ setScheme(!painted(),true); });
+})();
+</script>
+</body>
+</html>
