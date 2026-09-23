@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  EN195 WRAPAROUND ARCADE, Fall 2026 (EN195-700, asynchronous online).
+  Tight Spiral Studios. v1 2026-09-23.
+
+  Founder ask: "Create an updated en195 wraparound arcade that includes
+  sandbags, dress rehearsal (new name), Kireji Pond, and Reading Lamp."
+  The arcade wraps around the semester: four games pinned to the weeks their
+  workshops run, read from the FALL 2026 EN195-700 Course Schedule
+  (Drive 1FKp4AAcM9WJMQczMUFinUX_QnbPQyhW6h3WYKbTzqjs, read 2026-09-23):
+    Kireji Pond     Workshop 2 Poetry        Weeks 4-5   (#5.2 free verse due Oct 6)
+    Reading Lamp    Ch. 4 Images             Week 5, again Week 13 (portfolio)
+    Dress Rehearsal Workshop 3 10-min play   Weeks 7-9   (#9.1 play due Nov 2)
+    Sandbags        Workshop 4 flash         Weeks 10-11, again Week 13
+  The page works out the current week from the reader's clock and stamps the
+  game that belongs to it. Nothing is stored except the dark mode choice.
+
+  RELEASE FLAGS (READY below): a game whose file has not landed on the
+  playtest lane shows its opening week instead of a Play link. Kireji Pond
+  ships false: at v1 it fails three studio floors (Google Fonts, 25 text items
+  at 16px, one caption at 4.6:1) and lives only as an artifact. Flip it to
+  true when kireji-pond.html lands and passes the gate.
+
+  Floors: single file, no external hosts, 18px minimum, contrast by gate,
+  dark mode button (Row K v39), no emoji, scene first, art over half of every
+  card. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>EN195 Wraparound Arcade</title>
+<meta name="description" content="Four practice games for EN195 Creative Writing, Fall 2026, each pinned to the week its workshop runs.">
+<style>
+:root{
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --ink2:#4a3d22; --line:#b8a57a;
+  --rust:#7a3218; --stamp:#0F5F5A; --shade:#D9CDB6; --shadow:rgba(34,28,19,.16);
+  --chip:#efe0c4; --focus:#8a3a1c;
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --label:Verdana,'Segoe UI',Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([data-light="day"]){ color-scheme:dark;
+    --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --line:#6b604a;
+    --rust:#eaa183; --stamp:#8FD6CC; --shade:rgba(0,0,0,.5); --shadow:rgba(0,0,0,.45);
+    --chip:#33302a; --focus:#f0c357; }
+}
+:root[data-theme="dark"], :root[data-light="night"]{ color-scheme:dark;
+  --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --line:#6b604a;
+  --rust:#eaa183; --stamp:#8FD6CC; --shade:rgba(0,0,0,.5); --shadow:rgba(0,0,0,.45);
+  --chip:#33302a; --focus:#f0c357; }
+:root[data-light="day"]{ color-scheme:light; }
+
+*{ box-sizing:border-box; }
+html{ background:var(--bg); }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--serif);
+  font-size:19px; line-height:1.55; padding-inline:16px; }
+#backdrop{ position:fixed; inset:0; background:var(--bg); z-index:0; }
+.wrap{ position:relative; z-index:1; max-width:1040px; margin:0 auto; padding-block:14px 48px;
+  display:flex; flex-direction:column; gap:26px; }
+
+/* chrome */
+.chrome{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.brand{ display:flex; align-items:center; gap:10px; font-family:var(--label); font-weight:bold;
+  font-size:18px; letter-spacing:2px; }
+.brand svg{ width:40px; height:40px; flex:none; }
+.iconbtn{ width:48px; height:48px; padding:0; border-radius:50%; display:inline-grid; place-items:center;
+  background:var(--chip); color:var(--ink); border:2px solid var(--ink); cursor:pointer; }
+.iconbtn svg{ width:26px; height:26px; display:block; }
+.iconbtn:focus-visible, a:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; }
+
+/* hero */
+.hero{ display:flex; flex-direction:column; gap:12px; }
+.eyebrow{ margin:0; font-family:var(--label); font-size:18px; font-weight:bold; letter-spacing:2px;
+  text-transform:uppercase; color:var(--rust); }
+h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold; text-wrap:balance; }
+.lede{ margin:0; max-width:40em; font-size:20px; color:var(--ink2); }
+.ribbonbox{ overflow-x:auto; border-radius:14px 20px 16px 22px; box-shadow:0 2px 0 var(--shade), 0 10px 22px var(--shadow); }
+.ribbon{ width:100%; min-width:680px; height:auto; display:block; border-radius:14px 20px 16px 22px;
+}
+.now{ margin:0; font-size:20px; background:var(--card); border:2px solid var(--ink);
+  border-radius:6px 12px 9px 13px; padding:12px 16px; box-shadow:0 2px 0 var(--shade), 0 6px 14px var(--shadow);
+  transform:rotate(-0.3deg); }
+.now b{ color:var(--rust); }
+
+/* cabinets */
+.cabs{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px; }
+@media (max-width:760px){ .cabs{ grid-template-columns:1fr; } }
+.cab{ background:var(--card); border:2px solid var(--ink); border-radius:14px 20px 16px 22px;
+  box-shadow:0 2px 0 var(--shade), 0 10px 22px var(--shadow); overflow:hidden;
+  display:flex; flex-direction:column; position:relative; }
+.cab:nth-child(odd){ transform:rotate(-0.35deg); }
+.cab:nth-child(even){ transform:rotate(0.35deg); }
+.cab svg.art{ display:block; width:100%; height:auto; aspect-ratio:400/260; border-bottom:2px solid var(--ink); }
+.body{ padding:14px 18px 18px; display:flex; flex-direction:column; gap:10px; flex:1; }
+.when{ margin:0; font-family:var(--label); font-size:18px; font-weight:bold; letter-spacing:1px;
+  text-transform:uppercase; color:var(--rust); }
+.cab h2{ margin:0; font-size:30px; line-height:1.1; }
+.what{ margin:0; }
+.hook{ margin:0; font-size:18px; color:var(--ink2); border-left:3px solid var(--line); padding-left:10px; }
+.play{ margin-top:auto; align-self:flex-start; display:inline-flex; align-items:center; min-height:48px;
+  padding:10px 18px; font-family:var(--label); font-weight:bold; font-size:18px; text-decoration:none;
+  color:#1f1b12; background:#e0a93a; border:2px solid var(--ink); border-radius:6px 12px 9px 13px;
+  box-shadow:0 2px 0 var(--shade), 0 6px 14px var(--shadow); }
+.play:hover{ background:#eab957; }
+.soon{ margin-top:auto; align-self:flex-start; display:inline-flex; align-items:center; min-height:48px;
+  padding:10px 18px; font-family:var(--label); font-weight:bold; font-size:18px; color:var(--ink);
+  border:2px dashed var(--ink2); border-radius:6px 12px 9px 13px; }
+.stampx{ position:absolute; top:14px; right:14px; font-family:var(--label); font-weight:bold; font-size:18px;
+  letter-spacing:2px; color:var(--stamp); background:var(--card); border:2px solid var(--stamp);
+  border-radius:6px 9px 5px 8px; padding:3px 12px; transform:rotate(3deg); }
+.stampx[hidden]{ display:none; }
+
+/* foot */
+.note{ margin:0; max-width:44em; font-size:18px; color:var(--ink2); }
+.foot{ display:flex; align-items:center; gap:14px; padding-top:16px; border-top:2px solid var(--ink); flex-wrap:wrap; }
+.foot svg{ width:52px; height:52px; flex:none; }
+.foot b{ display:block; font-family:var(--label); font-size:18px; letter-spacing:2px; }
+.foot i{ display:block; font-size:18px; }
+@media (prefers-reduced-motion: reduce){ .cab, .now{ transform:none; } }
+</style>
+</head>
+<body>
+<div id="backdrop" aria-hidden="true"></div>
+
+<!-- shared cut-paper recipe (Row K v36): hand-cut edge, fibre, double shadow -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="cut" x="-10%" y="-15%" width="120%" height="140%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="0.1 0.2" numOctaves="3" seed="7" result="f"/><feColorMatrix in="f" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .09 0" result="g"/><feComposite in="g" in2="d" operator="in" result="gc"/><feMerge result="p"><feMergeNode in="d"/><feMergeNode in="gc"/></feMerge><feGaussianBlur in="d" stdDeviation="0.8" result="b1"/><feOffset in="b1" dx="1" dy="1.5" result="o1"/><feFlood flood-color="#0c0806" flood-opacity=".42"/><feComposite in2="o1" operator="in" result="s1"/><feGaussianBlur in="d" stdDeviation="2.6" result="b2"/><feOffset in="b2" dx="1.6" dy="4" result="o2"/><feFlood flood-color="#0c0806" flood-opacity=".26"/><feComposite in2="o2" operator="in" result="s2"/><feMerge><feMergeNode in="s2"/><feMergeNode in="s1"/><feMergeNode in="p"/></feMerge></filter>
+    <filter id="soft" x="-10%" y="-15%" width="120%" height="140%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="1.4" result="b"/><feOffset in="b" dx="1" dy="2.5" result="o"/><feFlood flood-color="#0c0806" flood-opacity=".2"/><feComposite in2="o" operator="in" result="s"/><feMerge><feMergeNode in="s"/><feMergeNode in="d"/></feMerge></filter>
+    <radialGradient id="lampglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f7e8b5" stop-opacity=".9"/><stop offset="1" stop-color="#f7e8b5" stop-opacity="0"/></radialGradient>
+    <radialGradient id="spot" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#fff3cf" stop-opacity=".75"/><stop offset="1" stop-color="#fff3cf" stop-opacity="0"/></radialGradient>
+    <path id="tss-spiral" d="M26.2 24.0 L26.3 24.5 L26.4 25.1 L26.2 25.7 L25.9 26.3 L25.5 26.8 L24.9 27.3 L24.2 27.6 L23.4 27.7 L22.5 27.7 L21.7 27.5 L20.8 27.0 L20.1 26.4 L19.5 25.6 L19.1 24.6 L18.8 23.5 L18.9 22.3 L19.2 21.2 L19.8 20.1 L20.6 19.1 L21.6 18.3 L22.9 17.7 L24.3 17.4 L25.7 17.4 L27.2 17.8 L28.5 18.5 L29.8 19.4 L30.8 20.7 L31.5 22.2 L32.0 23.8 L32.0 25.6 L31.7 27.4 L30.9 29.0 L29.8 30.5 L28.4 31.8 L26.7 32.8 L24.7 33.3 L22.7 33.5 L20.6 33.1 L18.6 32.4 L16.8 31.2 L15.3 29.6 L14.1 27.7 L13.4 25.5 L13.1 23.1 L13.3 20.8 L14.1 18.5 L15.4 16.3 L17.1 14.5 L19.2 13.1 L21.6 12.1 L24.2 11.7 L26.9 11.8 L29.6 12.5 L32.0 13.8 L34.1 15.7 L35.9 17.9 L37.1 20.6 L37.7 23.5 L37.7 26.4 L37.0 29.4 L35.7 32.2 L33.9 34.7 L31.4 36.7 L28.6 38.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="chrome">
+    <span class="brand"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>EN195 ARCADE</span>
+    <button class="iconbtn" id="darkBtn" type="button" aria-label="Dark mode" aria-pressed="false">
