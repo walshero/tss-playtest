@@ -414,3 +414,248 @@ function ovAdvance(){
     document.getElementById("ovLine").textContent="“"+OV_C+"”";
     document.getElementById("ovLine").classList.add("fadein");
     paintOv(true);
+    document.getElementById("ovAttr").style.display="block";
+    document.getElementById("ovAsk").style.display="block";
+    document.getElementById("ovB").textContent="Your turn";
+    document.getElementById("announce").textContent=OV_C+" Which one did you see?";
+    try{document.getElementById("ovB").scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}
+  } else { endOverture(); }
+}
+function endOverture(){
+  mode="game";
+  document.getElementById("overture").classList.remove("on");
+  document.getElementById("invite").style.display="block";
+  document.getElementById("passage").style.display="block";
+  document.getElementById("prov").style.display="block";
+  document.getElementById("readB").textContent="Read it to the room";
+  buildWall(); relayoutRoom(); paintLamp();
+  window.scrollTo(0,0);
+  document.getElementById("announce").textContent="Tap an overused phrase. Watch the image gallery.";
+}
+/* ---------- SPLASH ---------- */
+function miniFrame(art){
+  return '<svg viewBox="0 0 118 140" width="86" height="102">'+
+    '<rect x="2" y="2" width="114" height="136" fill="var(--panel)" stroke="var(--edge)" stroke-width="2.5"/>'+
+    '<g transform="translate(12,12)">'+
+    '<rect x="0" y="0" width="94" height="94" fill="var(--panel)"/>'+art+
+    '</g></svg>';
+}
+function buildSplash(){
+  document.getElementById("splashFrames").innerHTML=
+    miniFrame(sketch(0))+miniFrame(milkArt())+miniFrame(placeholderArt())+
+    '<svg viewBox="0 0 112 140" width="82" height="102">'+mindArt()+'</svg>';
+}
+function startSplash(){
+  mode="splash";
+  document.getElementById("page").style.display="none";
+  document.getElementById("splash").classList.add("on");
+  document.getElementById("overture").classList.remove("on");
+  document.getElementById("invite").style.display="none";
+  document.getElementById("passage").style.display="none";
+  document.getElementById("prov").style.display="none";
+  document.getElementById("after").style.display="none";
+  document.getElementById("readB").style.display="none";
+  document.getElementById("wallDiv").innerHTML="";
+  buildSplash();
+}
+function startOverture(){
+  document.getElementById("splash").classList.remove("on");
+  document.getElementById("page").style.display="block";
+  document.getElementById("readB").style.display="block";
+  mode="overture"; ovStage=0;
+  document.getElementById("overture").classList.add("on");
+  document.getElementById("invite").style.display="none";
+  document.getElementById("passage").style.display="none";
+  document.getElementById("prov").style.display="none";
+  document.getElementById("after").style.display="none";
+  document.getElementById("ovLine").textContent="“"+OV_A+"”";
+  document.getElementById("readB").textContent="Skip";
+  document.getElementById("ovAsk").innerHTML="Which one did you <em>see</em>?";
+  buildOvWall(); relayoutRoom();
+}
+function buildWall(){
+  if(mode==="splash"){return;}
+  if(mode==="overture"){buildOvWall();return;}
+  var lay=frameLayout();
+  var h=Math.round(lay.w*(parseInt(lay.vb.split(" ")[3],10)/parseInt(lay.vb.split(" ")[2],10)));
+  var html='<svg viewBox="'+lay.vb+'" width="'+lay.w+'" height="'+h+'">'+
+    '<defs><filter id="fsh" x="-20%" y="-20%" width="140%" height="150%">'+
+    '<feDropShadow dx="2" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity=".33"/>'+
+    '</filter></defs>';
+  lay.frames.forEach(function(f,i){
+    html+='<g transform="translate('+f.x+','+f.y+') rotate('+((i%2)?2:-2)+')" filter="url(#fsh)">'+
+      '<rect id="fhl'+i+'" x="-10" y="-10" width="'+(FW+20)+'" height="'+(FH+20)+'" fill="none" stroke="var(--edge)" stroke-width="5" opacity="0"/>'+
+      '<rect x="-4" y="-4" width="'+(FW+8)+'" height="'+(FH+8)+'" fill="var(--panel)"/>'+
+      '<rect x="2" y="2" width="'+(FW-4)+'" height="'+(IM+12)+'" fill="var(--mat)"/>'+
+      '<line x1="'+(FW/2)+'" y1="-12" x2="'+(FW/2)+'" y2="-4" stroke="var(--edge)" stroke-width="2"/>'+
+      '<g id="photo'+i+'" transform="translate(8,8)"></g>'+
+      '</g>';
+  });
+  html+='</svg>';
+  document.getElementById("wallDiv").innerHTML=html;
+  for(var i=0;i<5;i++){paintPhoto(i,false);}
+}
+/* keep the lamp and window inside the visible slice of the room */
+function relayoutRoom(){
+  var w=window.innerWidth,h=window.innerHeight;
+  var scale=Math.max(w/1000,h/700);
+  var visW=w/scale, x0=500-visW/2, x1=500+visW/2;
+  var lampDx=Math.max(0,(x0+80)-180);
+  var winDx=Math.min(0,(x1-110)-825);
+  document.getElementById("lampG").setAttribute("transform","translate("+lampDx+",0)");
+  document.getElementById("glow").setAttribute("transform","translate("+lampDx+",0)");
+  document.getElementById("windowG").setAttribute("transform","translate("+winDx+",0)");
+}
+window.addEventListener("resize",function(){buildWall();relayoutRoom();paintLamp();});
+function paintPhoto(i,animate){
+  var ph=document.getElementById("photo"+i); if(!ph){return;}
+  var kind=state[i].kind; var art;
+  if(kind==="c"||kind==="g"){art=sketch(i);}
+  else if(kind==="a"){art=milkArt();}
+  else{art=placeholderArt();}
+  ph.innerHTML='<rect x="0" y="0" width="'+IM+'" height="'+IM+'" fill="var(--panel)"/>'+art;
+  if(animate){
+    ph.classList.remove("develop"); void ph.getBoundingClientRect();
+    ph.classList.add("develop");
+  }
+}
+function paintLamp(){
+  var c=0; state.forEach(function(s){if(s.kind==="c"||s.kind==="g"){c++;}});
+  var glow=document.getElementById("glow");
+  var r=90+28*c;
+  glow.setAttribute("rx",r); glow.setAttribute("ry",r);
+}
+/* ---------- PASSAGE ---------- */
+function render(){
+  var pass=document.getElementById("passage"); pass.innerHTML="";
+  LINES.forEach(function(L,li){
+    var p=document.createElement("p"); p.className="line"; p.dataset.line=li;
+    L.forEach(function(part){
+      if(typeof part==="string"){ p.appendChild(document.createTextNode(part)); }
+      else{
+        var b=document.createElement("button");
+        b.type="button"; b.className="ph"; b.dataset.slot=part;
+        b.textContent=state[part].cur;
+        b.setAttribute("aria-label","Change this line: "+state[part].cur);
+        b.addEventListener("click",function(){openChoice(part);});
+        p.appendChild(b);
+      }
+    });
+    pass.appendChild(p);
+  });
+}
+function shuffle(a){var i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=a[i];a[i]=a[j];a[j]=t;}return a;}
+var order = SLOTS.map(function(s){
+  var all=s.opts.map(function(o,i){return i;}); return shuffle(all);});
+
+function openChoice(idx){
+  openSlot=idx;
+  var s=SLOTS[idx];
+  document.getElementById("chPhrase").textContent="“"+state[idx].cur+"”";
+  var wrap=document.getElementById("cards"); wrap.innerHTML="";
+  order[idx].forEach(function(oi){
+    var o=s.opts[oi];
+    var b=document.createElement("button");
+    b.type="button"; b.className="card"; b.textContent=o.t;
+    b.addEventListener("click",function(){pick(o.t,o.k);});
+    wrap.appendChild(b);
+  });
+  var keep=document.createElement("button");
+  keep.type="button"; keep.className="card keep"; keep.textContent="Keep it";
+  keep.addEventListener("click",function(){pick(SLOTS[idx].planted,SLOTS[idx].kind0);});
+  wrap.appendChild(keep);
+  document.getElementById("choice").classList.add("open");
+  document.getElementById("backB").focus();
+}
+function closeChoice(){
+  document.getElementById("choice").classList.remove("open");
+}
+function pick(text,kind){
+  state[openSlot].cur=text; state[openSlot].kind=kind;
+  var slot=openSlot;
+  closeChoice(); render();
+  paintPhoto(slot,true); paintLamp();
+  document.getElementById("announce").textContent="Line updated: "+text;
+  var b=document.querySelector('.ph[data-slot="'+slot+'"]');
+  if(b){b.focus();}
+}
+/* ---------- THE READING ---------- */
+var reading=false;
+function readAloud(){
+  if(reading){return;} reading=true;
+  document.getElementById("after").style.display="none";
+  var lines=[].slice.call(document.querySelectorAll("#passage .line"));
+  var rm=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fogLevel=0;
+  function lineKinds(li){
+    var ks=[]; LINES[li].forEach(function(part){
+      if(typeof part!=="string"){ks.push(state[part].kind);}});
+    return ks;
+  }
+  function frameSpot(li){
+    /* the images illustrate the story: light the frame whose line is read */
+    for(var j=0;j<5;j++){
+      var hl=document.getElementById("fhl"+j);
+      if(hl){hl.setAttribute("opacity",(li===j)?"1":"0");}
+    }
+  }
+  function react(li){
+    var ks=lineKinds(li);
+    if(ks.indexOf("a")>-1){fogLevel+=0.28;}
+    if(ks.indexOf("c")>-1||ks.indexOf("g")>-1){fogLevel=Math.max(0,fogLevel-0.1);}
+    document.getElementById("fog").style.opacity=Math.min(fogLevel,0.85);
+  }
+  function finish(){
+    lines.forEach(function(p){p.classList.remove("reading-now");});
+    frameSpot(-1);
+    var c=0,a=0,l=0,x=0,g=0;
+    state.forEach(function(s){
+      if(s.kind==="c"){c++;} if(s.kind==="a"){a++;}
+      if(s.kind==="l"){l++;} if(s.kind==="x"){x++;} if(s.kind==="g"){g++;}
+    });
+    var word;
+    if(a>=2){
+      word="The fog filled the room before the last line. The page waits.";
+    } else if(l+x>=2){
+      word="The gallery came out covered in pictures anyone could have taken. Clean frames, and nothing in them that belongs to anyone. The page waits.";
+      document.getElementById("fog").style.opacity=0;
+    } else if(a===0&&l===0&&x===0){
+      word="The lamp burned to the last word, and every photograph in the gallery held.";
+      document.getElementById("fog").style.opacity=0;
+    } else {
+      word="The lamp held through most of it. A frame or two in the gallery never quite developed. The page waits.";
+    }
+    if(a===0&&l===0&&x===0){ /* win-state art: the lamp flares to fill the room */
+      var gl=document.getElementById("glow");
+      gl.setAttribute("rx",300); gl.setAttribute("ry",300);
+    }
+    document.getElementById("roomWord").textContent=word;
+    document.getElementById("after").style.display="block";
+    document.getElementById("invite").style.display="none";
+    window.scrollTo({top:0,behavior:"smooth"});
+    document.getElementById("announce").textContent=word;
+    reading=false;
+  }
+  if(rm){lines.forEach(function(p,li){react(li);}); finish(); return;}
+  var i=0;
+  function step(){
+    lines.forEach(function(p){p.classList.remove("reading-now");});
+    if(i>=lines.length){finish();return;}
+    lines[i].classList.add("reading-now"); react(i); frameSpot(i);
+    i++; setTimeout(step,1700);
+  }
+  step();
+}
+/* ---------- comfort ladder ---------- */
+function setStop(s){
+  document.documentElement.setAttribute("data-stop",s);
+  try{localStorage.setItem("rl.stop",s);}catch(e){}
+  document.getElementById("lightMenu").classList.remove("open");
+  document.getElementById("lightB").setAttribute("aria-expanded","false");
+}
+document.getElementById("lightB").addEventListener("click",function(){
+  var m=document.getElementById("lightMenu");
+  var open=!m.classList.contains("open");
+  m.classList.toggle("open",open);
+  this.setAttribute("aria-expanded",open?"true":"false");
+});
