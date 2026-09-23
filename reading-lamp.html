@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" data-stop="paper">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reading Lamp</title>
+<style>
+/* ============ STOPS (comfort ladder, DARK HOST LAW) ============
+   D6 ruling: paper cut-out, Lumino City bar. Every object is a piece of
+   cut paper; the tokens are the paper stock, cut per stop. */
+html[data-stop="paper"]{color-scheme:light;
+  --bg:#cfe0e2; --ink:#1d232b; --muted:#3f4a54; --panel:#fdf8ec;
+  --edge:#1d232b; --floor:#c9c0ad; --base:#e3dbc6; --windowpane:#16393d;
+  --lampshade:#8a6322; --lampshade2:#c99a63; --glow:rgba(247,232,181,.6);
+  --chair:#1f4a4f; --chair2:#2a5f6e; --brick:#7e3a22;
+  --fog:rgba(226,233,230,.9); --milk:#ded9c8; --milk2:#eae4d4;
+  --mat:#c99a63; --slip:#ecd9b8;}
+html[data-stop="dim"]{color-scheme:dark;
+  --bg:#3b3e39; --ink:#edeadf; --muted:#c9c6b8; --panel:#30332e;
+  --edge:#edeadf; --floor:#34322b; --base:#3e3b33; --windowpane:#10262a;
+  --lampshade:#6e4f1b; --lampshade2:#8a6a3a; --glow:rgba(230,205,140,.35);
+  --chair:#173a3e; --chair2:#1f4a4f; --brick:#5e2c1a;
+  --fog:rgba(52,54,50,.9); --milk:#4a4c44; --milk2:#565850;
+  --mat:#8a6a3a; --slip:#453f30;}
+html[data-stop="night"]{color-scheme:dark;
+  --bg:#15171a; --ink:#dcded6; --muted:#b2b5ab; --panel:#1d2025;
+  --edge:#dcded6; --floor:#171612; --base:#1d1c17; --windowpane:#0a1a1e;
+  --lampshade:#57400f; --lampshade2:#6e5426; --glow:rgba(222,192,120,.3);
+  --chair:#10282c; --chair2:#173a3e; --brick:#43200f;
+  --fog:rgba(24,26,24,.92); --milk:#26282a; --milk2:#31343a;
+  --mat:#6e5426; --slip:#2e2a1e;}
+/* ============ BASE ============ */
+*{box-sizing:border-box;margin:0}
+body{font-family:Georgia,'Iowan Old Style','Times New Roman',serif;
+  color:var(--ink);background:var(--bg);font-size:20px;line-height:1.6;
+  min-height:100vh}
+/* BACKDROP-AS-ELEMENT: the room is a real fixed div at z 0 */
+#room{position:fixed;inset:0;z-index:0;background:var(--bg)}
+#room svg{width:100%;height:100%;display:block}
+#wallDiv{position:fixed;top:76px;left:0;right:0;z-index:1;
+  pointer-events:none;display:flex;justify-content:center}
+#wallDiv svg{display:block}
+#fog{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at 50% 45%, transparent 20%, var(--fog) 85%);
+  transition:opacity 1.2s ease}
+/* the page rides low so the wall of photographs stays in view */
+main{position:relative;z-index:2;max-width:680px;margin:0 auto;
+  padding:46vh 18px 140px}
+#page{background:var(--panel);border:2px solid var(--edge);
+  border-radius:4px;padding:30px 28px 22px;
+  box-shadow:0 10px 40px rgba(0,0,0,.3)}
+#invite{font-size:20px;color:var(--muted);font-style:italic;margin-bottom:20px}
+#passage p{margin-bottom:16px}
+/* a phrase is a slip of paper glued onto the page */
+.ph{font:inherit;color:inherit;background:var(--slip);border:none;
+  padding:3px 8px;cursor:pointer;text-decoration:none;border-radius:3px;
+  border-bottom:2px solid var(--edge);
+  box-shadow:0 2px 3px rgba(0,0,0,.22);
+  min-height:44px;display:inline}
+.ph:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.line.reading-now{font-weight:bold;border-left:4px solid var(--ink);
+  padding-left:12px}
+#prov{font-size:18px;color:var(--muted);margin-top:24px;
+  border-top:1px solid var(--muted);padding-top:12px}
+/* ============ SPLASH: the reader prepared, wordlessly ============ */
+#splash{position:fixed;inset:0;z-index:4;display:none;overflow-y:auto;
+  background:transparent}
+#splash.on{display:block}
+#splash .col{max-width:560px;margin:0 auto;padding:9vh 18px 60px;
+  text-align:center}
+#splashCard{background:var(--panel);border:2px solid var(--edge);
+  border-radius:4px;padding:34px 26px 30px;
+  box-shadow:0 10px 40px rgba(0,0,0,.3)}
+#splashTitle{font-size:34px;letter-spacing:.06em;margin-bottom:6px}
+#splashSub{font-size:20px;color:var(--muted);font-style:italic;
+  margin-bottom:22px}
+#splashFrames{display:flex;justify-content:center;gap:14px;margin-bottom:24px}
+#splashFrames svg{display:block;filter:drop-shadow(0 5px 7px rgba(0,0,0,.3))}
+#splashCard{box-shadow:0 3px 0 rgba(0,0,0,.12),0 14px 44px rgba(0,0,0,.3)}
+#beginB{margin:0 auto;max-width:300px}
+/* ============ OVERTURE: the lesson, shown once, never stated ======= */
+#overture{display:none}
+#overture.on{display:block}
+#ovLine{font-size:22px;line-height:1.55;margin-bottom:20px;min-height:4.6em}
+#ovAttr{font-size:18px;color:var(--muted);display:none;margin-bottom:16px}
+#ovAsk{font-size:21px;display:none;margin-bottom:16px}
+#ovAsk em{font-style:italic}
+.fadein{animation:dev .9s ease}
+/* ============ CHOICE SHEET: the room stays visible above ============ */
+#choice{position:fixed;left:0;right:0;bottom:0;z-index:5;display:none;
+  background:var(--bg);border-top:3px solid var(--edge);
+  max-height:60vh;overflow-y:auto;box-shadow:0 -12px 40px rgba(0,0,0,.35)}
+#choice.open{display:block}
+#choice .inner{max-width:680px;margin:0 auto;padding:18px 18px 88px}
+#chPhrase{font-style:italic;font-size:21px;margin-bottom:14px}
+.card{display:block;width:100%;text-align:left;font:inherit;font-size:20px;
+  color:var(--ink);background:var(--panel);border:2px solid var(--edge);
+  border-radius:4px;padding:14px 16px;min-height:52px;margin-bottom:12px;
+  cursor:pointer;line-height:1.5}
+.card:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.card.keep{background:none;border-style:dashed}
+#sheetBar{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:6px}
+/* ============ NAV + COMFORT: live corner controls, no walls ======= */
+.navbtn{font-family:system-ui,sans-serif;
+  font-size:18px;color:var(--ink);background:var(--panel);
+  border:2px solid var(--edge);border-radius:6px;min-height:48px;
+  min-width:48px;padding:10px 16px;cursor:pointer}
+.navbtn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+#homeB{position:fixed;z-index:6;top:16px;left:16px}
+#readB{position:fixed;z-index:6;top:16px;right:16px;font-family:system-ui,sans-serif;
+  font-size:18px;color:var(--ink);background:var(--panel);
+  border:2px solid var(--edge);border-radius:6px;min-height:48px;
+  padding:10px 16px;cursor:pointer}
+#readB:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+#lightB{position:fixed;z-index:6;bottom:16px;left:16px}
+#lightMenu{position:fixed;z-index:7;bottom:76px;left:16px;display:none}
+#lightMenu.open{display:block}
+#lightMenu button{display:block;width:120px;margin-top:10px}
+/* ============ AFTER THE READING: the finale card ============ */
+#after{display:none;margin-bottom:20px;border-bottom:2px solid var(--edge);
+  padding-bottom:18px}
+#after p{margin-bottom:16px;font-size:21px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.develop{animation:dev .7s ease}
+@keyframes dev{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  #fog{transition:none}
+  .develop{animation:none}
+}
+</style>
+</head>
+<body>
+<div id="room" aria-hidden="true">
+<svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
+  <defs>
+    <!-- hand-cut paper: displaced edges, then a real shadow off the set -->
+    <filter id="cut" x="-15%" y="-15%" width="130%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="5" result="d"/>
+      <feDropShadow in="d" dx="3" dy="7" stdDeviation="5" flood-color="#000000" flood-opacity=".32"/>
+    </filter>
+    <filter id="cutsoft" x="-10%" y="-10%" width="120%" height="125%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" result="d"/>
+      <feDropShadow in="d" dx="1" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity=".2"/>
+    </filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" result="n"/>
+      <feColorMatrix in="n" type="matrix"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0" result="g"/>
+      <feComposite in="g" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <!-- the set: sky-blue backing board, kraft floor board -->
+  <rect x="0" y="0" width="1000" height="700" fill="var(--bg)"/>
+  <rect x="-10" y="516" width="1020" height="190" fill="var(--floor)" filter="url(#cutsoft)"/>
+  <rect x="-10" y="504" width="1020" height="18" fill="var(--base)" filter="url(#cutsoft)"/>
+  <g id="windowG" filter="url(#cut)">
+    <rect x="726" y="76" width="198" height="248" rx="6" fill="var(--panel)"/>
+    <rect x="742" y="92" width="166" height="216" fill="var(--windowpane)"/>
+    <rect x="818" y="92" width="14" height="216" fill="var(--panel)"/>
+    <rect x="742" y="192" width="166" height="14" fill="var(--panel)"/>
+    <circle cx="782" cy="140" r="4" fill="var(--panel)"/>
+    <circle cx="874" cy="164" r="3" fill="var(--panel)"/>
+    <circle cx="856" cy="118" r="2.5" fill="var(--panel)"/>
+    <path d="M746 292 q30 -18 60 0" stroke="var(--panel)" stroke-width="5" fill="none"/>
+  </g>
+  <ellipse id="glow" cx="180" cy="392" rx="120" ry="120" fill="var(--glow)"/>
+  <g id="lampG" filter="url(#cut)">
+    <path d="M112 398 L248 398 L216 316 L144 316 Z" fill="var(--lampshade)"/>
+    <path d="M144 316 L165 316 L136 398 L112 398 Z" fill="var(--lampshade2)"/>
+    <rect x="172" y="398" width="16" height="128" fill="var(--brick)"/>
+    <path d="M132 536 q48 -18 96 0 l0 6 -96 0 Z" fill="var(--brick)"/>
+  </g>
+  <g id="chairG" filter="url(#cut)">
+    <path d="M366 398 q0 -30 30 -30 l128 0 q30 0 30 30 l0 84 -188 0 Z" fill="var(--chair)"/>
+    <path d="M366 398 q0 -30 30 -30 l30 0 q-22 4 -22 30 l0 84 -38 0 Z" fill="var(--chair2)"/>
+    <rect x="348" y="460" width="224" height="64" rx="14" fill="var(--chair2)"/>
+    <rect x="338" y="414" width="30" height="104" rx="12" fill="var(--chair)"/>
+    <rect x="552" y="414" width="30" height="104" rx="12" fill="var(--chair)"/>
+    <rect x="360" y="522" width="18" height="24" fill="var(--brick)"/>
+    <rect x="544" y="522" width="18" height="24" fill="var(--brick)"/>
+  </g>
+  <g id="tableG" filter="url(#cut)">
+    <ellipse cx="652" cy="498" rx="48" ry="11" fill="var(--brick)"/>
+    <rect x="645" y="498" width="14" height="48" fill="var(--brick)"/>
+    <rect x="624" y="480" width="56" height="12" rx="4" fill="var(--panel)"/>
+  </g>
+  <!-- paper tooth over the whole set -->
+  <rect x="0" y="0" width="1000" height="700" fill="#20242b" filter="url(#grain)" opacity=".14"/>
+</svg>
+</div>
+<!-- THE GALLERY: five photographs, one per phrase; they develop as you choose -->
+<div id="wallDiv" aria-hidden="true"></div>
+<div id="fog" aria-hidden="true"></div>
+
+<button id="homeB" class="navbtn" type="button">Home</button>
+<button id="readB" type="button">Read it to the room</button>
+<button id="lightB" class="navbtn" type="button" aria-expanded="false">Light</button>
+<div id="lightMenu">
+  <button class="navbtn" type="button" data-set="paper">Paper</button>
