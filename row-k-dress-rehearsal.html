@@ -7,7 +7,7 @@
 <meta name="audience" content="MassBay EN195 students learning to stage a secret without announcing it; the founder as first playtester">
 <title>Row K: Dress Rehearsal</title>
 <!--
-  ROW K v38 - a staging game. Tight Spiral Productions.
+  ROW K v39 - a staging game. Tight Spiral Productions.
   Three scenes: Ernesto (elevator), Vera (book club), Frank (the basement cat).
   Craft target: stagecraft / show-don't-tell for the stage (EN195 Workshop 3, Lens 3).
   Stagecraft lineage, full attribution (the footer carries names only, by
@@ -31,7 +31,8 @@
   so the build is assessable and not merely good (v17, closing OUTCOME-UNMAPPED).
   Floors: single-file offline, no network fetches, no emoji, scene-first,
   one decision per screen, 20px body / 18px min, 48px targets, back+home nav,
-  three comfort stops, reduced-motion support, keyboard operable.
+  one-tap dark mode and a sound switch (v39, replacing the three comfort
+  stops), reduced-motion support, keyboard operable.
 
   --- v27 (founder art notes, 2026-09-22 afternoon) ---
   Two plates redrawn, no strokes crossing anywhere (joints allowed, crossings
@@ -93,6 +94,36 @@
   Mittens a collar the next day. Fran's feedback, verbatim: "Are we
   projecting thoughts on the wall now?" Dev follows. Duchess is retired -
   the cat is Mittens everywhere, which closes the Mittens/Duchess question.
+
+  --- v39 (founder notes, 2026-09-22 night) ---
+  1. DARK MODE, NOT COMFORT. "Change comfort to just a simple dark mode icon
+     like on iOS." The COMFORT word button and its three-stop ladder are
+     gone. In their place, a round icon button with the half-filled circle
+     iOS uses for Dark Mode: one tap light, one tap dark. It opens in the
+     device's own setting (DARK HOST LAW holds) and remembers the player's
+     choice on that device. Labelled "Dark mode" for screen readers, with
+     its on/off state announced.
+  2. SOUND. "Audience murmuring before the play and curtains opening.
+     Gentle sound effects reinforcing learning." Every sound is synthesized
+     in the page (Web Audio) - no audio files, no network, single-file law
+     intact. A speaker icon beside dark mode turns sound off and on and is
+     remembered. Browsers allow sound only after the first tap, so the
+     murmur starts on the player's first touch.
+       - THE HOUSE MURMURS on the program screen: a low, wordless crowd.
+       - THE CURTAIN: picking a scene hushes the murmur as the curtain is
+         hauled - three velour tugs timed to the v13 stick-slip keyframes,
+         then a soft settle as it stops.
+       - A CARD SET DOWN: a quiet paper tap when a card goes on stage.
+       - THE VERDICT: the house answers the way the seats do. Every SHOW
+         earns applause (a full, warm round for three); every TELL earns a
+         restless murmur; an INVISIBLE choice earns nothing at all, because
+         the house heard nothing. The silence is the lesson.
+     Studio seats (the sound lab, and the learning seat after Jared Cooney
+     Horvath) set the rules: attention is limited, so sound marks outcomes
+     that matter, not every tap; no sound carries information the screen
+     does not already show (the game is complete on mute); sounds are short
+     and quiet, under the reading; nothing loops except the pre-show murmur,
+     and it stops the moment the play begins.
 
   --- v38 (founder notes, 2026-09-22 evening) ---
   1. SCENE 1 WALL. "Change the blue wall in scene 1 to office brick, diff
@@ -540,6 +571,12 @@
   }
   body[data-scheme="dark"][data-comfort="2"]{ --paper:#211C15; --card:#2E2820; }
   body[data-scheme="dark"][data-comfort="3"]{ --paper:#0B0906; --card:#1A1611; }
+  /* v39: the dark mode switch must also be able to say LIGHT on a dark device */
+  body[data-scheme="light"]{
+    --paper:#FAF6EE; --ink:#1F1B16; --card:#FFFFFF; --slotline:#5A5245;
+    --amber-soft:#F3D9AE; --stamp:#0F5F5A; --shade:#D9CDB6;
+    --shadow:rgba(34,28,19,0.14); color-scheme: light;
+  }
 
   /* v24: THE BOXES WEAR THE SCENE, THE PAGE DOES NOT. Founder, on v21:
      "make the boxes around text colored but not the whole dang screen." The
@@ -612,6 +649,17 @@
     padding:14px 0; max-width:760px; margin:0 auto;
     border-bottom:2px solid var(--ink);
   }
+  /* v39: round icon buttons, iOS-style: dark mode and sound */
+  .iconset{ display:flex; gap:10px; }
+  .iconbtn{
+    width:52px; height:52px; padding:0; border-radius:50%;
+    display:grid; place-items:center;
+    background:var(--card); border:2px solid var(--ink);
+  }
+  .iconbtn svg{ width:28px; height:28px; display:block; }
+  .iconbtn .slash{ display:none; }
+  #soundBtn[aria-pressed="false"] .waves{ display:none; }
+  #soundBtn[aria-pressed="false"] .slash{ display:inline; }
   .navbtn{
     background:var(--card); border:2px solid var(--ink); padding:8px 18px;
     font-family:Verdana,Arial,sans-serif; font-size:18px; font-weight:bold;
@@ -1029,7 +1077,25 @@
     <button class="navbtn" id="backBtn" type="button">BACK</button>
   </div>
   <h1>ROW K<small>DRESS REHEARSAL</small></h1>
-  <button class="navbtn" id="comfortBtn" type="button" aria-label="Comfort: cycle three lighting stops">COMFORT</button>
+  <div class="iconset">
+    <button class="iconbtn" id="soundBtn" type="button" aria-label="Sound" aria-pressed="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3.5 9.5 H7.5 L12.5 5.5 V18.5 L7.5 14.5 H3.5 Z" fill="currentColor"/>
+        <g class="waves" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M15.5 9.2 a4 4 0 0 1 0 5.6"/><path d="M18.2 6.5 a7.8 7.8 0 0 1 0 11"/>
+        </g>
+        <g class="slash" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <path d="M15.5 9.5 L21 15 M21 9.5 L15.5 15"/>
+        </g>
+      </svg>
+    </button>
+    <button class="iconbtn" id="darkBtn" type="button" aria-label="Dark mode" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/>
+      </svg>
+    </button>
+  </div>
 </header>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -1777,6 +1843,140 @@
       + sc.mark + '</g></svg>';
   }
 
+  /* ---------- v39 sound ----------
+     Everything is synthesized here with Web Audio: no files, no network.
+     Sound marks outcomes and moments, never carries information the screen
+     does not already show, and stays quiet under the reading. */
+  var SND = (function(){
+    var ctx = null, on = true, unlocked = false, crowd = null, WB = null, BB = null;
+    try { if(localStorage.getItem("rowk-sound") === "off") on = false; } catch(e){}
+    function ac(){
+      if(!on || !unlocked) return null;
+      if(!ctx){
+        var C = window.AudioContext || window.webkitAudioContext;
+        if(!C) return null;
+        try { ctx = new C(); } catch(e){ return null; }
+      }
+      if(ctx.state === "suspended"){ try { ctx.resume(); } catch(e){} }
+      return ctx;
+    }
+    function buf(c, brown){
+      if(brown && BB) return BB;
+      if(!brown && WB) return WB;
+      var n = c.sampleRate * 2, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0), last = 0;
+      for(var i=0; i<n; i++){
+        var w = Math.random()*2 - 1;
+        if(brown){ last = (last + 0.02*w) / 1.02; d[i] = last * 3.5; } else d[i] = w;
+      }
+      return brown ? (BB = b) : (WB = b);
+    }
+    function env(g, t, peak, a, d){
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + a);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+    }
+    // one short noise event: a clap, a tap, a scrape
+    function burst(c, t, dur, f, q, vol, brown){
+      var s = c.createBufferSource(); s.buffer = buf(c, brown);
+      var bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = f; bp.Q.value = q;
+      var g = c.createGain(); env(g, t, vol, 0.004, dur);
+      s.connect(bp); bp.connect(g); g.connect(c.destination);
+      s.start(t, Math.random()); s.stop(t + dur + 0.05);
+    }
+    // a wordless crowd: talkers are brown noise through a moving formant,
+    // pulsed at a syllable rate, over a low room bed
+    function makeCrowd(c, level, fadeIn){
+      var master = c.createGain(), nodes = [], t = c.currentTime;
+      master.gain.setValueAtTime(0.0001, t);
+      master.gain.exponentialRampToValueAtTime(level, t + fadeIn);
+      master.connect(c.destination);
+      function loopSrc(){ var s = c.createBufferSource(); s.buffer = buf(c, true); s.loop = true; s.start(0, Math.random()*1.5); nodes.push(s); return s; }
+      function osc(f, depth, target){ var o = c.createOscillator(), g = c.createGain(); o.frequency.value = f; g.gain.value = depth; o.connect(g); g.connect(target); o.start(); nodes.push(o); }
+      for(var k=0; k<7; k++){
+        var s = loopSrc(), bp = c.createBiquadFilter(), g = c.createGain();
+        bp.type = "bandpass"; bp.Q.value = 3.2; bp.frequency.value = 320 + Math.random()*620;
+        osc(0.07 + Math.random()*0.12, 90 + Math.random()*110, bp.frequency);
+        g.gain.value = 0.55;
+        osc(3 + Math.random()*2.6, 0.25, g.gain);
+        osc(0.11 + Math.random()*0.2, 0.3, g.gain);
+        s.connect(bp); bp.connect(g); g.connect(master);
+      }
+      var bed = loopSrc(), lp = c.createBiquadFilter(), bg = c.createGain();
+      lp.type = "lowpass"; lp.frequency.value = 420; bg.gain.value = 0.35;
+      bed.connect(lp); lp.connect(bg); bg.connect(master);
+      return {
+        stop: function(fade){
+          var t0 = c.currentTime;
+          master.gain.cancelScheduledValues(t0);
+          master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), t0);
+          master.gain.exponentialRampToValueAtTime(0.0001, t0 + fade);
+          setTimeout(function(){ nodes.forEach(function(n){ try { n.stop(); } catch(e){} }); master.disconnect(); }, fade*1000 + 120);
+        }
+      };
+    }
+    function hush(fade){ if(crowd){ crowd.stop(fade); crowd = null; } }
+    function murmur(){ var c = ac(); if(!c || crowd) return; crowd = makeCrowd(c, 0.05, 1.6); }
+    // the curtain: hushes the house, then three velour tugs on the v13 keyframes
+    function curtain(){
+      hush(1.1);
+      var c = ac(); if(!c) return;
+      var t0 = c.currentTime + 0.5;
+      [[0.10, 0.25, 0.85], [0.75, 0.28, 0.6], [1.38, 0.67, 1.0]].forEach(function(tug){
+        var s = c.createBufferSource(); s.buffer = buf(c, true);
+        var bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.Q.value = 0.9;
+        var t = t0 + tug[0], d = tug[1];
+        bp.frequency.setValueAtTime(420, t); bp.frequency.linearRampToValueAtTime(1150, t + d);
+        var g = c.createGain(); env(g, t, 0.11 * tug[2], d*0.35, d*0.9);
+        s.connect(bp); bp.connect(g); g.connect(c.destination);
+        s.start(t, Math.random()); s.stop(t + d*1.4 + 0.1);
+      });
+      var o = c.createOscillator(), og = c.createGain(), ts = t0 + 2.05;
+      o.type = "sine"; o.frequency.setValueAtTime(82, ts); o.frequency.exponentialRampToValueAtTime(48, ts + 0.3);
+      env(og, ts, 0.07, 0.01, 0.32);
+      o.connect(og); og.connect(c.destination); o.start(ts); o.stop(ts + 0.45);
+    }
+    // a card set down on the stage
+    function tap(){
+      var c = ac(); if(!c) return;
+      var t = c.currentTime + 0.01;
+      burst(c, t, 0.05, 2600, 0.8, 0.05, false);
+      burst(c, t + 0.005, 0.08, 700, 1.1, 0.035, true);
+    }
+    // the house answers: applause for what it saw, restlessness for what it
+    // was told, and silence for what it never saw or heard
+    function verdict(shows, tells){
+      var c = ac(); if(!c) return;
+      var t = c.currentTime + 0.2;
+      if(shows > 0){
+        var n = shows === 3 ? 90 : shows * 12, dur = shows === 3 ? 2.6 : 1.1;
+        for(var i=0; i<n; i++){
+          var at = t + dur * (Math.random() + Math.random()) / 2;
+          burst(c, at, 0.018 + Math.random()*0.02, 1100 + Math.random()*1500, 1.3, 0.022 + Math.random()*0.03, false);
+        }
+      }
+      if(tells > 0){
+        var cr = makeCrowd(c, 0.02 + 0.012*tells, 0.35);
+        setTimeout(function(){ cr.stop(0.9); }, (shows > 0 ? 1500 : 900) + tells*250);
+      }
+    }
+    return {
+      isOn: function(){ return on; },
+      unlock: function(step){ if(unlocked) return; unlocked = true; if(step === "lobby") murmur(); },
+      toggle: function(){
+        on = !on;
+        try { localStorage.setItem("rowk-sound", on ? "on" : "off"); } catch(e){}
+        if(!on) hush(0.3);
+        return on;
+      },
+      stage: function(step){
+        if(step === "lobby") murmur();
+        else if(step === "secret") curtain();
+        else hush(0.8);
+      },
+      tap: tap, verdict: verdict
+    };
+  })();
+
   function go(step){
     state.step = step;
     render();
@@ -1790,6 +1990,7 @@
     stage.innerHTML = "";
     // the page wears the scene's colour; the lobby wears the studio's
     document.body.className = (state.step==="lobby" || state.step==="about") ? "" : "scene-"+scene().mood;
+    SND.stage(state.step);
     if(state.step==="lobby") renderLobby();
     else if(state.step==="about") renderAbout();
     else if(state.step==="secret") renderSecret();
@@ -2145,6 +2346,7 @@
       if(state.picked[cat]===c.id) b.appendChild(el("span","onstage","ON STAGE"));
       b.addEventListener("click", function(){
         state.picked[cat] = (state.picked[cat]===c.id) ? null : c.id;
+        if(state.picked[cat]) SND.tap();
         render();
         var again = stage.querySelectorAll(".cardbtn")[idx];
         if(again) again.focus({preventScroll:true});
@@ -2232,6 +2434,7 @@
 
     // The room answers before the critics explain it.
     stage.appendChild(houseBlock(true));
+    SND.verdict(shows, tells);
 
     CATS.forEach(function(cat){
       var card = cardById(cat, state.picked[cat]);
@@ -2281,11 +2484,29 @@
     var i = ORDER.indexOf(state.step);
     if(i>0) go(ORDER[i-1]);
   });
-  document.getElementById("comfortBtn").addEventListener("click", function(){
-    var b = document.body;
-    var c = parseInt(b.getAttribute("data-comfort"),10);
-    b.setAttribute("data-comfort", String(c===3 ? 1 : c+1));
+  // v39: one tap light, one tap dark, remembered on this device
+  var darkBtn = document.getElementById("darkBtn");
+  function setScheme(dark, save){
+    document.body.setAttribute("data-scheme", dark ? "dark" : "light");
+    document.body.setAttribute("data-comfort", "1");
+    darkBtn.setAttribute("aria-pressed", dark ? "true" : "false");
+    if(save){ try { localStorage.setItem("rowk-scheme", dark ? "dark" : "light"); } catch(e){} }
+  }
+  darkBtn.addEventListener("click", function(){
+    setScheme(document.body.getAttribute("data-scheme") !== "dark", true);
   });
+
+  // v39: sound on or off, remembered; browsers allow sound only after a tap
+  var soundBtn = document.getElementById("soundBtn");
+  soundBtn.setAttribute("aria-pressed", SND.isOn() ? "true" : "false");
+  soundBtn.addEventListener("click", function(){
+    var now = SND.toggle();
+    soundBtn.setAttribute("aria-pressed", now ? "true" : "false");
+    if(now && state.step === "lobby") SND.stage("lobby");
+  });
+  function unlockSound(){ SND.unlock(state.step); }
+  document.addEventListener("pointerdown", unlockSound, true);
+  document.addEventListener("keydown", unlockSound, true);
 
   // each plate line learns its own length, so the draw-on lands on the beat
   (function(){
@@ -2293,13 +2514,15 @@
     INK.done();
   })();
 
-  // DARK HOST LAW: on a dark-preferring device the whole comfort ladder runs on
-  // the dark side (warm dark, deep dark, black), so no stop is ever a light
-  // palette and no host repaint can produce white-on-white. COMFORT still
-  // cycles three visibly distinct stops.
-  if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches){
-    document.body.setAttribute("data-scheme","dark");
-  }
+  // DARK HOST LAW: a dark-preferring device opens dark, so no host repaint
+  // can produce white-on-white. v39: the player's own choice, once made,
+  // wins on that device.
+  (function(){
+    var saved = null;
+    try { saved = localStorage.getItem("rowk-scheme"); } catch(e){}
+    var osDark = !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    setScheme(saved ? saved === "dark" : osDark, false);
+  })();
 
   render();
 })();
