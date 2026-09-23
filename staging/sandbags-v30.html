@@ -1402,3 +1402,238 @@ html{ background:var(--bg); }
      shop(132,98,82,3,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',2)+
      shop(220,134,60,1,8,'var(--p-brick)','var(--p-brick-d)','var(--p-cream-d)',1)+
      shop(288,116,66,2,8,'var(--p-terra)','var(--p-terra-d)','var(--p-bone-d)',2)+
+     shop(360,134,40,1,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',0)+
+     shop(406,120,70,2,8,'var(--p-brick)','var(--p-brick-d)','var(--p-bone-d)',1)+
+     shop(482,134,60,1,8,'var(--p-terra)','var(--p-terra-d)','var(--p-cream-d)',2)+
+     shop(548,110,50,2,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',0)+
+     wires(102,[0,90,190,290,390,490,590],'var(--p-char-d)')+
+     brickwalk(0,160,600,6)+curb(0,166,600,3)+
+     pole(250,92,74,32,true)+
+   '</g></g>'+ haze(.10) +
+   '<g class="ly3">'+
+     '<g class="noedge">'+rc(0,159,400,17,'var(--p-char-d)')+
+       '<ellipse cx="190" cy="160" rx="60" ry="6" fill="var(--lit)" opacity=".13"/></g>'+
+     curb(0,176,400,4)+brickwalk(0,180,400,20)+
+     shelter(268,196,86,42)+bench(278,196,64)+
+     busstop(252,140)+
+     '<g transform="translate(22 140) scale(1.3)">'+payphone(0,0)+payphone(30,3)+'</g>'+
+     '<g class="noedge" fill="var(--p-bone-d)">'+
+       '<ellipse cx="104" cy="195" rx="3.2" ry="2"/><ellipse cx="108.6" cy="195" rx="1.9" ry="1.5"/>'+
+       '<ellipse cx="99.4" cy="195" rx="1.7" ry="1.3"/></g>'+
+     figure(62,198,36,{felt:'cyan',dir:1,arm:'watch',coat:'var(--p-indigo)',coatD:'var(--p-indigo-d)',legs:'var(--p-char-d)',hair:'var(--p-char-d)'})+
+     figure(124,198,38,{felt:'magenta',dir:-1,stride:9,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo-d)',shoe:'var(--p-white)',hair:'var(--p-timber)'})+
+   '</g>'
+  ];
+
+  var pi=0, W=[], cut=[], lifted=false, crashed=false, strikes=0, celebrated=false;
+  var STRIKE_COST=3;
+
+  function cap(t){ return t.charAt(0).toUpperCase()+t.slice(1); }
+  function sentenceStarts(){
+    var starts=[], ns=true;
+    W.forEach(function(w){
+      if(w.g){ starts.push(false); if(/[.?!]/.test(w.t)) ns=true; return; }
+      if(w.cutNow){ starts.push(false); return; }
+      starts.push(ns); ns=false;
+    });
+    return starts;
+  }
+
+  function loadPiece(i){
+    pi=i%PIECES.length;
+    W=PIECES[pi].w.map(function(x){ return {t:x.t, b:!!x.b, m:!!x.m, g:!!x.g, why:x.why||null, cutNow:false, struck:false}; });
+    cut=[]; lifted=false; crashed=false; strikes=0; celebrated=false;
+    document.documentElement.classList.remove('flown');
+    $('after').classList.remove('on');
+    $('stamp').hidden=true;
+    $('whycard').classList.remove('on');
+    $('balloon').classList.remove('falling');
+    $('srcrow').textContent='from \u201C'+PIECES[pi].title+'\u201D \u00B7 '+PIECES[pi].by;
+    $('skybox').dataset.piece=pi;
+    $('sceneLayers').innerHTML=SCENERY[pi];
+    $('skyLayers').innerHTML=SKY[pi];
+    $('prompt').textContent='Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.';
+    render(); altitude(false);
+  }
+
+  function render(){
+    var box=$('draft'); box.innerHTML='';
+    var caps=sentenceStarts();
+    W.forEach(function(w,i){
+      var sp=document.createElement('span');
+      if(w.g){ sp.textContent=w.t; box.appendChild(sp); return; }
+      sp.className='w'+(w.cutNow?' cut':'')+(w.struck?' strut':'');
+      sp.dataset.i=i;
+      sp.textContent=' '+(caps[i]?cap(w.t):w.t);
+      if(!w.cutNow && !crashed){
+        sp.tabIndex=0; sp.setAttribute('role','button');
+        sp.setAttribute('aria-label','drop the word '+w.t);
+        sp.addEventListener('click',function(){ tapWord(i); });
+        sp.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tapWord(i);} });
+      }
+      box.appendChild(sp);
+    });
+    var p=$('pile'); p.innerHTML='';
+    if(!cut.length){ p.innerHTML='<span class="none">nothing dropped yet</span>'; }
+    else cut.forEach(function(i){ var s=document.createElement('span'); s.className='scrap'+(W[i].m?' mb':''); s.textContent=W[i].t; p.appendChild(s); });
+  }
+
+  // The draft is rebuilt on every tap, so the word the reader was standing on
+  // stops existing. Put them back: the same word if it survived, otherwise the
+  // next live word along - which is where a person's eye goes anyway.
+  function refocus(i){
+    if(i==null) return;
+    var box=$('draft');
+    if(crashed||lifted){ var lab=$('afterLabel'); if(lab) lab.focus({preventScroll:true}); return; }
+    var el=box.querySelector('.w[data-i="'+i+'"]:not(.cut)');
+    if(!el){
+      var live=box.querySelectorAll('.w:not(.cut)');
+      for(var k=0;k<live.length;k++){ if(+live[k].dataset.i>i){ el=live[k]; break; } }
+      if(!el && live.length) el=live[live.length-1];
+    }
+    if(el) el.focus({preventScroll:true});
+  }
+
+  function lift(){ return Math.max(0, cut.filter(function(i){return W[i].b;}).length - strikes*STRIKE_COST); }
+
+  function tapWord(i){
+    if(crashed) return;
+    var w=W[i];
+    if(w.b){
+      w.cutNow=true; cut.push(i);
+      $('whycard').classList.remove('on');
+      render(); altitude(false); refocus(i);
+    } else if(w.m){
+      w.cutNow=true; cut.push(i);
+      $('whycard').classList.remove('on');
+      render(); altitude(false); refocus(i);
+      $('weightline').textContent='\u201C'+w.t+'\u201D was a maybe. The piece survives either way. It fell to the heap, but nothing got lighter.';
+      $('liveStat').textContent='Dropped the maybe word '+w.t+'. No lift, no harm.';
+    } else {
+      strikes++;
+      w.struck=true;
+      showWhy(w);
+      if(strikes>=2){ crash(w); } else { plummet(w); }
+      refocus(i);
+    }
+  }
+
+  function showWhy(w){
+    var card=$('whycard');
+    card.innerHTML='<b>\u201C'+w.t+'\u201D is a strut.</b> '+(w.why||GENWHY);
+    card.classList.add('on');
+  }
+
+  function plummet(w){
+    $('balloon').classList.add('falling');
+    render(); altitude(true);
+    setTimeout(function(){ $('balloon').classList.remove('falling'); },700);
+    $('prompt').textContent='It plummets, but holds. That word stays. One more tear and it crashes.';
+    $('weightline').textContent='You lost altitude. Climb again, carefully.';
+    $('liveStat').textContent='Strike. The word '+w.t+' was load-bearing. The balloon dropped hard but holds.';
+  }
+
+  function altitude(falling){
+    var need=PIECES[pi].liftAt, n=lift(), frac=Math.min(n/need,1.12);
+    $('balloon').style.transform='translateY('+(-frac*200)+'px)'+(falling?' rotate(-6deg)':'');
+    $('altnum').textContent = (crashed?'CRASH':(frac>=1?'LIFTOFF':(n===0?(strikes>0?'back on the ground':'on the ground'):'rising, '+n+' of '+need+' bags')));
+    if(!crashed && !$('whycard').classList.contains('on')){
+      $('weightline').textContent = frac>=1
+        ? 'It flies, and it can still get leaner. Keep cutting if there is fat left, or read the piece below and take it.'
+        : (n>0 ? 'Lighter, but every next cut is riskier.' : 'Every word looks the same. Some are holding the piece up.');
+    }
+    $('liveStat').textContent='Lift '+n+' of '+need+'. '+(frac>=1?'Liftoff.':'');
+
+    // Flying is a state you can enter, keep trimming inside, and fall back out
+    // of - not a door that shuts behind you. The old code froze every word the
+    // moment the balloon cleared the line, so a piece that flew at eight bags
+    // with six more still hanging on it could not be trimmed any further. The
+    // game stopped the player mid-lesson to tell them they had won.
+    var flying = frac>=1 && !crashed;
+    if(flying && !lifted){ lifted=true; onLiftoff(); }
+    else if(!flying && lifted){ lifted=false; onGrounded(); }
+    if(lifted) updateReveal();
+  }
+
+  function crash(w){
+    crashed=true; lifted=false;
+    document.documentElement.classList.remove('flown');
+    $('balloon').classList.add('falling');
+    $('balloon').style.transform='translateY(14px) rotate(-9deg)';
+    $('altnum').textContent='CRASH';
+    $('prompt').textContent='Down it comes. Two tears is more than the meaning can hold.';
+    $('weightline').textContent='Now you know two struts by feel. That is not a loss. That is the lesson.';
+    $('liveStat').textContent='Crash. The word '+w.t+' was load-bearing.';
+    $('afterLabel').textContent='It crashed: the words that were holding it up';
+    $('stamp').hidden=true;
+    var struck=W.filter(function(x){return x.struck;}).map(function(x){return '\u201C'+x.t+'\u201D';}).join(' and ');
+    $('finalPiece').textContent=struck+' They looked like sandbags. They were struts. A crash is never shame; the next flight starts lighter in the head.';
+    $('attrLine').textContent='from \u201C'+PIECES[pi].title+'\u201D \u00B7 '+PIECES[pi].by;
+    $('after').classList.add('on');
+    render();
+  }
+
+  // Cut paper, same hand as the balloon and the heap: little torn scraps, not
+  // dots. Skipped entirely under reduced motion - the colour change still
+  // fires, so the win is never carried by movement alone.
+  function confetti(){
+    var mm = window.matchMedia;
+    if(mm && mm('(prefers-reduced-motion: reduce)').matches) return;
+    if(document.documentElement.classList.contains('se-reduce')) return;
+    var host=document.createElement('div');
+    host.className='confetti'; host.setAttribute('aria-hidden','true');
+    var cols=['var(--rust)','var(--gold-br)','var(--piece-accent)','var(--slate)','var(--gold-pale)'];
+    for(var i=0;i<44;i++){
+      var c=document.createElement('i');
+      c.style.left=(Math.random()*100).toFixed(1)+'%';
+      c.style.background=cols[i%cols.length];
+      c.style.width=(6+Math.random()*7).toFixed(0)+'px';
+      c.style.height=(9+Math.random()*11).toFixed(0)+'px';
+      c.style.animationDelay=(Math.random()*0.55).toFixed(2)+'s';
+      c.style.animationDuration=(1.9+Math.random()*1.5).toFixed(2)+'s';
+      c.style.setProperty('--sp',(Math.random()*2-1).toFixed(2));
+      host.appendChild(c);
+    }
+    document.body.appendChild(host);
+    setTimeout(function(){ if(host.parentNode) host.parentNode.removeChild(host); },3800);
+  }
+
+  function onLiftoff(){
+    document.documentElement.classList.add('flown');
+    // once per piece: re-earning the line after a strike is worth the colour,
+    // but not worth a second faceful of paper
+    if(!celebrated){ celebrated=true; confetti(); }
+    $('prompt').textContent='Liftoff. The lean piece was inside the whole time. Keep cutting if there is more fat, or take it.';
+    $('afterLabel').textContent='It flew: the piece that was inside';
+    $('stamp').hidden=false;
+    $('after').classList.add('on');
+    updateReveal();
+  }
+
+  function onGrounded(){
+    document.documentElement.classList.remove('flown');
+    $('stamp').hidden=true;
+    $('after').classList.remove('on');
+    $('prompt').textContent='Back under the line. Put a word back, or find another sandbag.';
+  }
+
+  // The reveal is live while the balloon is up, so a player who keeps trimming
+  // watches the piece tighten under them rather than reading a snapshot taken
+  // at the moment they crossed the line.
+  function updateReveal(){
+    var caps=sentenceStarts();
+    var text=W.map(function(w,i){ return w.cutNow?'':((w.g?'':' ')+(caps[i]?cap(w.t):w.t)); }).join('').trim();
+    $('finalPiece').textContent=text;
+    var n=lift(), need=PIECES[pi].liftAt, extra=n-need;
+    $('attrLine').textContent='from \u201C'+PIECES[pi].title+'\u201D \u00B7 '+PIECES[pi].by+' \u00B7 '
+      +(strikes===0?'a clean climb':'it flew even after a strike, which is revision')
+      +(extra>0?' \u00B7 '+extra+' bag'+(extra===1?'':'s')+' past the line.':'.');
+  }
+
+  $('undo').addEventListener('click',function(){
+    if(!cut.length||crashed) return;
+    var i=cut.pop(); W[i].cutNow=false;
+    $('whycard').classList.remove('on');
+    render(); altitude(false); refocus(i);
+  });
+  $('nextPiece').addEventListener('click',function(){ startPiece(pi+1); });
