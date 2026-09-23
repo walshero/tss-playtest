@@ -659,3 +659,53 @@ document.getElementById("lightB").addEventListener("click",function(){
   m.classList.toggle("open",open);
   this.setAttribute("aria-expanded",open?"true":"false");
 });
+[].slice.call(document.querySelectorAll("#lightMenu button")).forEach(function(b){
+  b.addEventListener("click",function(){setStop(this.dataset.set);});
+});
+document.getElementById("backB").addEventListener("click",closeChoice);
+function freshPassage(){
+  /* next sample: rotates the passage bank (one passage in this prototype;
+     the D3 bank slots in here) with fresh card order */
+  closeChoice();
+  state=SLOTS.map(function(s){return {cur:s.planted,kind:s.kind0};});
+  order=SLOTS.map(function(s){
+    var all=s.opts.map(function(o,i){return i;}); return shuffle(all);});
+  document.getElementById("after").style.display="none";
+  document.getElementById("invite").style.display="block";
+  document.getElementById("fog").style.opacity=0;
+  render(); buildWall(); paintLamp(); window.scrollTo(0,0);
+}
+document.getElementById("homeB").addEventListener("click",function(){
+  closeChoice();
+  state=SLOTS.map(function(s){return {cur:s.planted,kind:s.kind0};});
+  document.getElementById("fog").style.opacity=0;
+  render(); startSplash(); window.scrollTo(0,0);
+});
+document.getElementById("nextB").addEventListener("click",freshPassage);
+document.getElementById("replayB").addEventListener("click",function(){
+  document.getElementById("after").style.display="none";
+  readAloud();
+});
+document.getElementById("readB").addEventListener("click",function(){
+  if(mode==="overture"){endOverture();return;}
+  readAloud();
+});
+document.getElementById("ovB").addEventListener("click",ovAdvance);
+document.getElementById("beginB").addEventListener("click",startOverture);
+document.getElementById("againB").addEventListener("click",function(){
+  document.getElementById("after").style.display="none";
+  document.getElementById("invite").style.display="block";
+  document.getElementById("fog").style.opacity=0;
+  paintLamp();
+  document.getElementById("page").scrollIntoView({behavior:"smooth"});
+});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"){closeChoice();}
+});
+var saved=null; try{saved=localStorage.getItem("rl.stop");}catch(e){}
+if(saved){setStop(saved);}
+else if(window.matchMedia("(prefers-color-scheme: dark)").matches){setStop("night");}
+render(); startSplash(); relayoutRoom(); paintLamp();
+</script>
+</body>
+</html>
