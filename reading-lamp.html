@@ -78,6 +78,18 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
 #splashFrames svg{display:block;filter:drop-shadow(0 5px 7px rgba(0,0,0,.3))}
 #splashCard{box-shadow:0 3px 0 rgba(0,0,0,.12),0 14px 44px rgba(0,0,0,.3)}
 #beginB{margin:0 auto;max-width:300px}
+/* v0.6.2 phone fix: advance controls read as buttons (filled, centered),
+   the splash and overture take a tap anywhere, and the splash clears the
+   corner controls on short phones. iOS Safari fires click on a non-button
+   only when it has cursor:pointer, so the tap surfaces carry it. */
+#beginB,#ovB{text-align:center;font-weight:700;background:var(--ink);
+  color:var(--panel);border-color:var(--ink);touch-action:manipulation}
+#splash,#overture{cursor:pointer;touch-action:manipulation}
+#splash .col{padding:max(84px,9vh) 18px 104px}
+.taphint{font-size:18px;color:var(--muted);margin-top:12px;font-style:italic}
+@media (max-height:700px){#splash .col{padding-top:76px}#splashCard{padding:20px 18px 18px}
+  #splashTitle{font-size:28px}#splashSub{margin-bottom:12px}#splashFrames{margin-bottom:14px}
+  #splashFrames svg{width:62px;height:74px}}
 /* ============ OVERTURE: the lesson, shown once, never stated ======= */
 #overture{display:none}
 #overture.on{display:block}
@@ -211,6 +223,7 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
       <p id="splashSub">Trade overused phrases. Watch what develops.</p>
       <div id="splashFrames" aria-hidden="true"></div>
       <button class="card" id="beginB" type="button">Begin</button>
+      <p class="taphint">or tap anywhere</p>
     </div>
   </div>
 </div>
@@ -692,6 +705,14 @@ document.getElementById("readB").addEventListener("click",function(){
 });
 document.getElementById("ovB").addEventListener("click",ovAdvance);
 document.getElementById("beginB").addEventListener("click",startOverture);
+/* tap anywhere: the splash and the overture advance on any tap that is not
+   already a control (Home, Light and the buttons keep their own jobs) */
+document.getElementById("splash").addEventListener("click",function(e){
+  if(e.target.closest("button")) return; if(mode==="splash") startOverture();
+});
+document.getElementById("overture").addEventListener("click",function(e){
+  if(e.target.closest("button")) return; if(mode==="overture") ovAdvance();
+});
 document.getElementById("againB").addEventListener("click",function(){
   document.getElementById("after").style.display="none";
   document.getElementById("invite").style.display="block";
