@@ -150,8 +150,8 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
 
     <!-- the semester as a paper ribbon: fifteen week tabs, the four workshops,
          a game pinned where each one opens, and a pin for this week -->
-    <div class="ribbonbox"><svg class="ribbon" id="ribbon" viewBox="0 0 1000 230" aria-hidden="true" focusable="false">
-      <rect width="1000" height="230" fill="#e9dcc0"/>
+    <div class="ribbonbox"><svg class="ribbon" id="ribbon" viewBox="0 0 1000 300" aria-hidden="true" focusable="false">
+      <rect width="1000" height="300" fill="#e9dcc0"/>
       <g filter="url(#soft)">
         <path d="M-10 150 C120 118 220 176 360 146 C500 116 610 178 760 148 C860 128 930 150 1010 138 L1010 186 C930 198 860 176 760 196 C610 226 500 164 360 194 C220 224 120 166 -10 198 Z" fill="#c9b48a"/>
       </g>
@@ -161,6 +161,7 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
       <g id="weekTabs"></g>
       <g id="pins"></g>
       <g id="herePin"></g>
+      <g id="labels"></g>
     </svg></div>
     <p class="now" id="now" aria-live="polite">Loading this week.</p>
   </section>
@@ -179,7 +180,7 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
 (function(){
   var BASE='https://walshero.github.io/tss-playtest/';
   /* flip a flag when that game's file lands on the playtest lane and passes the gate */
-  var READY={ kireji:false, lamp:true, rehearsal:true, sandbags:true };
+  var READY={ kireji:true, lamp:true, rehearsal:true, sandbags:true };
 
   /* FALL 2026 EN195-700: Week 1 runs Sep 8-13, then Monday-to-Sunday weeks
      from Sep 14; Week 15 ends Dec 16. */
@@ -316,15 +317,26 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
   /* ribbon: week tabs along the strip, workshops tinted, games pinned */
   function yAt(x){ /* the ribbon's centre line, sampled from its two curves */
     var t=x/1000; return 156 + 16*Math.sin(t*Math.PI*2.9+0.35) ; }
-  var tabs='', WS=['#c9b48a','#8d9a80','#6f8598','#b06a47','#d2a13c','#a67a25'];
+  var tabs='', WS=['#c9b48a','#c5cdb8','#b9c6d2','#e6bca6','#ecd08e','#d9bf88'];
   for(var w=1; w<=15; w++){
     var x=30+(w-1)*67, ws=0;
     WORKSHOPS.forEach(function(o,i){ if(w>=o.from && w<=o.to) ws=i+1; });
     var y=yAt(x);
-    tabs+='<g filter="url(#cut)"><rect x="'+(x-18)+'" y="'+(y-20)+'" width="36" height="40" rx="4" fill="'+(ws?WS[ws]:'#e3d6b8')+'"/>'+
-      '<rect x="'+(x-3)+'" y="'+(y-14)+'" width="6" height="'+(w===wk?28:10)+'" rx="3" fill="#1f1b12" opacity="'+(w===wk?1:.35)+'"/></g>';
+    tabs+='<g filter="url(#cut)"><rect x="'+(x-18)+'" y="'+(y-20)+'" width="36" height="40" rx="4" fill="'+(ws?WS[ws]:'#e3d6b8')+'"/>'+'</g>'+(w===wk?'<rect x="'+(x-21)+'" y="'+(y-23)+'" width="42" height="46" rx="6" fill="none" stroke="#0F5F5A" stroke-width="5"/>':'');
   }
   document.getElementById('weekTabs').innerHTML=tabs;
+  /* read the map from the start: week numbers, start and end flags, workshop names */
+  var lab='', T='font-family:Georgia,serif;font-weight:700;';
+  for(var w2=1; w2<=15; w2++){ var x2=30+(w2-1)*67; lab+='<text x="'+x2+'" y="'+(yAt(x2)+9)+'" text-anchor="middle" style="'+T+'font-size:24px" fill="#1f1b12">'+w2+'</text>'; }
+  lab+='<text x="12" y="34" style="'+T+'font-size:28px" fill="#1f1b12">START Sep 8</text>';
+  lab+='<text x="988" y="34" text-anchor="end" style="'+T+'font-size:28px" fill="#1f1b12">END Dec 16</text>';
+  var SH=['Nonfiction','Poetry','Play','Flash','Portfolio'];
+  WORKSHOPS.forEach(function(o,i){
+    var xa=30+(o.from-1)*67, xb=30+(o.to-1)*67, xm=(xa+xb)/2 + (i===1?-20:i===2?34:0);
+    lab+='<text x="'+xm+'" y="282" text-anchor="middle" style="'+T+'font-size:26px" fill="#1f1b12">'+SH[i]+'</text>';
+  });
+  document.getElementById('labels').innerHTML=lab;
+  /* the tabs no longer carry a tick bar; the number is the tab */
   var ICON={
     kireji:'<circle r="30" fill="#1F3A5F"/><path d="M-16 8 C-14 -6 0 -12 14 -6 C22 -2 22 8 14 10 C2 14 -10 14 -16 8 Z" fill="#7C8C3A"/><circle cx="-6" cy="-6" r="4" fill="#B98A2E"/>',
     lamp:'<circle r="30" fill="#cfe0e2"/><circle r="22" fill="url(#lampglow)"/><path d="M-14 4 L14 4 L8 -14 L-8 -14 Z" fill="#8a6322"/><rect x="-2" y="4" width="4" height="16" fill="#7e3a22"/>',
@@ -339,8 +351,8 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
   });
   document.getElementById('pins').innerHTML=pins;
   if(wk>=1 && wk<=15){
-    var hx=30+(wk-1)*67, hy=yAt(hx)+22;
-    document.getElementById('herePin').innerHTML='<g filter="url(#cut)"><path d="M'+hx+' '+hy+' l-14 26 l28 0 z" fill="#0F5F5A"/></g>';
+    var hx=30+(wk-1)*67, hy=yAt(hx)+26;
+    document.getElementById('herePin').innerHTML='<g filter="url(#cut)"><path d="M'+hx+' '+hy+' l-12 22 l24 0 z" fill="#0F5F5A"/></g>';
   }
 
   /* this week, in words */
@@ -350,11 +362,12 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
   else {
     var ws=WORKSHOPS.filter(function(o){ return wk>=o.from && wk<=o.to; }).map(function(o){ return o.name; }).join(' and ');
     var on=GAMES.filter(live), next=GAMES.filter(function(g){ return g.from>wk; })[0];
-    msg='<b>Week '+wk+'</b>, '+range(wk)+'.'+(ws?' '+ws+'.':'');
+    msg='The semester runs from <b>Week 1, Sep 8</b> to <b>Week 15, Dec 16</b>. The teal box marks where we are: <b>Week '+wk+'</b>, '+range(wk)+'.'+(ws?' '+ws+'.':'');
     if(on.length) msg+=' This week: '+on.map(function(g){ return g.title; }).join(' and ')+'.';
     else if(next) msg+=' Next game: '+next.title+', Week '+next.from+' ('+range(next.from).split(' to ')[0]+').';
   }
   document.getElementById('now').innerHTML=msg;
+  var rb=document.querySelector('.ribbonbox'); if(rb) rb.scrollLeft=0;
 })();
 </script>
 
