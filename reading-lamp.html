@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reading Lamp</title>
+<!-- v0.7 2026-09-24 ART REBOOT (founder: "Reading lamp is not compelling with art at all.
+     Needs a major reboot."): the room rebuilt as a cut-paper reading room at night with
+     the lamp as material light; the gallery's line sketches replaced by cut-paper colour
+     photographs pegged on a line; the cliche is a stock print, the abstraction is fog.
+     Mechanic, copy, passage and verdicts unchanged. -->
 <style>
 /* ============ STOPS (comfort ladder, DARK HOST LAW) ============
    D6 ruling: paper cut-out, Lumino City bar. Every object is a piece of
@@ -135,6 +140,14 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
 #after p{margin-bottom:16px;font-size:21px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .develop{animation:dev .7s ease}
+/* v0.7: the room keeps its own colours; the stops only dim it */
+html[data-stop="dim"] #room svg{filter:brightness(.8)}
+html[data-stop="night"] #room svg{filter:brightness(.62) saturate(.95)}
+#cone,#glow{transition:opacity .9s ease}
+.steam{animation:steam 4s ease-out infinite;opacity:0}
+.steam:nth-child(2){animation-delay:-1.3s}.steam:nth-child(3){animation-delay:-2.6s}
+@keyframes steam{0%{transform:translateY(4px);opacity:0}30%{opacity:.55}100%{transform:translateY(-22px);opacity:0}}
+@media (prefers-reduced-motion: reduce){.steam{animation:none;opacity:.35}}
 @keyframes dev{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion: reduce){
   #fog{transition:none}
@@ -146,16 +159,35 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
 <div id="room" aria-hidden="true">
 <svg viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
   <defs>
-    <!-- hand-cut paper: displaced edges, then a real shadow off the set -->
-    <filter id="cut" x="-15%" y="-15%" width="130%" height="140%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="5" result="d"/>
-      <feDropShadow in="d" dx="3" dy="7" stdDeviation="5" flood-color="#000000" flood-opacity=".32"/>
-    </filter>
-    <filter id="cutsoft" x="-10%" y="-10%" width="120%" height="125%">
-      <feTurbulence type="fractalNoise" baseFrequency="0.013" numOctaves="2" result="n"/>
+    <!-- v0.7 THE ROOM, REBUILT (founder: "Reading lamp is not compelling with
+         art at all. Needs a major reboot."). A cut-paper reading room at night,
+         after the Lumino City bench: layered card with air between the sheets,
+         and the lamp as the one practical light. The light is material - a
+         fabric shade lit from inside, a cone that lands on the chair and the
+         rug - never a halo. Art colours are the room's own and stay put in
+         every stop; the stops only turn the room's light down. -->
+    <filter id="cut" x="-15%" y="-15%" width="130%" height="140%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="4" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="4" result="d"/>
-      <feDropShadow in="d" dx="1" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity=".2"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.11" numOctaves="3" seed="7" result="f"/>
+      <feColorMatrix in="f" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .1 0" result="g"/>
+      <feComposite in="g" in2="d" operator="in" result="gc"/>
+      <feMerge result="p"><feMergeNode in="d"/><feMergeNode in="gc"/></feMerge>
+      <feGaussianBlur in="d" stdDeviation="2" result="b1"/><feOffset in="b1" dx="2" dy="3" result="o1"/>
+      <feFlood flood-color="#0c0806" flood-opacity=".42"/><feComposite in2="o1" operator="in" result="s1"/>
+      <feGaussianBlur in="d" stdDeviation="7" result="b2"/><feOffset in="b2" dx="4" dy="10" result="o2"/>
+      <feFlood flood-color="#0c0806" flood-opacity=".26"/><feComposite in2="o2" operator="in" result="s2"/>
+      <feMerge><feMergeNode in="s2"/><feMergeNode in="s1"/><feMergeNode in="p"/></feMerge>
+    </filter>
+    <filter id="cutsoft" x="-10%" y="-10%" width="120%" height="125%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.04 0.12" numOctaves="3" seed="3" result="f"/>
+      <feColorMatrix in="f" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .1 0" result="g"/>
+      <feComposite in="g" in2="d" operator="in" result="gc"/>
+      <feGaussianBlur in="d" stdDeviation="2.4" result="b1"/><feOffset in="b1" dx="1" dy="3" result="o1"/>
+      <feFlood flood-color="#0c0806" flood-opacity=".25"/><feComposite in2="o1" operator="in" result="s1"/>
+      <feMerge><feMergeNode in="s1"/><feMergeNode in="d"/><feMergeNode in="gc"/></feMerge>
     </filter>
     <filter id="grain">
       <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" result="n"/>
@@ -163,44 +195,115 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
         values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0" result="g"/>
       <feComposite in="g" in2="SourceGraphic" operator="in"/>
     </filter>
+    <pattern id="paper" width="36" height="700" patternUnits="userSpaceOnUse">
+      <rect width="36" height="700" fill="#2f4a48"/>
+      <rect x="0" width="3" height="700" fill="#35524f"/>
+      <rect x="18" width="1.4" height="700" fill="#2a4341"/>
+      <path d="M9 30 q4 -8 8 0 q-4 8 -8 0 Z M27 100 q4 -8 8 0 q-4 8 -8 0 Z" fill="#3a5956" transform="translate(-4 0)"/>
+    </pattern>
+    <radialGradient id="shadeLit" cx=".5" cy=".7" r=".75">
+      <stop offset="0" stop-color="#fff3cf"/><stop offset=".5" stop-color="#f3cd82"/><stop offset="1" stop-color="#c98a3e"/>
+    </radialGradient>
+    <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe6a8" stop-opacity=".42"/><stop offset="1" stop-color="#ffe6a8" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glowG" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#ffdf9a" stop-opacity=".5"/><stop offset=".6" stop-color="#ffcf80" stop-opacity=".16"/><stop offset="1" stop-color="#ffcf80" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#18203a"/><stop offset=".7" stop-color="#2d3252"/><stop offset="1" stop-color="#4a3f52"/>
+    </linearGradient>
+    <radialGradient id="pane" cx=".5" cy=".6" r=".8">
+      <stop offset="0" stop-color="#fff1c8"/><stop offset=".5" stop-color="#ffc766"/><stop offset="1" stop-color="#b8662a"/>
+    </radialGradient>
   </defs>
-  <!-- the set: sky-blue backing board, kraft floor board -->
-  <rect x="0" y="0" width="1000" height="700" fill="var(--bg)"/>
-  <rect x="-10" y="516" width="1020" height="190" fill="var(--floor)" filter="url(#cutsoft)"/>
-  <rect x="-10" y="504" width="1020" height="18" fill="var(--base)" filter="url(#cutsoft)"/>
-  <g id="windowG" filter="url(#cut)">
-    <rect x="726" y="76" width="198" height="248" rx="6" fill="var(--panel)"/>
-    <rect x="742" y="92" width="166" height="216" fill="var(--windowpane)"/>
-    <rect x="818" y="92" width="14" height="216" fill="var(--panel)"/>
-    <rect x="742" y="192" width="166" height="14" fill="var(--panel)"/>
-    <circle cx="782" cy="140" r="4" fill="var(--panel)"/>
-    <circle cx="874" cy="164" r="3" fill="var(--panel)"/>
-    <circle cx="856" cy="118" r="2.5" fill="var(--panel)"/>
-    <path d="M746 292 q30 -18 60 0" stroke="var(--panel)" stroke-width="5" fill="none"/>
+  <!-- the back wall: striped paper over a panelled dado -->
+  <rect x="-200" y="0" width="1400" height="700" fill="url(#paper)"/>
+  <rect x="-200" y="0" width="1400" height="700" fill="#10181a" opacity=".28"/>
+  <g filter="url(#cutsoft)">
+    <rect x="-200" y="58" width="1400" height="9" fill="#6b4a33"/>
+    <rect x="-200" y="418" width="1400" height="100" fill="#6d4a31"/>
+    <rect x="-200" y="418" width="1400" height="8" fill="#8a6343"/>
+    <g fill="#5d3f2a"><rect x="-150" y="440" width="150" height="62"/><rect x="30" y="440" width="150" height="62"/><rect x="210" y="440" width="150" height="62"/><rect x="390" y="440" width="150" height="62"/><rect x="570" y="440" width="150" height="62"/><rect x="750" y="440" width="150" height="62"/><rect x="930" y="440" width="150" height="62"/></g>
   </g>
-  <ellipse id="glow" cx="180" cy="392" rx="120" ry="120" fill="var(--glow)"/>
-  <g id="lampG" filter="url(#cut)">
-    <path d="M112 398 L248 398 L216 316 L144 316 Z" fill="var(--lampshade)"/>
-    <path d="M144 316 L165 316 L136 398 L112 398 Z" fill="var(--lampshade2)"/>
-    <rect x="172" y="398" width="16" height="128" fill="var(--brick)"/>
-    <path d="M132 536 q48 -18 96 0 l0 6 -96 0 Z" fill="var(--brick)"/>
+  <!-- the floor: planks -->
+  <g filter="url(#cutsoft)">
+    <rect x="-200" y="512" width="1400" height="200" fill="#4e3524"/>
+    <g stroke="#3e291b" stroke-width="2"><path d="M-200 540 H1200 M-200 572 H1200 M-200 610 H1200 M-200 656 H1200"/><path d="M60 512 v28 M300 540 v32 M520 512 v28 M760 572 v38 M180 610 v46 M880 512 v28 M420 610 v46 M640 656 v50"/></g>
   </g>
+  <!-- the window: a night street through the glass, curtains either side -->
+  <g id="windowG">
+    <g filter="url(#cut)">
+      <rect x="712" y="84" width="226" height="300" fill="#e9dcbc"/>
+    </g>
+    <rect x="728" y="100" width="194" height="268" fill="url(#night)"/>
+    <circle cx="880" cy="140" r="15" fill="#f4ecd2"/><circle cx="880" cy="140" r="26" fill="#f4ecd2" opacity=".12"/>
+    <g fill="#e9e2cc"><circle cx="760" cy="124" r="1.6"/><circle cx="806" cy="150" r="1.2"/><circle cx="842" cy="112" r="1.4"/><circle cx="752" cy="190" r="1.1"/></g>
+    <g filter="url(#cutsoft)">
+      <path d="M728 300 L728 250 L752 226 L776 250 L776 236 L812 236 L812 258 L836 240 L862 262 L862 230 L906 230 L906 250 L922 250 L922 368 L728 368 Z" fill="#1c2233"/>
+      <path d="M728 330 L760 318 L800 332 L850 312 L922 326 L922 368 L728 368 Z" fill="#12151f"/>
+    </g>
+    <g fill="url(#pane)"><rect x="744" y="262" width="10" height="13"/><rect x="788" y="252" width="9" height="12"/><rect x="872" y="246" width="10" height="13"/><rect x="890" y="246" width="10" height="13"/><rect x="826" y="274" width="9" height="11"/></g>
+    <g filter="url(#cut)">
+      <rect x="818" y="100" width="12" height="268" fill="#e9dcbc"/>
+      <rect x="728" y="226" width="194" height="12" fill="#e9dcbc"/>
+      <rect x="704" y="376" width="242" height="14" fill="#d8c8a4"/>
+      <path d="M694 70 L752 70 Q740 200 758 396 L690 396 Z" fill="#9a4321"/>
+      <path d="M694 70 L712 70 Q706 220 716 396 L690 396 Z" fill="#7a3218"/>
+      <path d="M956 70 L898 70 Q910 200 892 396 L960 396 Z" fill="#9a4321"/>
+      <path d="M956 70 L940 70 Q946 220 936 396 L960 396 Z" fill="#7a3218"/>
+      <rect x="680" y="62" width="292" height="9" rx="4" fill="#3b2a1c"/>
+    </g>
+  </g>
+  <!-- the bookshelf behind the chair -->
+  <g id="shelfG" filter="url(#cut)">
+    <rect x="404" y="150" width="176" height="300" fill="#5b3b27"/>
+    <rect x="414" y="160" width="156" height="282" fill="#3a2518"/>
+    <g fill="#5b3b27"><rect x="414" y="222" width="156" height="8"/><rect x="414" y="296" width="156" height="8"/><rect x="414" y="370" width="156" height="8"/></g>
+    <g id="books"></g>
+  </g>
+  <!-- the rug -->
+  <g filter="url(#cutsoft)">
+    <ellipse cx="420" cy="600" rx="330" ry="58" fill="#7a3a2c"/>
+    <ellipse cx="420" cy="600" rx="300" ry="46" fill="none" stroke="#d8c39a" stroke-width="5"/>
+    <ellipse cx="420" cy="600" rx="250" ry="34" fill="#8e4636"/>
+  </g>
+  <!-- the lamp's light: a cone from the shade to the floor, a pool on the rug -->
+  <g id="lampG">
+    <ellipse id="glow" cx="180" cy="392" rx="120" ry="120" fill="url(#glowG)"/>
+    <path id="cone" d="M118 396 L244 396 L470 610 L-40 610 Z" fill="url(#cone)"/>
+    <ellipse cx="220" cy="600" rx="240" ry="40" fill="#ffe0a0" opacity=".16"/>
+    <g filter="url(#cut)">
+      <ellipse cx="180" cy="538" rx="44" ry="9" fill="#2a1d14"/>
+      <rect x="176" y="392" width="8" height="146" fill="#2f2219"/>
+      <path d="M110 398 L250 398 L218 312 L142 312 Z" fill="url(#shadeLit)"/>
+      <path d="M142 312 L218 312 L222 322 L138 322 Z" fill="#b37a36"/>
+      <path d="M110 398 L250 398 L248 406 L112 406 Z" fill="#c98a3e"/>
+    </g>
+    <ellipse cx="180" cy="300" rx="70" ry="26" fill="url(#glowG)"/>
+  </g>
+  <!-- the chair: a mustard wingback with a knitted throw -->
   <g id="chairG" filter="url(#cut)">
-    <path d="M366 398 q0 -30 30 -30 l128 0 q30 0 30 30 l0 84 -188 0 Z" fill="var(--chair)"/>
-    <path d="M366 398 q0 -30 30 -30 l30 0 q-22 4 -22 30 l0 84 -38 0 Z" fill="var(--chair2)"/>
-    <rect x="348" y="460" width="224" height="64" rx="14" fill="var(--chair2)"/>
-    <rect x="338" y="414" width="30" height="104" rx="12" fill="var(--chair)"/>
-    <rect x="552" y="414" width="30" height="104" rx="12" fill="var(--chair)"/>
-    <rect x="360" y="522" width="18" height="24" fill="var(--brick)"/>
-    <rect x="544" y="522" width="18" height="24" fill="var(--brick)"/>
+    <path d="M372 480 L372 356 Q372 316 412 314 L512 314 Q552 316 552 356 L552 480 Z" fill="#b8862f"/>
+    <path d="M372 480 L372 356 Q372 316 412 314 L424 314 Q394 330 396 366 L396 480 Z" fill="#8f6620"/>
+    <path d="M340 400 Q338 372 362 372 Q386 372 386 400 L386 520 L340 520 Z" fill="#c99638"/>
+    <path d="M538 400 Q538 372 562 372 Q586 372 586 400 L586 520 L538 520 Z" fill="#a57a26"/>
+    <rect x="352" y="460" width="222" height="62" rx="14" fill="#c99638"/>
+    <rect x="382" y="446" width="162" height="28" rx="12" fill="#d8a646"/>
+    <path d="M470 316 L520 316 Q540 318 540 340 L540 470 L500 486 L470 470 Z" fill="#d9ddd0"/>
+    <g fill="#8fa38f"><rect x="470" y="340" width="70" height="8"/><rect x="470" y="380" width="70" height="8"/><rect x="470" y="420" width="70" height="8"/><rect x="470" y="460" width="70" height="8"/></g>
+    <rect x="362" y="520" width="14" height="24" fill="#3b2a1c"/><rect x="552" y="520" width="14" height="24" fill="#3b2a1c"/>
   </g>
+  <!-- the side table: a stack of books and a cup of tea -->
   <g id="tableG" filter="url(#cut)">
-    <ellipse cx="652" cy="498" rx="48" ry="11" fill="var(--brick)"/>
-    <rect x="645" y="498" width="14" height="48" fill="var(--brick)"/>
-    <rect x="624" y="480" width="56" height="12" rx="4" fill="var(--panel)"/>
+    <ellipse cx="652" cy="490" rx="54" ry="11" fill="#6b4a33"/>
+    <rect x="645" y="490" width="14" height="54" fill="#4e3524"/>
+    <ellipse cx="652" cy="544" rx="30" ry="6" fill="#4e3524"/>
+    <rect x="620" y="470" width="52" height="10" fill="#2f5d62"/><rect x="624" y="460" width="46" height="10" fill="#b8452e"/><rect x="618" y="451" width="50" height="9" fill="#e9dcbc"/>
+    <path d="M676 470 h20 l-3 14 h-14 Z" fill="#efe3c6"/><path d="M696 474 q7 0 5 6 q-2 3 -6 2" fill="none" stroke="#efe3c6" stroke-width="3"/>
   </g>
   <!-- paper tooth over the whole set -->
-  <rect x="0" y="0" width="1000" height="700" fill="#20242b" filter="url(#grain)" opacity=".14"/>
+  <rect x="0" y="0" width="1000" height="700" fill="#20242b" filter="url(#grain)" opacity=".12"/>
 </svg>
 </div>
 <!-- THE GALLERY: five photographs, one per phrase; they develop as you choose -->
@@ -309,52 +412,73 @@ function frameLayout(){
     frames:[{x:14,y:14},{x:150,y:14},{x:286,y:14},{x:82,y:172},{x:218,y:172}]};
 }
 
-/* concrete sketches, one per slot, drawn inside a 94x94 box at 0,0 */
+/* v0.7 THE PHOTOGRAPHS. The line sketches are gone. Each concrete choice
+   develops into a small cut-paper photograph in colour, drawn in a 94x94
+   print: a kitchen at night, the open shoebox, the father at the lake, the
+   two on the porch steps, the box going to the truck. Faces are felt, one
+   colour per person, no features (studio rule). The cliche is a stock
+   photograph; the abstraction is fog. */
+function R(x,y,w,h,f,x2){return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+f+'"'+(x2||'')+'/>';}
+function Pth(d,f,x2){return '<path d="'+d+'" fill="'+f+'"'+(x2||'')+'/>';}
+function head(x,y,r,f){return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+f+'"/>';}
 function sketch(slot){
-  var k='stroke="var(--ink)" fill="none" stroke-width="2.5" stroke-linecap="round"';
-  if(slot===0){ /* refrigerator, hum ripples */
-    return '<rect x="26" y="18" width="34" height="60" rx="3" '+k+'/>'+
-    '<line x1="26" y1="44" x2="60" y2="44" '+k+'/>'+
-    '<line x1="54" y1="26" x2="54" y2="36" '+k+'/>'+
-    '<path d="M66 34 q6 8 0 16" '+k+'/>'+
-    '<path d="M72 28 q10 14 0 28" '+k+' opacity=".6"/>';
+  if(slot===0){ /* the kitchen at night: the refrigerator hums in the dark */
+    return R(0,0,94,94,'#2a3140')+
+      R(0,0,94,64,'#3a4254')+R(6,8,24,22,'#161b28')+'<circle cx="22" cy="15" r="3.4" fill="#e9e2cc"/>'+R(17,8,1.6,22,'#3a4254')+R(6,18,24,1.6,'#3a4254')+
+      R(0,64,94,30,'#6b5a48')+Pth('M0 72 H94 M0 82 H94','none',' stroke="#57483a" stroke-width="1"')+
+      R(40,10,34,70,'#cfe0d2',' rx="3"')+R(70,10,4,70,'#9fb6a8')+R(40,34,34,2,'#9fb6a8')+R(44,16,2.4,12,'#8aa092')+R(44,40,2.4,16,'#8aa092')+
+      R(52,44,10,12,'#f2ead8',' transform="rotate(-6 57 50)"')+Pth('M54 52 l3 -4 l3 4','none',' stroke="#b8452e" stroke-width="1.2"')+
+      '<circle cx="64" cy="20" r="2" fill="#c0392b"/><circle cx="56" cy="24" r="2" fill="#e0b340"/>'+
+      Pth('M40 80 h34 v2 h-34 Z','#ffe9b0',' opacity=".6"')+Pth('M36 82 L78 82 L86 94 L30 94 Z','#ffe9b0',' opacity=".18"')+
+      Pth('M78 30 q4 6 0 12 M83 26 q7 10 0 20','none',' stroke="#9fb6a8" stroke-width="1.2" opacity=".7"');
   }
-  if(slot===1){ /* shoebox, lid tilted, rubber bands */
-    return '<rect x="16" y="44" width="56" height="28" '+k+'/>'+
-    '<path d="M12 44 L40 28 L78 36 L72 44" '+k+'/>'+
-    '<ellipse cx="30" cy="80" rx="10" ry="4" '+k+'/>'+
-    '<ellipse cx="52" cy="82" rx="8" ry="3" '+k+'/>';
+  if(slot===1){ /* the shoebox, open, cedar and old rubber bands */
+    return R(0,0,94,94,'#e6d7b8')+R(0,58,94,36,'#7a5638')+Pth('M0 66 H94 M0 80 H94','none',' stroke="#6a4a30" stroke-width="1"')+
+      Pth('M16 52 L70 52 L70 80 L16 80 Z','#c49a64')+Pth('M70 52 L80 46 L80 74 L70 80 Z','#9c7648')+Pth('M16 52 L26 46 L80 46 L70 52 Z','#4a3222')+
+      R(24,44,20,9,'#f3eee2',' transform="rotate(-8 34 48)"')+R(36,42,20,10,'#e9e0cf',' transform="rotate(5 46 47)"')+R(48,43,18,9,'#f7f1e6',' transform="rotate(-3 57 47)"')+
+      Pth('M34 44 v9 M46 42 v10','none',' stroke="#c0392b" stroke-width="1.6"')+
+      Pth('M10 50 L40 20 L90 30 L78 40 Z','#d8b27a')+Pth('M10 50 L40 20 L42 24 L14 52 Z','#b08956')+
+      R(72,72,14,7,'#a0603a',' rx="1"')+
+      '<ellipse cx="24" cy="86" rx="7" ry="2.4" fill="none" stroke="#c0392b" stroke-width="1.4"/><ellipse cx="44" cy="88" rx="5" ry="1.8" fill="none" stroke="#c0392b" stroke-width="1.2"/>';
   }
-  if(slot===2){ /* father squinting at the lake, dog half out of frame */
-    return '<circle cx="40" cy="30" r="10" '+k+'/>'+
-    '<line x1="33" y1="28" x2="39" y2="28" '+k+'/>'+
-    '<line x1="43" y1="28" x2="49" y2="28" '+k+'/>'+
-    '<path d="M40 40 L40 62 M40 46 L26 56 M40 46 L58 58" '+k+'/>'+
-    '<path d="M6 70 q14 -6 24 0" '+k+'/>'+
-    '<circle cx="86" cy="62" r="8" '+k+'/>'+
-    '<path d="M86 70 L86 82 M86 74 L94 80" '+k+'/>'+
-    '<circle cx="20" cy="14" r="7" '+k+'/>';
+  if(slot===2){ /* my father at the lake, squinting, the dog half out of frame */
+    return R(0,0,94,94,'#c3d9e6')+'<circle cx="16" cy="14" r="10" fill="#fff4d0" opacity=".9"/>'+
+      Pth('M0 44 L10 30 L18 40 L26 26 L36 40 L46 28 L58 42 L70 30 L82 40 L94 32 L94 50 L0 50 Z','#3f5f4a')+
+      R(0,50,94,24,'#5f8fb0')+Pth('M6 58 h18 M40 64 h26 M70 56 h16','none',' stroke="#bcd6e6" stroke-width="1.4"')+
+      R(0,74,94,20,'#d9c7a0')+
+      Pth('M38 58 L52 58 L54 80 L36 80 Z','#4a6fa5')+Pth('M38 80 L44 80 L44 94 L38 94 Z M46 80 L52 80 L52 94 L46 94 Z','#a8966c')+
+      head(45,51,6.4,'#F4C542')+Pth('M38 46 q7 -5 14 0 v2 h-14 Z','#5a4632')+
+      Pth('M52 60 L60 50 L58 46 L50 56 Z','#4a6fa5')+'<ellipse cx="57" cy="46" rx="4.2" ry="2" fill="#D9A826"/>'+
+      Pth('M38 62 L30 74 L33 76 L41 66 Z','#4a6fa5')+
+      Pth('M78 66 q8 -4 16 0 v16 h-16 Z','#8a5a3a')+Pth('M78 70 q-8 -8 -4 -14','none',' stroke="#8a5a3a" stroke-width="2.4" stroke-linecap="round"')+
+      R(78,80,3,10,'#6e4630')+R(88,80,3,10,'#6e4630')+R(76,66,4,4,'#c0392b')+
+      Pth('M32 74 L36 74','none',' stroke="#6e4630" stroke-width="1"');
   }
-  if(slot===3){ /* porch steps, two seated, cigarette wisp */
-    return '<path d="M8 78 L30 78 L30 64 L52 64 L52 50 L74 50" '+k+'/>'+
-    '<circle cx="40" cy="40" r="7" '+k+'/><path d="M40 47 L40 60 L32 64" '+k+'/>'+
-    '<circle cx="58" cy="28" r="7" '+k+'/><path d="M58 35 L58 46 L52 50" '+k+'/>'+
-    '<line x1="64" y1="40" x2="70" y2="38" '+k+'/>'+
-    '<path d="M71 36 q3 -6 0 -10" '+k+' opacity=".6"/>';
+  if(slot===3){ /* the two of them barefoot on the porch steps, one cigarette */
+    return R(0,0,94,94,'#e8e0cf')+Pth('M0 10 H94 M0 20 H94 M0 30 H94 M0 40 H94','none',' stroke="#cfc4ad" stroke-width="1"')+
+      R(60,4,26,46,'#2a2f35')+Pth('M62 6 h22 v42 h-22 Z','none',' stroke="#6b5a48" stroke-width="1.6"')+
+      R(0,50,94,10,'#9c8f7a')+R(0,60,94,12,'#b3a58c')+R(0,72,94,22,'#c7b99d')+R(0,50,94,2,'#7c705e')+R(0,60,94,2,'#8f8270')+R(0,72,94,2,'#a39478')+
+      Pth('M18 38 L32 38 L34 58 L16 58 Z','#5b7fa6')+head(25,32,5.6,'#FF7F6B')+Pth('M19 30 q6 -8 12 0 l0 6 q-6 -4 -12 0 Z','#3b2a1c')+
+      Pth('M18 58 L30 58 L30 64 L20 64 Z','#5b7fa6')+Pth('M20 64 l0 9 h4 l0 -9 Z M27 64 l0 9 h4 l0 -9 Z','#FF7F6B')+
+      Pth('M40 34 L54 34 L55 54 L39 54 Z','#e9dcbc')+head(47,28,5.6,'#A77BD6')+Pth('M41 26 q6 -6 12 0 v3 h-12 Z','#7a5638')+
+      Pth('M39 54 L55 54 L54 62 L40 62 Z','#3f5a6b')+Pth('M41 62 v8 h4 v-8 Z M49 62 v8 h4 v-8 Z','#A77BD6')+
+      Pth('M54 40 L62 36','none',' stroke="#e9dcbc" stroke-width="3" stroke-linecap="round"')+R(62,34,6,1.6,'#f3eee2')+R(67.4,34,1,1.6,'#e0662b')+
+      Pth('M69 33 q3 -6 -1 -10 q-3 -4 1 -9','none',' stroke="#9aa0a6" stroke-width="1.2" opacity=".75"');
   }
-  /* slot 4: the shoebox carried to the truck */
-  return '<rect x="44" y="34" width="42" height="26" rx="3" '+k+'/>'+
-  '<rect x="52" y="42" width="12" height="10" '+k+'/>'+
-  '<circle cx="54" cy="66" r="7" '+k+'/><circle cx="78" cy="66" r="7" '+k+'/>'+
-  '<circle cx="22" cy="24" r="7" '+k+'/>'+
-  '<path d="M22 31 L22 52 M22 36 L34 40 M22 52 L15 64 M22 52 L29 64" '+k+'/>'+
-  '<rect x="30" y="34" width="13" height="9" '+k+'/>';
+  /* slot 4: I carried the shoebox to the truck */
+  return R(0,0,94,94,'#e7b88a')+R(0,40,94,6,'#c9936a')+R(0,46,94,48,'#8c8a86')+R(0,46,94,2,'#6e6c69')+
+    Pth('M40 40 L58 40 L64 30 L78 30 L84 42 L90 42 L90 64 L40 64 Z','#a33b2a')+Pth('M62 32 L76 32 L80 42 L60 42 Z','#2a2f38')+
+    R(40,40,24,4,'#7f2c1f')+R(44,34,12,8,'#c49a64')+R(52,30,10,10,'#b8864e')+
+    '<circle cx="52" cy="66" r="7" fill="#1f2226"/><circle cx="52" cy="66" r="2.6" fill="#a8a59c"/><circle cx="80" cy="66" r="7" fill="#1f2226"/><circle cx="80" cy="66" r="2.6" fill="#a8a59c"/>'+
+    Pth('M14 52 L26 52 L28 72 L12 72 Z','#2f5d62')+head(20,46,5.6,'#6FA8DC')+Pth('M14 44 q6 -6 12 0 v2 h-12 Z','#3b2a1c')+
+    Pth('M13 72 l-2 16 h4 l3 -16 Z M22 72 l3 16 h4 l-2 -16 Z','#3a3f46')+
+    R(24,54,16,11,'#c49a64')+Pth('M24 54 L28 51 L44 51 L40 54 Z','#d8b27a')+R(30,54,1.4,11,'#c0392b')+
+    Pth('M26 58 L32 60','none',' stroke="#2f5d62" stroke-width="3" stroke-linecap="round"');
 }
 function placeholderArt(){ /* the stock photo everyone has already seen */
-  var k='stroke="var(--muted)" fill="none" stroke-width="2.5"';
-  return '<rect x="8" y="8" width="78" height="78" '+k+' stroke-dasharray="6 5"/>'+
-  '<circle cx="30" cy="30" r="9" '+k+'/>'+
-  '<path d="M12 74 L38 46 L54 62 L66 50 L84 70" '+k+'/>';
+  return R(0,0,94,94,'#d9dcdf')+'<circle cx="28" cy="28" r="10" fill="#b8bcc1"/>'+
+  Pth('M0 74 L30 42 L48 60 L64 44 L94 72 L94 94 L0 94 Z','#a3a8ae')+Pth('M0 82 L40 62 L70 78 L94 70 L94 94 L0 94 Z','#8d9298')+
+  Pth('M-10 30 L30 -10 M-10 70 L70 -10 M10 104 L104 10 M50 104 L104 50','none',' stroke="#ffffff" stroke-width="3" opacity=".35"');
 }
 function milkArt(){ /* abstraction: torn-paper mist swallows the picture
   before it can form - a corner of a frame remains, dissolving */
@@ -389,14 +513,14 @@ function mindArt(){ /* mnemonic: the gallery is the reader's mind - a
 var mode="overture", ovStage=0;
 var OV_A="Something unspoken hung over the crowd on the platform.";
 var OV_C="The townspeople drew back enough to make room for it and then formed a close semicircle about it, looking curiously at the palm leaf which lay across the black cover.";
-function ovSketch(){ /* the palm leaf on the black cover, the semicircle */
-  var k='stroke="var(--ink)" fill="none" stroke-width="2.5" stroke-linecap="round"';
-  return '<circle cx="20" cy="26" r="6" '+k+'/><path d="M12 40 q8 -8 16 0" '+k+'/>'+
-  '<circle cx="47" cy="21" r="6" '+k+'/><path d="M39 35 q8 -8 16 0" '+k+'/>'+
-  '<circle cx="74" cy="26" r="6" '+k+'/><path d="M66 40 q8 -8 16 0" '+k+'/>'+
-  '<path d="M8 66 L22 54 L72 54 L86 66 L72 78 L22 78 Z" fill="var(--ink)" stroke="var(--ink)" stroke-width="2"/>'+
-  '<path d="M28 68 Q47 58 68 62" stroke="var(--panel)" fill="none" stroke-width="2.5"/>'+
-  '<path d="M34 66 L38 60 M40 64 L45 58 M47 63 L52 58 M54 62 L59 58 M60 63 L64 60" stroke="var(--panel)" fill="none" stroke-width="2"/>';
+function ovSketch(){ /* the palm leaf on the black cover; the semicircle of townspeople, snow on the platform */
+  var o=R(0,0,94,94,'#46506a')+'<g fill="#e9e6de">'+'<circle cx="12" cy="10" r="1"/><circle cx="40" cy="6" r="1"/><circle cx="70" cy="14" r="1"/><circle cx="84" cy="30" r="1"/><circle cx="24" cy="28" r="1"/></g>'+
+    R(0,56,94,38,'#d8d3c6')+Pth('M0 62 H94 M0 72 H94 M0 84 H94','none',' stroke="#b9b2a3" stroke-width="1"');
+  var ppl=[[12,44,'#F4C542'],[28,38,'#52C3C9'],[46,36,'#FF7F6B'],[64,38,'#A77BD6'],[80,44,'#6FA8DC']];
+  ppl.forEach(function(p){ o+=Pth('M'+(p[0]-7)+' '+(p[1]+22)+' L'+(p[0]-5)+' '+(p[1]+6)+' L'+(p[0]+5)+' '+(p[1]+6)+' L'+(p[0]+7)+' '+(p[1]+22)+' Z','#1f2430')+head(p[0],p[1],4.4,p[2])+Pth('M'+(p[0]-5)+' '+(p[1]-2)+' h10 v-3 h-10 Z','#1a1d24'); });
+  o+=Pth('M10 76 L22 64 L72 64 L84 76 L72 88 L22 88 Z','#15161a')+Pth('M24 76 Q46 64 70 70','none',' stroke="#5f8a4a" stroke-width="2.6"');
+  o+=Pth('M30 74 L34 67 M37 72 L41 65 M44 70 L48 64 M51 69 L55 64 M58 69 L62 65','none',' stroke="#7aa05e" stroke-width="2"');
+  return o;
 }
 function buildOvWall(){
   var w=Math.min(window.innerWidth*0.6,300);
@@ -414,10 +538,11 @@ function buildOvWall(){
   document.getElementById("wallDiv").innerHTML=html;
   paintOv(false);
 }
+function clipArt(a){return '<svg x="0" y="0" width="'+IM+'" height="'+IM+'" viewBox="0 0 94 94">'+a+'</svg>';}
 function paintOv(animate){
   var ph=document.getElementById("photoO"); if(!ph){return;}
   var art=(ovStage===0)?milkArt():ovSketch();
-  ph.innerHTML='<rect x="0" y="0" width="'+IM+'" height="'+IM+'" fill="var(--panel)"/>'+art;
+  ph.innerHTML='<rect x="0" y="0" width="'+IM+'" height="'+IM+'" fill="var(--panel)"/>'+clipArt(art);
   if(animate){ph.classList.remove("develop"); void ph.getBoundingClientRect();
     ph.classList.add("develop");}
 }
@@ -495,12 +620,16 @@ function buildWall(){
     '<defs><filter id="fsh" x="-20%" y="-20%" width="140%" height="150%">'+
     '<feDropShadow dx="2" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity=".33"/>'+
     '</filter></defs>';
+  /* v0.7: the gallery hangs on a line, pegged like prints drying */
+  var rows={}; lay.frames.forEach(function(f){rows[f.y]=1;});
+  var vbw=parseInt(lay.vb.split(" ")[2],10);
+  Object.keys(rows).forEach(function(y){ y=+y;
+    html+='<path d="M-10 '+(y-8)+' Q'+(vbw/2)+' '+(y+2)+' '+(vbw+10)+' '+(y-8)+'" fill="none" stroke="#d8c8a4" stroke-width="2"/>'; });
   lay.frames.forEach(function(f,i){
     html+='<g transform="translate('+f.x+','+f.y+') rotate('+((i%2)?2:-2)+')" filter="url(#fsh)">'+
       '<rect id="fhl'+i+'" x="-10" y="-10" width="'+(FW+20)+'" height="'+(FH+20)+'" fill="none" stroke="var(--edge)" stroke-width="5" opacity="0"/>'+
-      '<rect x="-4" y="-4" width="'+(FW+8)+'" height="'+(FH+8)+'" fill="var(--panel)"/>'+
-      '<rect x="2" y="2" width="'+(FW-4)+'" height="'+(IM+12)+'" fill="var(--mat)"/>'+
-      '<line x1="'+(FW/2)+'" y1="-12" x2="'+(FW/2)+'" y2="-4" stroke="var(--edge)" stroke-width="2"/>'+
+      '<rect x="-4" y="-4" width="'+(FW+8)+'" height="'+(FH+8)+'" fill="#f6f1e4"/>'+
+      '<rect x="'+(FW/2-3)+'" y="-12" width="6" height="16" rx="1.4" fill="#b08956"/><rect x="'+(FW/2-.6)+'" y="-12" width="1.2" height="16" fill="#7a5a36"/>'+
       '<g id="photo'+i+'" transform="translate(8,8)"></g>'+
       '</g>';
   });
@@ -516,7 +645,6 @@ function relayoutRoom(){
   var lampDx=Math.max(0,(x0+80)-180);
   var winDx=Math.min(0,(x1-110)-825);
   document.getElementById("lampG").setAttribute("transform","translate("+lampDx+",0)");
-  document.getElementById("glow").setAttribute("transform","translate("+lampDx+",0)");
   document.getElementById("windowG").setAttribute("transform","translate("+winDx+",0)");
 }
 window.addEventListener("resize",function(){buildWall();relayoutRoom();paintLamp();});
@@ -526,17 +654,37 @@ function paintPhoto(i,animate){
   if(kind==="c"||kind==="g"){art=sketch(i);}
   else if(kind==="a"){art=milkArt();}
   else{art=placeholderArt();}
-  ph.innerHTML='<rect x="0" y="0" width="'+IM+'" height="'+IM+'" fill="var(--panel)"/>'+art;
+  ph.innerHTML='<rect x="0" y="0" width="'+IM+'" height="'+IM+'" fill="var(--panel)"/>'+clipArt(art);
   if(animate){
     ph.classList.remove("develop"); void ph.getBoundingClientRect();
     ph.classList.add("develop");
   }
 }
+function buildBooks(){
+  var g=document.getElementById("books"); if(!g||g.childNodes.length){return;}
+  var cols=["#2f5d62","#b8452e","#d8a646","#6b4b5b","#e9dcbc","#3f5f7b","#7a3a2c","#8fa38f","#c98a3e"], o="", seed=7;
+  function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+  [160,230,304,378].forEach(function(top){ var x=418;
+    while(x<564){ var w=7+rnd()*9, h=44+rnd()*18; if(x+w>566)break;
+      if(rnd()<.12){ o+='<rect x="'+x+'" y="'+(top+62-h*.7)+'" width="'+(h*.7)+'" height="'+w+'" fill="'+cols[Math.floor(rnd()*cols.length)]+'"/>'; x+=h*.7+2; continue; }
+      o+='<rect x="'+x.toFixed(1)+'" y="'+(top+62-h).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+cols[Math.floor(rnd()*cols.length)]+'"/>';
+      o+='<rect x="'+x.toFixed(1)+'" y="'+(top+62-h*.8).toFixed(1)+'" width="'+w.toFixed(1)+'" height="2" fill="#000" opacity=".18"/>';
+      x+=w+.8; } });
+  g.innerHTML=o;
+  var t=document.getElementById("tableG");
+  if(t&&!document.getElementById("teaSteam")){
+    var ns="http://www.w3.org/2000/svg", st=document.createElementNS(ns,"g"); st.id="teaSteam";
+    st.innerHTML='<path class="steam" d="M682 466 q-4 -8 0 -16 q4 -8 0 -16" fill="none" stroke="#f3eee2" stroke-width="2.4" stroke-linecap="round"/><path class="steam" d="M688 466 q4 -8 0 -16 q-4 -8 0 -16" fill="none" stroke="#f3eee2" stroke-width="2.4" stroke-linecap="round"/><path class="steam" d="M694 466 q-4 -8 0 -16 q4 -8 0 -16" fill="none" stroke="#f3eee2" stroke-width="2.4" stroke-linecap="round"/>';
+    t.parentNode.insertBefore(st,t.nextSibling);
+  }
+}
 function paintLamp(){
+  buildBooks();
   var c=0; state.forEach(function(s){if(s.kind==="c"||s.kind==="g"){c++;}});
   var glow=document.getElementById("glow");
   var r=90+28*c;
   glow.setAttribute("rx",r); glow.setAttribute("ry",r);
+  var cone=document.getElementById("cone"); if(cone){cone.style.opacity=(.35+.13*c).toFixed(2);}
 }
 /* ---------- PASSAGE ---------- */
 function render(){
