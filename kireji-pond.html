@@ -1000,6 +1000,39 @@ $('#marks').addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   if((e.key==='p'||e.key==='P')&&S.phase==='play'&&!e.metaKey&&!e.ctrlKey) setPaused(!S.paused);
 });
+/* ---------- v2 Still water: the no/low motion lever ---------- */
+function bankTile(p){
+  const el=document.createElement('li');
+  el.className='tile';
+  if(p.k==='t') el.dataset.turn='';
+  el.innerHTML=`<button type="button" class="in" aria-expanded="false"><span class="tx"></span><span class="beads" aria-hidden="true">${'<i></i>'.repeat(p.s)}</span></button><div class="choice" hidden><button type="button" class="c-catch">Catch line</button><button type="button" class="c-smash">Smash cliché</button><button type="button" class="c-go">Let it go</button></div>`;
+  el.querySelector('.tx').textContent=p.t;
+  el.querySelector('.in').setAttribute('aria-label',`${p.t}, ${p.s} syllables. Tap to catch or smash.`);
+  const t={p,el,s:0,lane:0,w:0,h:0,gone:false,held:false,list:true};
+  el.querySelector('.in').addEventListener('click',()=>toggleHold(t));
+  el.querySelector('.c-catch').addEventListener('click',()=>{release(t);onTile(t)});
+  el.querySelector('.c-smash').addEventListener('click',()=>onSmash(t));
+  el.querySelector('.c-go').addEventListener('click',()=>letGo(t));
+  return t;
+}
+function clearBank(){plist.forEach(t=>{t.el.remove();if(!t.gone)deck.push(t.p)}); plist=[]; $('#plist').innerHTML=''}
+function dealList(){
+  clearBank();
+  for(let i=0;i<8;i++){const p=pick(); if(!p) break; const t=bankTile(p); $('#plist').appendChild(t.el); plist.push(t)}
+}
+function setStill(v){
+  S.still=v; document.body.classList.toggle('still',v);
+  ['#still','#still0'].forEach(s=>$(s).setAttribute('aria-pressed',v));
+  $('#stillBox').hidden=!v; $('#pause').hidden=v;
+  if(v){tiles.forEach(o=>{if(o.held)release(o)}); if(S.phase==='play'&&!S.busy){dealList(); say('Still water. The stream stops and the phrases wait on the bank. Tap one to Catch it, Smash it, or Let it go. Pull the lever for new phrases.')}}
+  else {clearBank(); if(S.phase==='play') say('The stream runs again.')}
+  try{localStorage.setItem('kirejiStill',v?'1':'0')}catch(e){}
+}
+$('#still').addEventListener('click',()=>setStill(!S.still));
+$('#still0').addEventListener('click',()=>setStill(!S.still));
+$('#pull').addEventListener('click',()=>{if(S.phase!=='play'||S.busy)return; dealList(); say('Lever pulled. New phrases on the bank.'); const f=$('#plist .in'); if(f) f.focus()});
+{let st=reduce; try{const v=localStorage.getItem('kirejiStill'); if(v!==null) st=v==='1'}catch(e){} if(st) setStill(true);}
+
 function show(id){['pIntro','pPlay','pDone','pFinal'].forEach(x=>$('#'+x).hidden=x!==id)}
 function startRound(){
   S.phase='play'; S.busy=false; $('#slots').classList.remove('busy'); S.pads=3; S.slots=[null,null,null];
