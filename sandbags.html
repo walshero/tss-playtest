@@ -4,6 +4,22 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v33 2026-09-23, TWO SCENES FROM THE FOUNDER'S PHOTOGRAPHS. Dead Ants: Sparr's
+  Drug on its corner at the LEFT (the wooden two-storey, DRUGS on the cornice,
+  the lit red sign band, a billboard on the roof), the tall brick blocks
+  behind, a Green Line trolley on the street, and on our sidewalk a line of
+  three payphones and the stop for the 39 at the RIGHT; the ant walks between
+  the two of them. Black Spots: the Longwood Avenue backdrop, the towers of the
+  medical area in brick and cream, the white hospital slab and its stack, a
+  crane, poles, wires and trees on the far sidewalk, a yellow double line and
+  trolley rails in the road. The balloon parks at the right edge on phones so
+  it covers none of it. Art notes, same night: Peach Cobbler keeps one kind
+  of cloud, golden-hour stratus in four slow-drifting tiers, and a single
+  raptor circling high over the street; the neighbours' colonial is slightly
+  run down (a shutter hanging by its hinge, one gone, a dark cracked pane,
+  patchy paint, a sagging gutter, weeds). Black Spots loses its top row of
+  cumulus and its birds; three pigeons work the near sidewalk instead.
+
   v32 2026-09-23, THE SKY MOVES AND THE SCENES TELL THE STORY (founder: "Better
   art on sandbags. Make the clouds move. And other cheap animations. Pay phone
   scale is crazy off and weird. The scenes need a narrative cohesion they lack
@@ -597,9 +613,19 @@ body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif
 #scenery .fx .crawl{ animation:crawl 6s ease-in-out infinite alternate; }
 @keyframes crawl{ from{ transform:translateX(-7px); } to{ transform:translateX(7px); } }
 #balloon{ animation:breathe 4.2s ease-in-out infinite alternate; }
+.skyart .circ{ transform-box:view-box; animation:circ 46s linear infinite; }
+@keyframes circ{ to{ transform:rotate(360deg); } }
+.skyart .circ .bank{ transform-box:fill-box; transform-origin:50% 50%; animation:bank 9s ease-in-out infinite alternate; }
+@keyframes bank{ from{ transform:rotate(-14deg) scaleX(.94); } to{ transform:rotate(12deg) scaleX(1); } }
+#scenery .fx .pigeon{ animation:peck 2.6s ease-in-out infinite; }
+#scenery .fx .pigeon:nth-child(2){ animation-duration:3.3s; animation-delay:-1.1s; }
+#scenery .fx .pigeon:nth-child(3){ animation-duration:2.1s; animation-delay:-.6s; }
+@keyframes peck{ 0%,100%{ transform:translateX(0); } 35%{ transform:translateX(5px); } 50%{ transform:translateX(5px) translateY(.6px); } 85%{ transform:translateX(-3px); } }
+#scenery .fx .pigeon .head{ transform-box:fill-box; transform-origin:0% 100%; animation:bob .5s steps(2) infinite; }
+@keyframes bob{ to{ transform:translateX(.9px); } }
 @keyframes breathe{ from{ translate:0 0; } to{ translate:0 -4px; } }
 @media (prefers-reduced-motion: reduce){
-  .skyart .skdrift, .rainfx, .twk, #scenery .fx *, #balloon{ animation:none !important; }
+  .skyart .skdrift, .rainfx, .twk, #scenery .fx *, #balloon, .skyart .circ, .skyart .bank{ animation:none !important; }
   #scenery .fx .steam{ opacity:.5; }
 }
 /* v32 PHONE FRAMING: the set fills its box a little larger on a narrow screen
@@ -611,7 +637,7 @@ body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif
   .skybox[data-piece="0"]{ --park:78%; }
   .skybox[data-piece="1"]{ --park:84%; }
   .skybox[data-piece="2"]{ --park:72%; }
-  .skybox[data-piece="3"]{ --park:52%; }
+  .skybox[data-piece="3"]{ --park:92%; }
 }
 /* v30: the sky plate hangs in the upper skybox, behind the set and the balloon */
 .skyart{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
@@ -1351,20 +1377,26 @@ html{ background:var(--bg); }
     /* 1, fair: cumulus in perspective - big and near at the top of the frame,
        smaller and flatter toward the rooftops - and three paper birds */
     function(W,H,S){ var rnd=skR(7), col=['#f3f0e8','#c3ced6','#fbfaf5'];
-      var near=skRow(rnd,W,S,H*.2,.5,2,col,'sx1')+skRow(rnd,W,S,H*.34,.3,3,col,'sx1'), far=skRow(rnd,W,S,H*.47,.16,4,col,'sx0','.85');
-      return [{c:far,v:4},{c:near,v:9},{c:skG('sx0',skBird(W*.3,H*.56,9,'#3e4e5d')+skBird(W*.36,H*.585,7,'#3e4e5d')+skBird(W*.41,H*.55,6,'#3e4e5d')),v:22}];
+      /* v33 founder: no top row of big cumulus; the birds come down to the
+         sidewalk as pigeons (see the scene's fx layer) */
+      var near=skRow(rnd,W,S,H*.34,.3,3,col,'sx1'), far=skRow(rnd,W,S,H*.47,.16,4,col,'sx0','.85');
+      return [{c:far,v:4},{c:near,v:9}];
     },
     /* 2, golden hour: rows of small altocumulus lit gold from below, a second
        low row, and a haze band sitting on the treeline */
-    function(W,H,S){ var rnd=skR(29), col=['#e9c9a4','#f4c27a','#fbe6c0'], o='';
-      [[.1,.1,9],[.2,.08,11],[.3,.065,12],[.41,.05,14]].forEach(function(L){
-        var n=Math.round(L[2]*W/S);
-        for(var i=0;i<n;i++){ if(rnd()<.25) continue;
-          o+=skG('sx0',cumulus(rnd,W*(i+.5)/n+(rnd()-.5)*W/n*.5,H*L[0]+(rnd()-.5)*H*.03,S*L[1]*(.7+rnd()*.7),col)); }
+    function(W,H,S){ var rnd=skR(29), o='';
+      /* v33 founder: one kind of cloud. Golden-hour stratus: long torn bands,
+         lit from below, three tiers, each a little lower and warmer, drifting
+         slowly. One raptor circles high over the street. */
+      [[.14,.20,'#f0cfa6','.55'],[.27,.26,'#f2c58e','.7'],[.40,.30,'#f5cf9a','.8'],[.52,.34,'#f3cf98','.75']].forEach(function(L,k){
+        var nb=Math.max(2,Math.round((2+k)*W/S)), g='';
+        for(var b=0;b<nb;b++){ if(rnd()<.2) continue;
+          g+=skBlob(rnd,W*(b+.5)/nb+(rnd()-.5)*W/nb*.5,H*L[0]+(rnd()-.5)*H*.02,W/nb*(.3+L[1]),H*(.012+k*.004),L[2],L[3]); }
+        o+=skG('sx0',g);
       });
-      var nb=Math.max(3,Math.round(3*W/S)), hz='';
-      for(var b=0;b<nb;b++) hz+=skG('sx0',skBlob(rnd,W*(b+.5)/nb,H*(.52+rnd()*.03),W/nb*.62,H*.028,'#f3cf98','.7'));
-      return [{c:hz,v:2},{c:o,v:6},{c:skG('sx0',skBird(W*.66,H*.47,10,'#563526')+skBird(W*.72,H*.45,8,'#563526')),v:18}];
+      var cx=W*.62, cy=H*.3, R=S*.16;
+      var hawk='<g class="circ" style="transform-origin:'+skF(cx)+'px '+skF(cy)+'px"><g class="bank">'+skBird(cx+R,cy,S*.05,'#3b2418')+'</g></g>';
+      return [{c:o,v:1.6},{c:hawk,v:0}];
     },
     /* 3, night: a scatter of paper stars and thin stratus drawn across the moon */
     function(W,H,S){ var rnd=skR(43), st='', o='';
@@ -1400,7 +1432,7 @@ html{ background:var(--bg); }
     var sv=$('scenery'); if(!sv) return;
     var r=sv.getBoundingClientRect(); if(!r.width||!r.height) return;
     var a=r.width/r.height, vb='0 40 400 160';
-    if(a<2.5){ var vw=Math.max(340,Math.min(400,160*a)), h=vw/a; vb=((400-vw)/2).toFixed(1)+' '+(200-h).toFixed(1)+' '+vw.toFixed(1)+' '+h.toFixed(1); }
+    if(a<2.5){ var vw=Math.max(340,Math.min(400,160*a)), h=vw/a, x0=(400-vw)/2; if(pi===3) x0=Math.max(0,x0-30); vb=x0.toFixed(1)+' '+(200-h).toFixed(1)+' '+vw.toFixed(1)+' '+h.toFixed(1); }
     sv.setAttribute('viewBox',vb);
     sv.setAttribute('preserveAspectRatio','xMidYMax meet');
   }
@@ -1504,6 +1536,33 @@ html{ background:var(--bg); }
       + '<ellipse cx="'+(x-3.2)+'" cy="'+(y+.6)+'" rx="2" ry="1.4" fill="#140d09"/><ellipse cx="'+x+'" cy="'+(y+.6)+'" rx="1.2" ry=".9" fill="#140d09"/><ellipse cx="'+(x+2.8)+'" cy="'+(y+.3)+'" rx="1.3" ry="1.1" fill="#140d09"/>';
   }
 
+  // a Green Line trolley (an LRV of the nineties): long low car, a row of lit
+  // windows, the green band, a pantograph, headlight on. x,y is its near
+  // bottom-left; it sits on the street.
+  function trolley(x,y){
+    var w=118, h=22, o='';
+    o+=rc(x-1,y+h,w+2,2.2,'var(--p-char-d)');
+    o+=box(x,y,w,h,4,'#3a6b45','#2c5236','#4a7d55');
+    o+='<g class="noedge">'+rc(x,y+h-7,w,2.6,'#e9e2cc')+rc(x,y+2,w,1.6,'#dfe8dc')+'</g>';
+    o+='<g class="lit">'+win(x+4,y+4,11,1,7.4,9,3,0)+'</g>';
+    o+='<g class="noedge">'+rc(x+w*.31,y+4,3,12,'#2c5236')+rc(x+w*.64,y+4,3,12,'#2c5236')+'</g>';
+    o+='<g class="noedge">'+ln('M'+(x+w*.5)+' '+y+' l-10 -8 l0 -3 M'+(x+w*.5)+' '+y+' l4 -8','#3d3d3d',1.1)+rc(x+w*.5-13,y-12,20,1.4,'#3d3d3d')+'</g>';
+    o+='<g class="lit glow"><circle cx="'+(x+w)+'" cy="'+(y+h-4)+'" r="2.2"/></g>';
+    for(var k=0;k<4;k++) o+='<circle cx="'+(x+14+k*30)+'" cy="'+(y+h+1)+'" r="2.6" fill="var(--p-char)"/>';
+    return o;
+  }
+
+  // a city pigeon on the pavement, walking: a plump grey body, a bobbing
+  // head with a white neck ring, a tail, two legs. d faces it (1 right).
+  function pigeon(x,y,d){
+    return '<g class="pigeon"><ellipse cx="'+x+'" cy="'+(y-3.2)+'" rx="4.2" ry="2.6" fill="#6b6f78"/>'
+      +'<path d="M'+(x-d*3.6)+' '+(y-3.4)+' l'+(-d*3)+' -.6 l'+(d*.6)+' 1.6 z" fill="#4c505a"/>'
+      +'<g class="head"><circle cx="'+(x+d*3.8)+'" cy="'+(y-5.4)+'" r="1.6" fill="#5a5e68"/><path d="M'+(x+d*5.2)+' '+(y-5.2)+' l'+(d*1.4)+' .4 l'+(-d*1.4)+' .5 z" fill="#d9a66b"/>'
+      +'<circle cx="'+(x+d*3.2)+'" cy="'+(y-4.2)+'" r=".9" fill="#f2f0ea"/></g>'
+      +'<path d="M'+(x-1.4)+' '+(y-1)+' l-.4 1.4 M'+(x+1.2)+' '+(y-1)+' l.4 1.4" stroke="#c9895a" stroke-width=".6" fill="none"/>'
+      +'<ellipse cx="'+(x+.6)+'" cy="'+(y-3.4)+'" rx="2.4" ry="1.6" fill="#7e838c"/></g>';
+  }
+
   var SCENERY=[
    /* 0, RAMEN AT ECHIGO KAWAGUCHI. v32: the village, from the source text.
         "I wandered away from the station, down an alleyway of vending machines,
@@ -1575,13 +1634,25 @@ html{ background:var(--bg); }
         hospital, late seventies, bright morning. Children's Hospital's 1914
         pavilion with its columns and green dome, the seventies concrete slab
         behind it, brick hospital blocks, a traffic signal, a cobrahead, an
-        ambulance at the far curb, the ladder crosswalk, granite curbs, the gum. */
+        ambulance at the far curb, the ladder crosswalk, granite curbs, the gum.
+        v33, from the founder's Longwood Avenue photograph (09-23): the tall
+        brick-and-cream towers of the medical area behind, the white hospital
+        slab and its stack, a crane; the street carries a yellow double line
+        and trolley rails, with poles, wires and a line of trees on the far
+        sidewalk. */
    '<g class="ly1">'+
-     box(0,74,124,84,9,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
-     '<g class="noedge" fill="var(--p-char-d)">'+win(8,82,7,5,7,9,9,6)+'</g>'+
-     slab(150,36,104,122,10)+
-     box(284,64,116,94,9,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
-     '<g class="noedge" fill="var(--p-char-d)">'+win(292,72,7,6,7,9,8.5,6)+'</g>'+
+     box(-10,80,90,78,9,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(-2,88,5,5,7,9,9,6)+'</g>'+
+     slab(120,52,90,106,10)+rc(148,34,7,20,'var(--p-granite-d)')+
+     '<g class="noedge">'+ln('M236 66 l30 -30 M266 36 l-4 12 M244 60 l26 0','var(--p-verm)',1.2)+ln('M266 36 l0 30','var(--p-verm)',.6)+'</g>'+
+     box(226,46,60,112,9,'var(--p-terra)','var(--p-terra-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-cream)">'+win(230,52,2,9,5,7,18,4.5)+'</g>'+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(238,52,3,9,5,7,5,4.5)+'</g>'+
+     box(296,20,54,138,9,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-cream)">'+win(300,26,2,12,4,6,22,4.5)+'</g>'+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(308,26,3,12,5,6,5,4.5)+'</g>'+
+     box(360,70,60,88,9,'var(--p-terra-d)','var(--p-char-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(366,78,5,6,6,8,6,6)+'</g>'+
    '</g>'+ haze(.40) +
    '<g class="ly2">'+
      pavilion(18,150,140,10)+
@@ -1593,10 +1664,13 @@ html{ background:var(--bg); }
      signal(172,86,-26)+
      pole(374,80,80,-26,false)+
      rc(0,150,400,8,'var(--p-bone-d)')+curb(0,158,400,4)+
+     tree(262,150,9,'var(--p-moss)','var(--p-moss-d)')+tree(330,150,8,'var(--p-sage)','var(--p-sage-d)')+tree(392,150,9,'var(--p-moss)','var(--p-moss-d)')+
+     polesline([28,120,240,352],108,150)+
      ambulance(214,136)+
    '</g>'+ haze(.14) +
    '<g class="ly3">'+
-     '<g class="noedge">'+rc(0,162,400,26,'var(--p-char)')+'</g>'+
+     '<g class="noedge">'+rc(0,162,400,26,'var(--p-char)')+
+       ln('M0 173.6 h400 M0 176.4 h400','#d9b53c',1)+ln('M0 169 h400 M0 181 h400','#8a8478',.7,.8)+'</g>'+
      '<g class="noedge" opacity=".92">'+
        rc(44,164,96,3.2,'var(--p-white)')+rc(40,170,104,3.6,'var(--p-white)')+rc(36,176.4,112,4,'var(--p-white)')+rc(32,183,120,4.4,'var(--p-white)')+'</g>'+
      '<g class="noedge" fill="var(--p-char-d)">'+
@@ -1618,6 +1692,7 @@ html{ background:var(--bg); }
      '<rect class="blink" x="234" y="136" width="6.4" height="3.6" rx=".6" fill="#ff3b30"/>'+
      '<rect class="blink2" x="241" y="136" width="6.4" height="3.6" rx=".6" fill="#fff6e6"/>'+
      '<circle class="blink" cx="237" cy="137.8" r="6" fill="#ff3b30" opacity=".22"/>'+
+     '<g>'+pigeon(250,199,1)+pigeon(292,199,-1)+pigeon(318,199,1)+'</g>'+
    '</g>',
 
    /* 2, PEACH COBBLER. A suburban street, late golden afternoon: his cape
@@ -1639,8 +1714,16 @@ html{ background:var(--bg); }
      colonial(262,134,112,16,'var(--p-cream)','var(--p-cream-d)','var(--p-terra)','var(--p-terra-d)')+
      '<g class="lit glow">'+win(272,140,4,1,11,12,14,0)+win(272,160,1,1,11,12,0,0)+win(347,160,1,1,11,12,0,0)+
        win(297,160,1,1,11,12,0,0)+win(322,160,1,1,11,12,0,0)+'</g>'+
-     shutter(272,140,11,12,'var(--p-moss-d)')+shutter(297,140,11,12,'var(--p-moss-d)')+shutter(322,140,11,12,'var(--p-moss-d)')+shutter(347,140,11,12,'var(--p-moss-d)')+
-     shutter(272,160,11,12,'var(--p-moss-d)')+shutter(297,160,11,12,'var(--p-moss-d)')+shutter(322,160,11,12,'var(--p-moss-d)')+shutter(347,160,11,12,'var(--p-moss-d)')+
+     /* v33 founder: slightly run down. One shutter hangs by its top hinge, one
+        is gone, a pane is dark and cracked, the paint is patchy, the gutter
+        sags, weeds at the foundation. */
+     shutter(272,140,11,12,'var(--p-moss-d)')+shutter(297,140,11,12,'var(--p-moss-d)')+shutter(322,140,11,12,'var(--p-moss-d)')+rc(344,140,2.4,12,'var(--p-moss-d)')+
+     '<g transform="rotate(14 358.6 140)">'+rc(358.6,140,2.4,12,'var(--p-moss-d)')+'</g>'+
+     shutter(272,160,11,12,'var(--p-moss-d)')+shutter(297,160,11,12,'var(--p-moss-d)')+rc(319,160,2.4,12,'var(--p-moss-d)')+shutter(347,160,11,12,'var(--p-moss-d)')+
+     '<g class="noedge">'+rc(322,160,11,12,'var(--p-char-d)')+ln('M324 162 l4 5 l-2 4','#9aa39c',.5)+
+       rc(300,146,7,4,'var(--p-cream-d)')+rc(338,168,9,3,'var(--p-cream-d)')+rc(280,171,5,4,'var(--p-cream-d)')+
+       ln('M262 136 q40 3.5 60 1.2 q30 -2 52 .6','var(--p-terra-d)',1.1)+
+       ln('M268 178 l1 -6 M271 178 l-1 -5 M336 178 l1 -7 M339 178 l1 -5 M342 178 l-1 -6 M362 178 l1 -5','var(--p-moss-d)',.9)+'</g>'+
      rc(311,160,12,18,'var(--p-moss-d)',' rx=".8"')+
      '<g class="lit glow"><circle cx="328" cy="162" r="2.6"/></g>'+
      tree(380,150,19,'var(--p-moss)','var(--p-moss-d)')+
@@ -1675,49 +1758,78 @@ html{ background:var(--bg); }
      figure(352,189,16,{felt:'coral',coat:'var(--p-gold)',coatD:'var(--p-gold-d)',legs:'var(--p-indigo)',hair:'#c2410c'})+
    '</g><circle class="pulse" cx="328" cy="162" r="5" fill="#ffd98a" opacity=".3"/></g>',
 
-   /* 3, DEAD ANTS. Centre Street, Jamaica Plain, the nineties, night. We are
-        on the near sidewalk, so the near things are the big things: the bus
-        shelter with its bench, the sign for the 39, two pedestal payphones,
-        the ant. Across the street, small, the low brick storefronts under a
-        cobrahead's sodium glow, and the triple-deckers behind. */
-   '<g class="ly1"><g transform="translate(0 66) scale(.6)">'+
-     decker(20,84,50,7,'var(--p-plum)','var(--p-plum-d)','var(--p-bone-d)','var(--p-char-d)')+
-     decker(150,90,46,7,'var(--p-char)','var(--p-char-d)','var(--p-bone-d)','var(--p-char-d)')+
-     decker(330,80,52,7,'var(--p-plum)','var(--p-plum-d)','var(--p-bone-d)','var(--p-char-d)')+
-     decker(480,86,52,7,'var(--p-char)','var(--p-char-d)','var(--p-bone-d)','var(--p-char-d)')+
-     decker(600,80,52,7,'var(--p-plum)','var(--p-plum-d)','var(--p-bone-d)','var(--p-char-d)')+
-     '<g class="lit glow" opacity=".9">'+win(52,90,1,1,6,10,0,0)+win(52,134,1,1,6,10,0,0)+win(180,118,1,1,6,10,0,0)+win(362,86,1,1,6,10,0,0)+win(512,108,1,1,6,10,0,0)+win(632,130,1,1,6,10,0,0)+'</g>'+
-   '</g></g>'+ haze(.34) +
-   '<g class="ly2"><g transform="translate(0 44) scale(.68)">'+
-     shop(0,116,64,2,8,'var(--p-brick)','var(--p-brick-d)','var(--p-bone-d)',1)+
-     shop(70,134,56,1,8,'var(--p-terra)','var(--p-terra-d)','var(--p-cream-d)',0)+
-     shop(132,98,82,3,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',2)+
-     shop(220,134,60,1,8,'var(--p-brick)','var(--p-brick-d)','var(--p-cream-d)',1)+
-     shop(288,116,66,2,8,'var(--p-terra)','var(--p-terra-d)','var(--p-bone-d)',2)+
-     shop(360,134,40,1,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',0)+
-     shop(406,120,70,2,8,'var(--p-brick)','var(--p-brick-d)','var(--p-bone-d)',1)+
-     shop(482,134,60,1,8,'var(--p-terra)','var(--p-terra-d)','var(--p-cream-d)',2)+
-     shop(548,110,50,2,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',0)+
-     wires(102,[0,90,190,290,390,490,590],'var(--p-char-d)')+
-     brickwalk(0,160,600,6)+curb(0,166,600,3)+
-     pole(250,92,74,32,true)+
-   '</g></g>'+ haze(.10) +
+   /* 3, DEAD ANTS. v33, staged from the founder's two photographs (09-23):
+        Sparr's Drug on its corner, the old wooden two-storey with DRUGS on the
+        cornice, a billboard above it; the tall brick blocks of the Longwood end
+        behind; a Green Line trolley on the street; and on our side, the near
+        sidewalk, three pedestal payphones in a line and the stop for the 39.
+        Sparr's is on the LEFT, the phones and the stop on the RIGHT; the ant
+        walks between the two of them. Night, sodium. */
+   '<g class="ly1"><g transform="translate(0 40) scale(.62)">'+
+     box(-20,10,110,150,10,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(-12,20,7,9,7,9,7,6)+'</g>'+
+     box(100,30,120,130,10,'var(--p-terra)','var(--p-terra-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(108,40,8,8,7,9,7,6)+'</g>'+
+     box(240,0,74,160,10,'var(--p-brick-d)','var(--p-char-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(248,10,5,10,6,9,6.5,6)+'</g>'+
+     box(330,44,130,116,10,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(338,54,9,7,7,9,7,6)+'</g>'+
+     box(470,20,100,140,10,'var(--p-terra-d)','var(--p-char-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(478,30,6,9,7,9,7,6)+'</g>'+
+     box(580,60,90,100,10,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
+     '<g class="lit glow" opacity=".9">'+win(2,56,1,1,7,9,0,0)+win(122,76,1,1,7,9,0,0)+win(150,112,1,1,7,9,0,0)+win(262,46,1,1,6,9,0,0)+win(380,90,1,1,7,9,0,0)+win(506,66,1,1,7,9,0,0)+win(492,120,1,1,7,9,0,0)+win(610,90,1,1,7,9,0,0)+'</g>'+
+   '</g></g>'+ haze(.36) +
+   '<g class="ly2">'+
+     /* Sparr's: corner-cut wooden block, clapboard, cornice, DRUGS letters,
+        the lit sign band, the shop windows below, a billboard on the roof */
+     box(-30,96,150,62,10,'var(--p-timber)','var(--p-char-d)','var(--p-char-d)')+
+     rc(-32,92,154,5,'var(--p-kraft-d)')+rc(-31,97,152,1.6,'var(--p-char-d)')+
+     '<g class="noedge">'+ln('M-30 104 h150 M-30 110 h150 M-30 116 h150 M-30 122 h150 M-30 128 h150','var(--p-char-d)',.5,.6)+'</g>'+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(-22,102,7,1,11,15,8,0)+'</g>'+
+     '<g class="noedge">'+rc(-22,102,11,15,'var(--lit)',' opacity=".55"')+rc(54,102,11,15,'var(--lit)',' opacity=".4"')+'</g>'+
+     rc(-30,124,150,7,'var(--p-verm)')+
+     '<g class="noedge">'+rc(6,132,80,6,'#f6e6c0')+
+       ln('M12 134 h3 M12 133 v4 M12 137 h3 M20 133 v4 M20 133 h3 M20 135 h2 M27 133 v4 M27 133 h3 M27 135 h3 M35 133 v4 M35 133 h3 M35 137 h3 M43 133 v4 M43 133 h3 M43 135 h3 M43 137 h3 M52 133 h3 M52 133 v2 M52 135 h3 M55 135 v2 M52 137 h3 M62 133 h3 M62 133 v4 M62 137 h3 M70 133 h3 M70 133 v4 M70 137 h3 M78 133 h3 M78 133 v2 M78 135 h3 M81 135 v2 M78 137 h3','#b83a2a',.9)+'</g>'+
+     '<g class="lit glow">'+lr(-24,140,44,16)+lr(26,140,60,16)+'</g>'+
+     rc(88,140,12,18,'var(--p-timber)',' rx=".6"')+
+     '<g class="noedge">'+rc(-24,140,44,16,'#000',' opacity=".08"')+
+       rc(-20,143,8,10,'var(--p-verm)',' opacity=".7"')+rc(-8,144,10,8,'var(--p-gold)',' opacity=".7"')+rc(30,143,10,10,'var(--p-indigo)',' opacity=".7"')+rc(46,145,12,8,'var(--p-verm)',' opacity=".7"')+rc(64,143,14,10,'var(--p-moss)',' opacity=".7"')+'</g>'+
+     box(-10,70,84,22,4,'var(--p-white)','var(--p-white-d)','var(--p-granite)')+
+     rc(-12,68,88,3,'var(--p-steel-d)')+rc(6,92,2,4,'var(--p-steel-d)')+rc(56,92,2,4,'var(--p-steel-d)')+
+     '<g class="noedge">'+rc(-4,74,32,14,'var(--p-indigo)')+rc(32,74,36,14,'var(--p-gold)')+rc(0,79,24,4,'var(--p-white)',' rx="1"')+
+       ln('M38 79 h24 M38 83 h18','var(--p-verm)',1.6)+'</g>'+
+     /* the far side of the street: shops beyond Sparr's and the trolley */
+     '<g transform="translate(120 44) scale(.68)">'+
+       shop(0,116,64,2,8,'var(--p-brick)','var(--p-brick-d)','var(--p-bone-d)',1)+
+       shop(70,134,56,1,8,'var(--p-terra)','var(--p-terra-d)','var(--p-cream-d)',0)+
+       shop(132,98,82,3,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',2)+
+       shop(220,134,60,1,8,'var(--p-brick)','var(--p-brick-d)','var(--p-cream-d)',1)+
+       shop(288,116,66,2,8,'var(--p-terra)','var(--p-terra-d)','var(--p-bone-d)',2)+
+       shop(360,110,80,2,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',0)+
+       wires(102,[0,90,190,290,390,440],'var(--p-char-d)')+
+       brickwalk(0,160,440,6)+curb(0,166,440,3)+
+       pole(250,92,74,32,true)+
+     '</g>'+
+     '<g class="noedge">'+ln('M-10 160 h420','var(--p-char)',1)+'</g>'+
+   '</g>'+ haze(.10) +
    '<g class="ly3">'+
      '<g class="noedge">'+rc(0,159,400,17,'var(--p-char-d)')+
-       '<ellipse cx="190" cy="160" rx="60" ry="6" fill="var(--lit)" opacity=".13"/></g>'+
+       ln('M0 167.5 h400','#d9c67a',.8,.55)+
+       '<ellipse cx="290" cy="160" rx="60" ry="6" fill="var(--lit)" opacity=".13"/></g>'+
+     trolley(96,153)+
      curb(0,176,400,4)+brickwalk(0,180,400,20)+
-     shelter(268,196,86,42)+bench(278,196,64)+
-     busstop(252,140)+
-     payphone(44,193)+payphone(60,193)+
-     figure(80,198,38,{felt:'cyan',dir:1,arm:'watch',coat:'var(--p-indigo)',coatD:'var(--p-indigo-d)',legs:'var(--p-char-d)',hair:'var(--p-char-d)'})+
-     figure(128,198,38,{felt:'magenta',dir:-1,stride:9,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo-d)',shoe:'var(--p-white)',hair:'var(--p-timber)'})+
+     busstop(300,146)+
+     payphone(238,193)+payphone(256,193)+payphone(274,193)+
+     figure(152,198,38,{felt:'cyan',dir:1,arm:'watch',coat:'var(--p-indigo)',coatD:'var(--p-indigo-d)',legs:'var(--p-char-d)',hair:'var(--p-char-d)'})+
+     figure(200,198,38,{felt:'magenta',dir:-1,stride:9,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo-d)',shoe:'var(--p-white)',hair:'var(--p-timber)'})+
    '</g>'+
-   /* v32: "An ant walked between us on the sidewalk." It walks, between them.
-      Across the street, Sparr's sign hums. */
+   /* "An ant walked between us on the sidewalk." It walks, between them.
+      Sparr's sign hums; the trolley's headlight and the stop light are on. */
    '<g class="fx noedge">'+
-     '<ellipse cx="104" cy="195.4" rx="11" ry="2.4" fill="#ffd98a" opacity=".16"/>'+
-     '<g class="crawl">'+ant(104,194)+'</g>'+
-     '<rect class="pulse" x="92" y="111" width="52" height="3.4" rx="1" fill="#ff9a5c" opacity=".85"/>'+
+     '<ellipse cx="176" cy="195.4" rx="11" ry="2.4" fill="#ffd98a" opacity=".16"/>'+
+     '<g class="crawl">'+ant(176,194)+'</g>'+
+     '<rect class="pulse" x="-30" y="124" width="150" height="7" fill="#ff9a5c" opacity=".55"/>'+
+     '<circle class="pulse" cx="214" cy="171" r="4" fill="#fff2b0" opacity=".5"/>'+
    '</g>'
   ];
 
