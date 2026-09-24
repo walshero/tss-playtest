@@ -840,7 +840,9 @@ function toggleHold(t){
 }
 function letGo(t){
   if(S.phase!=='play'||S.busy||t.gone) return;
-  release(t); t.fast=true; t.el.classList.add('going');
+  release(t);
+  if(t.list){retire(t,'take');say(`Let go: “${t.p.t}” drifts off the bank.`);return}
+  t.fast=true; t.el.classList.add('going');
   t.el.querySelectorAll('button').forEach(b=>b.disabled=true);
   say(`Let go: “${t.p.t}” rushes downstream.`);
 }
