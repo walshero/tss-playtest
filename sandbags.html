@@ -4,6 +4,40 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v32 2026-09-23, THE SKY MOVES AND THE SCENES TELL THE STORY (founder: "Better
+  art on sandbags. Make the clouds move. And other cheap animations. Pay phone
+  scale is crazy off and weird. The scenes need a narrative cohesion they lack
+  now. Japan needs to be a village. Read the scenes each are based on and try
+  to let the art align with the gut"). Each scene was re-read against its
+  source text in Drive, and the art now stages that text's key moment:
+    - Ramen: the village. The narrator "wandered away from the station, down an
+      alleyway of vending machines, lanterns, and sliding doors." A local train
+      on the hill, the platform sign he cannot read, a hillside of tiled roofs,
+      poles and wires, red lanterns under the arcade, two lit drinks machines,
+      lit shoji, and plastic ramen in the window with the chopsticks "suspended
+      midair". He stands bare-headed in the rain; steam comes off the shop.
+    - Crosswalk: the child has pulled his hand away and stands IN the crosswalk
+      while the father still reaches from the curb; the walk signal flashes
+      its hand, the countdown is at 3, the ambulance lights turn.
+    - Peach Cobbler: the fence is knocked down and "leaned up my tree"; the
+      Tercel with the dented door; the flattened petunias; the trampoline next
+      door with a red-haired kid bouncing on it; the slip and slide; and him,
+      walking the cobbler through the gap in the fence.
+    - Dead Ants: payphones rebuilt to real size (a pedestal phone's housing sits
+      at head height, not a box the size of a torso); the ant walks between the
+      two of them; Sparr's sign across the street hums.
+  MOTION, all of it cheap: the clouds drift (each sky is drawn twice side by
+  side and the pair slides on the compositor, so the paper filters render
+  once); rain falls; stars twinkle; lanterns sway; signals blink; steam rises;
+  the balloon breathes. Animated props live in an unfiltered top layer so no
+  cut-paper filter re-renders per frame. Everything stops under reduced motion.
+  PHONE FRAMING: the set is cropped to its story band (viewBox 0 40 400 160)
+  and, on a narrow screen, fills its box a little larger; the balloon is
+  smaller on phones and parks beside the story instead of on top of it.
+  TEXT (founder fix, 09-23): Dead Ants now reads "An ant walked between us on
+  the sidewalk, and you suddenly stepped without thinking, slid your sneaker
+  quickly across the pavement, and completely smeared it from existence".
+
   v31 2026-09-23, REAL WEATHER (founder: "That cloud is weird and it's the same
   cloud every time. I need art direction." Ruling: direction C of the cloud study).
   v30 had one cloud, stamped everywhere, shaped like a weather-app icon. Every
@@ -534,6 +568,51 @@ body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif
 .skybox::before{ content:''; position:absolute; inset:0; z-index:0;
   pointer-events:none; background:var(--sky-light, none); }
 .scenery{ z-index:1; }
+/* v32 MOTION. Drift layers are twice the box wide and slide half their width on
+   the compositor; the paper filters inside them render once, not per frame. */
+.skyart .skdrift{ position:absolute; top:0; left:0; height:100%; will-change:transform;
+  animation:skdrift var(--dur,120s) linear infinite; }
+@keyframes skdrift{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+.rainfx{ stroke-dasharray:9 26; animation:rainfx .6s linear infinite; }
+@keyframes rainfx{ to{ stroke-dashoffset:-35; } }
+.twk{ animation:twk 3.4s ease-in-out infinite; }
+.twk:nth-child(3n){ animation-duration:4.8s; animation-delay:-1.2s; }
+.twk:nth-child(4n+1){ animation-duration:2.6s; animation-delay:-2.1s; }
+@keyframes twk{ 50%{ opacity:.2; } }
+#scenery .fx, #scenery .fx *{ stroke:none; }
+#scenery .fx .sway{ transform-box:fill-box; transform-origin:50% 0; animation:sway 3.2s ease-in-out infinite alternate; }
+#scenery .fx .sway:nth-child(2n){ animation-duration:2.7s; animation-delay:-1s; }
+@keyframes sway{ from{ transform:rotate(-8deg); } to{ transform:rotate(8deg); } }
+#scenery .fx .blink{ animation:blink 1.1s steps(1) infinite; }
+#scenery .fx .blink2{ animation:blink 1.1s steps(1) infinite; animation-delay:-.55s; }
+@keyframes blink{ 50%{ opacity:0; } }
+#scenery .fx .pulse{ animation:pulse 2.8s ease-in-out infinite; }
+@keyframes pulse{ 50%{ opacity:.45; } }
+#scenery .fx .steam{ transform-box:fill-box; animation:steam 3.6s ease-out infinite; opacity:0; }
+#scenery .fx .steam:nth-child(2){ animation-delay:-1.2s; }
+#scenery .fx .steam:nth-child(3){ animation-delay:-2.4s; }
+@keyframes steam{ 0%{ transform:translateY(4px); opacity:0; } 30%{ opacity:.75; } 100%{ transform:translateY(-12px); opacity:0; } }
+#scenery .fx .bounce{ animation:bounce .8s cubic-bezier(.33,0,.67,1) infinite alternate; }
+@keyframes bounce{ from{ transform:translateY(0); } to{ transform:translateY(-13px); } }
+#scenery .fx .crawl{ animation:crawl 6s ease-in-out infinite alternate; }
+@keyframes crawl{ from{ transform:translateX(-7px); } to{ transform:translateX(7px); } }
+#balloon{ animation:breathe 4.2s ease-in-out infinite alternate; }
+@keyframes breathe{ from{ translate:0 0; } to{ translate:0 -4px; } }
+@media (prefers-reduced-motion: reduce){
+  .skyart .skdrift, .rainfx, .twk, #scenery .fx *, #balloon{ animation:none !important; }
+  #scenery .fx .steam{ opacity:.5; }
+}
+/* v32 PHONE FRAMING: the set fills its box a little larger on a narrow screen
+   (fitScene switches meet to slice), the balloon is smaller, and it parks
+   beside the story instead of on top of it. */
+@media (max-width:700px){
+  .scenery{ height:40%; }
+  .skybox #balloon{ width:104px; margin-left:-52px; left:var(--park,50%); }
+  .skybox[data-piece="0"]{ --park:78%; }
+  .skybox[data-piece="1"]{ --park:84%; }
+  .skybox[data-piece="2"]{ --park:72%; }
+  .skybox[data-piece="3"]{ --park:52%; }
+}
 /* v30: the sky plate hangs in the upper skybox, behind the set and the balloon */
 .skyart{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
 .skyart .sk{ position:absolute; display:block; height:auto; overflow:visible; }
@@ -735,7 +814,7 @@ html{ background:var(--bg); }
 
   <div class="plate">
     <div class="skybox" id="skybox" data-piece="0" data-scene="sky" aria-hidden="true">
-      <svg class="scenery" id="scenery" viewBox="0 0 400 200"
+      <svg class="scenery" id="scenery" viewBox="0 40 400 160"
            preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false"
            data-art-class="studio-cut"
            data-art="Studio-cut paper diorama, Tight Spiral Paper Craft, 2026-09-20. Four scenes built to the Art Director's shot list in convening/SANDBAGS-CONVENING.md from referenced architecture: Niigata snow-country gangi and 60-degree roofs; Longwood Avenue with the 1914 Children's Hospital pavilion and green dome; New England clapboard with a steel bulkhead; Jamaica Plain Centre Street low-rise brick with the 39 bus. Generated shapes (window grids, fences, boxes) are declared in the source. CC0.">
@@ -873,8 +952,8 @@ html{ background:var(--bg); }
     {t:"In"},{t:"the"},{t:"end"},{t:",",g:1},{t:"I"},{t:"finally",b:1,ins:1},{t:"baked"},{t:"a"},{t:"peach",why:"it is not a cobbler. It is a PEACH cobbler. The specific is the peace offering."},{t:"cobbler"},{t:",",g:1},{t:"and"},{t:"walked"},{t:"it"},{t:"over"},{t:"myself",why:"the entire piece walks to the neighbor's door on this one word."},{t:".",g:1} ]},
    { title:"Dead Ants", by:"Matt Walsh", liftAt:7, w:[
     {t:"We"},{t:"were"},{t:"just",b:1,ins:1},{t:"standing"},{t:"around",b:1,ins:1},{t:"by"},{t:"the"},{t:"old",b:1,ins:1},{t:"payphones"},{t:"across"},{t:"from"},{t:"Sparr's",why:"the real name makes the memory real. Proper nouns are load-bearing in memoir."},{t:",",g:1},{t:"patiently",b:1,ins:1},{t:"waiting"},{t:"for"},{t:"the"},{t:"39"},{t:"bus"},{t:".",g:1},
-    {t:"An"},{t:"ant",why:"the smallest life in the piece carries the biggest promise."},{t:"right",b:1,ins:1},{t:"on"},{t:"the"},{t:"sidewalk"},{t:",",g:1},{t:"and"},{t:"you"},{t:"suddenly",b:1,ins:1},{t:"stepped"},{t:"without",why:"the promise breaks 'without thinking'; thoughtlessness, not cruelty, is the story."},{t:"thinking"},{t:",",g:1},
-    {t:"slid"},{t:"your",m:1},{t:"sneaker"},{t:"quickly",b:1,ins:1},{t:"across"},{t:"the"},{t:"pavement"},{t:"and"},{t:"completely",b:1,ins:1},{t:"smeared"},{t:"it"},{t:"from"},{t:"existence",why:"bigger than 'killed it'; the word carries the drunk-philosophical promise it breaks."},{t:",",g:1},
+    {t:"An"},{t:"ant",why:"the smallest life in the piece carries the biggest promise."},{t:"walked"},{t:"between"},{t:"us",why:"the ant crosses the space between two people; that gap is the story."},{t:"on"},{t:"the"},{t:"sidewalk"},{t:",",g:1},{t:"and"},{t:"you"},{t:"suddenly",b:1,ins:1},{t:"stepped"},{t:"without",why:"the promise breaks 'without thinking'; thoughtlessness, not cruelty, is the story."},{t:"thinking"},{t:",",g:1},
+    {t:"slid"},{t:"your",m:1},{t:"sneaker"},{t:"quickly",b:1,ins:1},{t:"across"},{t:"the"},{t:"pavement"},{t:",",g:1},{t:"and"},{t:"completely",b:1,ins:1},{t:"smeared"},{t:"it"},{t:"from"},{t:"existence",why:"bigger than 'killed it'; the word carries the drunk-philosophical promise it breaks."},{t:",",g:1},
     {t:"and"},{t:"then",b:1},{t:"you"},{t:"slowly",b:1,ins:1},{t:"looked"},{t:"at"},{t:"me"},{t:"to"},{t:"see"},{t:"if"},{t:"I"},{t:"had"},{t:"seen",why:"the piece ends on being witnessed. The look back is the confession."},{t:".",g:1} ]}
   ];
 
@@ -955,7 +1034,7 @@ html{ background:var(--bg); }
      sky's own tone between the layers pushes them back while every object
      keeps the paper it was cut from. */
   function haze(op){
-    return '<g class="noedge"><rect x="-10" y="-6" width="420" height="212" fill="url(#hazeG)" opacity="'+op+'"/></g>';
+    return '<g class="noedge"><rect x="-10" y="38" width="420" height="168" fill="url(#hazeG)" opacity="'+op+'"/></g>';
   }
   /* ---------- period props, one per line of the shot list ---------- */
   // dark-stained timber frame over pale plaster: posts, sill, mid-rail
@@ -1245,7 +1324,7 @@ html{ background:var(--bg); }
   }
   function skRain(rnd,W,H,n,y0,y1){
     var d=''; for(var j=0;j<n;j++) d+='M'+skF(rnd()*W)+' '+skF(H*(y0+rnd()*(y1-y0)))+' l-7 34 ';
-    return '<path d="'+d+'" stroke="rgba(236,240,228,.5)" stroke-width="1.2" fill="none"/>';
+    return '<path class="rainfx" d="'+d+'" stroke="rgba(236,240,228,.5)" stroke-width="1.2" fill="none"/>';
   }
   // a layer of cumulus across the full width: size set by the box's short side, count by its width
   function skRow(rnd,W,S,y,size,per,col,tier,op){
@@ -1259,21 +1338,21 @@ html{ background:var(--bg); }
   var SKYGEN=[
     /* 0, storm: one ragged nimbostratus deck, three sheets, each hem lower and darker;
        torn scud under it; rain out of the hem */
-    function(W,H,S){ var rnd=skR(11), o='';
+    function(W,H,S){ var rnd=skR(11), o='', sc='';
       [['#8d958a',.16],['#737b71',.24],['#5b645e',.31]].forEach(function(L){
         var y=H*L[1], d='M -20 -20 L '+(W+20)+' -20 L '+(W+20)+' '+skF(y), x=W+20;
         while(x>-20){ var sw=18+rnd()*46, dip=4+rnd()*16; d+=' Q '+skF(x-sw/2)+' '+skF(y+dip*2)+' '+skF(x-sw)+' '+skF(y+(rnd()-.5)*8); x-=sw; }
         o+=skG('sx1','<path d="'+d+' Z" fill="'+L[0]+'"/>');
       });
       var ns=Math.max(4,Math.round(4*W/S));
-      for(var k=0;k<ns;k++) o+=skG('sx0',skBlob(rnd,W*(k+.5)/ns+(rnd()-.5)*W/ns*.4,H*(.37+rnd()*.06),S*(.07+rnd()*.05),H*.018,'#525b55',.95));
-      return o+skRain(rnd,W,H,Math.round(40*W/S),.3,.8);
+      for(var k=0;k<ns;k++) sc+=skG('sx0',skBlob(rnd,W*(k+.5)/ns+(rnd()-.5)*W/ns*.4,H*(.37+rnd()*.06),S*(.07+rnd()*.05),H*.018,'#525b55',.95));
+      return [{c:o,v:5},{c:sc,v:13},{c:skRain(rnd,W,H,Math.round(40*W/S),.3,.8),v:0}];
     },
     /* 1, fair: cumulus in perspective - big and near at the top of the frame,
        smaller and flatter toward the rooftops - and three paper birds */
     function(W,H,S){ var rnd=skR(7), col=['#f3f0e8','#c3ced6','#fbfaf5'];
-      return skRow(rnd,W,S,H*.2,.5,2,col,'sx1')+skRow(rnd,W,S,H*.34,.3,3,col,'sx1')+skRow(rnd,W,S,H*.47,.16,4,col,'sx0','.85')
-        +skG('sx0',skBird(W*.3,H*.56,9,'#3e4e5d')+skBird(W*.36,H*.585,7,'#3e4e5d')+skBird(W*.41,H*.55,6,'#3e4e5d'));
+      var near=skRow(rnd,W,S,H*.2,.5,2,col,'sx1')+skRow(rnd,W,S,H*.34,.3,3,col,'sx1'), far=skRow(rnd,W,S,H*.47,.16,4,col,'sx0','.85');
+      return [{c:far,v:4},{c:near,v:9},{c:skG('sx0',skBird(W*.3,H*.56,9,'#3e4e5d')+skBird(W*.36,H*.585,7,'#3e4e5d')+skBird(W*.41,H*.55,6,'#3e4e5d')),v:22}];
     },
     /* 2, golden hour: rows of small altocumulus lit gold from below, a second
        low row, and a haze band sitting on the treeline */
@@ -1283,20 +1362,19 @@ html{ background:var(--bg); }
         for(var i=0;i<n;i++){ if(rnd()<.25) continue;
           o+=skG('sx0',cumulus(rnd,W*(i+.5)/n+(rnd()-.5)*W/n*.5,H*L[0]+(rnd()-.5)*H*.03,S*L[1]*(.7+rnd()*.7),col)); }
       });
-      var nb=Math.max(3,Math.round(3*W/S));
-      for(var b=0;b<nb;b++) o+=skG('sx0',skBlob(rnd,W*(b+.5)/nb,H*(.52+rnd()*.03),W/nb*.62,H*.028,'#f3cf98','.7'));
-      return o+skG('sx0',skBird(W*.66,H*.47,10,'#563526')+skBird(W*.72,H*.45,8,'#563526'));
+      var nb=Math.max(3,Math.round(3*W/S)), hz='';
+      for(var b=0;b<nb;b++) hz+=skG('sx0',skBlob(rnd,W*(b+.5)/nb,H*(.52+rnd()*.03),W/nb*.62,H*.028,'#f3cf98','.7'));
+      return [{c:hz,v:2},{c:o,v:6},{c:skG('sx0',skBird(W*.66,H*.47,10,'#563526')+skBird(W*.72,H*.45,8,'#563526')),v:18}];
     },
     /* 3, night: a scatter of paper stars and thin stratus drawn across the moon */
     function(W,H,S){ var rnd=skR(43), st='', o='';
-      for(var i=0,n=Math.round(34*W/S);i<n;i++) st+=skC(rnd()*W,rnd()*H*.62,.7+rnd()*.8,'rgba(246,238,214,.9)');
-      o+=st;
+      for(var i=0,n=Math.round(34*W/S);i<n;i++) st+='<circle class="twk" cx="'+skF(rnd()*W)+'" cy="'+skF(rnd()*H*.62)+'" r="'+skF(.7+rnd()*.8)+'" fill="rgba(246,238,214,.9)"/>';
       [[.56,.07,.42,'#4d5070','#35374d'],[.02,.16,.34,'#44476a','#303248'],[.36,.31,.46,'#3f4262','#2c2e44']].forEach(function(L){
         var x=W*L[0], y=H*L[1], w=W*L[2], h=Math.max(6,S*.022), g='';
         for(var k=0;k<3;k++) g+=skBlob(rnd,x+w*(.2+k*.3),y+(rnd()-.5)*h,w*(.2+rnd()*.1),h*(.7+rnd()*.5),k%2?L[3]:L[4],'.8');
         o+=skG('sx0',g);
       });
-      return o;
+      return [{c:'<g>'+st+'</g>',v:0},{c:o,v:3}];
     }
   ];
   var skyDrawn='';
@@ -1305,13 +1383,32 @@ html{ background:var(--bg); }
     if(!W||!H) return;
     var key=pi+':'+W+'x'+H; if(!force && key===skyDrawn) return; skyDrawn=key;
     var S=Math.min(W,H*.85);
-    box.innerHTML='<svg class="sk skfull" viewBox="0 0 '+W+' '+H+'" aria-hidden="true" focusable="false">'+SKYGEN[pi](W,H,S)+'</svg>';
+    // v32: a still layer is drawn once at box size; a drifting layer is drawn
+    // twice, side by side, and slides left by one box width, forever.
+    box.innerHTML=SKYGEN[pi](W,H,S).map(function(L){
+      if(!L.v) return '<svg class="sk skfull" viewBox="0 0 '+W+' '+H+'" aria-hidden="true" focusable="false">'+L.c+'</svg>';
+      return '<svg class="sk skdrift" style="width:'+(2*W)+'px;--dur:'+skF(W/L.v)+'s" viewBox="0 0 '+(2*W)+' '+H+'" aria-hidden="true" focusable="false">'
+        +L.c+'<g transform="translate('+W+' 0)">'+L.c+'</g></svg>';
+    }).join('');
+    fitScene();
   }
-  (function(){ var t=null; window.addEventListener('resize',function(){ clearTimeout(t); t=setTimeout(function(){ drawSky(false); },150); }); })();
+  // v32: frame the set to its box. A wide box shows the whole story band
+  // (0 40 400 160). A narrow one trims the outer 30 units each side, never
+  // more, so the story reads a little bigger on a phone and nothing that
+  // matters (every figure and prop sits between 30 and 370) is ever cut.
+  function fitScene(){
+    var sv=$('scenery'); if(!sv) return;
+    var r=sv.getBoundingClientRect(); if(!r.width||!r.height) return;
+    var a=r.width/r.height, vb='0 40 400 160';
+    if(a<2.5){ var vw=Math.max(340,Math.min(400,160*a)), h=vw/a; vb=((400-vw)/2).toFixed(1)+' '+(200-h).toFixed(1)+' '+vw.toFixed(1)+' '+h.toFixed(1); }
+    sv.setAttribute('viewBox',vb);
+    sv.setAttribute('preserveAspectRatio','xMidYMax meet');
+  }
+  (function(){ var t=null; window.addEventListener('resize',function(){ clearTimeout(t); t=setTimeout(function(){ drawSky(false); fitScene(); },150); }); })();
 
   function rain(){
     var c='rgba(236,240,228,.5)';
-    return '<g class="noedge">'
+    return '<g class="noedge rainfx">'
       +ln('M18 92 l-6 24 M58 74 l-6 24 M98 106 l-6 24 M138 82 l-6 24 M178 114 l-6 24',c,1.1,.5)
       +ln('M218 88 l-6 24 M258 118 l-6 24 M298 80 l-6 24 M338 110 l-6 24 M378 86 l-6 24',c,1.1,.5)
       +ln('M38 140 l-6 24 M118 148 l-6 24 M198 156 l-6 24 M238 132 l-6 24 M318 146 l-6 24',c,1.1,.5)
@@ -1319,27 +1416,119 @@ html{ background:var(--bg); }
       +'</g>';
   }
 
+  /* ---------- v32 props ---------- */
+  // a village house: plaster wall under a heavy tiled roof with a dark ridge.
+  // lit is 0/1: whether one window is warm.
+  function minka(x,y,w,h,wall,roof,lit){
+    var rh=h*.55;
+    return rc(x,y-h,w,h,wall)
+      + P('M'+(x-w*.12)+' '+(y-h+1)+' L'+(x+w*.16)+' '+(y-h-rh)+' L'+(x+w*.84)+' '+(y-h-rh)+' L'+(x+w*1.12)+' '+(y-h+1)+' Z',roof)
+      + '<g class="noedge">'+rc(x+w*.12,y-h-rh-1.4,w*.76,1.8,'var(--p-char-d)')
+      + rc(x+w*.18,y-h*.66,w*.26,h*.44,lit?'var(--lit)':'var(--p-char-d)')+'</g>';
+  }
+  // a row of them, seeded, so the hillside is a village and not four huts
+  function village(x0,x1,y,sz,seed,litp){
+    var r=skR(seed), o='', x=x0;
+    while(x<x1){
+      var w=sz*(1+r()*.8), h=sz*(.55+r()*.35);
+      o+=minka(x,y+(r()-.5)*sz*.25,w,h, r()<.5?'var(--p-cream)':'var(--p-bone)', r()<.6?'var(--p-char)':'var(--p-slate-d)', r()<(litp||0));
+      x+=w*1.3+r()*sz*.4;
+    }
+    return o;
+  }
+  // a local train on its embankment, white with a stripe, windows lit
+  function train(x,y,cars,f,stripe){
+    var o=rc(x-8,y+11,cars*44+16,3,'var(--p-kraft-d)');
+    for(var i=0;i<cars;i++){ var cx=x+i*44;
+      o+=rc(cx,y,42,11,f,' rx="2"')+'<g class="noedge">'+rc(cx,y+7.4,42,1.6,stripe)+'</g>'+'<g class="lit">'+win(cx+3,y+2,6,1,4,3.4,2.6,0)+'</g>'; }
+    return o;
+  }
+  // the station: platform roof on posts, and a sign in characters he cannot read
+  function station(x,y,w){
+    var o=rc(x,y-2,w,4,'var(--p-granite)')+rc(x+4,y-20,2.2,18,'var(--p-steel-d)')+rc(x+w-6,y-20,2.2,18,'var(--p-steel-d)');
+    o+=P('M'+(x-3)+' '+(y-20)+' h'+(w+6)+' l-4 -4 h-'+(w-2)+' z','var(--p-slate-d)');
+    o+=rc(x+w*.3,y-17,w*.4,8,'var(--p-white)',' rx=".6"');
+    o+='<g class="noedge">'+ln('M'+(x+w*.34)+' '+(y-15)+' h3 M'+(x+w*.355)+' '+(y-15)+' v4 M'+(x+w*.43)+' '+(y-15.4)+' l2 4 M'+(x+w*.44)+' '+(y-13)+' h3 M'+(x+w*.52)+' '+(y-15)+' v4.4 M'+(x+w*.52)+' '+(y-13)+' h3 M'+(x+w*.6)+' '+(y-15)+' l-2 4','var(--p-char-d)',.7)+'</g>';
+    return o;
+  }
+  // wooden poles and sagging wires, which every Japanese village street has
+  function polesline(xs,top,g){
+    var o='';
+    xs.forEach(function(x){ o+=rc(x,top,2.4,g-top,'var(--p-kraft-d)')+rc(x-6,top+4,14,1.8,'var(--p-kraft-d)'); });
+    return o+'<g class="noedge">'+wires(top+5,xs.map(function(x){ return x+1; }),'var(--p-char-d)')+'</g>';
+  }
+  // a drinks vending machine: cabinet, lit panel of bottles, the take-out slot
+  function vending(x,g,f,fS){
+    var o=box(x,g-25,13,25,3,f,fS,'var(--p-granite)'), b='';
+    for(var j=0;j<3;j++) for(var i=0;i<4;i++) b+=rc(x+2+i*2.4,g-22+j*3.3,1.5,2.5,['var(--p-verm)','var(--p-gold)','var(--p-indigo)','var(--p-moss)'][(i+j)%4]);
+    return o+'<g class="noedge">'+rc(x+1.2,g-23.4,10.6,11,'var(--lit)')+b+rc(x+1.6,g-9,9.8,2.8,'var(--p-char-d)')+'</g>';
+  }
+  // shoji: sliding doors, the paper lit from inside
+  function shoji(x,y,w,h){
+    var o='<g class="lit">'+lr(x,y,w,h)+'</g>', g='';
+    for(var gx=x+w/6;gx<x+w-1;gx+=w/6) g+='M'+gx.toFixed(1)+' '+y+' v'+h+' ';
+    for(var gy=y+h/5;gy<y+h-1;gy+=h/5) g+='M'+x+' '+gy.toFixed(1)+' h'+w+' ';
+    return o+'<g class="noedge">'+ln(g,'var(--p-timber)',.6)+rc(x+w/2-.6,y,1.2,h,'var(--p-timber)')+'</g>';
+  }
+  // a chochin lantern, for the animated layer: it hangs from its top and sways
+  function chochin(x,y){
+    return '<g class="sway">'+ln('M'+x+' '+(y-5)+' v5','var(--p-char-d)',.6)
+      +'<rect x="'+(x-2.8)+'" y="'+y+'" width="5.6" height="7.4" rx="2.6" fill="#d8452c"/>'
+      +'<rect x="'+(x-1.8)+'" y="'+(y+1.4)+'" width="3.6" height="4.6" rx="1.6" fill="#ffb36b" opacity=".55"/>'
+      +'<rect x="'+(x-2)+'" y="'+(y-.6)+'" width="4" height="1.4" fill="#231a14"/><rect x="'+(x-2)+'" y="'+(y+6.8)+'" width="4" height="1.4" fill="#231a14"/></g>';
+  }
+  // a pedestal payphone at true scale: y is the ground. A person here is about
+  // 38 tall, so the housing sits at head height and is about a head and a half
+  // tall, on a post the width of a wrist. Not a booth, and not a torso-sized box.
+  function payphone(x,y){
+    return rc(x-1.3,y-26,2.6,26,'var(--p-steel-d)')+rc(x-4,y-1.6,8,1.6,'var(--p-steel-d)')
+      + box(x-5,y-39,10,13,2.4,'var(--p-steel)','var(--p-steel-d)','var(--p-steel-d)')
+      + rc(x-6.2,y-41.4,13.4,2.6,'var(--p-steel-d)',' rx=".6"')
+      + '<g class="noedge">'+rc(x-3.6,y-36.6,7.2,4.4,'var(--p-char-d)')+rc(x-2.8,y-31,5.6,3.6,'var(--p-bone-d)')
+      + rc(x-7.2,y-37,2.2,8.6,'var(--p-char)',' rx="1"')+ln('M'+(x-6.2)+' '+(y-28.6)+' q-1 5 3 7','var(--p-char)',.6)+'</g>';
+  }
+  // a kettle grill on three legs
+  function grill(x,g){
+    return '<g class="noedge">'+ln('M'+(x-3)+' '+(g-5)+' l-2 5 M'+(x+3)+' '+(g-5)+' l2 5 M'+x+' '+(g-5)+' v5','var(--p-char)',.8)+'</g>'
+      + P('M'+(x-5)+' '+(g-8)+' a5 4 0 0 0 10 0 z','var(--p-char)')+P('M'+(x-5)+' '+(g-8.6)+' a5 3.4 0 0 1 10 0 z','var(--p-char-d)');
+  }
+  // a trampoline: a black mat in a steel ring on splayed legs
+  function trampoline(x,g,r){
+    return '<g class="noedge">'+ln('M'+(x-r*.8)+' '+(g-6)+' l-2 6 M'+(x+r*.8)+' '+(g-6)+' l2 6 M'+(x-r*.3)+' '+(g-5)+' l-1 5 M'+(x+r*.3)+' '+(g-5)+' l1 5','var(--p-steel-d)',1)+'</g>'
+      + '<ellipse cx="'+x+'" cy="'+(g-6)+'" rx="'+r+'" ry="'+(r*.2)+'" fill="var(--p-steel)"/>'
+      + '<ellipse cx="'+x+'" cy="'+(g-6)+'" rx="'+(r*.86)+'" ry="'+(r*.15)+'" fill="var(--p-char-d)"/>';
+  }
+  // an ant, drawn a little larger than life so a phone can see it
+  function ant(x,y){
+    return ln('M'+(x-3)+' '+(y+1.4)+' l-1.4 1.4 M'+(x-3)+' '+(y+1.4)+' l0 1.8 M'+x+' '+(y+1.2)+' l-1 1.8 M'+x+' '+(y+1.2)+' l1 1.8 M'+(x+2.6)+' '+(y+1.2)+' l1.4 1.6 M'+(x+3.6)+' '+(y-.6)+' l1.6 -1.6','#140d09',.5)
+      + '<ellipse cx="'+(x-3.2)+'" cy="'+(y+.6)+'" rx="2" ry="1.4" fill="#140d09"/><ellipse cx="'+x+'" cy="'+(y+.6)+'" rx="1.2" ry=".9" fill="#140d09"/><ellipse cx="'+(x+2.8)+'" cy="'+(y+.3)+'" rx="1.3" ry="1.1" fill="#140d09"/>';
+  }
+
   var SCENERY=[
-   /* 0, RAMEN AT ECHIGO KAWAGUCHI. Uonuma hills in the rain; up the slope a
-        gassho farmhouse and two 60-degree gables in dark timber and plaster;
-        along the street the gangi, with the noodle shop under it: noren over
-        the door, one lit window of plastic ramen. Villagers under umbrellas. */
+   /* 0, RAMEN AT ECHIGO KAWAGUCHI. v32: the village, from the source text.
+        "I wandered away from the station, down an alleyway of vending machines,
+        lanterns, and sliding doors. A heavy rain fell, and the villagers opened
+        their umbrellas." Uonuma hills with the local train on them and the
+        station whose name he could not read; a hillside of tiled roofs; poles
+        and wires; the gangi arcade with red lanterns, lit shoji, two drinks
+        machines, and the noodle shop: noren, plastic ramen in the window with
+        the chopsticks "suspended midair". He stands in the rain, bare-headed. */
    '<g class="ly1">'+
      P('M0 106 L34 76 L60 92 L98 52 L134 84 L170 62 L206 88 L250 56 L290 84 L330 68 L366 90 L400 74 L400 200 L0 200 Z','var(--p-sage-d)')+
      P('M0 130 L40 110 L74 124 L118 98 L160 120 L200 104 L246 124 L288 106 L330 122 L370 108 L400 120 L400 200 L0 200 Z','var(--p-sage)')+
      '<g class="noedge" opacity=".5">'+
        P('M0 148 Q100 143 200 149 T400 146 L400 152 Q200 155 0 154 Z','var(--p-moss)')+
        P('M0 160 Q120 155 240 161 T400 158 L400 164 Q200 167 0 166 Z','var(--p-moss)')+'</g>'+
+     train(150,112,3,'var(--p-white)','var(--p-indigo)')+
+     village(6,392,134,8,5,.3)+
    '</g>'+ haze(.42) +
    '<g class="ly2">'+
-     hut(222,100,58,22,50,12,'var(--p-cream)','var(--p-cream-d)','var(--p-kraft-d)','var(--p-timber)',7)+
-     timber(222,100,58,22,'var(--p-timber)')+
-     hut(108,106,42,24,36,10,'var(--p-cream)','var(--p-cream-d)','var(--p-char)','var(--p-char-d)',4)+
-     timber(108,106,42,24,'var(--p-timber)')+
-     hut(164,112,36,20,31,9,'var(--p-bone)','var(--p-bone-d)','var(--p-char)','var(--p-char-d)',4)+
-     timber(164,112,36,20,'var(--p-timber)')+
-     hut(300,104,34,18,30,8,'var(--p-bone)','var(--p-bone-d)','var(--p-char)','var(--p-char-d)',4)+
-     '<g class="lit glow">'+win(118,112,1,1,7,7,0,0)+win(174,118,1,1,6,6,0,0)+win(238,108,2,1,7,7,8,0)+win(310,110,1,1,6,6,0,0)+'</g>'+
+     station(12,128,74)+
+     village(96,396,130,15,21,.45)+
+     hut(222,104,48,20,40,10,'var(--p-cream)','var(--p-cream-d)','var(--p-char)','var(--p-char-d)',6)+
+     timber(222,104,48,20,'var(--p-timber)')+
+     '<g class="lit glow">'+win(234,110,2,1,7,7,8,0)+'</g>'+
+     polesline([92,176,262,348],84,128)+
    '</g>'+ haze(.16) +
    '<g class="ly3">'+
      hut(22,128,58,40,50,12,'var(--p-cream)','var(--p-cream-d)','var(--p-char)','var(--p-char-d)',6)+
@@ -1357,16 +1546,30 @@ html{ background:var(--bg); }
        '<g class="noedge">'+rc(26,184,32,2,'var(--p-timber)')+
          '<ellipse cx="33" cy="182" rx="4.2" ry="2.4" fill="var(--p-cream)"/><ellipse cx="42" cy="182" rx="4.2" ry="2.4" fill="var(--p-cream)"/><ellipse cx="51" cy="182" rx="4.2" ry="2.4" fill="var(--p-cream)"/>'+
          '<ellipse cx="33" cy="180.8" rx="4.2" ry="1.1" fill="var(--p-terra)"/><ellipse cx="42" cy="180.8" rx="4.2" ry="1.1" fill="var(--p-terra)"/><ellipse cx="51" cy="180.8" rx="4.2" ry="1.1" fill="var(--p-terra)"/></g>'+
+       '<g class="noedge">'+ln('M31 178.6 l3.6 -7.4 M33 178.8 l3.8 -7.2 M40 178.6 l3.6 -7.4 M42 178.8 l3.8 -7.2 M49 178.6 l3.6 -7.4 M51 178.8 l3.8 -7.2','var(--p-kraft-d)',.7)+
+         ln('M34.4 180 q.6 -3.4 1.4 -6 M43.4 180 q.6 -3.4 1.4 -6 M52.4 180 q.6 -3.4 1.4 -6','var(--p-gold)',.6)+'</g>'+
        noren(62,170,17,'var(--p-indigo)')+
        rc(84,172,3.4,7,'var(--p-verm)',' rx="1.4"')+
-       '<g class="lit glow"><ellipse cx="85.7" cy="175.5" rx="1.6" ry="2.4"/></g>')+
+       '<g class="lit glow"><ellipse cx="85.7" cy="175.5" rx="1.6" ry="2.4"/></g>'+
+       shoji(150,171,42,19)+
+       vending(204,191,'var(--p-white)','var(--p-white-d)')+
+       vending(222,191,'var(--p-verm)','var(--p-verm-d)'))+
      '<g class="noedge" opacity=".28"><rect x="26" y="192" width="32" height="8" fill="var(--lit)"/><rect x="84" y="190" width="4" height="10" fill="var(--lit)"/></g>'+
      villager(146,199,23,'var(--p-indigo)','var(--p-gold)','var(--p-verm)','var(--p-cream)','cyan')+
      villager(294,199,24,'var(--p-plum)','var(--p-cream)','var(--p-indigo)','var(--p-bone)','pink')+
      villager(334,198,21,'var(--p-char)','var(--p-terra)','var(--p-char-d)','var(--p-bone-d)','purple')+
      villager(374,199,23,'var(--p-indigo-d)','var(--p-verm)','var(--p-cream)','var(--p-kraft-d)','coral')+
-     figure(104,199,30,{felt:'yellow',coat:'var(--p-char)',coatD:'var(--p-char-d)',legs:'var(--p-char-d)',hair:'var(--p-char-d)'})+
-   '</g>'+ rain(),
+     figure(104,199,34,{felt:'yellow',coat:'var(--p-char)',coatD:'var(--p-char-d)',legs:'var(--p-char-d)',hair:'var(--p-bone)'})+
+   '</g>'+ rain() +
+   '<g class="fx noedge">'+
+     ln('M88 169.2 Q170 173 262 169.2','var(--p-char-d)',.5)+
+     chochin(100,170)+chochin(122,171)+chochin(144,171.6)+chochin(240,171)+chochin(258,170)+
+     '<g><path class="steam" d="M68 166 q-2 -4 0 -8 q2 -4 0 -8" fill="none" style="stroke:rgba(245,240,228,.8);stroke-width:1.4;stroke-linecap:round"/>'+
+       '<path class="steam" d="M73 166 q2 -4 0 -8 q-2 -4 0 -8" fill="none" style="stroke:rgba(245,240,228,.8);stroke-width:1.4;stroke-linecap:round"/>'+
+       '<path class="steam" d="M78 166 q-2 -4 0 -8 q2 -4 0 -8" fill="none" style="stroke:rgba(245,240,228,.8);stroke-width:1.4;stroke-linecap:round"/></g>'+
+     '<rect class="pulse" x="205.2" y="167.6" width="10.6" height="11" fill="#fff6d8" opacity=".35"/>'+
+     '<rect class="pulse" x="223.2" y="167.6" width="10.6" height="11" fill="#fff6d8" opacity=".35" style="animation-delay:-1.4s"/>'+
+   '</g>',
 
    /* 1, BLACK SPOTS ON THE CROSSWALK. Longwood Avenue, on the way to the
         hospital, late seventies, bright morning. Children's Hospital's 1914
@@ -1401,8 +1604,20 @@ html{ background:var(--bg); }
        '<ellipse cx="80" cy="178.4" rx="3.6" ry="2"/><ellipse cx="132" cy="185.2" rx="4.2" ry="2.3"/>'+
        '<ellipse cx="54" cy="185.4" rx="3" ry="1.8"/><ellipse cx="100" cy="185.6" rx="2.4" ry="1.4"/></g>'+
      curb(0,188,400,5)+rc(0,193,400,7,'var(--p-bone-d)')+
-     figure(66,198,44,{felt:'blue',dir:1,arm:'reach',coat:'var(--p-kraft)',coatD:'var(--p-kraft-d)',legs:'var(--p-steel-d)',hair:'var(--p-timber)'})+
-     figure(100,198,26,{felt:'orange',dir:1,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo)',hair:'var(--p-kraft-d)'})+
+     rc(154,146,2.6,52,'var(--p-steel-d)')+
+     box(148,134,14,16,3,'var(--p-char)','var(--p-char-d)','var(--p-steel-d)')+
+     figure(60,198,42,{felt:'blue',dir:1,arm:'reach',coat:'var(--p-kraft)',coatD:'var(--p-kraft-d)',legs:'var(--p-steel-d)',hair:'var(--p-timber)'})+
+     figure(118,183,23,{felt:'orange',dir:-1,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo)',hair:'var(--p-kraft-d)'})+
+   '</g>'+
+   /* v32: "I was standing in the crosswalk even though the numbers were running
+      out and the ambulance was getting louder." The hand flashes, the count is
+      at 3, the ambulance bar turns red and white. */
+   '<g class="fx noedge">'+
+     '<g class="blink"><path d="M151.6 144 v-5.4 q0 -1 1 -1 q1 0 1 1 v3 v-4.2 q0 -1 1 -1 q1 0 1 1 v4.2 v-3.6 q0 -1 1 -1 q1 0 1 1 v5 q0 3 -3 4 h-1.4 q-2.6 -1 -2.6 -3 z" fill="#ff8a3d"/></g>'+
+     '<g fill="#ffb347"><rect x="158.4" y="137.4" width="3" height=".9"/><rect x="160.6" y="137.4" width=".9" height="4"/><rect x="158.8" y="139.4" width="2.4" height=".9"/><rect x="160.6" y="139.8" width=".9" height="4"/><rect x="158.4" y="143" width="3" height=".9"/></g>'+
+     '<rect class="blink" x="234" y="136" width="6.4" height="3.6" rx=".6" fill="#ff3b30"/>'+
+     '<rect class="blink2" x="241" y="136" width="6.4" height="3.6" rx=".6" fill="#fff6e6"/>'+
+     '<circle class="blink" cx="237" cy="137.8" r="6" fill="#ff3b30" opacity=".22"/>'+
    '</g>',
 
    /* 2, PEACH COBBLER. A suburban street, late golden afternoon: his cape
@@ -1437,15 +1652,28 @@ html{ background:var(--bg); }
      '<g class="noedge">'+rc(0,178,400,3,'var(--p-moss-d)')+'</g>'+
      P('M306 178 l22 0 l8 22 l-38 0 z','var(--p-bone-d)')+
      bulkhead(110,186)+
-     fence(150,158,9,28,11,'var(--p-white)')+
-     '<g class="noedge"><circle cx="44" cy="190" r="5" fill="var(--p-verm)"/></g>'+
+     fence(150,158,3,28,11,'var(--p-white)')+fence(206,158,4,28,11,'var(--p-white)')+
+     '<g transform="translate(144 186) rotate(-24) translate(0 -28)">'+fence(0,0,3,28,11,'var(--p-white-d)')+'</g>'+
+     '<g class="noedge" transform="translate(40 0)">'+P('M18 179 q6 -1.6 12 0 q6 1.6 12 0 q6 -1.6 12 0 q6 1.6 12 0 v1.6 h-48 z','var(--p-moss-d)')+
+       '<ellipse cx="22" cy="179.4" rx="2.6" ry=".9" fill="#d96aa0"/><ellipse cx="30" cy="179.6" rx="2.4" ry=".8" fill="#9b6ad6"/><ellipse cx="38" cy="179.3" rx="2.6" ry=".9" fill="#d96aa0"/>'+
+       '<ellipse cx="47" cy="179.6" rx="2.4" ry=".8" fill="#9b6ad6"/><ellipse cx="56" cy="179.4" rx="2.6" ry=".9" fill="#d96aa0"/><ellipse cx="64" cy="179.6" rx="2.2" ry=".8" fill="#9b6ad6"/></g>'+
+     '<g transform="translate(22 177) scale(.62)">'+sedan(0,0,'var(--p-terra)','var(--p-terra-d)')+
+       '<g class="noedge">'+P('M36 12 q4 3.6 9 .4 q-3.6 5.4 -9 -.4 z','var(--p-terra-d)')+'</g></g>'+
+     grill(128,194)+
+     '<g class="noedge">'+rc(214,193,46,3.2,'var(--p-gold)',' rx="1"')+rc(214,193.6,46,.9,'var(--p-cream)')+'</g>'+
+     trampoline(352,196,22)+
+     
      rc(62,186,16,7,'var(--p-gold)',' rx="1.5"')+rc(72,182,6,4,'var(--p-gold-d)',' rx="1"')+
      '<circle cx="66" cy="194" r="2.6" fill="var(--p-char)"/><circle cx="76" cy="194" r="2.6" fill="var(--p-char)"/>'+
      '<g class="noedge">'+ln('M86 196 l16 -14','var(--p-kraft)',3.2)+'</g>'+
      rc(378,170,3,22,'var(--p-kraft-d)')+rc(372,164,16,9,'var(--p-steel)',' rx="3"')+
      rc(384,165,2,7,'var(--p-verm)')+
-     figure(290,198,32,{felt:'purple',dir:1,arm:'carry',carry:cobbler,stride:5,coat:'var(--p-slate)',coatD:'var(--p-slate-d)',legs:'var(--p-steel-d)',hair:'var(--p-timber)'})+
-   '</g>',
+     figure(188,197,34,{felt:'purple',dir:1,arm:'carry',carry:cobbler,stride:5,coat:'var(--p-slate)',coatD:'var(--p-slate-d)',legs:'var(--p-steel-d)',hair:'var(--p-timber)'})+
+   '</g>'+
+   /* v32: the red-haired kid on the trampoline next door, mid-bounce */
+   '<g class="fx noedge"><g class="bounce">'+
+     figure(352,189,16,{felt:'coral',coat:'var(--p-gold)',coatD:'var(--p-gold-d)',legs:'var(--p-indigo)',hair:'#c2410c'})+
+   '</g><circle class="pulse" cx="328" cy="162" r="5" fill="#ffd98a" opacity=".3"/></g>',
 
    /* 3, DEAD ANTS. Centre Street, Jamaica Plain, the nineties, night. We are
         on the near sidewalk, so the near things are the big things: the bus
@@ -1480,12 +1708,16 @@ html{ background:var(--bg); }
      curb(0,176,400,4)+brickwalk(0,180,400,20)+
      shelter(268,196,86,42)+bench(278,196,64)+
      busstop(252,140)+
-     '<g transform="translate(22 140) scale(1.3)">'+payphone(0,0)+payphone(30,3)+'</g>'+
-     '<g class="noedge" fill="var(--p-bone-d)">'+
-       '<ellipse cx="104" cy="195" rx="3.2" ry="2"/><ellipse cx="108.6" cy="195" rx="1.9" ry="1.5"/>'+
-       '<ellipse cx="99.4" cy="195" rx="1.7" ry="1.3"/></g>'+
-     figure(62,198,36,{felt:'cyan',dir:1,arm:'watch',coat:'var(--p-indigo)',coatD:'var(--p-indigo-d)',legs:'var(--p-char-d)',hair:'var(--p-char-d)'})+
-     figure(124,198,38,{felt:'magenta',dir:-1,stride:9,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo-d)',shoe:'var(--p-white)',hair:'var(--p-timber)'})+
+     payphone(44,193)+payphone(60,193)+
+     figure(80,198,38,{felt:'cyan',dir:1,arm:'watch',coat:'var(--p-indigo)',coatD:'var(--p-indigo-d)',legs:'var(--p-char-d)',hair:'var(--p-char-d)'})+
+     figure(128,198,38,{felt:'magenta',dir:-1,stride:9,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo-d)',shoe:'var(--p-white)',hair:'var(--p-timber)'})+
+   '</g>'+
+   /* v32: "An ant walked between us on the sidewalk." It walks, between them.
+      Across the street, Sparr's sign hums. */
+   '<g class="fx noedge">'+
+     '<ellipse cx="104" cy="195.4" rx="11" ry="2.4" fill="#ffd98a" opacity=".16"/>'+
+     '<g class="crawl">'+ant(104,194)+'</g>'+
+     '<rect class="pulse" x="92" y="111" width="52" height="3.4" rx="1" fill="#ff9a5c" opacity=".85"/>'+
    '</g>'
   ];
 
@@ -1516,6 +1748,7 @@ html{ background:var(--bg); }
     $('skybox').dataset.piece=pi;
     $('sceneLayers').innerHTML=SCENERY[pi];
     drawSky(true);
+    fitScene();
     $('prompt').textContent='Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.';
     render(); altitude(false);
   }
