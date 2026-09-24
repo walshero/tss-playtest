@@ -1,502 +1,421 @@
 <!DOCTYPE html>
-<html lang="en" data-light="day">
+<html lang="en">
+<!--
+  EN195 ARCADE (arcade.html, the TSP home arcade). Tight Spiral Studios.
+  v3 2026-09-24: promoted from en195-fall-arcade.html to arcade.html (founder: "I want this
+  to be the new arcade"). Games link relative, so the arcade and the games travel together.
+  MAINTENANCE: every date lives in the TERM and DUE block at the top of the script.
+  Each semester, copy the dates from the Course Schedule into that block. Nothing else
+  on the page needs editing. After the end date the page says the term is over and
+  keeps every game open.
+  v2 2026-09-23 notes follow.
+  EN195 WRAPAROUND ARCADE, Fall 2026 (EN195-700, asynchronous online).
+
+  Founder ask: "Create an updated en195 wraparound arcade that includes
+  sandbags, dress rehearsal (new name), Kireji Pond, and Reading Lamp."
+  The arcade wraps around the semester: four games pinned to the weeks their
+  workshops run, read from the FALL 2026 EN195-700 Course Schedule
+  (Drive 1FKp4AAcM9WJMQczMUFinUX_QnbPQyhW6h3WYKbTzqjs, read 2026-09-23):
+    Kireji Pond     Workshop 2 Poetry        Weeks 4-5   (#5.2 free verse due Oct 6)
+    Reading Lamp    Ch. 4 Images             Week 5, again Week 13 (portfolio)
+    Dress Rehearsal Workshop 3 10-min play   Weeks 7-9   (#9.1 play due Nov 2)
+    Sandbags        Workshop 4 flash         Weeks 10-11, again Week 13
+  The page works out the current week from the reader's clock and stamps the
+  game that belongs to it. Nothing is stored except the dark mode choice.
+
+  RELEASE FLAGS (READY below): a game whose file has not landed on the
+  playtest lane shows its opening week instead of a Play link. Kireji Pond
+  ships false: at v1 it fails three studio floors (Google Fonts, 25 text items
+  at 16px, one caption at 4.6:1) and lives only as an artifact. Flip it to
+  true when kireji-pond.html lands and passes the gate.
+
+  Floors: single file, no external hosts, 18px minimum, contrast by gate,
+  dark mode button (Row K v39), no emoji, scene first, art over half of every
+  card. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.
+-->
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>The Creative Writing Arcade — Tight Spiral Productions</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>EN195 Wraparound Arcade</title>
+<meta name="description" content="Four practice games for EN195 Creative Writing, each pinned to the week its workshop runs.">
 <style>
-/* STUDIO EYES v2: the OS does not get a vote — light modes are html[data-light]. */
-:root{ color-scheme: dark; }
-
-/* ── LIGHT: DEFAULT (day) — the arcade's native dark room ─────────────── */
 :root{
-  --floor:#1a1d21;      /* the room */
-  --floor-2:#22262b;
-  --panel:#1e2228;      /* the opaque body panel under card text */
-  --paper:#e8e2d6;      /* the ink (text) */
-  --paper-fill:#e8e2d6; /* the same value, used only as decoration (focus ring) */
-  --amber-ink:#ffcf5a;  /* the marquee — TEXT role */
-  --amber-fill:#ffcf5a; /* the marquee — DECORATION/ground role */
-  --amber-dim:#c9a03f;
-  --glow:rgba(255,207,90,.16);
-  --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
-  --serif:Georgia,"Times New Roman",serif;
-  --mono:ui-monospace,"SF Mono",Menlo,monospace;
-  /* Studio Eyes chrome tokens (adapted to the dark room). --ink is the chrome
-     text: LIGHT here, because every chrome ground is dark. */
-  --ink:#e8e2d6;
-  --ink-2:#c9a03f;
-  --surface:#22262b;
-  --surface-2:#2b3037;
-  --line:rgba(255,207,90,.30);
-  --accent:#ffcf5a;
-  --accent-strong:#ffcf5a;
-  --on-accent:#1a1d21;
-  --focus:#ffcf5a;
-  --r:10px; --tap:44px;
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --ink2:#4a3d22; --line:#b8a57a;
+  --rust:#7a3218; --stamp:#0F5F5A; --shade:#D9CDB6; --shadow:rgba(34,28,19,.16);
+  --chip:#efe0c4; --focus:#8a3a1c;
+  --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+  --label:Verdana,'Segoe UI',Arial,sans-serif;
 }
-/* ── LIGHT: DUSK — warmer, dimmer room; ink stays light ──────────────── */
-html[data-light="dusk"]{
-  --floor:#241f18; --floor-2:#2d281f; --panel:#241f19;
-  --amber-ink:#ffd873; --amber-fill:#ffd873; --amber-dim:#d6ad52;
-  --glow:rgba(255,216,115,.16);
-  --ink-2:#d6ad52;
-  --surface:#2a2418; --surface-2:#342d20;
-  --line:rgba(255,216,115,.30);
-  --accent:#ffd873; --accent-strong:#ffd873; --focus:#ffd873;
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([data-light="day"]){ color-scheme:dark;
+    --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --line:#6b604a;
+    --rust:#eaa183; --stamp:#8FD6CC; --shade:rgba(0,0,0,.5); --shadow:rgba(0,0,0,.45);
+    --chip:#33302a; --focus:#f0c357; }
 }
-/* ── LIGHT: WARM-DARK (night) — warm charcoal, never pure black ──────── */
-html[data-light="night"]{
-  --floor:#161310; --floor-2:#1e1a13; --panel:#1f1b14;
-  --amber-ink:#ffcf5a; --amber-fill:#ffcf5a; --amber-dim:#c9a03f;
-  --glow:rgba(255,207,90,.16);
-  --ink-2:#c9a03f;
-  --surface:#201c15; --surface-2:#2a251b;
-  --line:rgba(255,207,90,.30);
-  --accent:#ffcf5a; --accent-strong:#ffcf5a; --focus:#ffcf5a;
-}
-/* ── STUDIO EYES toggles ─────────────────────────────────────────────── */
-html.se-a1{ zoom:1.15; }
-html.se-a2{ zoom:1.3; }
-html.se-contrast{ --paper:#fdf9ef; --amber-dim:#ffdf8f; --line:rgba(255,207,90,.55); }
-html.se-reduce *,@media (prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
-html.se-cb a.cab{ outline:1px solid var(--line); }
+:root[data-theme="dark"], :root[data-light="night"]{ color-scheme:dark;
+  --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --line:#6b604a;
+  --rust:#eaa183; --stamp:#8FD6CC; --shade:rgba(0,0,0,.5); --shadow:rgba(0,0,0,.45);
+  --chip:#33302a; --focus:#f0c357; }
+:root[data-light="day"]{ color-scheme:light; }
 
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  background:var(--floor);
-  color:var(--paper);
-  font-family:var(--sans);
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
-}
+*{ box-sizing:border-box; }
+html{ background:var(--bg); }
+body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--serif);
+  font-size:19px; line-height:1.55; padding-inline:16px; }
+#backdrop{ position:fixed; inset:0; background:var(--bg); z-index:0; }
+.wrap{ position:relative; z-index:1; max-width:1040px; margin:0 auto; padding-block:14px 48px;
+  display:flex; flex-direction:column; gap:26px; }
 
-/* ── THE ROOM: carpet + haze. This is a place, not a page. ───────────── */
-.room{
-  position:fixed; inset:0; z-index:0; pointer-events:none;
-  background:
-    radial-gradient(ellipse 120% 60% at 50% 0%, var(--glow), transparent 60%),
-    repeating-linear-gradient(115deg, transparent 0 22px, rgba(255,255,255,.012) 22px 44px),
-    linear-gradient(180deg, var(--floor) 0%, var(--floor-2) 55%, var(--floor) 100%);
-}
+/* chrome */
+.chrome{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.brand{ display:flex; align-items:center; gap:10px; font-family:var(--label); font-weight:bold;
+  font-size:18px; letter-spacing:2px; }
+.brand svg{ width:40px; height:40px; flex:none; }
+.iconbtn{ width:48px; height:48px; padding:0; border-radius:50%; display:inline-grid; place-items:center;
+  background:var(--chip); color:var(--ink); border:2px solid var(--ink); cursor:pointer; }
+.iconbtn svg{ width:26px; height:26px; display:block; }
+.iconbtn:focus-visible, a:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; }
 
-.wrap{position:relative; z-index:1; max-width:760px; margin:0 auto; padding:0 1rem 5rem}
+/* hero */
+.hero{ display:flex; flex-direction:column; gap:12px; }
+.eyebrow{ margin:0; font-family:var(--label); font-size:18px; font-weight:bold; letter-spacing:2px;
+  text-transform:uppercase; color:var(--rust); }
+h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold; text-wrap:balance; }
+.lede{ margin:0; max-width:40em; font-size:20px; color:var(--ink2); }
+.ribbonbox{ overflow-x:auto; border-radius:14px 20px 16px 22px; box-shadow:0 2px 0 var(--shade), 0 10px 22px var(--shadow); }
+.ribbon{ width:100%; min-width:680px; height:auto; display:block; border-radius:14px 20px 16px 22px;
+}
+.now{ margin:0; font-size:20px; background:var(--card); border:2px solid var(--ink);
+  border-radius:6px 12px 9px 13px; padding:12px 16px; box-shadow:0 2px 0 var(--shade), 0 6px 14px var(--shadow);
+  transform:rotate(-0.3deg); }
+.now b{ color:var(--rust); }
 
-/* ── MARQUEE ─────────────────────────────────────────────────────────── */
-.marquee{ text-align:center; padding:1.3rem 0 1rem }
-.tube{
-  display:inline-block; padding:.42rem 1.1rem; margin-bottom:.7rem;
-  border:2px solid var(--amber-fill); border-radius:3px;
-  color:var(--amber-ink); font:700 .68rem/1 var(--sans);
-  letter-spacing:.22em; text-transform:uppercase;
-  box-shadow:0 0 22px var(--glow), inset 0 0 22px var(--glow);
-}
-h1{
-  font-family:var(--serif); font-weight:400;
-  font-size:clamp(1.7rem,6.6vw,2.5rem); line-height:1.04;
-  color:var(--paper); margin-bottom:.5rem;
-}
-h1 b{ color:var(--amber-ink); font-weight:700; display:block }
-.sub{
-  font-family:var(--serif); font-style:italic;
-  font-size:.96rem; line-height:1.45; color:var(--paper); opacity:.9;
-  max-width:30rem; margin:.7rem auto 0;
-}
-.count{
-  margin-top:.75rem; font:700 .7rem/1 var(--sans);
-  letter-spacing:.16em; text-transform:uppercase; color:var(--amber-dim);
-}
+/* cabinets */
+.cabs{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px; }
+@media (max-width:760px){ .cabs{ grid-template-columns:1fr; } }
+.cab{ background:var(--card); border:2px solid var(--ink); border-radius:14px 20px 16px 22px;
+  box-shadow:0 2px 0 var(--shade), 0 10px 22px var(--shadow); overflow:hidden;
+  display:flex; flex-direction:column; position:relative; }
+.cab:nth-child(odd){ transform:rotate(-0.35deg); }
+.cab:nth-child(even){ transform:rotate(0.35deg); }
+.cab svg.art{ display:block; width:100%; height:auto; aspect-ratio:400/260; border-bottom:2px solid var(--ink); }
+.body{ padding:14px 18px 18px; display:flex; flex-direction:column; gap:10px; flex:1; }
+.when{ margin:0; font-family:var(--label); font-size:18px; font-weight:bold; letter-spacing:1px;
+  text-transform:uppercase; color:var(--rust); }
+.cab h2{ margin:0; font-size:30px; line-height:1.1; }
+.what{ margin:0; }
+.hook{ margin:0; font-size:18px; color:var(--ink2); border-left:3px solid var(--line); padding-left:10px; }
+.play{ margin-top:auto; align-self:flex-start; display:inline-flex; align-items:center; min-height:48px;
+  padding:10px 18px; font-family:var(--label); font-weight:bold; font-size:18px; text-decoration:none;
+  color:#1f1b12; background:#e0a93a; border:2px solid var(--ink); border-radius:6px 12px 9px 13px;
+  box-shadow:0 2px 0 var(--shade), 0 6px 14px var(--shadow); }
+.play:hover{ background:#eab957; }
+.soon{ margin-top:auto; align-self:flex-start; display:inline-flex; align-items:center; min-height:48px;
+  padding:10px 18px; font-family:var(--label); font-weight:bold; font-size:18px; color:var(--ink);
+  border:2px dashed var(--ink2); border-radius:6px 12px 9px 13px; }
+.stampx{ position:absolute; top:14px; right:14px; font-family:var(--label); font-weight:bold; font-size:18px;
+  letter-spacing:2px; color:var(--stamp); background:var(--card); border:2px solid var(--stamp);
+  border-radius:6px 9px 5px 8px; padding:3px 12px; transform:rotate(3deg); }
+.stampx[hidden]{ display:none; }
 
-/* ── THE CABINETS ────────────────────────────────────────────────────── */
-.floor{ display:flex; flex-direction:column; gap:1.1rem; margin-top:1.1rem }
-
-.cab{
-  display:block; text-decoration:none; color:inherit;
-  background:linear-gradient(175deg, #2b3037, #1e2228);
-  border:1px solid rgba(255,207,90,.20);
-  border-radius:12px; overflow:hidden;
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-  transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease;
-}
-.cab:hover, .cab:focus-visible{
-  transform:translateY(-3px);
-  border-color:var(--amber-fill);
-  box-shadow:0 14px 40px rgba(0,0,0,.45), 0 0 0 1px var(--amber-fill);
-}
-.cab:focus-visible{ outline:3px solid var(--amber-fill); outline-offset:3px }
-
-/* the screen: every cabinet is >50% image (userPreferences floor) */
-.screen{
-  position:relative; height:200px;
-  background:#0e1114;
-  border-bottom:1px solid rgba(255,207,90,.18);
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden;
-}
-.screen svg{ width:100%; height:100%; display:block }
-.scan{
-  position:absolute; inset:0; pointer-events:none;
-  background:repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 1px, transparent 1px 3px);
-}
-
-/* Opaque body panel: the auditor cannot sample the card's gradient, so the text
-   needs a real, known ground under it — matches the gradient's lower stop. */
-.body{ background:var(--panel); padding:1rem 1.1rem 1.15rem }
-.no{
-  display:inline-block; min-width:26px; text-align:center;
-  padding:.18rem .42rem; margin-bottom:.5rem;
-  background:var(--amber-fill); color:#1a1d21;
-  font:800 .74rem/1 var(--sans); border-radius:3px;
-}
-h2{ font-family:var(--serif); font-size:1.42rem; font-weight:400; color:var(--paper); margin-bottom:.18rem }
-.after{ font:700 .66rem/1 var(--sans); letter-spacing:.13em; text-transform:uppercase; color:var(--amber-dim); margin-bottom:.55rem }
-.blurb{ font-size:.96rem; line-height:1.5; color:var(--paper); opacity:.92 }
-.verb{
-  margin-top:.7rem; padding-top:.7rem;
-  border-top:1px solid rgba(232,226,214,.14);
-  display:flex; align-items:center; justify-content:space-between; gap:.6rem;
-}
-.does{ font-size:.86rem; color:var(--paper); opacity:.85 }
-.does b{ color:var(--amber-ink) }
-.play{
-  flex:none; padding:.5rem .8rem; min-height:44px;
-  display:flex; align-items:center;
-  background:var(--amber-fill); color:#1a1d21;
-  font:800 .74rem/1 var(--sans); letter-spacing:.06em;
-  border-radius:6px; text-transform:uppercase;
-}
-
-.foot{
-  margin-top:2.6rem; padding-top:1.2rem;
-  border-top:1px solid rgba(232,226,214,.14);
-  text-align:center; font-size:.86rem; line-height:1.6;
-  color:var(--paper); opacity:.8;
-}
-.foot b{ color:var(--amber-ink); opacity:1 }
-
-@media(prefers-reduced-motion:reduce){ *{transition:none!important} }
-
-/* ═══ STUDIO EYES v2 — RESERVED CHROME (own row, never overlaps content) ═══ */
-.se-chrome{ position:relative; z-index:100; display:grid; grid-template-columns:1fr auto 1fr;
-  align-items:center; gap:10px; padding:9px 14px; background:var(--surface);
-  border-bottom:2px solid var(--line); }
-.se-home{ justify-self:start; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
-  padding:8px 12px; border:1.5px solid var(--line); border-radius:8px; background:var(--surface-2);
-  color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; }
-.se-brand{ justify-self:center; display:inline-flex; align-items:center; gap:9px; color:var(--ink); }
-.se-brand svg{ width:34px; height:20px; color:var(--accent-strong); flex:0 0 auto; }
-.se-brand .wm{ font-family:var(--serif); font-size:16px; letter-spacing:.01em; white-space:nowrap; }
-.se-eyes{ justify-self:end; display:inline-flex; align-items:center; gap:7px; min-height:var(--tap);
-  padding:8px 13px; border:2px solid transparent; border-radius:8px; background:var(--accent-strong);
-  color:var(--on-accent); font-family:var(--mono); font-weight:700; font-size:13px; cursor:pointer; }
-.se-home:focus-visible,.se-eyes:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
-@media (max-width:560px){ .se-brand .wm{ display:none; } }
-
-/* ═══ STUDIO EYES panel — opens under the chrome, top-right ═══ */
-.se-panel{ position:fixed; right:12px; top:calc(var(--tap) + 22px); z-index:101;
-  width:min(320px,calc(100vw - 24px)); background:var(--surface); color:var(--ink);
-  border:2px solid var(--accent-strong); border-radius:var(--r); padding:15px;
-  box-shadow:0 10px 34px rgba(0,0,0,.5); display:none; }
-.se-panel[data-open="1"]{ display:block; }
-.se-panel h2{ font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2); margin:0 0 8px; }
-.se-row{ display:flex; gap:6px; margin-bottom:14px; }
-.se-eyebtn{ flex:1; min-height:var(--tap); padding:8px 4px; border:1.5px solid var(--line); border-radius:8px;
-  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:12.5px; cursor:pointer; }
-.se-eyebtn[aria-pressed="true"]{ background:var(--accent-strong); color:var(--on-accent); border-color:var(--accent-strong); }
-.se-eyebtn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
-.se-tog{ display:flex; width:100%; align-items:center; justify-content:space-between; gap:10px;
-  min-height:var(--tap); padding:8px 11px; margin-bottom:6px; border:1.5px solid var(--line); border-radius:8px;
-  background:var(--surface-2); color:var(--ink); font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; text-align:left; }
-.se-tog[aria-pressed="true"]{ border-color:var(--accent-strong); }
-.se-tog .st{ font-family:var(--mono); font-size:11px; color:var(--ink-2); }
-.se-tog[aria-pressed="true"] .st{ color:var(--accent-strong); font-weight:700; }
-.se-tog:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
-.se-sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
-
-/* ═══ BOTTOM NAV RAIL — Back + Home ═══ */
-.se-rail{ display:flex; gap:10px; justify-content:center; padding:20px; margin-top:2.4rem;
-  border-top:2px solid var(--line); }
-.se-rail a,.se-rail button{ min-height:var(--tap); padding:10px 18px; border:1.5px solid var(--line); border-radius:8px;
-  background:var(--surface-2); color:var(--ink); font-family:var(--mono); font-weight:700; font-size:13px; text-decoration:none; cursor:pointer; }
-.se-rail a:focus-visible,.se-rail button:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+/* foot */
+.note{ margin:0; max-width:44em; font-size:18px; color:var(--ink2); }
+.foot{ display:flex; align-items:center; gap:14px; padding-top:16px; border-top:2px solid var(--ink); flex-wrap:wrap; }
+.foot svg{ width:52px; height:52px; flex:none; }
+.foot b{ display:block; font-family:var(--label); font-size:18px; letter-spacing:2px; }
+.foot i{ display:block; font-size:18px; }
+@media (prefers-reduced-motion: reduce){ .cab, .now{ transform:none; } }
 </style>
 </head>
 <body>
+<div id="backdrop" aria-hidden="true"></div>
 
-<!-- RESERVED CHROME — Home · teaspoon brand · Studio Eyes (own row) -->
-<header class="se-chrome">
-  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
-  <span class="se-brand">
-    <svg viewBox="0 0 64 27" fill="none" stroke="currentColor" aria-hidden="true" focusable="false"><path d="M33.2 13.5 L33.3 13.6 L33.3 13.8 L33.4 13.9 L33.4 14.1 L33.4 14.3 L33.3 14.5 L33.3 14.7 L33.2 14.9 L33.1 15.0 L33.0 15.2 L32.8 15.4 L32.7 15.5 L32.5 15.7 L32.2 15.8 L32.0 15.9 L31.7 15.9 L31.5 16.0 L31.2 16.0 L30.9 15.9 L30.6 15.9 L30.3 15.8 L30.1 15.7 L29.8 15.5 L29.5 15.3 L29.3 15.1 L29.1 14.8 L28.9 14.5 L28.7 14.2 L28.6 13.9 L28.5 13.5 L28.4 13.1 L28.4 12.7 L28.4 12.3 L28.5 11.9 L28.6 11.5 L28.8 11.2 L29.0 10.8 L29.2 10.4 L29.5 10.1 L29.8 9.8 L30.2 9.5 L30.6 9.3 L31.1 9.1 L31.5 8.9 L32.0 8.8 L32.5 8.8 L33.0 8.8 L33.5 8.8 L34.0 8.9 L34.5 9.1 L35.0 9.3 L35.5 9.6 L35.9 9.9 L36.4 10.3 L36.7 10.8 L37.1 11.2 L37.3 11.8 L37.6 12.3 L37.7 12.9 L37.9 13.5 L37.9 14.1 L37.9 14.7 L37.8 15.4 L37.6 16.0 L37.4 16.6 L37.1 17.2 L36.8 17.8 L36.3 18.3 L35.8 18.8 L35.3 19.2 L34.7 19.6 L34.1 19.9 L33.4 20.2 L32.7 20.4 L32.0 20.5 L31.3 20.6 L30.5 20.5 L29.8 20.4 L29.0 20.2 L28.3 19.9 L27.6 19.5 L26.9 19.1 L26.3 18.6 L25.8 18.0 L25.3 17.4 L24.8 16.7 L24.4 16.0 L24.2 15.2 L23.9 14.3 L23.8 13.5 L23.8 12.6 L23.9 11.8 L24.0 10.9 L24.2 10.0 L24.6 9.2 L25.0 8.4 L25.5 7.7 L26.1 7.0 L26.8 6.3 L27.5 5.7 L28.3 5.3 L29.2 4.8 L30.1 4.5 L31.0 4.3 L32.0 4.2 L33.0 4.1 L34.0 4.2 L35.0 4.4 L35.9 4.7 L36.9 5.1 L37.8 5.6 L38.6 6.2 L39.4 6.8 L40.1 7.6 L40.8 8.4 L41.3 9.4 L41.8 10.3 L42.1 11.3 L42.4 12.4 L42.5 13.5" stroke-width="2.3" stroke-linecap="round"/><circle cx="32" cy="13.5" r="1.6" fill="currentColor" stroke="none"/></svg>
-    <span class="wm">Tight Spiral</span>
-  </span>
-</header>
-<p class="se-stamp" style="margin:.4rem 0 1rem;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.76rem;opacity:.92;display:flex;align-items:center;gap:.45rem"><span id="seUpdated">Last updated&hellip;</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v10 <span style="opacity:.75">75e938c</span></span></span></p>
-<script>(function(){var u=document.getElementById('seUpdated');if(!u)return;var d=new Date(document.lastModified);u.textContent=isNaN(d.getTime())?'Last updated recently':'Last updated '+d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});})();</script>
-
-
-<div class="room" aria-hidden="true"></div>
+<!-- shared cut-paper recipe (Row K v36): hand-cut edge, fibre, double shadow -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="cut" x="-10%" y="-15%" width="120%" height="140%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency="0.1 0.2" numOctaves="3" seed="7" result="f"/><feColorMatrix in="f" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .09 0" result="g"/><feComposite in="g" in2="d" operator="in" result="gc"/><feMerge result="p"><feMergeNode in="d"/><feMergeNode in="gc"/></feMerge><feGaussianBlur in="d" stdDeviation="0.8" result="b1"/><feOffset in="b1" dx="1" dy="1.5" result="o1"/><feFlood flood-color="#0c0806" flood-opacity=".42"/><feComposite in2="o1" operator="in" result="s1"/><feGaussianBlur in="d" stdDeviation="2.6" result="b2"/><feOffset in="b2" dx="1.6" dy="4" result="o2"/><feFlood flood-color="#0c0806" flood-opacity=".26"/><feComposite in2="o2" operator="in" result="s2"/><feMerge><feMergeNode in="s2"/><feMergeNode in="s1"/><feMergeNode in="p"/></feMerge></filter>
+    <filter id="soft" x="-10%" y="-15%" width="120%" height="140%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="1.4" result="b"/><feOffset in="b" dx="1" dy="2.5" result="o"/><feFlood flood-color="#0c0806" flood-opacity=".2"/><feComposite in2="o" operator="in" result="s"/><feMerge><feMergeNode in="s"/><feMergeNode in="d"/></feMerge></filter>
+    <radialGradient id="lampglow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f7e8b5" stop-opacity=".9"/><stop offset="1" stop-color="#f7e8b5" stop-opacity="0"/></radialGradient>
+    <radialGradient id="spot" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#fff3cf" stop-opacity=".75"/><stop offset="1" stop-color="#fff3cf" stop-opacity="0"/></radialGradient>
+    <path id="tss-spiral" d="M26.2 24.0 L26.3 24.5 L26.4 25.1 L26.2 25.7 L25.9 26.3 L25.5 26.8 L24.9 27.3 L24.2 27.6 L23.4 27.7 L22.5 27.7 L21.7 27.5 L20.8 27.0 L20.1 26.4 L19.5 25.6 L19.1 24.6 L18.8 23.5 L18.9 22.3 L19.2 21.2 L19.8 20.1 L20.6 19.1 L21.6 18.3 L22.9 17.7 L24.3 17.4 L25.7 17.4 L27.2 17.8 L28.5 18.5 L29.8 19.4 L30.8 20.7 L31.5 22.2 L32.0 23.8 L32.0 25.6 L31.7 27.4 L30.9 29.0 L29.8 30.5 L28.4 31.8 L26.7 32.8 L24.7 33.3 L22.7 33.5 L20.6 33.1 L18.6 32.4 L16.8 31.2 L15.3 29.6 L14.1 27.7 L13.4 25.5 L13.1 23.1 L13.3 20.8 L14.1 18.5 L15.4 16.3 L17.1 14.5 L19.2 13.1 L21.6 12.1 L24.2 11.7 L26.9 11.8 L29.6 12.5 L32.0 13.8 L34.1 15.7 L35.9 17.9 L37.1 20.6 L37.7 23.5 L37.7 26.4 L37.0 29.4 L35.7 32.2 L33.9 34.7 L31.4 36.7 L28.6 38.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </defs>
+</svg>
 
 <div class="wrap">
-
-  <header class="marquee">
-    <div class="tube">Tight Spiral Productions</div>
-    <h1>The Creative Writing<b>Arcade</b></h1>
-    <p class="sub">Five machines that teach a writing move by making you do it.
-       No lecture. No quiz. You play, and the craft is the mechanic.</p>
-    <div class="count">Five cabinets + a guest · Free · Works offline</div>
+  <header class="chrome">
+    <span class="brand"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>EN195 ARCADE</span>
+    <button class="iconbtn" id="darkBtn" type="button" aria-label="Dark mode" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/></svg>
+    </button>
   </header>
 
-  <main class="floor">
+  <section class="hero" aria-labelledby="t">
+    <p class="eyebrow" id="termLine">EN195 Creative Writing · Fall 2026</p>
+    <h1 id="t">Four games, one per workshop.</h1>
+    <p class="lede">Each game practices one move the week before you need it on the page. They are practice: nothing is graded, and nothing you do here leaves your screen.</p>
 
-    <!-- 1 — COWPATHS -->
-    <a class="cab" href="cliche-cowpaths.html">
-      <div class="screen">
-        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
-          <rect width="300" height="170" fill="#0e1114"/>
-          <path d="M0 150 Q60 148 90 130 T150 105 T210 78 T300 50" stroke="#3d4148" stroke-width="16" fill="none" stroke-linecap="round"/>
-          <path d="M0 150 Q60 148 90 130 T150 105 T210 78 T300 50" stroke="#ffcf5a" stroke-width="2.5" fill="none" stroke-dasharray="7 9" opacity=".85"/>
-          <path d="M0 160 Q80 156 120 142 T220 118 T300 100" stroke="#2c3037" stroke-width="9" fill="none"/>
-          <path d="M0 132 Q70 130 110 112 T200 88 T300 70" stroke="#262a30" stroke-width="6" fill="none"/>
-          <g fill="#4a4f57">
-            <ellipse cx="52" cy="70" rx="13" ry="9"/><ellipse cx="96" cy="52" rx="10" ry="7"/>
-            <ellipse cx="196" cy="132" rx="11" ry="8"/><ellipse cx="248" cy="118" rx="9" ry="6"/>
-          </g>
-          <circle cx="240" cy="42" r="4" fill="#ffcf5a"/>
-          <circle cx="262" cy="36" r="2.5" fill="#ffcf5a" opacity=".6"/>
-        </svg>
-        <div class="scan"></div>
-      </div>
-      <div class="body">
-        <span class="no">1</span>
-        <h2>Cliché Cowpaths</h2>
-        <div class="after">Three cartridges · Field, Line, City</div>
-        <p class="blurb">The cows never planned the route. They followed the cow in front.
-           Three hundred years later the street still bends. A cliché is the same —
-           nobody chose it, everybody walks it, and now it's paved.</p>
-        <div class="verb">
-          <span class="does"><b>Notice.</b> The worn path under your sentence.</span>
-          <span class="play">Play</span>
-        </div>
-      </div>
-    </a>
+    <!-- the semester as a paper ribbon: fifteen week tabs, the four workshops,
+         a game pinned where each one opens, and a pin for this week -->
+    <div class="ribbonbox"><svg class="ribbon" id="ribbon" viewBox="0 0 1000 300" aria-hidden="true" focusable="false">
+      <rect width="1000" height="300" fill="#e9dcc0"/>
+      <g filter="url(#soft)">
+        <path d="M-10 150 C120 118 220 176 360 146 C500 116 610 178 760 148 C860 128 930 150 1010 138 L1010 186 C930 198 860 176 760 196 C610 226 500 164 360 194 C220 224 120 166 -10 198 Z" fill="#c9b48a"/>
+      </g>
+      <g filter="url(#cut)">
+        <path d="M-10 140 C120 108 220 166 360 136 C500 106 610 168 760 138 C860 118 930 140 1010 128 L1010 172 C930 184 860 162 760 182 C610 212 500 150 360 180 C220 210 120 152 -10 184 Z" fill="#fffaf0"/>
+      </g>
+      <g id="weekTabs"></g>
+      <g id="pins"></g>
+      <g id="herePin"></g>
+      <g id="labels"></g>
+    </svg></div>
+    <p class="now" id="now" aria-live="polite">Loading this week.</p>
+  </section>
 
-    <!-- 2 — SANDBAGS -->
-    <a class="cab" href="sandbags.html">
-      <div class="screen">
-        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
-          <rect width="300" height="170" fill="#0e1114"/>
-          <ellipse cx="150" cy="46" rx="34" ry="40" fill="#3d4148" stroke="#ffcf5a" stroke-width="2"/>
-          <path d="M150 86 L142 100 M150 86 L158 100" stroke="#ffcf5a" stroke-width="1.6"/>
-          <rect x="132" y="100" width="36" height="24" rx="3" fill="#2c3037" stroke="#ffcf5a" stroke-width="1.6"/>
-          <g fill="#4a4f57" stroke="#5a606a" stroke-width="1">
-            <rect x="108" y="132" width="26" height="17" rx="4"/>
-            <rect x="138" y="132" width="26" height="17" rx="4"/>
-            <rect x="168" y="132" width="26" height="17" rx="4"/>
-            <rect x="123" y="152" width="26" height="16" rx="4"/>
-            <rect x="153" y="152" width="26" height="16" rx="4"/>
-          </g>
-          <path d="M118 128 L124 118 M150 128 L150 118 M182 128 L176 118" stroke="#5a606a" stroke-width="1.2"/>
-          <path d="M30 30 h18 M34 40 h10" stroke="#2c3037" stroke-width="2"/>
-          <path d="M252 30 h18 M256 40 h10" stroke="#2c3037" stroke-width="2"/>
-        </svg>
-        <div class="scan"></div>
-      </div>
-      <div class="body">
-        <span class="no">2</span>
-        <h2>Sandbags</h2>
-        <div class="after">A flash fiction climb</div>
-        <p class="blurb">The balloon won't rise. Every word you cut is ballast over the side.
-           Cut too little and you never leave the ground. Cut the wrong thing and you crash.</p>
-        <div class="verb">
-          <span class="does"><b>Compress.</b> Find what the story can't lose.</span>
-          <span class="play">Play</span>
-        </div>
-      </div>
-    </a>
+  <section class="cabs" aria-label="The four games" id="cabs"></section>
 
-    <!-- 3 — THE TELL -->
-    <a class="cab" href="the-tell.html">
-      <div class="screen">
-        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
-          <rect width="300" height="170" fill="#0e1114"/>
-          <rect x="52" y="34" width="70" height="98" rx="6" fill="#2c3037" stroke="#4a4f57" stroke-width="1.6" transform="rotate(-7 87 83)"/>
-          <rect x="115" y="30" width="70" height="98" rx="6" fill="#3d4148" stroke="#ffcf5a" stroke-width="2"/>
-          <rect x="178" y="34" width="70" height="98" rx="6" fill="#2c3037" stroke="#4a4f57" stroke-width="1.6" transform="rotate(7 213 83)"/>
-          <g stroke="#ffcf5a" stroke-width="2" stroke-linecap="round">
-            <path d="M132 56 h36"/><path d="M132 68 h26"/><path d="M132 80 h32"/>
-          </g>
-          <circle cx="150" cy="104" r="9" fill="none" stroke="#ffcf5a" stroke-width="2"/>
-          <circle cx="150" cy="104" r="3" fill="#ffcf5a"/>
-          <path d="M30 150 h240" stroke="#2c3037" stroke-width="2"/>
-        </svg>
-        <div class="scan"></div>
-      </div>
-      <div class="body">
-        <span class="no">3</span>
-        <h2>The Tell</h2>
-        <div class="after">An async workshop game</div>
-        <p class="blurb">Every draft leaks. The writer knows what they meant; the page knows
-           what they said. Read for the gap — the place the story tells on itself.</p>
-        <div class="verb">
-          <span class="does"><b>Read.</b> What the draft admits by accident.</span>
-          <span class="play">Play</span>
-        </div>
-      </div>
-    </a>
-
-    <!-- 4 — WORKSHOP WALL -->
-    <a class="cab" href="workshop-wall.html">
-      <div class="screen">
-        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
-          <rect width="300" height="170" fill="#0e1114"/>
-          <g fill="#2c3037" stroke="#4a4f57" stroke-width="1.2">
-            <rect x="34" y="28" width="56" height="44" rx="3" transform="rotate(-3 62 50)"/>
-            <rect x="102" y="34" width="56" height="44" rx="3" transform="rotate(2 130 56)"/>
-            <rect x="170" y="26" width="56" height="44" rx="3" transform="rotate(-2 198 48)"/>
-            <rect x="66" y="88" width="56" height="44" rx="3" transform="rotate(3 94 110)"/>
-            <rect x="204" y="88" width="56" height="44" rx="3" transform="rotate(-4 232 110)"/>
-          </g>
-          <rect x="134" y="82" width="60" height="50" rx="3" fill="#3d4148" stroke="#ffcf5a" stroke-width="2"/>
-          <g stroke="#ffcf5a" stroke-width="1.8" stroke-linecap="round">
-            <path d="M146 96 h34"/><path d="M146 106 h24"/><path d="M146 116 h30"/>
-          </g>
-          <g fill="#ffcf5a"><circle cx="62" cy="30" r="3"/><circle cx="130" cy="36" r="3"/><circle cx="198" cy="28" r="3"/><circle cx="94" cy="90" r="3"/><circle cx="232" cy="90" r="3"/><circle cx="164" cy="84" r="3.5"/></g>
-        </svg>
-        <div class="scan"></div>
-      </div>
-      <div class="body">
-        <span class="no">4</span>
-        <h2>The Workshop Wall</h2>
-        <div class="after">Writerly moves, labeled</div>
-        <p class="blurb">A move you can name is a move you can steal. The wall pins the craft
-           where you can see it — and hands you the pin.</p>
-        <div class="verb">
-          <span class="does"><b>Name.</b> The move, so you can use it.</span>
-          <span class="play">Play</span>
-        </div>
-      </div>
-    </a>
-
-    <!-- 5 — REVIEW BENCH -->
-    <a class="cab" href="review-bench.html">
-      <div class="screen">
-        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
-          <rect width="300" height="170" fill="#0e1114"/>
-          <path d="M150 30 v14" stroke="#4a4f57" stroke-width="3"/>
-          <path d="M78 48 h144" stroke="#ffcf5a" stroke-width="3" stroke-linecap="round"/>
-          <path d="M150 44 v66" stroke="#4a4f57" stroke-width="3"/>
-          <path d="M78 48 l-16 32 h32 z" fill="#2c3037" stroke="#ffcf5a" stroke-width="1.8"/>
-          <path d="M222 48 l-16 32 h32 z" fill="#3d4148" stroke="#ffcf5a" stroke-width="1.8"/>
-          <rect x="66" y="84" width="24" height="4" rx="2" fill="#4a4f57"/>
-          <rect x="210" y="84" width="24" height="4" rx="2" fill="#ffcf5a"/>
-          <rect x="106" y="112" width="88" height="34" rx="4" fill="#2c3037" stroke="#4a4f57" stroke-width="1.4"/>
-          <g stroke="#5a606a" stroke-width="1.6" stroke-linecap="round">
-            <path d="M118 124 h44"/><path d="M118 134 h30"/>
-          </g>
-          <circle cx="150" cy="30" r="4" fill="#ffcf5a"/>
-        </svg>
-        <div class="scan"></div>
-      </div>
-      <div class="body">
-        <span class="no">5</span>
-        <h2>The Review Bench</h2>
-        <div class="after">Flash fiction peer workshop</div>
-        <p class="blurb">Praise is cheap and vague is worse. The bench makes you weigh a draft
-           against something — and say what you'd trade.</p>
-        <div class="verb">
-          <span class="does"><b>Judge.</b> With a reason you can defend.</span>
-          <span class="play">Play</span>
-        </div>
-      </div>
-    </a>
-
-<!-- 6 — BARCELONA SUMMERS (guest · student game, external) -->
-    <a class="cab" href="https://eclectic-youtiao-c065da.netlify.app/" rel="noopener">
-      <div class="screen">
-        <svg viewBox="0 0 300 170" fill="none" aria-hidden="true">
-          <rect width="300" height="170" fill="#0e1114"/>
-          <rect x="0" y="0" width="300" height="120" fill="#17140f"/>
-          <circle cx="232" cy="46" r="26" fill="#ffcf5a" opacity=".9"/>
-          <circle cx="232" cy="46" r="42" fill="#ffcf5a" opacity=".14"/>
-          <g fill="#2c3037">
-            <rect x="24" y="86" width="46" height="34"/><rect x="96" y="74" width="54" height="46"/>
-            <rect x="170" y="94" width="40" height="26"/>
-          </g>
-          <rect x="0" y="120" width="300" height="50" fill="#0e1114"/>
-          <g stroke="#4a4f57" stroke-width="4">
-            <line x1="24" y1="120" x2="24" y2="168"/><line x1="74" y1="120" x2="74" y2="168"/>
-            <line x1="124" y1="120" x2="124" y2="168"/><line x1="174" y1="120" x2="174" y2="168"/>
-            <line x1="224" y1="120" x2="224" y2="168"/><line x1="274" y1="120" x2="274" y2="168"/>
-          </g>
-          <rect x="0" y="126" width="300" height="5" fill="#ffcf5a" opacity=".85"/>
-        </svg>
-        <div class="scan"></div>
-      </div>
-      <div class="body">
-        <span class="no">6</span>
-        <h2>Barcelona Summers</h2>
-        <div class="after">Guest cabinet &middot; Hamish K. &middot; EN195 Creative Writing (summer 6-week online)</div>
-        <p class="blurb">A summer in Barcelona, read three ways. Make the editor&rsquo;s cut &mdash;
-           keep what shows, lose what tells &mdash; and watch a scene carry its meaning
-           without stopping to explain itself.</p>
-        <div class="verb">
-          <span class="does"><b>Notice.</b> What the image does that the sentence can&rsquo;t say.</span>
-          <span class="play">Play</span>
-        </div>
-      </div>
-    </a>
-
-  </main>
+  <p class="note">Every game runs in your browser on a phone or a laptop, with a dark mode button and no sign-in. Questions go to the Ask the Professor board on Blackboard.</p>
 
   <footer class="foot">
-    <b>Play. Notice. Design.</b><br>
-    Built by Tight Spiral Productions. Every machine runs offline, keeps nothing,
-    and costs nothing. Take them into a classroom if they're useful.
+    <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
+    <div><b>TIGHT SPIRAL STUDIOS</b><i>Play. Notice. Design.</i></div>
   </footer>
-
 </div>
-
-<!-- BOTTOM NAV RAIL — Back + Home -->
-<nav class="se-rail" aria-label="Page navigation">
-  <button type="button" id="seBack" aria-label="Back">Back</button>
-  <a href="index.html" aria-label="Home">Home</a>
-</nav>
 
 <script>
 (function(){
-  var root=document.documentElement, sr=document.getElementById('seSr');
-  // Studio Eyes: open/close
-  // Back rail
-  var back=document.getElementById('seBack');
-  if(back) back.addEventListener('click',function(){ history.back(); });
+  /* ============ TERM: the one block to edit each semester ============
+     Copy these from the EN195 Course Schedule. The ribbon, the week box, the
+     THIS WEEK stamps, the start and end flags and the due dates on the cards
+     are all worked out from here. Dates are YYYY-MM-DD. */
+  var TERM={
+    name:'Fall 2026',
+    week1:'2026-09-08',   /* first day of Week 1 */
+    week2:'2026-09-14',   /* the Monday Week 2 starts; weeks run Monday to Sunday after that */
+    end:'2026-12-16'      /* last day of Week 15 */
+  };
+  var DUE={ '5.1':'Oct 6', '5.2':'Oct 6', '9.1':'Nov 2', '11.4':'Nov 22', '14.2':'Dec 10' };
+  /* ==================================================================== */
+
+  var BASE='';   /* the games sit beside this page */
+  /* flip a flag to false to show a game's opening week instead of a Play link */
+  var READY={ kireji:true, lamp:true, rehearsal:true, sandbags:true };
+
+  function day(iso,endOfDay){ var p=iso.split('-'); return new Date(+p[0],+p[1]-1,+p[2],endOfDay?23:0,endOfDay?59:0); }
+  var W1=day(TERM.week1), W2=day(TERM.week2), END=day(TERM.end,true);
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var MONTH=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  function md(d){ return MON[d.getMonth()]+' '+d.getDate(); }
+  function due(k){ return DUE[k]?', due '+DUE[k]:''; }
+  function weekOf(d){
+    if(d<W1) return 0; if(d>END) return 16;
+    if(d<W2) return 1;
+    return Math.min(15, 2+Math.floor((d-W2)/(7*864e5)));
+  }
+  function range(w){
+    var a, b;
+    if(w===1){ a=W1; b=new Date(W2.getTime()-864e5); }
+    else { a=new Date(W2.getTime()+(w-2)*7*864e5); b=new Date(a.getTime()+6*864e5); if(w===15) b=END; }
+    return md(a)+' to '+(a.getMonth()===b.getMonth()?'':MON[b.getMonth()]+' ')+b.getDate();
+  }
+  document.getElementById('termLine').textContent='EN195 Creative Writing · '+TERM.name;
+  var WORKSHOPS=[
+    {name:'Workshop 1: Creative Nonfiction', from:2, to:3},
+    {name:'Workshop 2: Poetry', from:4, to:6},
+    {name:'Workshop 3: 10-Minute Play', from:6, to:9},
+    {name:'Workshop 4: Flash Fiction', from:10, to:12},
+    {name:'Portfolio and artist statement', from:13, to:15}
+  ];
+
+  /* ---------- cut-paper plates, one per game (viewBox 400 x 260) ---------- */
+  function kireji(){ return ''+
+    '<rect width="400" height="260" fill="#EDCDB5"/><rect y="0" width="400" height="60" fill="#D98A78" opacity=".55"/>'+
+    '<circle cx="310" cy="58" r="26" fill="#C8553F"/>'+
+    '<g filter="url(#soft)"><path d="M0 132 L60 96 L110 118 L170 80 L230 116 L290 92 L400 124 L400 170 L0 170 Z" fill="#A2ABA3"/></g>'+
+    '<g filter="url(#cut)"><path d="M-10 150 C80 138 180 146 260 140 C320 136 360 142 410 138 L410 270 L-10 270 Z" fill="#1F3A5F"/>'+
+    '<path d="M-10 196 C90 186 200 196 410 188 L410 270 L-10 270 Z" fill="#3F6A8E"/></g>'+
+    '<g fill="none" stroke="#B7CEDA" stroke-width="2.4" opacity=".85"><ellipse cx="150" cy="205" rx="36" ry="7"/><ellipse cx="150" cy="205" rx="62" ry="12" opacity=".6"/><ellipse cx="150" cy="205" rx="90" ry="17" opacity=".35"/></g>'+
+    '<g filter="url(#cut)"><path d="M232 176 C236 156 262 148 290 152 C318 156 330 170 326 184 C300 192 256 192 232 176 Z" fill="#6f6a5c"/>'+
+    '<path d="M258 154 C262 136 282 128 300 138 C312 146 312 158 302 162 C288 166 266 164 258 154 Z" fill="#7C8C3A"/>'+
+    '<path d="M296 160 C304 164 312 164 316 158 L312 170 C302 172 294 170 290 166 Z" fill="#5F6B34"/>'+
+    '<circle cx="272" cy="136" r="6" fill="#B98A2E"/><circle cx="272" cy="136" r="2.6" fill="#1B1A17"/>'+
+    '<path d="M60 170 C62 130 58 100 66 60" stroke="#5F6B34" stroke-width="5" fill="none"/><path d="M66 60 C58 70 56 84 60 96 C68 84 70 72 66 60 Z" fill="#5F6B34"/>'+
+    '<path d="M84 172 C86 144 84 124 90 100" stroke="#4d5a2a" stroke-width="4" fill="none"/></g>'+
+    '<g filter="url(#cut)"><rect x="350" y="16" width="34" height="34" rx="3" fill="#B23A2A"/><rect x="357" y="23" width="20" height="20" fill="none" stroke="#F8E9DC" stroke-width="3"/></g>';
+  }
+  function lamp(){ return ''+
+    '<rect width="400" height="260" fill="#cfe0e2"/>'+
+    '<g filter="url(#soft)"><rect x="-10" y="196" width="420" height="80" fill="#c9c0ad"/><rect x="-10" y="188" width="420" height="10" fill="#e3dbc6"/></g>'+
+    '<ellipse cx="96" cy="130" rx="92" ry="92" fill="url(#lampglow)"/>'+
+    '<g filter="url(#cut)"><path d="M50 128 L142 128 L122 72 L72 72 Z" fill="#8a6322"/><path d="M72 72 L86 72 L66 128 L50 128 Z" fill="#c99a63"/>'+
+    '<rect x="90" y="128" width="12" height="70" fill="#7e3a22"/><path d="M68 206 q28 -12 56 0 l0 5 -56 0 Z" fill="#7e3a22"/></g>'+
+    '<path d="M160 40 Q270 62 392 36" stroke="#1d232b" stroke-width="2" fill="none"/>'+
+    frame(176,50,-3,'<rect x="10" y="30" width="22" height="34" rx="2" fill="none" stroke="#1d232b" stroke-width="2.4"/><line x1="10" y1="44" x2="32" y2="44" stroke="#1d232b" stroke-width="2.4"/><path d="M38 38 q5 6 0 12" stroke="#1d232b" stroke-width="2.4" fill="none"/>')+
+    frame(250,58,2,'<circle cx="24" cy="26" r="7" fill="none" stroke="#1d232b" stroke-width="2.4"/><path d="M24 33 L24 50 M24 38 L14 46 M24 38 L36 46" stroke="#1d232b" stroke-width="2.4" fill="none"/><path d="M4 56 q10 -5 18 0" stroke="#1d232b" stroke-width="2.4" fill="none"/>')+
+    frame(324,48,-2,'<rect x="4" y="4" width="40" height="52" fill="#ded9c8"/><path d="M2 36 q9 -8 18 -3 q8 -8 16 -2 q6 -3 10 2 l0 24 -44 0 Z" fill="#eae4d4"/><path d="M28 18 a8 8 0 1 1 -6 13" stroke="#3f4a54" stroke-width="2.2" fill="none" opacity=".6"/>');
+  }
+  function frame(x,y,r,inner){ return '<g transform="translate('+x+','+y+') rotate('+r+')" filter="url(#cut)">'+
+    '<line x1="30" y1="-8" x2="30" y2="0" stroke="#1d232b" stroke-width="2"/>'+
+    '<rect x="0" y="0" width="60" height="76" fill="#fdf8ec"/><rect x="5" y="5" width="50" height="58" fill="#c99a63"/>'+
+    '<g transform="translate(6,6)"><rect width="48" height="56" fill="#fdf8ec"/>'+inner+'</g></g>'; }
+  function rehearsal(){ var seats='';
+    for(var i=0;i<9;i++){ var x=18+i*42; seats+='<path d="M'+x+' 214 q0 -22 18 -22 l6 0 q18 0 18 22 l0 20 -42 0 Z" fill="'+(i===4?'#8d3221':'#503745')+'"/>'; }
+    var heads=[['#F4C542',60],['#52C3C9',144],['#F28DB2',228],['#A77BD6',312]].map(function(h){
+      return '<circle cx="'+(h[1]+21)+'" cy="186" r="11" fill="'+h[0]+'"/>'; }).join('');
+    return ''+
+    '<rect width="400" height="260" fill="#2c2b30"/>'+
+    '<g filter="url(#soft)"><rect x="40" y="40" width="320" height="130" fill="#414045"/></g>'+
+    '<path d="M200 20 L120 170 L280 170 Z" fill="url(#spot)"/>'+
+    '<g filter="url(#cut)"><rect x="40" y="150" width="320" height="22" fill="#b98f5c"/><rect x="40" y="168" width="320" height="6" fill="#8f6c43"/>'+
+    '<path d="M20 10 L126 10 C110 60 104 110 96 172 L20 172 Z" fill="#b8452e"/><path d="M40 10 L60 10 C54 70 50 120 48 172 L36 172 Z" fill="#8d3221"/>'+
+    '<path d="M380 10 L274 10 C290 60 296 110 304 172 L380 172 Z" fill="#b8452e"/><path d="M360 10 L340 10 C346 70 350 120 352 172 L364 172 Z" fill="#8d3221"/>'+
+    '<rect x="10" y="0" width="380" height="18" fill="#6f3a2c"/>'+
+    '<circle cx="186" cy="124" r="9" fill="#6FA8DC"/><path d="M176 134 L196 134 L200 150 L172 150 Z" fill="#57697a"/>'+
+    '<circle cx="222" cy="126" r="8" fill="#FF7F6B"/><path d="M213 135 L231 135 L234 150 L210 150 Z" fill="#96513f"/></g>'+
+    '<g filter="url(#cut)">'+heads+'</g>'+
+    '<g filter="url(#cut)">'+seats+'</g>'+
+    '<g filter="url(#cut)"><rect x="186" y="238" width="28" height="18" rx="3" fill="#d2a13c"/></g>'+
+    '<text x="200" y="252" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="14" fill="#2c2b30">K</text>';
+  }
+  function balloon(){ return ''+
+    '<rect width="400" height="260" fill="#cf9c5c"/><rect width="400" height="120" fill="#b5804a" opacity=".6"/>'+
+    '<circle cx="90" cy="200" r="60" fill="#fff3ce" opacity=".35"/>'+
+    '<g filter="url(#soft)">'+cloud(290,70,90,'#f3d6a4','#d9a36c')+cloud(70,52,64,'#f3d6a4','#d9a36c')+'</g>'+
+    '<g filter="url(#cut)"><path d="M0 228 L40 206 L80 214 L120 196 L170 212 L230 200 L280 214 L340 196 L400 210 L400 260 L0 260 Z" fill="#6f7f55"/>'+
+    '<path d="M20 232 L20 212 L44 196 L68 212 L68 232 Z" fill="#6f8598"/><path d="M300 232 L300 206 L352 206 L352 232 Z" fill="#efe3c6"/><path d="M294 208 L326 188 L358 208 Z" fill="#b06a47"/></g>'+
+    '<g filter="url(#cut)" transform="translate(152,40)">'+
+    '<path d="M48 0 C22 0 8 22 8 46 c0 24 20 36 30 52 h20 c10 -16 30 -28 30 -52 0 -24 -14 -46 -40 -46 z" fill="#9a4321"/>'+
+    '<path d="M48 0 c-14 0 -24 22 -24 46 0 24 10 38 17 52 h5 c-4 -16 -11 -30 -11 -52 0 -22 5 -46 13 -46 z" fill="#efe3c6"/>'+
+    '<path d="M48 0 c14 0 24 22 24 46 0 24 -10 38 -17 52 h-5 c4 -16 11 -30 11 -52 0 -22 -5 -46 -13 -46 z" fill="#efe3c6"/>'+
+    '<path d="M48 0 c-8 0 -12 22 -12 46 0 24 6 36 10 52 h5 c3 -16 9 -28 9 -52 0 -24 -4 -46 -12 -46 z" fill="#d9945e"/>'+
+    '<path d="M36 98 h24 l-4 10 h-16 z" fill="#b98f5c"/><path d="M38 106 l-4 14 M58 106 l4 14" stroke="#3b2a1c" stroke-width="1.6"/>'+
+    '<rect x="30" y="120" width="36" height="22" rx="2" fill="#b98f5c"/><rect x="30" y="126" width="36" height="2.4" fill="#8f6c43"/><rect x="30" y="133" width="36" height="2.4" fill="#8f6c43"/>'+
+    '<ellipse cx="24" cy="136" rx="7" ry="9" fill="#9c7f55"/><ellipse cx="72" cy="136" rx="7" ry="9" fill="#9c7f55"/></g>';
+  }
+  function cloud(cx,base,w,face,shade){
+    var b=[[.2,.16],[.42,.26],[.64,.22],[.84,.14]], s='', f='';
+    b.forEach(function(p){ var x=cx-w/2+p[0]*w, r=p[1]*w;
+      s+='<circle cx="'+x.toFixed(1)+'" cy="'+(base-r*.55).toFixed(1)+'" r="'+r.toFixed(1)+'" fill="'+shade+'"/>';
+      f+='<circle cx="'+(x+r*.05).toFixed(1)+'" cy="'+(base-r*.65).toFixed(1)+'" r="'+(r*.92).toFixed(1)+'" fill="'+face+'"/>'; });
+    return '<rect x="'+(cx-w/2)+'" y="'+(base-w*.1)+'" width="'+w+'" height="'+(w*.1)+'" rx="'+(w*.05)+'" fill="'+shade+'"/>'+s+f;
+  }
+
+  var GAMES=[
+    {id:'kireji', title:'Kireji Pond', from:4, to:5, again:0, file:'kireji-pond.html', art:kireji,
+     when:'Workshop 2: Poetry · Weeks 4 and 5',
+     what:'Phrases drift down the stream. Catch the fresh image, smash the cliché, let the rest go, and build a three-line poem that turns.',
+     hook:'Play before your Free Verse Poem (#5.2'+due('5.2')+'). Turns and fresh images are what the poetry workshop looks for.'},
+    {id:'lamp', title:'Reading Lamp', from:5, to:5, again:13, file:'reading-lamp.html', art:lamp,
+     when:'Chapter 4: Images · Week 5, again Week 13',
+     what:'Trade overused phrases for things a reader can see, then read the page to the room and watch which photographs develop.',
+     hook:'Goes with Sellers, Chapter 4: Images (#5.1'+due('5.1')+'). Come back before your portfolio: the A criteria ask you to avoid word packages.'},
+    {id:'rehearsal', title:'Dress Rehearsal', from:7, to:9, again:0, file:'row-k-dress-rehearsal.html', art:rehearsal,
+     when:'Workshop 3: 10-Minute Play · Weeks 7 to 9',
+     what:'Each scene hides a secret. Pick the move, the line, or the silence that stages it, and the house tells you whether it saw the secret or was told it.',
+     hook:'Pairs with on-the-nose dialogue (#8.3). Play before you submit your play (#9.1'+due('9.1')+').'},
+    {id:'sandbags', title:'Sandbags', from:10, to:11, again:13, file:'sandbags.html', art:balloon,
+     when:'Workshop 4: Flash Fiction · Weeks 10 and 11, again Week 13',
+     what:'Every word is a sandbag. Cut the ones a flash piece can fly without. Cut a word the story leans on, twice, and it crashes.',
+     hook:'Play before your flash story (#11.4'+due('11.4')+'), then again while you revise for the portfolio (#14.2'+due('14.2')+').'}
+  ];
+
+  var today=new Date(), wk=weekOf(today);
+  function live(g){ return (wk>=g.from && wk<=g.to) || (g.again && wk>=g.again && wk<=14); }
+
+  /* cabinets */
+  var cabs=document.getElementById('cabs');
+  GAMES.forEach(function(g){
+    var a=document.createElement('article'); a.className='cab'; a.setAttribute('aria-labelledby','h-'+g.id);
+    var act = READY[g.id]
+      ? '<a class="play" href="'+BASE+g.file+'">Play '+g.title+'</a>'
+      : '<span class="soon">Opens Week '+g.from+', '+range(g.from).split(' to ')[0]+'</span>';
+    a.innerHTML='<svg class="art" viewBox="0 0 400 260" aria-hidden="true" focusable="false">'+g.art()+'</svg>'+
+      '<span class="stampx"'+(live(g)?'':' hidden')+'>THIS WEEK</span>'+
+      '<div class="body"><p class="when">'+g.when+'</p><h2 id="h-'+g.id+'">'+g.title+'</h2>'+
+      '<p class="what">'+g.what+'</p><p class="hook">'+g.hook+'</p>'+act+'</div>';
+    cabs.appendChild(a);
+  });
+
+  /* ribbon: week tabs along the strip, workshops tinted, games pinned */
+  function yAt(x){ /* the ribbon's centre line, sampled from its two curves */
+    var t=x/1000; return 156 + 16*Math.sin(t*Math.PI*2.9+0.35) ; }
+  var tabs='', WS=['#c9b48a','#c5cdb8','#b9c6d2','#e6bca6','#ecd08e','#d9bf88'];
+  for(var w=1; w<=15; w++){
+    var x=30+(w-1)*67, ws=0;
+    WORKSHOPS.forEach(function(o,i){ if(w>=o.from && w<=o.to) ws=i+1; });
+    var y=yAt(x);
+    tabs+='<g filter="url(#cut)"><rect x="'+(x-18)+'" y="'+(y-20)+'" width="36" height="40" rx="4" fill="'+(ws?WS[ws]:'#e3d6b8')+'"/>'+'</g>'+(w===wk?'<rect x="'+(x-21)+'" y="'+(y-23)+'" width="42" height="46" rx="6" fill="none" stroke="#0F5F5A" stroke-width="5"/>':'');
+  }
+  document.getElementById('weekTabs').innerHTML=tabs;
+  /* read the map from the start: week numbers, start and end flags, workshop names */
+  var lab='', T='font-family:Georgia,serif;font-weight:700;';
+  for(var w2=1; w2<=15; w2++){ var x2=30+(w2-1)*67; lab+='<text x="'+x2+'" y="'+(yAt(x2)+9)+'" text-anchor="middle" style="'+T+'font-size:24px" fill="#1f1b12">'+w2+'</text>'; }
+  lab+='<text x="12" y="34" style="'+T+'font-size:28px" fill="#1f1b12">START '+md(W1)+'</text>';
+  lab+='<text x="988" y="34" text-anchor="end" style="'+T+'font-size:28px" fill="#1f1b12">END '+md(END)+'</text>';
+  var SH=['Nonfiction','Poetry','Play','Flash','Portfolio'];
+  WORKSHOPS.forEach(function(o,i){
+    var xa=30+(o.from-1)*67, xb=30+(o.to-1)*67, xm=(xa+xb)/2 + (i===1?-20:i===2?34:0);
+    lab+='<text x="'+xm+'" y="282" text-anchor="middle" style="'+T+'font-size:26px" fill="#1f1b12">'+SH[i]+'</text>';
+  });
+  document.getElementById('labels').innerHTML=lab;
+  /* the tabs no longer carry a tick bar; the number is the tab */
+  var ICON={
+    kireji:'<circle r="30" fill="#1F3A5F"/><path d="M-16 8 C-14 -6 0 -12 14 -6 C22 -2 22 8 14 10 C2 14 -10 14 -16 8 Z" fill="#7C8C3A"/><circle cx="-6" cy="-6" r="4" fill="#B98A2E"/>',
+    lamp:'<circle r="30" fill="#cfe0e2"/><circle r="22" fill="url(#lampglow)"/><path d="M-14 4 L14 4 L8 -14 L-8 -14 Z" fill="#8a6322"/><rect x="-2" y="4" width="4" height="16" fill="#7e3a22"/>',
+    rehearsal:'<circle r="30" fill="#2c2b30"/><path d="M-26 -18 L-6 -18 C-9 0 -10 12 -12 22 L-26 22 Z M26 -18 L6 -18 C9 0 10 12 12 22 L26 22 Z" fill="#b8452e"/><circle cy="10" r="6" fill="#F4C542"/>',
+    sandbags:'<circle r="30" fill="#cf9c5c"/><path d="M0 -22 C-12 -22 -16 -10 -16 -2 c0 10 8 14 12 20 h8 c4 -6 12 -10 12 -20 0 -8 -4 -20 -16 -20 z" fill="#9a4321"/><path d="M0 -22 c-5 0 -7 10 -7 20 0 10 4 14 5 20 h4 c1 -6 5 -10 5 -20 0 -10 -2 -20 -7 -20 z" fill="#efe3c6"/><rect x="-6" y="20" width="12" height="7" fill="#b98f5c"/>'
+  };
+  var pins='';
+  GAMES.forEach(function(g){
+    var x=30+(g.from-1)*67, y=yAt(x)-78;
+    pins+='<line x1="'+x+'" y1="'+(y+30)+'" x2="'+x+'" y2="'+(yAt(x)-20)+'" stroke="#1f1b12" stroke-width="2.4"/>'+
+      '<g transform="translate('+x+','+y+')" filter="url(#cut)"><circle r="34" fill="#fffaf0"/>'+ICON[g.id]+'</g>';
+  });
+  document.getElementById('pins').innerHTML=pins;
+  if(wk>=1 && wk<=15){
+    var hx=30+(wk-1)*67, hy=yAt(hx)+26;
+    document.getElementById('herePin').innerHTML='<g filter="url(#cut)"><path d="M'+hx+' '+hy+' l-12 22 l24 0 z" fill="#0F5F5A"/></g>';
+  }
+
+  /* this week, in words */
+  var msg;
+  if(wk===0) msg='The semester starts <b>'+DAYS[W1.getDay()]+', '+MONTH[W1.getMonth()]+' '+W1.getDate()+'</b>. The first game opens in Week '+GAMES[0].from+'.';
+  else if(wk===16) msg=TERM.name+' is over. Every game stays open: play any of them again.';
+  else {
+    var ws=WORKSHOPS.filter(function(o){ return wk>=o.from && wk<=o.to; }).map(function(o){ return o.name; }).join(' and ');
+    var on=GAMES.filter(live), next=GAMES.filter(function(g){ return g.from>wk; })[0];
+    msg='The semester runs from <b>Week 1, '+md(W1)+'</b> to <b>Week 15, '+md(END)+'</b>. The teal box marks where we are: <b>Week '+wk+'</b>, '+range(wk)+'.'+(ws?' '+ws+'.':'');
+    if(on.length) msg+=' This week: '+on.map(function(g){ return g.title; }).join(' and ')+'.';
+    else if(next) msg+=' Next game: '+next.title+', Week '+next.from+' ('+range(next.from).split(' to ')[0]+').';
+  }
+  document.getElementById('now').innerHTML=msg;
+  var rb=document.querySelector('.ribbonbox'); if(rb) rb.scrollLeft=0;
 })();
 </script>
 
-<!--
-  PROVENANCE — The Creative Writing Arcade
-  Tight Spiral Productions. Built 2026-07-11.
-
-  CHANGELOG
-  2026-07-11  Created. The public front door: EN195's games, minus the semester.
-              One arcade, five cabinets. Cowpaths carries three cartridges of its
-              own; it is a cabinet here, not a second arcade (Aleph: do not nest
-              arcades).
-  2026-07-29  Migrated to Comfort Kernel v2 (Studio Eyes). Reserved chrome header
-              (Home / teaspoon brand / Studio Eyes) + bottom Back/Home rail.
-              Light modes are html[data-light] day/dusk/night (warm-dark = warm
-              charcoal, never black); the arcade's native dark room IS the default.
-              Removed the legacy corner Comfort FAB (default/softer/warm) and the
-              duplicate mobile Home chip; nav now lives only in the chrome + rail.
-
-  FLOORS HELD
-  - NO OPENING WALL: first paint is the room + the marquee + the cabinets.
-    Comfort is Studio Eyes in the chrome, never a door.
-  - LIGHT LADDER: day / dusk / night via html[data-light]; night stays warm-dark.
-    Every visible text >=4.5:1 in all three modes (comfort-gate verified).
-  - Every cabinet screen is >50% image.
-  - 44px minimum on every control.
--->
-
+<!-- dark mode, Row K v39: opens on the device's setting, remembers the choice,
+     reads the page's actual paint so a mismatch host cannot make it lie -->
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('darkBtn'), KEY='en195-arcade-scheme', saved=null;
+  function painted(){
+    var v=getComputedStyle(root).getPropertyValue('--bg').trim().replace('#','');
+    if(v.length===3) v=v.replace(/./g,'$&$&');
+    var n=parseInt(v,16); if(isNaN(n)) return false;
+    return (((n>>16)&255)*.299+((n>>8)&255)*.587+(n&255)*.114) < 110;
+  }
+  function setScheme(dark,save){
+    root.setAttribute('data-light', dark?'night':'day');
+    btn.setAttribute('aria-pressed', dark?'true':'false');
+    if(save){ try{ localStorage.setItem(KEY, dark?'dark':'light'); }catch(e){} }
+  }
+  try{ saved=localStorage.getItem(KEY); }catch(e){}
+  if(saved) setScheme(saved==='dark',false);
+  else setScheme(painted(),false);
+  btn.addEventListener('click',function(){ setScheme(!painted(),true); });
+})();
+</script>
 </body>
 </html>
