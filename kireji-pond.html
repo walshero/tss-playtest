@@ -44,6 +44,7 @@ button:focus-visible{outline:3px solid var(--beni);outline-offset:3px}
 .tile{transform-origin:0 0}
 #lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0);animation:blink 5.5s infinite}
 @keyframes blink{0%,93%,100%{transform:scaleY(0)}95.5%{transform:scaleY(1)}}
+#yaa{font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:44px;fill:#B23A2A;stroke:#F5EEDB;stroke-width:6px;paint-order:stroke;text-anchor:middle;opacity:0;transition:opacity .45s}
 #pochan{font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:34px;fill:#B23A2A;stroke:#F5EEDB;stroke-width:5px;paint-order:stroke;opacity:0}
 #pochan.show{animation:pochan 2.6s ease-out forwards}
 @keyframes pochan{0%{opacity:0;transform:translateY(10px)}15%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0}}
@@ -498,6 +499,7 @@ body.still .eddy .e{animation:none}
       </g>
       <path id="wake" d="" fill="none" stroke="#EAF2F5" stroke-width="2.5" stroke-linecap="round"/>
       <g id="splash"></g>
+      <text id="yaa" x="585" y="236" aria-hidden="true"></text>
       <text id="pochan" x="540" y="452" aria-hidden="true"><tspan x="540" dy="0">ぽ</tspan><tspan x="540" dy="38">ち</tspan><tspan x="540" dy="38">ゃ</tspan><tspan x="540" dy="38">ん</tspan></text>
       <!-- the frog -->
       <g id="frogWrap" clip-path="url(#waterClip)">
@@ -1508,11 +1510,18 @@ function splash(cx,cy){
   }).then(()=>{drops.forEach(d=>d.c.remove());cols.forEach(c=>c.e.remove())});
 }
 function resetFrog(){Object.assign(FROG,{x:HOME.x,y:HOME.y,rot:0,sx:1,sy:1,flip:1});pose(false);clipAt(null);drawFrog();$('#wake').setAttribute('d','')}
+function yaa(){
+  const el=$('#yaa'); if(!el) return; Snd.yaa();
+  el.textContent='や'; el.style.transition='none'; el.style.opacity=1; el.style.transform='rotate(-5deg)'; el.style.transformBox='fill-box'; el.style.transformOrigin='center';
+  let n=0; const iv=setInterval(()=>{if(n++<4) el.textContent+='ー'; else clearInterval(iv)},reduce?1:170);
+  setTimeout(()=>{el.style.transition='opacity .45s';el.style.opacity=0},1700);
+}
 async function frogJump(){
-  if(reduce){splash(470,622);await wait(1400);return}
+  if(reduce){yaa();splash(470,622);await wait(1400);return}
   jaw(false); await wait(500);
   // 1. the leap: crouch, arc, nose-first into the water
   const WL=622; clipAt(WL);
+  yaa(); // the leap shouts the kireji: yaaaa, the way you'd say wheee to a baby
   await hop({x:380,y:552},250,980,{extend:1.25,at:{q:1,fn:()=>splash(470,WL)}});
   // 2. mizu no oto: rings, the sound
   await wait(1900);
@@ -1893,6 +1902,18 @@ const Snd=(()=>{
     swish(){if(!ready())return;const t=now(); noise(t,.45,'bandpass',1500,380,.09,.9)},
     crumple(){if(!ready())return;const t=now(); for(let i=0;i<7;i++) noise(t+i*.028+Math.random()*.02,.035,'highpass',2400+Math.random()*2000,0,.09)},
     paper(up){if(!ready())return;const t=now(), n=up?9:5; for(let i=0;i<n;i++) noise(t+i*.11+Math.random()*.05,.06,'highpass',3000,0,.03+Math.random()*.03)},
+    yaa(){ // a squeaky sing-song yaaaa: a small voice, rising like wheee and sliding down
+      if(!ready())return; const t=now(), D=1.55, src=ac.createOscillator(); src.type='sawtooth';
+      src.frequency.setValueAtTime(330,t); src.frequency.linearRampToValueAtTime(470,t+.14); src.frequency.linearRampToValueAtTime(720,t+.55);
+      src.frequency.linearRampToValueAtTime(650,t+1.0); src.frequency.linearRampToValueAtTime(400,t+D);
+      const vib=ac.createOscillator(); vib.frequency.value=6.5; const vg=ac.createGain(); vg.gain.value=14; vib.connect(vg).connect(src.frequency);
+      const env=ac.createGain(); env.gain.setValueAtTime(0,t); env.gain.linearRampToValueAtTime(.55,t+.05); env.gain.setValueAtTime(.55,t+D-.35); env.gain.linearRampToValueAtTime(0,t+D);
+      env.connect(master);
+      [[350,960,7,1],[2500,1400,9,.55],[3100,3000,11,.28]].forEach(([fy,fa,q,a])=>{ // the y glides into the a
+        const f=ac.createBiquadFilter(); f.type='bandpass'; f.Q.value=q; f.frequency.setValueAtTime(fy,t); f.frequency.linearRampToValueAtTime(fa,t+.16);
+        const g=ac.createGain(); g.gain.value=a; src.connect(f).connect(g).connect(env)});
+      src.start(t); vib.start(t); src.stop(t+D+.05); vib.stop(t+D+.05);
+    },
     plop(){if(!ready())return;const t=now(); tone(t,'sine',320,1250,.07,.26,.004); noise(t+.02,.5,'lowpass',2200,300,.12);
       tone(t+.34,'sine',420,1500,.05,.1,.004); tone(t+.62,'sine',520,1700,.04,.05,.004)}
   };
