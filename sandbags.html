@@ -4,6 +4,28 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v38 2026-09-25, THE LENS AND THE VILLAGE LAUGHS. Two founder rulings the same
+  afternoon. (1) Focus: "each scene looks like a power outage. This isn't how
+  photographers or filmmakers find focus." So nothing is darkened; the far layers
+  and the sky go soft like a macro lens on a paper model, the street stays sharp,
+  and a warm key light is added on each story spot (the noodle shop, the
+  crosswalk, the neighbours' open door, the ant's sodium pool). Lit windows
+  elsewhere cut by about half; Crosswalk's child in a pale yellow coat so he reads
+  against the stripes. (2) Funny failure is a requirement: every crash now plays
+  a village gag after the fall, and the key light follows it. Echigo, the thud
+  knocks a can out of the machine and a villager gives it his umbrella. Crosswalk,
+  the pigeons scatter, the signal turns to WALK, they come back single file on
+  the stripes. Peach Cobbler, the trampoline kid goes up and over. Dead Ants, a
+  sandbag rolls off the basket and an ant carries it away. Reduced motion shows
+  each punchline as a still. Mock-ups and measurements:
+  claude/SANDBAGS-VALUE-MOCKUPS-2026-09-25.md.
+
+  v37 2026-09-25, THE PLATFORM WAITS (founder: "the Shinkansen should come
+  later, not at the very beginning. There's already a lot to look at."). The
+  E7's cycle now starts 18 seconds after load, so the player reads the village
+  and starts cutting before the train pulls in. Measured by Studio Eyes
+  value-structure V4: first big move went from 3s to 21s after load.
+
   v36 2026-09-24, THE SHINKANSEN IN THE FOREGROUND (founder: "Have the
   Shinkansen arrive in the foreground. Just push everything up like a platform
   so the balloon and people aren't blocked."). Echigo's village rides 40 units
@@ -450,7 +472,7 @@
 <meta name="color-scheme" content="light dark">
 <meta name="spec-source" content="convening/SANDBAGS-CONVENING.md">
 <meta name="audience" content="MassBay EN195 students revising their own flash fiction; the founder as first playtester">
-<title>Sandbags: a flash fiction climb</title>
+<title>Sandbags v38: a flash fiction climb</title>
 <meta name="description" content="A Tight Spiral Studios production for EN195. Tap the words a flash fiction can live without and fly the balloon. Tear the meaning twice and it crashes.">
 <style>
 :root{
@@ -700,7 +722,7 @@ body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif
    and departs"). In from the right, brakes to the platform, dwells, pulls out
    to the left, gone, and a quiet stretch before the next one. Under reduced
    motion it simply stands at the platform. */
-#scenery .fx .shink{ animation:shink 46s infinite; }
+#scenery .fx .shink{ animation:shink 46s 18s infinite backwards; } /* v37: the platform is empty for the first 18s (founder 09-25: "the Shinkansen should come later, not at the very beginning"); value-structure V4 */
 @keyframes shink{
   0%{ transform:translateX(720px); animation-timing-function:cubic-bezier(.12,.6,.3,1); }
   24%{ transform:translateX(0); animation-timing-function:linear; }
@@ -907,6 +929,76 @@ html{ background:var(--bg); }
 .studiotag{ display:block; font-style:italic; font-size:18px; }
 .se-brand svg.mk{ width:34px; height:34px; }
 </style>
+<style>
+.gametitle .ver{ font-size:20px; font-weight:700; color:var(--rust); white-space:nowrap; letter-spacing:0; }
+/* v38 THE LENS. Keep the light, move the focus (founder 09-25: "each scene looks
+   like a power outage. This isn't how photographers or filmmakers find focus").
+   A macro lens on a paper model: far layers and sky go soft, the street stays
+   sharp, a warm key light is added on the story. Nothing is darkened. */
+#scenery .ly1{ filter:url(#card1) url(#dofFar) saturate(.85); }
+#scenery .ly2{ filter:url(#card2) url(#dofMid); }
+#scenery .fx .mid{ filter:url(#dofMid); }
+#scenery .keylight{ mix-blend-mode:screen; transition:opacity .6s ease 1s; }
+.skybox .skyart{ filter:blur(1.2px); }
+.skybox[data-piece="1"] .skyart{ filter:blur(1.6px); }
+.skybox::after{ content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:radial-gradient(ellipse 80% 75% at 50% 55%, rgba(0,0,0,0) 62%, rgba(20,16,12,.16) 100%); }
+.skybox[data-piece="3"]{ --sky-light:radial-gradient(circle at 74% 18%, rgba(232,238,255,.34), rgba(210,222,255,.05) 4%, rgba(210,222,255,0) 12%); }
+#scenery .mass *{ fill:var(--p-sage-d) !important; }
+#scenery .stepdark{ filter:brightness(.78); }
+#scenery .door{ fill:#ffc25a; }
+
+/* v38 FUNNY FAILURE (founder 09-25: "when the sandbags crashes... something
+   happens in the village"). Timing floor: the balloon falls .6s, holds .4s,
+   the gag plays 1.5 to 2.5s, then the frame is still. No red, no stamp. The
+   key light leaves the story and follows the gag, the way a film cut would.
+   Every gag element's resting style IS its last frame, so reduced motion
+   shows the punchline without the movement. */
+.skybox.gagging #sceneLayers{ animation:thud .32s .55s ease-out both; }
+@keyframes thud{ 0%{ transform:none; } 35%{ transform:translateY(1.6px); } 70%{ transform:translateY(-.5px); } 100%{ transform:none; } }
+.skybox.gagging #scenery .keylight{ opacity:.35; }
+#gag .gglow{ mix-blend-mode:screen; animation:gglow .6s 1s ease-out both; }
+@keyframes gglow{ from{ opacity:0; } to{ opacity:1; } }
+#gag *{ transform-box:fill-box; }
+/* Echigo: the thud knocks a can out of the machine; a villager gives it his umbrella */
+#gag .can{ transform-origin:center; animation:canfall .32s 1s cubic-bezier(.5,0,1,.6) both, canroll .7s 1.32s ease-out both, appear .01s 1s both; }
+@keyframes appear{ from{ opacity:0; } to{ opacity:1; } }
+@keyframes canfall{ from{ translate:0 -13px; opacity:1; } to{ translate:0 0; } }
+@keyframes canroll{ from{ transform:translateX(-22px) rotate(-400deg); } to{ transform:none; } }
+#gag .walker{ animation:walkin 1s 1.5s ease-in-out both, appear .01s 1.5s both; }
+@keyframes walkin{ from{ transform:translateX(44px); } to{ transform:none; } }
+#gag .walker .step{ transform-origin:50% 0; animation:step .25s 1.5s 4 alternate both; }
+@keyframes step{ from{ transform:rotate(-8deg); } to{ transform:rotate(8deg); } }
+#gag .gift{ transform-origin:50% 100%; animation:gift .6s 2.6s ease-in-out both, appear .01s 2.6s both; }
+@keyframes gift{ from{ transform:translate(10px,-17px) rotate(0deg); } 60%{ transform:translate(4px,-10px) rotate(-30deg); } to{ transform:none; } }
+/* Crosswalk: the pigeons scatter, the signal turns to WALK, they come back single file */
+.skybox.gagging #scenery .fx .pw{ opacity:0; animation:pfly .8s 1s ease-in both; }
+@keyframes pfly{ from{ opacity:1; transform:none; } 80%{ opacity:1; } to{ opacity:0; transform:translate(-30px,-90px) scale(.7); } }
+.skybox.gagging #scenery .fx .hand{ opacity:0; animation:handoff .3s 1.6s both; }
+@keyframes handoff{ from{ opacity:1; } to{ opacity:0; } }
+#gag .walksig{ animation:gglow .3s 1.6s both; }
+#gag .file{ animation:file 1.5s 2s linear both, appear .01s 2s both; }
+@keyframes file{ from{ transform:translateX(118px); } to{ transform:none; } }
+/* Peach Cobbler: the thud sends the trampoline kid up and over */
+.skybox.gagging #scenery .fx .bounce{ transform-origin:50% 50%; animation:flip 1.9s 1s cubic-bezier(.3,0,.6,1) both; }
+@keyframes flip{ 0%{ transform:none; } 12%{ transform:translateY(3px); } 45%{ transform:translateY(-58px) rotate(-180deg); } 70%{ transform:translateY(-6px) rotate(-360deg); } 78%{ transform:translateY(0) rotate(-360deg); }
+  86%{ transform:translateY(-7px) rotate(-360deg); } 93%{ transform:translateY(0) rotate(-360deg); } 97%{ transform:translateY(-2px) rotate(-360deg); } 100%{ transform:none; } }
+/* Dead Ants: a sandbag rolls off the basket and an ant carries it away. The ant lives. */
+.skybox.gagging #scenery .fx .antnow{ opacity:0; }
+#gag .bag{ transform-origin:center; animation:bagroll .8s 1s ease-out both; }
+@keyframes bagroll{ from{ transform:translateX(var(--fromx,30px)) rotate(300deg); } to{ transform:none; } }
+#gag .ant2{ animation:antin .4s 1.8s ease-in-out both; }
+@keyframes antin{ from{ transform:translateX(-10px); } to{ transform:none; } }
+#gag .carry{ animation:carry 1.6s 2.3s ease-in-out both; }
+@keyframes carry{ from{ transform:none; } to{ transform:translateX(-64px); } }
+#gag .lift{ animation:lift .25s 2.1s ease-out both; }
+@keyframes lift{ from{ transform:none; } to{ transform:translate(-.5px,-3px); } }
+#gag .carry .bag{ animation:bagroll .8s 1s ease-out both; }
+@media (prefers-reduced-motion: reduce){
+  .skybox.gagging #sceneLayers, #gag *, .skybox.gagging #scenery .fx *{ animation:none !important; }
+}
+html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-reduce .skybox.gagging #scenery .fx *{ animation:none !important; }
+</style>
 </head>
 <body>
 <div id="backdrop" aria-hidden="true"></div>
@@ -925,7 +1017,7 @@ html{ background:var(--bg); }
 
 <div class="wrap">
   <p class="production">A Tight Spiral Studios production for EN195</p>
-  <h1 class="gametitle">Sandbags<span class="sub">a flash fiction climb</span></h1>
+  <h1 class="gametitle">Sandbags <span class="ver">v38</span><span class="sub">a flash fiction climb</span></h1>
   <p class="prompt" id="prompt">Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.</p>
 
   <div class="plate">
@@ -967,7 +1059,7 @@ html{ background:var(--bg); }
             <stop offset="1" style="stop-color:color-mix(in srgb, var(--lit,#ffd98a) 62%, #6b2e0c)"/>
           </radialGradient>
         </defs>
-        <g id="sceneLayers"></g>
+        <defs><filter id="dofFar" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="1.5"/></filter><filter id="dofMid" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation=".55"/></filter></defs><g id="sceneLayers"></g><g id="gag" aria-hidden="true"></g>
       </svg>
       <div class="skyart" id="skyLayers" aria-hidden="true" data-art-class="studio-cut" data-art="Cut-paper sky: seeded clouds, birds and stars, a different weather per piece. Original, Tight Spiral Paper Craft, CC0."></div>
       <div class="altrow" id="altnum">on the ground</div>
@@ -1032,7 +1124,7 @@ html{ background:var(--bg); }
 <div class="wrap">
   <div class="foot">
     <p>Sandbags, a Tight Spiral Studios production for EN195 Creative Writing, MassBay Community College. Stagecraft: Matt Walsh. Tight Spiral Studios &middot; walshero@gmail.com. Single-file, offline, stores nothing. A strike is never shame. That word was holding the piece up, and now you know it by feel. Excerpts from four pieces by Matt Walsh, used by the author. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.</p>
-    <p class="updated"><span id="seUpdated"></span> &middot; v36</p>
+    <p class="updated"><span id="seUpdated"></span> &middot; v38</p>
     <div class="studiofoot">
       <svg class="spiralmark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
       <div>
@@ -1983,24 +2075,24 @@ html{ background:var(--bg); }
      '<g class="noedge" opacity=".5">'+
        P('M-120 148 Q0 142 100 147 T300 146 T520 147 L520 153 Q200 156 -120 154 Z','var(--p-moss)')+
        P('M-120 160 Q20 155 140 160 T380 158 T520 159 L520 165 Q200 168 -120 166 Z','var(--p-moss)')+'</g>'+
-     village(-116,516,134,8,5,.3)+
+     '<g class="mass">'+village(-116,516,134,8,5,0)+'</g>'+
    '</g>'+ haze(.40) +
    '<g class="ly2">'+
      station(12,128,74)+
      kayabuki(118,118,40,14)+
-     takayuka(-106,134,30,8,'var(--p-tinred)','var(--p-tinred-d)',1,.5)+
+     takayuka(-106,134,30,8,'var(--p-tinred)','var(--p-tinred-d)',0,.5)+
      takayuka(-66,132,26,8,'var(--p-tingreen)','var(--p-tingreen-d)',0,.3)+
-     takayuka(174,132,28,8,'var(--p-tinblue)','var(--p-tinblue-d)',2,.5)+
-     takayuka(214,128,32,8,'var(--p-tinred)','var(--p-tinred-d)',1,.28)+
+     takayuka(174,132,28,8,'var(--p-tinblue)','var(--p-tinblue-d)',0,.5)+
+     takayuka(214,128,32,8,'var(--p-tinred)','var(--p-tinred-d)',0,.28)+
      takayuka(262,132,26,8,'var(--p-steel)','var(--p-steel-d)',0,.5,'var(--p-bone-d)')+
-     takayuka(418,130,30,8,'var(--p-tingreen)','var(--p-tingreen-d)',2,.5)+
-     takayuka(466,134,28,8,'var(--p-tinblue)','var(--p-tinblue-d)',1,.3)+
+     takayuka(418,130,30,8,'var(--p-tingreen)','var(--p-tingreen-d)',0,.5)+
+     takayuka(466,134,28,8,'var(--p-tinblue)','var(--p-tinblue-d)',0,.3)+
      polesline([-70,92,176,262,348,440,500],84,128)+
    '</g>'+ haze(.14) +
    '<g class="ly3">'+
      /* a cedar machiya, gable to the street, red tin, a lit koshi upstairs */
      snowGable(-110,122,56,46,50,12,'var(--p-cedar)','var(--p-cedar-d)','var(--p-tinred)','var(--p-tinred-d)',7,.5,1)+
-     cedar(-110,122,56,44)+koshi(-100,130,36,12,1)+fw(-88,106,10,8,0)+
+     cedar(-110,122,56,44)+koshi(-100,130,36,12,0)+fw(-88,106,10,8,0)+
      /* the sake brewer's kura, cedar ball out */
      kura(-46,126,48,40,10)+
      /* the noodle shop: cream plaster, heavy tile, two lit windows upstairs */
@@ -2009,23 +2101,23 @@ html{ background:var(--bg); }
      /* the long inn, eaves to the street, a row of lit rooms and a rail */
      eaves(120,140,150,26,22,12,'var(--p-bone)','var(--p-bone-d)','var(--p-char)','var(--p-char-d)',5)+
      timber(120,140,150,24,'var(--p-timber)')+
-     fw(130,145,12,9,1)+fw(154,145,12,9,0)+fw(178,145,12,9,1)+fw(202,145,12,9,1)+fw(226,145,12,9,0)+fw(250,145,12,9,1)+
+     fw(130,145,12,9,0)+fw(154,145,12,9,0)+fw(178,145,12,9,0)+fw(202,145,12,9,1)+fw(226,145,12,9,0)+fw(250,145,12,9,0)+
      '<g class="noedge">'+rc(122,157,146,1.6,'var(--p-timber-d)')+ln('M126 157 v6 M140 157 v6 M154 157 v6 M168 157 v6 M182 157 v6 M196 157 v6 M210 157 v6 M224 157 v6 M238 157 v6 M252 157 v6 M266 157 v6','var(--p-timber-d)',.8)+'</g>'+
      /* the lopsided snow roof: the long side takes all the snow; blue tin */
      snowGable(284,126,58,42,52,12,'var(--p-cream)','var(--p-cream-d)','var(--p-tinblue)','var(--p-tinblue-d)',7,.26,1)+
-     cedar(284,146,58,22)+fw(292,131,11,10,1)+fw(318,131,11,10,0)+
+     cedar(284,146,58,22)+fw(292,131,11,10,0)+fw(318,131,11,10,0)+
      /* a steep green-tin gable with the ridge splitter */
      snowGable(348,134,48,34,46,10,'var(--p-bone)','var(--p-bone-d)','var(--p-tingreen)','var(--p-tingreen-d)',6,.5,1)+
-     fw(356,139,9,9,1)+fw(378,139,9,9,1)+
+     fw(356,139,9,9,0)+fw(378,139,9,9,1)+
      /* the sweet shop, eaves to the street, red tin */
      eaves(404,138,62,28,20,10,'var(--p-white)','var(--p-white-d)','var(--p-tinred)','var(--p-tinred-d)',5)+
-     cedar(404,152,62,14)+fw(414,143,12,8,1)+fw(444,143,12,8,1)+
+     cedar(404,152,62,14)+fw(414,143,12,8,0)+fw(444,143,12,8,1)+
      /* one more lopsided roof at the end of the street, the other way round */
      snowGable(476,128,46,40,44,10,'var(--p-cedar)','var(--p-cedar-d)','var(--p-steel)','var(--p-steel-d)',6,.72,1)+
-     cedar(476,128,46,38)+fw(486,134,10,9,1)+
+     cedar(476,128,46,38)+fw(486,134,10,9,0)+
      rc(-120,166,640,34,'var(--p-slate-d)')+
      gangi(-120,166,640,
-       koshi(-104,171,40,16,1)+
+       koshi(-104,171,40,16,0)+
        '<g class="noedge">'+rc(-40,172,9,11,'var(--p-kraft)',' rx="2"')+rc(-30,176,9,7,'var(--p-kraft-d)',' rx="2"')+rc(-20,174,9,9,'var(--p-kraft)',' rx="2"')+'</g>'+
        sugidama(-6,171)+
        '<g class="lit glow">'+lr(26,170,32,18)+'</g>'+
@@ -2041,8 +2133,8 @@ html{ background:var(--bg); }
        vending(204,191,'var(--p-white)','var(--p-white-d)')+
        vending(222,191,'var(--p-verm)','var(--p-verm-d)')+
        noren(300,170,20,'var(--p-verm-d)')+
-       koshi(412,171,34,15,1)+noren(452,170,14,'var(--p-plum)'))+
-     '<g class="noedge" opacity=".28"><rect x="26" y="192" width="32" height="8" fill="var(--lit)"/><rect x="84" y="190" width="4" height="10" fill="var(--lit)"/><rect x="-104" y="192" width="40" height="8" fill="var(--lit)"/><rect x="412" y="192" width="34" height="8" fill="var(--lit)"/></g>'+
+       koshi(412,171,34,15,0)+noren(452,170,14,'var(--p-plum)'))+
+     '<g class="noedge" opacity=".28"><rect x="26" y="192" width="32" height="8" fill="var(--lit)"/><rect x="84" y="190" width="4" height="10" fill="var(--lit)"/></g>'+
      vsignal(496,160)+
      villager(-70,199,22,'var(--p-moss-d)','var(--p-cream)','var(--p-tingreen)','var(--p-bone)','orange')+
      villager(146,199,23,'var(--p-indigo)','var(--p-gold)','var(--p-verm)','var(--p-cream)','cyan')+
@@ -2050,7 +2142,7 @@ html{ background:var(--bg); }
      villager(334,198,21,'var(--p-char)','var(--p-terra)','var(--p-char-d)','var(--p-bone-d)','purple')+
      villager(374,199,23,'var(--p-indigo-d)','var(--p-verm)','var(--p-cream)','var(--p-kraft-d)','coral')+
      villager(440,199,22,'var(--p-terra-d)','var(--p-bone)','var(--p-verm)','var(--p-cream)','blue')+
-     figure(104,199,34,{felt:'yellow',coat:'var(--p-char)',coatD:'var(--p-char-d)',legs:'var(--p-char-d)',hair:'var(--p-bone)'})+
+     '<g class="noedge"><ellipse cx="60" cy="196" rx="62" ry="7" fill="var(--lit)" opacity=".30"/><ellipse cx="52" cy="196" rx="30" ry="4" fill="#ffe2a0" opacity=".35"/></g>'+figure(104,199,34,{felt:'yellow',coat:'var(--p-char)',coatD:'var(--p-char-d)',legs:'var(--p-char-d)',hair:'var(--p-bone)'})+
    '</g>'+ rainWide() +
    '<g class="fx noedge">'+
      ln('M88 169.2 Q170 173 262 169.2','var(--p-char-d)',.5)+
@@ -2060,7 +2152,7 @@ html{ background:var(--bg); }
        '<path class="steam" d="M78 166 q-2 -4 0 -8 q2 -4 0 -8" fill="none" style="stroke:rgba(245,240,228,.8);stroke-width:1.4;stroke-linecap:round"/></g>'+
      '<rect class="pulse" x="205.2" y="167.6" width="10.6" height="11" fill="#fff6d8" opacity=".35"/>'+
      '<rect class="pulse" x="223.2" y="167.6" width="10.6" height="11" fill="#fff6d8" opacity=".35" style="animation-delay:-1.4s"/>'+
-   '</g>'+'</g>'+ echigoPlatform(),
+   '<g class="noedge keylight"><defs><radialGradient id="kl0"><stop offset="0" stop-color="#ffd58a" stop-opacity="0.55"/><stop offset=".55" stop-color="#ffd58a" stop-opacity="0.193"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient></defs><ellipse cx="56" cy="160" rx="70" ry="48" fill="url(#kl0)"/></g>'+'</g>'+'</g>'+ echigoPlatform(),
 
    /* 1, BLACK SPOTS ON THE CROSSWALK. Longwood Avenue, on the way to the
         hospital, late seventies, bright morning. Children's Hospital's 1914
@@ -2114,17 +2206,17 @@ html{ background:var(--bg); }
      rc(154,146,2.6,52,'var(--p-steel-d)')+
      box(148,134,14,16,3,'var(--p-char)','var(--p-char-d)','var(--p-steel-d)')+
      figure(60,198,42,{felt:'blue',dir:1,arm:'reach',coat:'var(--p-kraft)',coatD:'var(--p-kraft-d)',legs:'var(--p-steel-d)',hair:'var(--p-timber)'})+
-     figure(118,183,23,{felt:'orange',dir:-1,coat:'var(--p-verm)',coatD:'var(--p-verm-d)',legs:'var(--p-indigo)',hair:'var(--p-kraft-d)'})+
+     figure(118,183,23,{felt:'orange',dir:-1,coat:'#f4dc6a',coatD:'#d8b83c',legs:'var(--p-indigo)',hair:'var(--p-kraft-d)'})+
    '</g>'+
    /* v32: "I was standing in the crosswalk even though the numbers were running
       out and the ambulance was getting louder." The hand flashes, the count is
       at 3, the ambulance bar turns red and white. */
-   '<g class="fx noedge">'+
-     '<g class="blink"><path d="M151.6 144 v-5.4 q0 -1 1 -1 q1 0 1 1 v3 v-4.2 q0 -1 1 -1 q1 0 1 1 v4.2 v-3.6 q0 -1 1 -1 q1 0 1 1 v5 q0 3 -3 4 h-1.4 q-2.6 -1 -2.6 -3 z" fill="#ff8a3d"/></g>'+
+   '<g class="noedge keylight"><defs><radialGradient id="kl1"><stop offset="0" stop-color="#fff3cf" stop-opacity="0.5"/><stop offset=".55" stop-color="#fff3cf" stop-opacity="0.175"/><stop offset="1" stop-color="#fff3cf" stop-opacity="0"/></radialGradient></defs><ellipse cx="96" cy="180" rx="70" ry="26" fill="url(#kl1)"/></g>'+'<g class="fx noedge">'+
+     '<g class="blink hand"><path d="M151.6 144 v-5.4 q0 -1 1 -1 q1 0 1 1 v3 v-4.2 q0 -1 1 -1 q1 0 1 1 v4.2 v-3.6 q0 -1 1 -1 q1 0 1 1 v5 q0 3 -3 4 h-1.4 q-2.6 -1 -2.6 -3 z" fill="#ff8a3d"/></g>'+
      '<g fill="#ffb347"><rect x="158.4" y="137.4" width="3" height=".9"/><rect x="160.6" y="137.4" width=".9" height="4"/><rect x="158.8" y="139.4" width="2.4" height=".9"/><rect x="160.6" y="139.8" width=".9" height="4"/><rect x="158.4" y="143" width="3" height=".9"/></g>'+
-     '<rect class="blink" x="234" y="136" width="6.4" height="3.6" rx=".6" fill="#ff3b30"/>'+
-     '<rect class="blink2" x="241" y="136" width="6.4" height="3.6" rx=".6" fill="#fff6e6"/>'+
-     '<circle class="blink" cx="237" cy="137.8" r="6" fill="#ff3b30" opacity=".22"/>'+
+     '<rect class="blink mid" x="234" y="136" width="6.4" height="3.6" rx=".6" fill="#ff3b30"/>'+
+     '<rect class="blink2 mid" x="241" y="136" width="6.4" height="3.6" rx=".6" fill="#fff6e6"/>'+
+     '<circle class="blink mid" cx="237" cy="137.8" r="6" fill="#ff3b30" opacity=".22"/>'+
      '<g>'+pigeon(250,199,[16,0,40,-13.3])+pigeon(262,199,[15,-6.1,44,-14.7])+pigeon(330,199,[19,-3,26,-8.7])+pigeon(378,199,[13,-9,30,-10])+'</g>'+
    '</g>',
 
@@ -2143,15 +2235,15 @@ html{ background:var(--bg); }
    '</g>'+ haze(.36) +
    '<g class="ly2">'+
      colonial(-116,140,88,14,'var(--p-bone)','var(--p-bone-d)','var(--p-steel)','var(--p-steel-d)')+
-     '<g class="lit glow">'+win(-106,146,3,1,10,11,16,0)+win(-80,166,1,1,10,11,0,0)+'</g>'+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(-106,146,3,1,10,11,16,0)+win(-80,166,1,1,10,11,0,0)+'</g>'+
      '<g class="noedge" fill="var(--p-char-d)">'+win(-106,166,1,1,10,11,0,0)+'</g>'+
      cape(410,156,104,14,'var(--p-sage)','var(--p-sage-d)','var(--p-char)','var(--p-char-d)')+
      '<g class="noedge" fill="var(--p-char-d)">'+win(422,164,1,1,11,12,0,0)+win(486,164,1,1,11,12,0,0)+'</g>'+
-     '<g class="lit glow">'+win(454,164,1,1,11,12,0,0)+'</g>'+
-     cape(14,152,102,16,'var(--p-slate)','var(--p-slate-d)','var(--p-steel-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(454,164,1,1,11,12,0,0)+'</g>'+
+     '<g class="stepdark">'+cape(14,152,102,16,'var(--p-slate)','var(--p-slate-d)','var(--p-steel-d)','var(--p-char-d)')+
      '<g class="noedge" fill="var(--p-char-d)">'+win(28,160,1,1,12,13,0,0)+win(88,160,1,1,12,13,0,0)+win(60,158,1,1,11,20,0,0)+
        win(36,142,1,1,6,6,0,0)+win(79,142,1,1,6,6,0,0)+'</g>'+
-     shutter(28,160,12,13,'var(--p-char-d)')+shutter(88,160,12,13,'var(--p-char-d)')+
+     shutter(28,160,12,13,'var(--p-char-d)')+shutter(88,160,12,13,'var(--p-char-d)')+'</g>'+
      colonial(262,134,112,16,'var(--p-cream)','var(--p-cream-d)','var(--p-terra)','var(--p-terra-d)')+
      '<g class="lit glow">'+win(272,140,4,1,11,12,14,0)+win(272,160,1,1,11,12,0,0)+win(347,160,1,1,11,12,0,0)+
        win(297,160,1,1,11,12,0,0)+win(322,160,1,1,11,12,0,0)+'</g>'+
@@ -2165,7 +2257,7 @@ html{ background:var(--bg); }
        rc(300,146,7,4,'var(--p-cream-d)')+rc(338,168,9,3,'var(--p-cream-d)')+rc(280,171,5,4,'var(--p-cream-d)')+
        ln('M262 136 q40 3.5 60 1.2 q30 -2 52 .6','var(--p-terra-d)',1.1)+
        ln('M268 178 l1 -6 M271 178 l-1 -5 M336 178 l1 -7 M339 178 l1 -5 M342 178 l-1 -6 M362 178 l1 -5','var(--p-moss-d)',.9)+'</g>'+
-     rc(311,160,12,18,'var(--p-moss-d)',' rx=".8"')+
+     '<g class="lit glow door">'+lr(311,160,12,18)+'</g>'+'<g class="noedge">'+rc(309.6,158.6,14.8,1.6,'var(--p-timber-d)')+rc(309.6,158.6,1.6,19.4,'var(--p-timber-d)')+rc(321.6,158.6,1.6,19.4,'var(--p-timber-d)')+'</g>'+
      '<g class="lit glow"><circle cx="328" cy="162" r="2.6"/></g>'+
      tree(380,150,19,'var(--p-moss)','var(--p-moss-d)')+
      tree(136,150,17,'var(--p-terra)','var(--p-terra-d)')+
@@ -2174,7 +2266,7 @@ html{ background:var(--bg); }
    '<g class="ly3">'+
      rc(-124,178,648,22,'var(--p-moss)')+
      '<g class="noedge">'+rc(-124,178,648,3,'var(--p-moss-d)')+'</g>'+
-     P('M306 178 l22 0 l8 22 l-38 0 z','var(--p-bone-d)')+
+     P('M306 178 l22 0 l8 22 l-38 0 z','var(--p-bone-d)')+'<g class="noedge">'+P('M310 178 l14 0 l7 22 l-27 0 z','#ffcf7a')+'</g>'+
      bulkhead(110,186)+
      fence(150,158,3,28,11,'var(--p-white)')+fence(206,158,4,28,11,'var(--p-white)')+
      '<g transform="translate(144 186) rotate(-24) translate(0 -28)">'+fence(0,0,3,28,11,'var(--p-white-d)')+'</g>'+
@@ -2195,9 +2287,9 @@ html{ background:var(--bg); }
      figure(188,197,34,{felt:'purple',dir:1,arm:'carry',carry:cobbler,stride:5,coat:'var(--p-slate)',coatD:'var(--p-slate-d)',legs:'var(--p-steel-d)',hair:'var(--p-timber)'})+
    '</g>'+
    /* v32: the red-haired kid on the trampoline next door, mid-bounce */
-   '<g class="fx noedge"><g class="bounce">'+
+   '<g class="noedge keylight"><defs><radialGradient id="kl2"><stop offset="0" stop-color="#ffd48a" stop-opacity="0.55"/><stop offset=".55" stop-color="#ffd48a" stop-opacity="0.193"/><stop offset="1" stop-color="#ffd48a" stop-opacity="0"/></radialGradient></defs><ellipse cx="318" cy="170" rx="46" ry="34" fill="url(#kl2)"/></g>'+'<g class="fx noedge"><g class="bounce">'+
      figure(352,189,16,{felt:'coral',coat:'var(--p-gold)',coatD:'var(--p-gold-d)',legs:'var(--p-indigo)',hair:'#c2410c'})+
-   '</g><circle class="pulse" cx="328" cy="162" r="5" fill="#ffd98a" opacity=".3"/>'+
+   '</g><circle class="pulse mid" cx="328" cy="162" r="5" fill="#ffd98a" opacity=".3"/>'+
      /* v34: the raptor lives on the chimneys now (founder: "It perches on one
         chimney, flies around them, perches on the other chimney. Perched for
         30 seconds or so. Randomized."). Drawn by hawkTick below. */
@@ -2228,18 +2320,18 @@ html{ background:var(--bg); }
      box(680,30,90,130,10,'var(--p-brick-d)','var(--p-char-d)','var(--p-char-d)')+
      '<g class="noedge" fill="var(--p-char-d)">'+win(688,40,6,9,7,9,6,6)+'</g>'+
      box(780,70,70,90,10,'var(--p-terra)','var(--p-terra-d)','var(--p-char-d)')+
-     '<g class="lit glow" opacity=".9">'+win(2,56,1,1,7,9,0,0)+win(122,76,1,1,7,9,0,0)+win(150,112,1,1,7,9,0,0)+win(262,46,1,1,6,9,0,0)+win(380,90,1,1,7,9,0,0)+win(506,66,1,1,7,9,0,0)+win(492,120,1,1,7,9,0,0)+win(610,90,1,1,7,9,0,0)+'</g>'+
+     '<g class="lit glow" opacity=".7">'+win(380,90,1,1,7,9,0,0)+win(610,90,1,1,7,9,0,0)+'</g>'+
    '</g></g>'+ haze(.36) +
    '<g class="ly2">'+
      /* the far side of the street: shops beyond Sparr's and the trolley */
      '<g transform="translate(120 44) scale(.68)">'+
-       shop(0,116,64,2,8,'var(--p-brick)','var(--p-brick-d)','var(--p-bone-d)',1)+
+       shop(0,116,64,2,8,'var(--p-brick)','var(--p-brick-d)','var(--p-bone-d)',0)+
        shop(70,134,56,1,8,'var(--p-terra)','var(--p-terra-d)','var(--p-cream-d)',0)+
-       shop(132,98,82,3,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',2)+
-       shop(220,134,60,1,8,'var(--p-brick)','var(--p-brick-d)','var(--p-cream-d)',1)+
+       shop(132,98,82,3,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',0)+
+       shop(220,134,60,1,8,'var(--p-brick)','var(--p-brick-d)','var(--p-cream-d)',0)+
        shop(288,116,66,2,8,'var(--p-terra)','var(--p-terra-d)','var(--p-bone-d)',2)+
        shop(360,110,80,2,8,'var(--p-brick-d)','var(--p-char-d)','var(--p-bone-d)',0)+
-       shop(446,112,78,2,8,'var(--p-terra-d)','var(--p-char-d)','var(--p-bone-d)',1)+
+       shop(446,112,78,2,8,'var(--p-terra-d)','var(--p-char-d)','var(--p-bone-d)',0)+
        shop(530,130,70,1,8,'var(--p-brick)','var(--p-brick-d)','var(--p-cream-d)',0)+
        wires(102,[0,90,190,290,390,490,600],'var(--p-char-d)')+
        brickwalk(0,160,600,6)+curb(0,166,600,3)+
@@ -2254,7 +2346,7 @@ html{ background:var(--bg); }
      box(-126,78,84,80,8,'var(--p-terra-d)','var(--p-char-d)','var(--p-char-d)')+
      rc(-128,74,88,4.5,'var(--p-bone-d)')+
      '<g class="noedge" fill="var(--p-char-d)">'+win(-118,84,5,3,9,11,6,6)+'</g>'+
-     '<g class="lit glow">'+lr(-120,136,34,20)+lr(-80,136,32,20)+'</g>'+
+     '<g class="lit glow" opacity=".6">'+lr(-120,136,34,20)+lr(-80,136,32,20)+'</g>'+
      sparrs(-40,96,96,62)+
      rc(-126,158,236,2,'var(--p-granite)')+
      '<g class="noedge">'+ln('M-124 160 h648','var(--p-char)',1)+'</g>'+
@@ -2262,7 +2354,7 @@ html{ background:var(--bg); }
    '<g class="ly3">'+
      '<g class="noedge">'+rc(-124,159,648,17,'var(--p-char-d)')+
        ln('M-124 167.5 h648','#d9c67a',.8,.55)+
-       '<ellipse cx="290" cy="160" rx="60" ry="6" fill="var(--lit)" opacity=".13"/></g>'+
+       '</g>'+
      mbtaBus(98,150)+
      curb(-124,176,648,4)+brickwalk(-124,180,648,20)+
      busstop(300,146)+
@@ -2272,10 +2364,10 @@ html{ background:var(--bg); }
    '</g>'+
    /* "An ant walked between us on the sidewalk." It walks, between them.
       Sparr's sign hums; the 39's headlight and the stop light are on. */
-   '<g class="fx noedge">'+
-     '<ellipse cx="176" cy="195.4" rx="11" ry="2.4" fill="#ffd98a" opacity=".16"/>'+
-     '<g class="crawl">'+ant(176,194)+'</g>'+
-     '<rect class="pulse" x="-40" y="124" width="96" height="7" fill="#ff9a5c" opacity=".35"/>'+
+   '<g class="noedge keylight"><defs><radialGradient id="kl3"><stop offset="0" stop-color="#ffb860" stop-opacity="0.5"/><stop offset=".55" stop-color="#ffb860" stop-opacity="0.175"/><stop offset="1" stop-color="#ffb860" stop-opacity="0"/></radialGradient></defs><ellipse cx="176" cy="188" rx="60" ry="22" fill="url(#kl3)"/></g>'+'<g class="fx noedge">'+
+     '<ellipse cx="176" cy="193" rx="44" ry="9" fill="#ffb054" opacity=".30"/><ellipse cx="176" cy="194.4" rx="22" ry="4.4" fill="#ffd28a" opacity=".55"/>'+
+     '<g class="crawl antnow">'+ant(176,194)+'</g>'+
+     '<rect class="pulse mid" x="-40" y="124" width="96" height="7" fill="#ff9a5c" opacity=".35"/>'+
      '<circle class="pulse" cx="214" cy="171" r="4" fill="#fff2b0" opacity=".5"/>'+
    '</g>'
   ];
@@ -2305,6 +2397,7 @@ html{ background:var(--bg); }
     $('balloon').classList.remove('falling');
     $('srcrow').textContent='from \u201C'+PIECES[pi].title+'\u201D \u00B7 '+PIECES[pi].by;
     $('skybox').dataset.piece=pi;
+    clearGag();
     $('sceneLayers').innerHTML=SCENERY[pi];
     if(pi===2) hawkReset();
     drawSky(true);
@@ -2412,8 +2505,80 @@ html{ background:var(--bg); }
     if(lifted) updateReveal();
   }
 
+
+  /* v38 FUNNY FAILURE: one small village gag per piece, in the sharp foreground
+     plane, lit by a key light that follows it. Built on crash, cleared on load. */
+  function gagGlow(cx,cy,rx,ry,col){
+    return '<g class="gglow"><defs><radialGradient id="gg"><stop offset="0" stop-color="'+col+'" stop-opacity=".55"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></radialGradient></defs>'
+      +'<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="url(#gg)"/></g>';
+  }
+  function gagEchigo(){
+    var x=258, y=159, s=22, sh=y-s*.76, o='';
+    o+=gagGlow(250,153,34,12,'#ffd58a');
+    // the villager, bare-headed now; his umbrella is the gift
+    o+='<g class="walker"><g class="noedge">'
+      +'<ellipse cx="'+x+'" cy="'+y+'" rx="'+(s*.34)+'" ry="1.8" fill="rgba(18,14,10,.32)"/>'
+      +'<path d="M'+(x-s*.14)+' '+sh+' L'+(x+s*.14)+' '+sh+' L'+(x+s*.22)+' '+y+' L'+(x-s*.22)+' '+y+' z" fill="var(--p-indigo)"/>'
+      +'<g class="step">'+rc(x-s*.31,sh+s*.06,s*.16,s*.30,'var(--p-indigo)',' rx=".7"')+'</g>'
+      +rc(x+s*.15,sh+s*.06,s*.16,s*.30,'var(--p-indigo)',' rx=".7"')
+      +rc(x-s*.155,sh+s*.32,s*.31,s*.09,'var(--p-gold)')
+      +'<circle cx="'+x+'" cy="'+(sh-s*.1)+'" r="'+(s*.09)+'" fill="#e8b98f"/>'
+      +P('M'+(x-s*.09)+' '+(sh-s*.1)+' a'+(s*.09)+' '+(s*.09)+' 0 0 1 '+(s*.18)+' 0 q-'+(s*.09)+' -'+(s*.03)+' -'+(s*.18)+' 0 z','var(--p-char-d)')
+      +'</g></g>';
+    // the can, fallen from the red machine's slot and rolled to a stop
+    o+='<g class="can"><g class="noedge">'+rc(239.4,152,3.4,5,'var(--p-verm)',' rx=".6"')+rc(239.4,153.6,3.4,1.3,'var(--p-cream)')+'</g></g>';
+    // his umbrella, set down over the can like a roof
+    var ux=241.1, uy=153.4, r=8;
+    o+='<g class="gift"><g class="noedge">'+rc(ux-.5,uy-r*.42,1,6,'var(--p-timber)')
+      +'<path d="M'+(ux-r)+' '+(uy-r*.42+1.6)+' a'+r+' '+(r*.5)+' 0 0 1 '+(2*r)+' 0 z" fill="var(--p-verm)"/>'
+      +ln('M'+ux+' '+(uy-r*.42-1.5)+' L'+(ux-r*.7)+' '+(uy-r*.42+1.4)+' M'+ux+' '+(uy-r*.42-1.5)+' L'+(ux+r*.7)+' '+(uy-r*.42+1.4),'var(--p-cream)',.6,.7)
+      +'</g></g>';
+    return o;
+  }
+  function gagCrosswalk(){
+    var o=gagGlow(96,182,64,16,'#fff3cf');
+    // WALK: a pale walking figure lights in the signal box
+    o+='<g class="walksig"><g class="noedge"><circle cx="154.6" cy="138.6" r="1.1" fill="#f2f0ea"/>'
+      +ln('M154.4 140 l-.6 3.6 M153.8 143.6 l-1.6 3 M153.8 143.6 l1.4 3 M154.3 141 l-1.8 1.6 M154.3 141 l1.9 1.2','#f2f0ea',.9)+'</g></g>';
+    // the pigeons, back on foot, in single file along the stripes
+    var p='';
+    [0,10,20,30].forEach(function(dx,i){ p+=pigeon(62+dx,187.6,[1.2+i*.1,-i*.3,2,-1]).replace('class="pw"','class="pw2"'); });
+    o+='<g class="file">'+p+'</g>';
+    return o;
+  }
+  function gagPeach(){ return gagGlow(352,176,40,24,'#ffd48a'); }
+  function gagDeadAnts(fromx){
+    var o=gagGlow(150,193,48,10,'#ffb860');
+    var bag='<g class="noedge">'+rc(-2.8,-2.2,5.6,4.2,'var(--p-kraft)',' rx="1.4"')+rc(-.9,-3,1.8,1.2,'var(--p-kraft-d)',' rx=".4"')+'</g>';
+    o+='<g class="carry"><g class="ant2">'+ant(124+64,194)+'</g>'
+      +'<g transform="translate('+(188.6)+' 193)"><g class="lift"><g class="bag" style="--fromx:'+fromx.toFixed(1)+'px">'+bag+'</g></g></g></g>';
+    return o;
+  }
+  function startGag(){
+    var sb=$('skybox'), g=$('gag'); if(!g) return;
+    var html='';
+    if(pi===0) html=gagEchigo();
+    else if(pi===1) html=gagCrosswalk();
+    else if(pi===2) html=gagPeach();
+    else {
+      // where the basket came down, in the set's own units, so the bag rolls from it
+      var fromx=30;
+      try{
+        var sv=$('scenery'), br=$('balloon').getBoundingClientRect(), pt=sv.createSVGPoint();
+        pt.x=br.left+br.width/2; pt.y=br.bottom;
+        var q=pt.matrixTransform(sv.getScreenCTM().inverse());
+        fromx=Math.max(-120,Math.min(160,q.x-188.6));
+      }catch(e){}
+      html=gagDeadAnts(fromx);
+    }
+    g.innerHTML=html;
+    sb.classList.remove('gagging'); void sb.offsetWidth; sb.classList.add('gagging');
+  }
+  function clearGag(){ var g=$('gag'); if(g) g.innerHTML=''; $('skybox').classList.remove('gagging'); }
+
   function crash(w){
     crashed=true; lifted=false;
+    startGag();
     document.documentElement.classList.remove('flown');
     $('balloon').classList.add('falling');
     $('balloon').style.transform='translateY(14px) rotate(-9deg)';
