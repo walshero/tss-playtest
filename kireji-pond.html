@@ -257,6 +257,7 @@ body.still .eddy .e{animation:none}
 .sndbtn{position:absolute;top:16px;left:16px;z-index:9;display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 12px;
   background:var(--paper2);color:var(--sumi);border:2px solid var(--sumi);box-shadow:3px 3px 0 var(--sumi);font-weight:700;font-size:18px;cursor:pointer}
 .sndbtn .x{display:none}
+.sndbtn.ask{border-color:var(--beni);box-shadow:3px 3px 0 var(--beni)}
 .sndbtn[aria-pressed="false"] .x{display:inline}.sndbtn[aria-pressed="false"] .w{display:none}
 @media (max-width:780px){.tour{padding-top:76px}}
 /* v4.2 reflow: large text, zoom and narrow phones. The panel scrolls below the corner control, never under it,
@@ -1750,6 +1751,7 @@ const Snd=(()=>{
     fall.gain.setTargetAtTime(.1,ac.currentTime,1.5);
     amb=ac.createGain(); amb.gain.value=1; amb.connect(master);
     timer=setInterval(tick,400);
+    ac.onstatechange=()=>{if(typeof api.onchange==='function') api.onchange()};
     return ac;
   }
   const now=()=>ac.currentTime;
@@ -1798,20 +1800,20 @@ const Snd=(()=>{
         o.connect(am).connect(g).connect(d); o.start(b); lfo.start(b); o.stop(b+dur+.02); lfo.stop(b+dur+.02)}
     },
     minmin(){ // minminzemi: three loud min-min-min, then a long miiinnnmmm that closes down
-      const t=now()+.05, d=panTo(), base=rnd(1500,1850);
+      const t=now()+.05, d=panTo(), base=rnd(900,1100), k=1.6; // k stretches the whole call; the rhythm's ratios hold
       const note=(b,dur,last)=>{
         const o=ac.createOscillator(); o.type='sawtooth';
-        o.frequency.setValueAtTime(base*.8,b); o.frequency.linearRampToValueAtTime(base*1.06,b+Math.min(.12,dur*.3));
+        o.frequency.setValueAtTime(base*.8,b); o.frequency.linearRampToValueAtTime(base*1.06,b+Math.min(.12*k,dur*.3));
         if(last){o.frequency.setValueAtTime(base*1.06,b+dur*.4); o.frequency.linearRampToValueAtTime(base*.72,b+dur)}
         else o.frequency.linearRampToValueAtTime(base*.92,b+dur);
         const f=ac.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.4; f.frequency.setValueAtTime(base*1.9,b);
         if(last){f.frequency.setValueAtTime(base*1.9,b+dur*.45); f.frequency.exponentialRampToValueAtTime(600,b+dur)} // the mmm: the sound closes
-        const am=ac.createGain(); am.gain.value=.6; const lfo=ac.createOscillator(); lfo.frequency.value=rnd(90,120);
+        const am=ac.createGain(); am.gain.value=.6; const lfo=ac.createOscillator(); lfo.frequency.value=rnd(60,80);
         const lg=ac.createGain(); lg.gain.value=.4; lfo.connect(lg).connect(am.gain);
-        const g=ac.createGain(); g.gain.setValueAtTime(0,b); g.gain.linearRampToValueAtTime(.12,b+.05); g.gain.setValueAtTime(.12,b+dur*(last?.5:.6)); g.gain.linearRampToValueAtTime(0,b+dur);
+        const g=ac.createGain(); g.gain.setValueAtTime(0,b); g.gain.linearRampToValueAtTime(.12,b+.05*k); g.gain.setValueAtTime(.12,b+dur*(last?.5:.6)); g.gain.linearRampToValueAtTime(0,b+dur);
         o.connect(f).connect(am).connect(g).connect(d); o.start(b); lfo.start(b); o.stop(b+dur+.05); lfo.stop(b+dur+.05);
       };
-      note(t,.34); note(t+.46,.34); note(t+.92,.34); note(t+1.4,1.9,true);
+      note(t,.34*k); note(t+.46*k,.34*k); note(t+.92*k,.34*k); note(t+1.4*k,1.9*k,true);
     },
     higurashi(){ // the evening cicada: kana-kana-kana, falling and fading
       const t=now()+.05, d=panTo(), n=16, f0=rnd(4300,4700);
@@ -1859,6 +1861,7 @@ const Snd=(()=>{
   }
   const api={
     get on(){return on},
+    get running(){return !!ac&&ac.state==='running'},
     hide(h){if(!ac)return; if(h){ac.suspend().catch(()=>{}); if(silentEl) silentEl.pause()} else if(on){ac.resume().catch(()=>{}); if(silentEl) silentEl.play().catch(()=>{})}},
     probe(){return {ac,master,call}},
     wake:unlock,
@@ -1895,10 +1898,15 @@ const Snd=(()=>{
   };
   return api;
 })();
-{const b=$('#snd'), paint=()=>{b.setAttribute('aria-pressed',Snd.on);$('#sndTxt').textContent=Snd.on?'Sound on':'Sound off'};
-  paint(); b.addEventListener('click',()=>{Snd.set(!Snd.on);paint()});
+{const b=$('#snd'), paint=()=>{const run=Snd.running; b.setAttribute('aria-pressed',Snd.on); b.classList.toggle('ask',Snd.on&&!run);
+    $('#sndTxt').textContent=!Snd.on?'Sound off':(run?'Sound on':'Tap for sound')};
+  Snd.onchange=paint; paint();
+  // while the browser is still holding sound back, this button asks for it rather than turning it off
+  b.addEventListener('click',()=>{if(b.classList.contains('ask')){Snd.wake();setTimeout(paint,200)}else Snd.set(!Snd.on);paint()});
   const wake=()=>Snd.wake();
-  ['touchend','click','keydown','pointerup'].forEach(ev=>addEventListener(ev,wake,{capture:true,passive:true}));
+  // the very first touch anywhere, on the very first panel, starts the pond
+  ['pointerdown','mousedown','touchend','click','keydown','pointerup'].forEach(ev=>addEventListener(ev,wake,{capture:true,passive:true}));
+  try{Snd.wake()}catch(e){} // and where the browser allows it, sound starts before any touch at all
   document.addEventListener('visibilitychange',()=>Snd.hide(document.hidden));}
 
 /* ---------- v4 opening panels ---------- */
