@@ -95,9 +95,9 @@ button:focus-visible{outline:3px solid var(--beni);outline-offset:3px}
 .tile:hover .in{background:#FFF8E6}
 .beads{display:flex;gap:5px}
 .beads i{width:6px;height:6px;border-radius:50%;background:var(--ai2)}
-.marks .tile[data-turn] .in::after{content:"turn";position:absolute;top:-11px;right:-8px;
-  background:var(--beni);color:#fff;font:700 18px/1 "Zen Kaku Gothic New",sans-serif;
-  letter-spacing:.08em;padding:4px 6px}
+.marks .tile[data-turn] .in::after{content:"切";content:"切" / "turn";position:absolute;top:-14px;right:-10px;
+  background:var(--beni);color:#fff;font:800 20px/1 "Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;
+  padding:5px 6px;border-radius:2px}
 .tile.sink .in{animation:sink .8s forwards}
 .tile.take .in{animation:take .45s forwards}
 .tile.nope .in{animation:nope .4s}
@@ -269,6 +269,11 @@ body.still .eddy .e{animation:none}
 @media (max-width:420px){.tnav{flex-wrap:wrap;row-gap:14px}.tnav .tcount{order:-1;flex-basis:100%}.tnav #tNext{margin-left:auto}.tnav [disabled]{display:none}}
 /* v4.3: phrases float over the title and seal; an open menu floats over everything */
 .cartouche{z-index:1}.stream{z-index:2}
+/* v4.4: the title scroll retracts into this mark: 切 (cut) over 池 (pond), in the scroll's own paper and ink */
+.kmark{position:absolute;top:0;right:0;width:44px;padding:6px 0;display:flex;flex-direction:column;align-items:center;line-height:1.06;
+  background:var(--paper2);color:var(--sumi);border:2px solid var(--sumi);box-shadow:0 3px 0 rgba(27,26,23,.28);
+  font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:21px;
+  opacity:0;transform-origin:50% 0;pointer-events:none}
 .choice.float{position:fixed;z-index:60;max-width:min(380px,calc(100vw - 16px))}
 @media (max-width:350px){.sndbtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.sndbtn{min-width:44px;justify-content:center}}
 </style>
@@ -514,7 +519,7 @@ body.still .eddy .e{animation:none}
     <div class="reveal" id="reveal" hidden><div class="rcard" id="rcard"><p class="eyebrow" id="revLbl"></p><p class="rpoem" id="revPoem"></p></div></div>
     <button class="sndbtn" id="snd" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z" fill="currentColor"/><path class="w" d="M15.5 8.5c1.6 1.9 1.6 5.1 0 7M18.5 6c3 3.3 3 8.7 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="sndTxt">Sound on</span></button>
     <div class="cartouche" aria-hidden="true">
-      <div class="seal" lang="ja"><span>切</span><span>字</span></div>
+      <div class="kmark" id="kmark" lang="ja"><span>切</span><span>池</span></div>
       <div class="slip"><span id="slipJp" lang="ja">切れ字の池</span><small id="slipEn">Kireji Pond</small></div>
     </div>
 
@@ -1171,13 +1176,14 @@ let slipRolled=false, slipRollBusy=null;
 function rollSlip(up){
   const slip=$('.slip'), box=$('.cartouche'); if(!slip||!box) return Promise.resolve();
   slipRolled=up;
-  if(reduce){slip.style.transition='opacity .25s';slip.style.opacity=up?0:1;slip.style.clipPath='';return wait(260)}
+  if(reduce){slip.style.transition='opacity .25s';slip.style.opacity=up?0:1;slip.style.clipPath='';const km=$('#kmark');if(km){km.style.transform='';km.style.opacity=up?1:0}return wait(260)}
   slip.style.transition='';slip.style.opacity=1;slip.style.visibility='visible';
   let roll=$('.sroll'); if(!roll){roll=document.createElement('div');roll.className='sroll';roll.innerHTML='<i></i><i></i>';box.appendChild(roll)}
   const tugs=up?[[.14,240,150],[.2,110,280],[.52,360,90],[.6,140,230],[.83,260,120],[1,200,0]]
                :[[.62,300,70],[.3,280,60],[0,320,0]];
   const run=async()=>{
     Snd.paper(up);
+    if(!up){const km=$('#kmark'); if(km&&+getComputedStyle(km).opacity>0) await anim(220,k=>{km.style.opacity=(1-k).toFixed(2);km.style.transform=`scale(${(1-.5*k).toFixed(3)})`})}
     let p=up?0:1;
     const place=(p,tilt,lift)=>{
       const H=slip.offsetHeight, rh=11+9*p, y=slip.offsetTop+(1-p)*H-rh/2-(lift||0);
@@ -1192,8 +1198,10 @@ function rollSlip(up){
       await anim(dur,k=>{const e=1-Math.pow(1-k,2.2); p=from+(to-from)*e; place(p,dir*2.4*Math.sin(Math.PI*k)*(1-k*.4))});
       if(hold) await anim(hold,k=>place(p,dir*.6*Math.sin(k*Math.PI*2)*(1-k)));
     }
-    if(up){ // the rod lifts off the top and is gone
-      await anim(240,k=>{place(1,-1.2*k,18*k);roll.style.opacity=(1-k).toFixed(2)});
+    if(up){ // the rolled scroll tucks itself into the kanji mark
+      const km=$('#kmark');
+      await anim(300,k=>{place(1,-1.2*k,6*k);roll.style.opacity=(1-k).toFixed(2);
+        if(km){km.style.opacity=k.toFixed(2);km.style.transform=`scale(${(.5+.5*(1-Math.pow(1-k,3))).toFixed(3)})`}});
       slip.style.visibility='hidden';
     } else slip.style.clipPath='';
     roll.style.display='none'; slip.style.transform='';
@@ -1236,14 +1244,14 @@ async function win(){
   rp.querySelectorAll('span').forEach((x,i)=>x.textContent=lines[i].t);
   $('#rcard').classList.remove('fade'); $('#reveal').hidden=false;
   say(`Your poem: ${lines.map(p=>p.t).join(' / ')}. The turn is underlined.`);
-  await new Promise(r=>setTimeout(r,2800));
+  await new Promise(r=>setTimeout(r,3800));
   await flySequence();
   $('#reveal').hidden=true;
   S.wins.push(lines); renderSeals();
   tiles.forEach(t=>{closeChoice(t);t.el.remove()}); tiles=[]; plist.forEach(t=>t.el.remove()); plist=[];
   if(S.wins.length===3){
     await frogJump();
-    S.phase='final'; $('#slipJp').textContent='水の音'; $('#slipEn').textContent='Mizu no Oto'; rollSlip(false);
+    S.phase='final'; rollSlip(false);
     const box=$('#finals'); box.innerHTML='';
     S.wins.forEach((w,i)=>{const b=document.createElement('blockquote');b.className='poem';fillPoem(b,w,SEASONS[i].name+' · '+SEASONS[i].jp);box.appendChild(b)});
     show('pFinal'); $('#again').focus();
