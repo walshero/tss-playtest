@@ -267,6 +267,9 @@ body.still .eddy .e{animation:none}
 .tpane .rom{flex:1 1 9em}
 @media (max-width:780px){.tour{top:72px;padding:6px 10px 24px;--P:14px}.tcard{padding:16px 14px 12px}}
 @media (max-width:420px){.tnav{flex-wrap:wrap;row-gap:14px}.tnav .tcount{order:-1;flex-basis:100%}.tnav #tNext{margin-left:auto}.tnav [disabled]{display:none}}
+/* v4.3: phrases float over the title and seal; an open menu floats over everything */
+.cartouche{z-index:1}.stream{z-index:2}
+.choice.float{position:fixed;z-index:60;max-width:min(380px,calc(100vw - 16px))}
 @media (max-width:350px){.sndbtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.sndbtn{min-width:44px;justify-content:center}}
 </style>
 </head>
@@ -894,7 +897,7 @@ function spawn(s){
   tiles.push(t);
 }
 function prefill(){
-  tiles.forEach(t=>t.el.remove()); tiles=[];
+  tiles.forEach(t=>{closeChoice(t);t.el.remove()}); tiles=[];
   const seeds=[LIP*.2,LIP*.55,LIP*.9,LIP+(L-LIP)*.35,LIP+(L-LIP)*.75]; seeds.forEach(x=>spawn(x)); lastSpawn=performance.now();
 }
 function entryS(){
@@ -940,20 +943,30 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 function retire(t,cls){
-  t.gone=true; t.held=false; t.el.classList.remove('held'); t.el.querySelector('.choice').hidden=true; t.el.classList.add(cls); t.el.querySelectorAll('button').forEach(b=>b.disabled=true);
+  closeChoice(t); t.gone=true; t.held=false; t.el.classList.remove('held'); t.el.querySelector('.choice').hidden=true; t.el.classList.add(cls); t.el.querySelectorAll('button').forEach(b=>b.disabled=true);
   setTimeout(()=>t.el.remove(),cls==='sink'?800:450);
 }
 
 /* ---------- play ---------- */
-function release(t){t.held=false;t.el.classList.remove('held');t.el.querySelector('.choice').hidden=true;t.el.querySelector('.in').setAttribute('aria-expanded','false')}
+/* v4.3: an open menu floats above everything (the picture's edge, the poem panel), always on screen */
+function placeChoice(t){
+  const c=t.ch; if(!c) return; const r=t.el.querySelector('.in').getBoundingClientRect(), cw=c.offsetWidth, ch=c.offsetHeight, m=8;
+  let top=r.bottom+10; if(top+ch>innerHeight-m) top=r.top-10-ch; if(top<m) top=Math.max(m,innerHeight-m-ch);
+  const left=Math.max(m,Math.min(r.left,innerWidth-m-cw));
+  c.style.left=left.toFixed(0)+'px'; c.style.top=top.toFixed(0)+'px';
+}
+function openChoice(t){if(t.list)return;const c=t.el.querySelector('.choice');if(!c)return;t.ch=c;document.body.appendChild(c);c.classList.add('float');placeChoice(t)}
+function closeChoice(t){const c=t.ch;if(!c)return;t.ch=null;c.classList.remove('float');c.style.left=c.style.top='';t.el.appendChild(c)}
+{const re=()=>tiles.forEach(o=>{if(o.held&&o.ch)placeChoice(o)});addEventListener('scroll',re,{passive:true});addEventListener('resize',re)}
+function release(t){closeChoice(t);t.held=false;t.el.classList.remove('held');t.el.querySelector('.choice').hidden=true;t.el.querySelector('.in').setAttribute('aria-expanded','false')}
 function toggleHold(t){
   if(S.phase!=='play'||S.busy||t.gone) return;
   const open=!t.held;
   [...tiles,...plist].forEach(o=>{if(o!==t&&o.held)release(o)});
   if(!open){release(t);return}
-  t.held=true;t.el.classList.add('held');t.el.querySelector('.choice').hidden=false;
+  t.held=true;t.el.classList.add('held');t.el.querySelector('.choice').hidden=false;openChoice(t);
   t.el.querySelector('.in').setAttribute('aria-expanded','true');
-  t.el.querySelector('.c-catch').focus();
+  (t.ch||t.el).querySelector('.c-catch').focus();
 }
 function letGo(t){
   if(S.phase!=='play'||S.busy||t.gone) return;
@@ -1227,7 +1240,7 @@ async function win(){
   await flySequence();
   $('#reveal').hidden=true;
   S.wins.push(lines); renderSeals();
-  tiles.forEach(t=>t.el.remove()); tiles=[]; plist.forEach(t=>t.el.remove()); plist=[];
+  tiles.forEach(t=>{closeChoice(t);t.el.remove()}); tiles=[]; plist.forEach(t=>t.el.remove()); plist=[];
   if(S.wins.length===3){
     await frogJump();
     S.phase='final'; $('#slipJp').textContent='水の音'; $('#slipEn').textContent='Mizu no Oto'; rollSlip(false);
