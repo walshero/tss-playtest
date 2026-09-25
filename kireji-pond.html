@@ -275,6 +275,26 @@ body.still .eddy .e{animation:none}
   font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:21px;
   opacity:0;transform-origin:50% 0;pointer-events:none}
 .choice.float{position:fixed;z-index:60;max-width:min(380px,calc(100vw - 16px))}
+/* v4.6 bento: on a phone the play panel packs into tight compartments; nothing wraps that doesn't have to */
+@media (max-width:780px){
+  .panel{padding:14px 12px 18px}
+  .panel section{gap:10px}
+  .ph{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
+  .ph .eyebrow{letter-spacing:.08em;white-space:nowrap}
+  .ph h2{font-size:22px;white-space:nowrap}
+  .seals{gap:4px}.seals span{width:26px;height:26px;font-size:18px}
+  .padrow{gap:6px 10px;padding:8px 10px;border:2px solid var(--sumi2)}
+  #pads{gap:2px}.padrow svg{width:22px;height:14px}
+  .slots{gap:6px}
+  .slots li{grid-template-columns:22px 1fr;gap:6px}
+  .count{font-size:22px}
+  .slot{min-height:46px;padding:7px 10px}
+  .msg{min-height:0;padding:4px 0 4px 10px}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .controls > button{justify-content:center;text-align:center;padding:9px 8px}
+  .controls #still{grid-column:1 / -1}
+}
+@media (max-width:360px){.ph .eyebrow{letter-spacing:.04em}.ph h2{font-size:20px}}
 @media (max-width:350px){.sndbtn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.sndbtn{min-width:44px;justify-content:center}}
 </style>
 </head>
@@ -1693,9 +1713,9 @@ try{layStreamLines()}catch(e){}
 
 /* ---------- v4.5 sound: made here, in the page, no files ----------
    A waterfall under everything, bright enough for a phone speaker. Each season has its own
-   creatures: the bush warbler (uguisu) and white-eyes in spring, cicadas in summer (the
-   sizzling aburazemi, the evening higurashi), the brown-eared bulbul (hiyodori) in autumn,
-   and now and then the frog. The play sounds sit on top: the fly, the tongue, the gulp, paper,
+   creatures, matched to their kigo: the bush warbler (uguisu) and the frog in spring, the
+   sizzling aburazemi cicada in summer, and in autumn the brown-eared bulbul (hiyodori), the
+   evening cicada (higurashi) and the bell cricket (suzumushi). Out of season the frog is rare. The play sounds sit on top: the fly, the tongue, the gulp, paper,
    and the pochan of the last leap.
    iPhone: audio unlocks on a finished tap (touchend or click), and the page asks to be treated
    as playback so the ring/silent switch does not mute it. */
@@ -1769,9 +1789,14 @@ const Snd=(()=>{
       whistle(b+.13,[[0,2750*k],[.1,2350*k]],.065,d,.1);
       whistle(b+.27,[[0,1900*k],[.12,2600*k],[.3,3100*k],[.36,2900*k]],.07,d,.1);
     },
-    mejiro(){ // white-eyes: a quick, bright twitter
-      const t=now()+.05, d=panTo(), n=6+Math.floor(rnd(0,6));
-      for(let i=0;i<n;i++){const f=rnd(4200,6200); whistle(t+i*rnd(.06,.09),[[0,f],[.045,f*.8]],.045,d)}
+    suzumushi(){ // bell cricket: a run of clear, trembling riiin
+      const t=now()+.05, d=panTo(), n=3+Math.floor(rnd(0,4)), f0=rnd(4100,4500);
+      for(let i=0;i<n;i++){const b=t+i*rnd(.45,.6), dur=rnd(.28,.4);
+        const o=ac.createOscillator(); o.type='sine'; o.frequency.value=f0*rnd(.99,1.01);
+        const am=ac.createGain(); am.gain.value=.5; const lfo=ac.createOscillator(); lfo.type='square'; lfo.frequency.value=rnd(38,48);
+        const lg=ac.createGain(); lg.gain.value=.5; lfo.connect(lg).connect(am.gain);
+        const g=ac.createGain(); g.gain.setValueAtTime(0,b); g.gain.linearRampToValueAtTime(.06,b+.03); g.gain.setValueAtTime(.06,b+dur*.7); g.gain.linearRampToValueAtTime(0,b+dur);
+        o.connect(am).connect(g).connect(d); o.start(b); lfo.start(b); o.stop(b+dur+.02); lfo.stop(b+dur+.02)}
     },
     abura(){ // aburazemi: frying-oil sizzle that swells and fades
       const t=now()+.05, d=panTo(), dur=rnd(6,9);
@@ -1803,18 +1828,21 @@ const Snd=(()=>{
         o.connect(f).connect(am).connect(g).connect(d); o.start(b); lfo.start(b); o.stop(b+.25); lfo.stop(b+.25)}
     }
   };
+  // Each creature sounds in the season its kigo (haiku season word) belongs to:
+  // uguisu and kaeru (Basho's frog) are spring; the cicada is summer;
+  // higurashi and suzumushi are early autumn, hiyodori late autumn.
   const PLAN=[ // per season: [creature, first wait s, then every min..max s]
-    [['uguisu',3,14,26],['mejiro',9,10,18]],
-    [['abura',2,11,19],['higurashi',14,24,40]],
-    [['hiyodori',3,12,22]]
+    [['uguisu',3,14,26],['frog',8,20,40]],
+    [['abura',2,11,19]],
+    [['hiyodori',3,12,22],['higurashi',10,24,40],['suzumushi',6,14,24]]
   ];
   function tick(){
     if(!ready()||document.hidden) return;
     const se=Math.max(0,Math.min(2,(typeof S!=='undefined'&&S.round)||0)), t=performance.now()/1000;
     if(se!==lastSeason){lastSeason=se; for(const k in next) delete next[k];
-      PLAN[se].forEach(([k,first])=>next[k]=t+first); if(!next.frog) next.frog=t+rnd(25,45)}
+      PLAN[se].forEach(([k,first])=>next[k]=t+first); if(se) next.stray=t+rnd(60,120)}
     PLAN[se].forEach(([k,,a,b])=>{if(t>=next[k]){call[k]();next[k]=t+rnd(a,b)}});
-    if(t>=next.frog){call.frog();next.frog=t+rnd(45,90)}
+    if(se&&t>=next.stray){call.frog();next.stray=t+rnd(120,200)} // out of season, the frog is rare
   }
   function unlock(){
     if(!on) return; init(); if(!ac) return;
