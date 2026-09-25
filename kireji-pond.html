@@ -59,6 +59,13 @@ button:focus-visible{outline:3px solid var(--beni);outline-offset:3px}
 
 /* Cartouche + seal, top right, like a print's title slip */
 .cartouche{position:absolute;top:16px;right:16px;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+/* the title slip rolls up like a hanging scroll when play begins, and unrolls for the finale */
+.slip{position:relative}
+.sroll{position:absolute;display:none;pointer-events:none;border:2px solid var(--sumi);border-radius:8px;
+  background:var(--paper2);box-shadow:0 3px 0 rgba(27,26,23,.28)}
+.sroll::before{content:"";position:absolute;left:4px;right:4px;top:50%;border-top:1.5px solid var(--sumi2)}
+.sroll i{position:absolute;top:50%;width:7px;height:9px;margin-top:-4.5px;background:var(--sumi);border-radius:2px}
+.sroll i:first-child{left:-9px}.sroll i:last-child{right:-9px}
 .slip{writing-mode:vertical-rl;background:var(--paper2);border:2px solid var(--sumi);
   padding:12px 7px;font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:26px;letter-spacing:.12em;line-height:1}
 .slip small{display:block;font-size:18px;font-weight:600;letter-spacing:.24em;margin-inline-start:6px;
@@ -1048,7 +1055,42 @@ $('#pull').addEventListener('click',()=>{if(S.phase!=='play'||S.busy)return; dea
 {let st=reduce; try{const v=localStorage.getItem('kirejiStill'); if(v!==null) st=v==='1'}catch(e){} if(st) setStill(true);}
 
 function show(id){['pIntro','pPlay','pDone','pFinal'].forEach(x=>$('#'+x).hidden=x!==id)}
+/* The title slip rolls up like a hanging scroll: a hand pulling it in uneven tugs,
+   a hitch, a pause, the roll swelling as paper winds on, then the rod lifts away. */
+let slipRolled=false, slipRollBusy=null;
+function rollSlip(up){
+  const slip=$('.slip'), box=$('.cartouche'); if(!slip||!box) return Promise.resolve();
+  slipRolled=up;
+  if(reduce){slip.style.transition='opacity .25s';slip.style.opacity=up?0:1;slip.style.clipPath='';return wait(260)}
+  slip.style.transition='';slip.style.opacity=1;slip.style.visibility='visible';
+  let roll=$('.sroll'); if(!roll){roll=document.createElement('div');roll.className='sroll';roll.innerHTML='<i></i><i></i>';box.appendChild(roll)}
+  const tugs=up?[[.14,240,150],[.2,110,280],[.52,360,90],[.6,140,230],[.83,260,120],[1,200,0]]
+               :[[.62,300,70],[.3,280,60],[0,320,0]];
+  const run=async()=>{
+    let p=up?0:1;
+    const place=(p,tilt,lift)=>{
+      const H=slip.offsetHeight, rh=11+9*p, y=slip.offsetTop+(1-p)*H-rh/2-(lift||0);
+      slip.style.clipPath=`inset(0 0 ${(p*100).toFixed(2)}% 0)`;
+      slip.style.transform=`rotate(${(tilt*.35).toFixed(2)}deg)`;
+      Object.assign(roll.style,{display:'block',left:(slip.offsetLeft-6)+'px',width:(slip.offsetWidth+12)+'px',
+        top:y.toFixed(1)+'px',height:rh.toFixed(1)+'px',transform:`rotate(${tilt.toFixed(2)}deg)`,opacity:1});
+    };
+    place(p,0);
+    for(const [to,dur,hold] of tugs){
+      const from=p, dir=Math.sign(to-from)||1;
+      await anim(dur,k=>{const e=1-Math.pow(1-k,2.2); p=from+(to-from)*e; place(p,dir*2.4*Math.sin(Math.PI*k)*(1-k*.4))});
+      if(hold) await anim(hold,k=>place(p,dir*.6*Math.sin(k*Math.PI*2)*(1-k)));
+    }
+    if(up){ // the rod lifts off the top and is gone
+      await anim(240,k=>{place(1,-1.2*k,18*k);roll.style.opacity=(1-k).toFixed(2)});
+      slip.style.visibility='hidden';
+    } else slip.style.clipPath='';
+    roll.style.display='none'; slip.style.transform='';
+  };
+  slipRollBusy=(slipRollBusy||Promise.resolve()).then(run); return slipRollBusy;
+}
 function startRound(){
+  if(!slipRolled) rollSlip(true);
   S.phase='play'; S.busy=false; $('#slots').classList.remove('busy'); S.pads=3; S.slots=[null,null,null];
   applySeason(); renderPads(); renderSlots(); renderSeals();
   layer.classList.remove('hush'); layer.inert=false; prefill(); setPaused(false); if(S.still) dealList();
@@ -1089,7 +1131,7 @@ async function win(){
   tiles.forEach(t=>t.el.remove()); tiles=[]; plist.forEach(t=>t.el.remove()); plist=[];
   if(S.wins.length===3){
     await frogJump();
-    S.phase='final'; $('#slipJp').textContent='水の音'; $('#slipEn').textContent='Mizu no Oto';
+    S.phase='final'; $('#slipJp').textContent='水の音'; $('#slipEn').textContent='Mizu no Oto'; rollSlip(false);
     const box=$('#finals'); box.innerHTML='';
     S.wins.forEach((w,i)=>{const b=document.createElement('blockquote');b.className='poem';fillPoem(b,w,SEASONS[i].name+' · '+SEASONS[i].jp);box.appendChild(b)});
     show('pFinal'); $('#again').focus();
