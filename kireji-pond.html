@@ -70,8 +70,8 @@ button:focus-visible{outline:3px solid var(--beni);outline-offset:3px}
   padding:12px 7px;font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:26px;letter-spacing:.12em;line-height:1}
 .slip small{display:block;font-size:18px;font-weight:600;letter-spacing:.24em;margin-inline-start:6px;
   font-family:"Zen Kaku Gothic New",sans-serif;text-transform:uppercase}
-.seal{width:40px;height:40px;background:var(--beni);color:#F8E9DC;display:grid;place-items:center;
-  font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:24px;border-radius:3px;margin-top:4px}
+.seal{flex:none;box-sizing:border-box;width:40px;padding:6px 0;line-height:1.08;background:var(--beni);color:#F8E9DC;display:flex;flex-direction:column;align-items:center;
+  font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-weight:800;font-size:23px;border-radius:3px;margin-top:4px}
 
 /* Stream tiles */
 .stream{position:absolute;inset:0;transition:opacity .5s}
@@ -210,11 +210,60 @@ body.still #stream{visibility:hidden}
   .fallfx path,.flow,#throat,.final .ripple{animation:none}
   .final .ripple{opacity:.5}
 }
+
+/* v4 opening panels: center stage, a stone in an eddy of the stream */
+.app.touring{grid-template-columns:1fr}
+.app.touring .panel{display:none}
+@media (max-width:780px){.app.touring{height:calc(100vh - 32px);height:calc(100dvh - 32px);grid-template-rows:1fr}}
+.tour{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;padding:56px 28px;overflow:auto;--P:34px}
+@media (max-width:780px){.tour{padding:20px 12px 24px;--P:18px}.stone{margin-top:auto!important}}
+.stone{position:relative;flex:none;width:min(480px,calc(100% - 2*var(--P)));margin:auto var(--P)}
+.eddy{position:absolute;left:calc(-1*var(--P));top:calc(-1*var(--P));width:calc(100% + 2*var(--P));height:calc(100% + 2*var(--P));overflow:visible;pointer-events:none}
+.eddy .e{fill:none;stroke-linecap:round}
+.eddy .e1{stroke-dasharray:130 30 54 46 160 80;animation:eddy 17s linear infinite}
+.eddy .e2{stroke-dasharray:74 64 210 152;animation:eddy 12s linear infinite}
+.eddy .e3{stroke-dasharray:240 60 110 90;animation:eddy 23s linear infinite}
+@keyframes eddy{to{stroke-dashoffset:-500}}
+.tcard{position:relative;background:var(--paper2);border:3px solid var(--sumi);padding:22px 24px 18px;touch-action:pan-y}
+.tskip{display:table;margin:10px auto 0;text-align:center;background:none;border:0;padding:6px 8px;font-size:18px;color:var(--sumi2);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.tpanes{position:relative}
+.tpane{position:absolute;top:0;left:0;right:0;display:flex;flex-direction:column;gap:14px;visibility:hidden;opacity:0;transform:translateX(18px);transition:opacity .35s,transform .35s,visibility 0s .35s}
+.tpane.on{position:relative;visibility:visible;opacity:1;transform:none;transition:opacity .35s,transform .35s}
+.tpane.back{transform:translateX(-18px)}
+.tpane h2{font-size:30px}
+.tpane h2:focus{outline:none}
+.tpane p{font-size:18px}
+.tpane .basho{border-block:2px solid var(--sumi)}
+.bk{color:var(--beniInk)}
+.cutrow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;border-block:2px solid var(--sumi);padding-block:14px;
+  font-family:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",Georgia,serif;font-size:19px;font-weight:600;line-height:1.35}
+.cutrow span:first-child{text-align:right}
+.cutrow b{position:relative;padding:14px 12px;color:#F8E9DC;background:var(--beni);font-size:20px}
+.cutrow b::before,.cutrow b::after{content:"";position:absolute;left:50%;width:3px;height:14px;background:var(--beni);transform:translateX(-50%) skewX(-18deg)}
+.cutrow b::before{top:-14px}.cutrow b::after{bottom:-14px}
+.beadrow{display:flex;flex-direction:column;gap:8px;padding-left:4px}
+.beadrow span{display:flex;gap:6px}.beadrow i{width:9px;height:9px;border-radius:50%;background:var(--ai2)}
+.tgo{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:4px}
+.tnav{display:flex;align-items:center;gap:12px;margin-top:22px}
+.tnav .primary{box-shadow:4px 4px 0 var(--beni)}
+.tnav [disabled]{visibility:hidden}
+.tcount{margin:0 auto;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:18px;font-weight:700;letter-spacing:.1em;color:var(--sumi2)}
+.pips{display:flex;gap:7px}.pips i{width:10px;height:10px;border:2px solid var(--sumi2)}.pips i.on{background:var(--beni);border-color:var(--beni)}
+@media (max-width:780px){.app:not(.touring) .scene{min-height:0}.cutrow{grid-template-columns:1fr;justify-items:center;text-align:center;gap:18px}.cutrow span:first-child{text-align:center}.tcard{padding:18px 16px 14px}.tpane h2{font-size:25px}.cutrow{font-size:18px;gap:8px}}
+@media (prefers-reduced-motion:reduce){.eddy .e{animation:none}.tpane,.tpane.on{transition:none;transform:none}}
+body.still .eddy .e{animation:none}
+
+/* v4.1 sound: a live corner control */
+.sndbtn{position:absolute;top:16px;left:16px;z-index:9;display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 12px;
+  background:var(--paper2);color:var(--sumi);border:2px solid var(--sumi);box-shadow:3px 3px 0 var(--sumi);font-weight:700;font-size:18px;cursor:pointer}
+.sndbtn .x{display:none}
+.sndbtn[aria-pressed="false"] .x{display:inline}.sndbtn[aria-pressed="false"] .w{display:none}
+@media (max-width:780px){.tour{padding-top:76px}}
 </style>
 </head>
 <body>
 <h1 class="sr">Kireji Pond</h1>
-<div class="app" id="app">
+<div class="app touring" id="app">
   <div class="scene" id="scene" aria-label="Woodblock scene: a stream runs down into an old pond where a frog sits on a stone.">
     <svg class="bg" id="sceneSvg" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <defs>
@@ -236,7 +285,7 @@ body.still #stream{visibility:hidden}
         <linearGradient id="bellyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8D29A"/><stop offset="1" stop-color="#EFE5BE"/></linearGradient>
         <radialGradient id="irisG" cx=".42" cy=".4" r=".6"><stop offset="0" stop-color="#F3CD62"/><stop offset=".7" stop-color="#C08A2A"/><stop offset="1" stop-color="#7A4E14"/></radialGradient>
         <linearGradient id="logG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9C7852"/><stop offset=".5" stop-color="#7A5A38"/><stop offset="1" stop-color="#4E3822"/></linearGradient>
-        <linearGradient id="bankG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#76873A"/><stop offset="1" stop-color="#3F4A22"/></linearGradient>
+        <linearGradient id="bankG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#76873A"/><stop offset=".5" stop-color="#76873A"/><stop offset=".5" stop-color="#66772F"/><stop offset=".74" stop-color="#66772F"/><stop offset=".74" stop-color="#525F27"/><stop offset="1" stop-color="#525F27"/></linearGradient>
         <linearGradient id="mistG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F2EAD7" stop-opacity="0"/><stop offset=".18" stop-color="#F2EAD7" stop-opacity=".85"/><stop offset=".82" stop-color="#F2EAD7" stop-opacity=".85"/><stop offset="1" stop-color="#F2EAD7" stop-opacity="0"/></linearGradient>
         <linearGradient id="topBand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1F3A5F" stop-opacity=".72"/><stop offset=".45" stop-color="#1F3A5F" stop-opacity=".25"/><stop offset="1" stop-color="#1F3A5F" stop-opacity="0"/></linearGradient>
         <linearGradient id="ridgeG" gradientUnits="userSpaceOnUse" x1="0" y1="250" x2="0" y2="330"><stop offset="0" stop-color="#1F3A5F" stop-opacity=".45"/><stop offset="1" stop-color="#1F3A5F" stop-opacity="0"/></linearGradient>
@@ -451,37 +500,77 @@ body.still #stream{visibility:hidden}
     </svg>
     <div class="stream" id="stream" inert></div>
     <div class="reveal" id="reveal" hidden><div class="rcard" id="rcard"><p class="eyebrow" id="revLbl"></p><p class="rpoem" id="revPoem"></p></div></div>
+    <button class="sndbtn" id="snd" type="button" aria-pressed="true"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z" fill="currentColor"/><path class="w" d="M15.5 8.5c1.6 1.9 1.6 5.1 0 7M18.5 6c3 3.3 3 8.7 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span id="sndTxt">Sound on</span></button>
     <div class="cartouche" aria-hidden="true">
-      <div class="seal">蛙</div>
+      <div class="seal" lang="ja"><span>切</span><span>字</span></div>
       <div class="slip"><span id="slipJp" lang="ja">切れ字の池</span><small id="slipEn">Kireji Pond</small></div>
+    </div>
+
+    <div class="tour" id="tour" role="region" aria-label="Kireji Pond: how it works">
+      <div class="stone" id="stone">
+        <svg class="eddy" id="eddy" aria-hidden="true"></svg>
+        <div class="tcard" id="tcard">
+          <div class="tpanes">
+            <section class="tpane on" aria-labelledby="t1h">
+              <p class="eyebrow">Matsuo Bashō · 1686</p>
+              <h2 id="t1h" tabindex="-1">Before the leap, stillness.</h2>
+              <div class="basho">
+                <p class="jp" lang="ja">古池や<br>蛙飛び込む<br>水の音</p>
+                <div class="rom">
+                  <p class="ro" lang="ja-Latn">furu ike ya<br>kawazu tobikomu<br>mizu no oto</p>
+                  <p class="gl">old pond — <b>ya</b><br>a frog jumps in<br>water's sound</p>
+                </div>
+              </div>
+            </section>
+            <section class="tpane" aria-labelledby="t2h">
+              <p class="eyebrow">The principle · <span lang="ja" style="white-space:nowrap">切字</span></p>
+              <h2 id="t2h" tabindex="-1">The cut.</h2>
+              <div class="cutrow" aria-hidden="true"><span>old pond</span><b>ya</b><span>a frog jumps in<br>water's sound</span></div>
+              <p><b class="bk">Ya</b> is a <em>kireji</em>, a cutting word. It splits the poem in two: an old, quiet pond on one side, a frog and a sound on the other.</p>
+              <p>The poem lives in the gap you leap across. English has no cutting words, so we cut with a turn: a dash, a shift, a surprise.</p>
+            </section>
+            <section class="tpane" aria-labelledby="t3h">
+              <p class="eyebrow">How to play</p>
+              <h2 id="t3h" tabindex="-1">Catch from the stream.</h2>
+              <ul class="rules">
+                <li>Phrases float down the stream. Tap one to stop it.</li>
+                <li>Then <b>Catch</b> it, <b>Smash</b> it, or <b>Let it go</b>.</li>
+                <li>Build three lines: 5 · 7 · 5 syllables. The dots under each phrase count them.</li>
+              </ul>
+              <div class="beadrow" aria-hidden="true"><span><i></i><i></i><i></i><i></i><i></i></span><span><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span><i></i><i></i><i></i><i></i><i></i></span></div>
+            </section>
+            <section class="tpane" aria-labelledby="t4h">
+              <p class="eyebrow">How to play</p>
+              <h2 id="t4h" tabindex="-1">Make it turn.</h2>
+              <ul class="rules">
+                <li>One line must turn: a leap, a splash, a sudden shift.</li>
+                <li>Spot a cliché? Tap it, then <b>Smash cliché</b>. A right call clears the water. A wrong call, or catching a cliché, clouds it.</li>
+                <li>Rearrange anytime: move a line, or remove it.</li>
+                <li>Feed the frog three poems. Then listen.</li>
+              </ul>
+              <div class="tgo">
+                <button class="primary" id="start" type="button">Enter the stream</button>
+                <button class="ghost lever" id="still0" type="button" aria-pressed="false"><span class="knob" aria-hidden="true"></span>Still water: no moving phrases</button>
+              </div>
+            </section>
+          </div>
+          <div class="tnav">
+            <button class="ghost" id="tBack" type="button">Back</button>
+            <p class="tcount" aria-live="polite"><span id="tCount">1 of 4</span><span class="pips" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></span></p>
+            <button class="primary" id="tNext" type="button">Next</button>
+          </div>
+          <button class="tskip" id="tSkip" type="button">Skip to the stream</button>
+          <a class="tskip" id="tArcade" href="arcade.html" hidden>Back to the EN195 Arcade</a>
+        </div>
+      </div>
     </div>
   </div>
 
   <aside class="panel" id="panel">
     <!-- Intro: the original haiku -->
     <section id="pIntro">
-      <p class="eyebrow">Matsuo Bashō · 1686</p>
+      <p class="eyebrow">Kireji Pond</p>
       <h2>Before the leap, stillness.</h2>
-      <div class="basho">
-        <p class="jp" lang="ja">古池や<br>蛙飛び込む<br>水の音</p>
-        <div class="rom">
-          <p class="ro" lang="ja-Latn">furu ike ya<br>kawazu tobikomu<br>mizu no oto</p>
-          <p class="gl">old pond — <b>ya</b><br>a frog jumps in<br>water's sound</p>
-        </div>
-      </div>
-      <p class="note"><b>Ya</b> is a <em>kireji</em>, a cutting word. It marks the hinge: an old, quiet pond, then a frog, then a sound. The whole poem turns on that leap. (Word-by-word gloss.)</p>
-      <h3>How to play</h3>
-      <ul class="rules">
-        <li>Phrases float down the stream. Tap one to stop it, then Catch it, Smash it, or Let it go.</li>
-        <li>Build three lines: 5 · 7 · 5 syllables. The dots under each phrase count them.</li>
-        <li>One line must turn: a leap, a splash, a sudden shift.</li>
-        <li>Spot a cliché? Tap it, then choose <b>Smash cliché</b>. A right call shatters it and clears the water. A wrong call, or catching a cliché, clouds it.</li>
-        <li>Rearrange anytime: move line 1 to the bottom (or 3 to the top), or remove any line.</li>
-        <li>Feed the frog three poems. Then listen.</li>
-      </ul>
-      <button class="primary" id="start">Enter the stream</button>
-      <button class="ghost lever" id="still0" type="button" aria-pressed="false"><span class="knob" aria-hidden="true"></span>Still water: no moving phrases</button>
-      <a class="ghost" href="arcade.html" style="text-decoration:none;color:inherit;align-self:flex-start">Back to the EN195 Arcade</a>
     </section>
 
     <!-- Play -->
@@ -834,7 +923,7 @@ function place(){
 }
 function frame(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
-  if(!S.paused&&!S.still&&!S.busy&&(S.phase==='play'||S.phase==='intro')){
+  if(!S.paused&&!S.still&&!S.busy&&S.phase==='play'){
     tiles.forEach(t=>{if(!t.gone&&!t.held){if(t.fast)t.v=Math.min(420,(t.v||SPEED)*(1+5*dt));t.s+=(t.fast?t.v:vAt(t.s))*dt}});
     maybeSpawn();
   }
@@ -859,7 +948,7 @@ function toggleHold(t){
 }
 function letGo(t){
   if(S.phase!=='play'||S.busy||t.gone) return;
-  release(t);
+  release(t); Snd.swish();
   if(t.list){retire(t,'take');say(`Let go: “${t.p.t}” drifts off the bank.`);return}
   t.fast=true; t.el.classList.add('going');
   t.el.querySelectorAll('button').forEach(b=>b.disabled=true);
@@ -874,7 +963,7 @@ function onSmash(t){
     say(`Smashed. “${t.p.t}” was a cliché. Snap. Crumpled and swallowed.${back?' The water clears a little.':''}`);
     renderPads();
   } else {
-    t.el.classList.remove('nope'); void t.el.offsetWidth; t.el.classList.add('nope');
+    t.el.classList.remove('nope'); void t.el.offsetWidth; t.el.classList.add('nope'); Snd.sink();
     S.pads--;
     if(S.pads<=0){cloudOver();}
     else say(`“${t.p.t}” is fresh, not a cliché. It survives, and the water clouds.`,true);
@@ -904,7 +993,7 @@ function drawBall(ctx,x,y,s,spin){
   ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(-8,-4);ctx.lineTo(0,1);ctx.lineTo(-3,9);ctx.moveTo(4,-10);ctx.lineTo(7,-1);ctx.lineTo(11,3);ctx.moveTo(-10,6);ctx.lineTo(-4,4);ctx.stroke();
   ctx.fillStyle='#4E7A9E';ctx.fillRect(-6,-2,5,1.5);ctx.fillRect(2,4,6,1.5);ctx.restore();
 }
-function gulp(){const g=$('#frog');g.classList.remove('gulp');void g.getBBox();g.classList.add('gulp')}
+function gulp(){Snd.gulp();const g=$('#frog');g.classList.remove('gulp');void g.getBBox();g.classList.add('gulp')}
 function sizeFx(){const cv=$('#fx'),d=devicePixelRatio||1,r=cv.getBoundingClientRect();const W=Math.max(1,Math.round(r.width*d)),H=Math.max(1,Math.round(r.height*d));if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H}const c=cv.getContext('2d');c.setTransform(d,0,0,d,-r.left*d,-r.top*d);return c}
 function clearFx(c){c.save();c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,c.canvas.width,c.canvas.height);c.restore();sizeFx()}
 const easeO=k=>1-Math.pow(1-k,3), easeI=k=>k*k*k;
@@ -914,7 +1003,7 @@ function shatter(t){
   const face=t.el.querySelector('.in'), r=face.getBoundingClientRect();
   t.gone=true; t.held=false;
   if(reduce||t.list){t.el.remove();gulp();return}
-  cores.push({x:r.left+r.width/2,y:r.top+r.height/2,t:0,el:t.el,gulped:false,crumpled:false});
+  Snd.whip(); cores.push({x:r.left+r.width/2,y:r.top+r.height/2,t:0,el:t.el,gulped:false,crumpled:false});
   if(!bitsOn){bitsOn=true;let lt=performance.now();
     const ctx=sizeFx();
     (function loop(now){
@@ -936,7 +1025,7 @@ function shatter(t){
         jaw(true);
         if(c.t<.11){k=0}
         else if(c.t<.25){k=easeO((c.t-.11)/.14)}
-        else if(c.t<.46){k=1;if(!c.crumpled){c.crumpled=true;c.el.classList.add('crumple')}ball=Math.min(1,Math.max(0,(c.t-.31)/.12))}
+        else if(c.t<.46){k=1;if(!c.crumpled){c.crumpled=true;Snd.crumple();c.el.classList.add('crumple')}ball=Math.min(1,Math.max(0,(c.t-.31)/.12))}
         else if(c.t<.64){if(c.el.isConnected)c.el.remove();k=1-easeI((c.t-.46)/.18);ball=Math.max(.5,k)}
         else {jaw(false);if(c.el.isConnected)c.el.remove();if(!c.gulped){c.gulped=true;gulp()}cores.splice(i,1);continue}
         const tip={x:m.x+(c.x-m.x)*k,y:m.y+(c.y-m.y)*k};
@@ -957,11 +1046,11 @@ function onTile(t){
     say(p.s===7?'Line 2 already holds a seven. Tap it in your poem to send it back.':'Lines 1 and 3 are both full. Tap one to send it back.',true);
     t.el.classList.remove('nope'); void t.el.offsetWidth; t.el.classList.add('nope'); return;
   }
-  S.slots[idx]=p; retire(t,'take'); renderSlots(idx);
+  S.slots[idx]=p; Snd.tock(); retire(t,'take'); renderSlots(idx);
   if(S.slots.every(Boolean)) evaluate(); else say(`Caught: “${p.t}.”`);
 }
 function clicheHit(t){
-  retire(t,'sink'); S.pads--;
+  Snd.sink(); retire(t,'sink'); S.pads--;
   if(S.pads<=0) cloudOver();
   else say(CLICHE[clicheI++%CLICHE.length](t.p.t),true);
   renderPads();
@@ -1066,6 +1155,7 @@ function rollSlip(up){
   const tugs=up?[[.14,240,150],[.2,110,280],[.52,360,90],[.6,140,230],[.83,260,120],[1,200,0]]
                :[[.62,300,70],[.3,280,60],[0,320,0]];
   const run=async()=>{
+    Snd.paper(up);
     let p=up?0:1;
     const place=(p,tilt,lift)=>{
       const H=slip.offsetHeight, rh=11+9*p, y=slip.offsetTop+(1-p)*H-rh/2-(lift||0);
@@ -1089,6 +1179,7 @@ function rollSlip(up){
   slipRollBusy=(slipRollBusy||Promise.resolve()).then(run); return slipRollBusy;
 }
 function startRound(){
+  endTour();
   if(!slipRolled) rollSlip(true);
   S.phase='play'; S.busy=false; $('#slots').classList.remove('busy'); S.pads=3; S.slots=[null,null,null];
   applySeason(); renderPads(); renderSlots(); renderSeals();
@@ -1243,7 +1334,7 @@ function flySequence(){
       return{x:p.x+w.x,y:p.y+w.y,s:lerp(1.8,.8,k)*sz,face:1};
     }
     const setFrog=(rot,sx,sy)=>{FROG.rot=rot;FROG.sx=sx;FROG.sy=sy;drawFrog()};
-    let starts=null, gulped=false, tiltS=0, cp=null, cs=null, trail=[], last=performance.now(); const t0=last;
+    let starts=null, gulped=false, whipped=false, tiltS=0, cp=null, cs=null, trail=[], last=performance.now(); const t0=last;
     function tick(now){
       const t=now-t0, dt=Math.min(.04,(now-last)/1000); last=now;
       clearFx(ctx);
@@ -1264,7 +1355,7 @@ function flySequence(){
       } else if(t<T.C){ // knot into a fly
         const k=(t-T.B)/(T.C-T.B);
         words.forEach(w=>drawWord(w,t,.4*(1-k),1-k));
-        fly(G.x,G.y,2.1*sz*ease(k),t,-1,0,true);
+        fly(G.x,G.y,2.1*sz*ease(k),t,-1,0,true); Snd.buzz(1.15*ease(k));
       } else if(t<T.F){ // the look, the double take, the escape, the strike
         const f=flyState(t), f2=flyState(t-40);
         const vx=f.x-f2.x, vy=f.y-f2.y, sp=Math.hypot(vx,vy);
@@ -1275,15 +1366,16 @@ function flySequence(){
         ctx.fillStyle=SUMI;trail.forEach((p,i)=>{if(i%2)return;ctx.globalAlpha=.1+.4*i/trail.length;ctx.beginPath();ctx.arc(p.x,p.y,(1+1.4*i/trail.length)*sz,0,Math.PI*2);ctx.fill()});
         ctx.globalAlpha=1;
         if(t>T.E-70) jaw(true);
+        if(t>=T.E&&!whipped){whipped=true;Snd.whip()}
         if(t>=T.E){ // the tongue: always aimed at the fly, always a little behind it, until it isn't
           const k=(t-T.E)/(T.F-T.E), g=1-(1-k)*(1-k), m=mouthScreen();
           const tip={x:m.x+(f.x-m.x)*g,y:m.y+(f.y-m.y)*g}, L=Math.hypot(f.x-m.x,f.y-m.y);
           setFrog(lerp(-5,9,easeO(k)),lerp(1.04,1,k),lerp(.93,1.03,k));
           drawTongue(ctx,m,tip,L*.16*(1-k),sz*1.15);
         }
-        fly(f.x,f.y,f.s,t,f.face,tiltS,true);
+        fly(f.x,f.y,f.s,t,f.face,tiltS,true); Snd.buzz(f.s/(1.8*sz));
       } else if(t<T.F2){ // contact: the hit holds for a beat
-        if(!cp){const f=flyState(T.F);cp={x:f.x,y:f.y};cs=f.s}
+        if(!cp){const f=flyState(T.F);cp={x:f.x,y:f.y};cs=f.s;Snd.buzz(0);Snd.hit()}
         const k=(t-T.F)/(T.F2-T.F), m=mouthScreen();
         drawTongue(ctx,m,cp,0,sz*1.15*(1+.25*Math.sin(Math.PI*k)));
         ctx.save();ctx.strokeStyle=SUMI;ctx.lineWidth=2*sz;ctx.lineCap='round';ctx.globalAlpha=1-k*.6;
@@ -1301,7 +1393,7 @@ function flySequence(){
         if(!gulped){gulped=true;jaw(false);gulp()}
         const k=Math.min(1,(t-T.H)/(T.Z-T.H)); setFrog(3*(1-easeO(k)),1,1);
       }
-      if(t<T.Z) requestAnimationFrame(tick); else {clearFx(ctx);jaw(false);setFrog(0,1,1);res()}
+      if(t<T.Z) requestAnimationFrame(tick); else {Snd.buzz(0);clearFx(ctx);jaw(false);setFrog(0,1,1);res()}
     }
     requestAnimationFrame(tick);
   });
@@ -1346,7 +1438,7 @@ function ring(cx,cy,max,dur){
   anim(dur,k=>{e.setAttribute('rx',(6+max*k).toFixed(1));e.setAttribute('ry',(2+max*.22*k).toFixed(1));e.setAttribute('opacity',(1-k).toFixed(2))}).then(()=>e.remove());
 }
 function splash(cx,cy){
-  scene.classList.add('final');
+  scene.classList.add('final'); Snd.plop();
   const pc=$('#pochan'); pc.classList.remove('show'); void pc.getBBox(); pc.classList.add('show');
   const NS='http://www.w3.org/2000/svg', box=$('#splash'), drops=[], cols=[];
   for(let i=0;i<20;i++){
@@ -1412,16 +1504,38 @@ function makeTextures(){
       const a=Math.max(0,v-.5)*2.2*120+(sp>.985?60:0), l=Math.max(0,.3-v)*2.4*70;
       const i=(y*w+x)*4; if(a>=l){id.data[i]=8;id.data[i+1]=12;id.data[i+2]=18;id.data[i+3]=a}else{id.data[i]=235;id.data[i+1]=226;id.data[i+2]=205;id.data[i+3]=l}}
     g.putImageData(id,0,0)});
-  const mottle=tile(256,256,(g,w,h)=>{const n1=vnoise(8),n2=vnoise(32),id=g.createImageData(w,h);
-    for(let y=0;y<h;y++)for(let x=0;x<w;x++){const v=.6*n1(x/32,y/32)+.4*n2(x/8,y/8), sp=rnd();
-      const i=(y*w+x)*4; id.data[i]=240;id.data[i+1]=232;id.data[i+2]=212;id.data[i+3]=Math.max(0,v-.45)*170+(sp>.97?50:0)}
-    g.putImageData(id,0,0)});
+  // mokume: the grain of the cherry block itself printing through. Long, near-parallel lines,
+  // crisp (never blurred), bending around two knots. Seamless: every wave has a whole number
+  // of periods across the tile, and each line is drawn again one tile up and down.
+  const mottle=tile(512,256,(g,w,h)=>{
+    const knots=[[150,70,34],[372,176,28]];
+    const lines=[]; for(let y=-4;y<h+4;y+=5+rnd()*6) lines.push(y);
+    lines.forEach(y0=>{
+      const k1=1+Math.floor(rnd()*2), k2=3+Math.floor(rnd()*3), a1=1.5+rnd()*3, a2=.4+rnd()*.9, p1=rnd()*6.28, p2=rnd()*6.28;
+      const light=rnd()<.78, al=light?(.07+rnd()*.12):(.05+rnd()*.06);
+      const col=light?`rgba(244,236,214,${al.toFixed(3)})`:`rgba(24,22,18,${al.toFixed(3)})`;
+      const wk1=1+Math.floor(rnd()*3), wph=rnd()*6.28, wbase=.5+rnd()*1.1;
+      const Y=x=>{let y=y0+a1*Math.sin(x/w*6.283*k1+p1)+a2*Math.sin(x/w*6.283*k2+p2);
+        knots.forEach(([kx,ky,kr])=>{const dx=x-kx,dy=y0-ky,d2=dx*dx/(kr*kr*4);if(Math.abs(dy)<kr*2.2)y+=Math.sign(dy||1)*kr*.55*Math.exp(-d2)*Math.exp(-Math.abs(dy)/kr)});
+        return y};
+      for(const oy of[-h,0,h]){
+        for(let x=0;x<w;x+=3){ // width swells and thins along the line, and the line breaks now and then
+          const t=.5+.5*Math.sin(x/w*6.283*wk1+wph); if(t<.12) continue;
+          g.strokeStyle=col; g.lineWidth=wbase*t+.15; g.lineCap='round';
+          g.beginPath(); g.moveTo(x,Y(x)+oy); g.lineTo(x+3,Y(x+3)+oy); g.stroke();
+        }
+      }
+    });
+    knots.forEach(([kx,ky,kr])=>{ // the knot eyes: a few closed rings
+      for(let i=0;i<3;i++){g.strokeStyle=`rgba(24,22,18,${(.08+.03*i).toFixed(3)})`;g.lineWidth=.8;
+        g.beginPath();g.ellipse(kx,ky,kr*(.55-.15*i)*1.9,kr*(.55-.15*i)*.6,0,0,6.283);g.stroke()}});
+  });
   const paper=tile(256,256,(g,w,h)=>{
     for(let i=0;i<520;i++){const x=rnd()*w,y=rnd()*h,L=6+rnd()*26,a=(rnd()-.5)*.9,wob=rnd()*2-1;
       g.strokeStyle=`rgba(96,76,44,${(.03+rnd()*.06).toFixed(3)})`;g.lineWidth=.5+rnd()*.6;
       for(const ox of[-w,0,w])for(const oy of[-h,0,h]){g.beginPath();g.moveTo(x+ox,y+oy);g.quadraticCurveTo(x+ox+L/2*Math.cos(a),y+oy+L/2*Math.sin(a)+wob,x+ox+L*Math.cos(a),y+oy+L*Math.sin(a));g.stroke()}}
     for(let i=0;i<900;i++){g.fillStyle=`rgba(90,70,40,${(.04+rnd()*.1).toFixed(3)})`;g.fillRect(rnd()*w,rnd()*h,1,1)}});
-  $('#imgGrain').setAttribute('href',grain); $('#imgMottle').setAttribute('href',mottle); $('#imgPaper').setAttribute('href',paper);
+  $('#imgGrain').setAttribute('href',grain); $('#imgMottle').setAttribute('href',mottle); $('#imgMottle').setAttribute('width',512); const pm=$('#pMottle'); if(pm) pm.setAttribute('width',512); $('#imgPaper').setAttribute('href',paper);
 }
 try{makeTextures()}catch(e){}
 /* ---------- carved blocks: the log, the water, the far trees ----------
@@ -1437,22 +1551,33 @@ function carveBlocks(){
   const gouge=(x,y,L,w,ang,bend)=>{const c=Math.cos(ang),s=Math.sin(ang),P=(u,v)=>f1(x+u*c-v*s)+' '+f1(y+u*s+v*c);
     return `M${P(0,0)}Q${P(L*.3,bend-w)} ${P(L,bend*.5)}Q${P(L*.3,bend+w)} ${P(0,0)}Z`};
   const clip=(id,d)=>{const c=el(defs,'clipPath',{id});el(c,'path',{d});return `url(#${id})`};
+  // one continuous cut along a curve: nothing at the ends, full width in the middle
+  const ribbon=(pts,wm)=>{const n=pts.length;if(n<2)return'';const T=[],B=[];
+    for(let i=0;i<n;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(n-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;
+      const w=wm*Math.pow(Math.max(0,Math.sin(Math.PI*i/(n-1))),.6);T.push([pts[i][0]-dy/l*w,pts[i][1]+dx/l*w]);B.push([pts[i][0]+dy/l*w,pts[i][1]-dx/l*w])}
+    return 'M'+T.map(p=>f1(p[0])+' '+f1(p[1])).join('L')+'L'+B.reverse().map(p=>f1(p[0])+' '+f1(p[1])).join('L')+'Z'};
 
   // WATER: indigo block, a darker wipe at the far shore, then rows of cuts that widen toward us
   const wb=$('#wBlock');
   if(wb){
     wb.setAttribute('clip-path',clip('wCut','M-40 478 C200 470 500 476 760 468 C880 464 960 470 1040 466 L1040 720 L-40 720 Z'));
     [[460,.72,24],[484,.42,18],[502,.18,16]].forEach(([y,o,h])=>el(wb,'rect',{x:-40,y,width:1080,height:h,fill:'#0E2B44','fill-opacity':o})); // stepped bokashi
+    // Water the way Hiroshige cuts it: long lines in small families of two or three,
+    // riding one slow swell together, with flat untouched indigo between the families.
     let mid='',hi='';
-    for(let y=484;y<712;){
-      const f=(y-470)/240, step=6+17*f;
-      for(let x=-60-r()*80;x<1060;){
-        const L=22+(48+90*f)*r(), w=.9+(1.1+2.8*f)*(.4+.6*r());
-        const d=gouge(x,y+(r()-.5)*step*.35,L,w,(r()-.5)*.035,(r()-.5)*(1.5+3*f));
-        if(r()<.1) hi+=d; else mid+=d;
-        x+=L+(8+30*f)*r()+4;
+    for(let y=488;y<716;){
+      const f=Math.min(1,(y-470)/240), nl=2+(r()<.45?1:0), sp=3.2+4.5*f, A=1+3.2*f, per=110+170*f, ph=r()*6.28;
+      for(let j=0;j<nl;j++){
+        const yy=y+j*sp;
+        for(let x=-80-r()*140;x<1060;){
+          const L=(90+230*f)*(.45+r()*.9), n=Math.max(8,Math.round(L/7)), pts=[];
+          for(let i=0;i<n;i++){const xx=x+L*i/(n-1);pts.push([xx,yy+A*Math.sin(xx/per*6.283+ph+j*.4)])}
+          const d=ribbon(pts,(.75+1.5*f)*(j?.7:1));
+          if(j===0&&r()<.16) hi+=d; else mid+=d;
+          x+=L+(24+90*f)*(.4+r())+8;
+        }
       }
-      y+=step;
+      y+=(nl-1)*sp+(13+30*f)*(.75+.5*r());
     }
     el(wb,'path',{d:mid,fill:'#3A7096'}); el(wb,'path',{d:hi,fill:'#C9DCE3'});
   }
@@ -1468,14 +1593,25 @@ function carveBlocks(){
       for(let i=N;i>=0;i--){const p=P(i/N,vf);d+='L'+f1(p[0])+' '+f1(p[1])}
       el(lb,'path',{d:d+'Z',fill})};
     band(.64,1.02,.06,'#553E28'); band(.19,-.02,.04,'#98764D');
-    const ang=Math.atan2(TR[1]-TL[1],TR[0]-TL[0]); let dark='',pale='';
-    for(let v=.07;v<.97;v+=.05+.03*r()){
-      for(let u=-.02-r()*.05;u<1.02;){
-        const Lu=.04+.16*r(), p=P(u,v+(r()-.5)*.02), d=gouge(p[0],p[1],Lu*412,.8+1.9*r(),ang+(r()-.5)*.05,(r()-.5)*2.5);
-        if(v<.22&&r()<.55) pale+=d; else dark+=d;
-        u+=Lu+.015+.07*r();
+    // Bark cut along the grain: long lines that run the length of the log and part around the knot.
+    let dark='',pale='';
+    const KU=.417, KV=.53;
+    for(let v=.08;v<.95;v+=.065+.035*r()){
+      const ph=r()*6.28, amp=.008+.012*r();
+      for(let u=-.03-r()*.05;u<1.03;){
+        const Lu=.22+.5*r(), n=Math.max(10,Math.round(Lu*70)), pts=[];
+        for(let i=0;i<n;i++){const uu=u+Lu*i/(n-1), dv=v-KV;
+          const kn=.1*Math.exp(-Math.pow((uu-KU)/.055,2))*Math.sign(dv||1)*Math.exp(-Math.abs(dv)/.16);
+          pts.push(P(uu,v+amp*Math.sin(uu*10+ph)+kn))}
+        const d=ribbon(pts,.7+1.2*r());
+        if(v<.24) pale+=d; else dark+=d;
+        u+=Lu+.03+.09*r();
       }
     }
+    // the knot's own rings
+    {let kd='';[1,.62].forEach(q=>{const pts=[];for(let j=0;j<=24;j++){const a=j/24*6.283;pts.push([770+14*q*Math.cos(a),567+7*q*Math.sin(a)])}
+      kd+='M'+pts.map(p=>f1(p[0])+' '+f1(p[1])).join('L')+'Z'});
+     el(lb,'path',{d:kd,fill:'none',stroke:'#2E2016','stroke-width':1.3})}
     el(lb,'path',{d:dark,fill:'#2E2016'}); el(lb,'path',{d:pale,fill:'#C7A574'});
   }
   // the cut end: rings cut by hand, and two checks where the wood split as it dried
@@ -1524,9 +1660,141 @@ function layStreamLines(){
 }
 try{layStreamLines()}catch(e){}
 
-/* ---------- boot: the stream already flowing under the intro ---------- */
+
+/* ---------- v4.1 sound: made here, in the page, no files ----------
+   A soft waterfall under everything; the fly's buzz, which thins and drops as it flees;
+   the whip and wet tock of the tongue; the gulp; paper; and the pochan of the last leap. */
+const Snd=(()=>{
+  let on=true, ac=null, master=null, fall=null, bz=null, noiseBuf=null;
+  try{const v=localStorage.getItem('kirejiSound'); if(v==='0') on=false}catch(e){}
+  const AC=window.AudioContext||window.webkitAudioContext;
+  function init(){
+    if(ac||!AC) return ac;
+    try{ac=new AC()}catch(e){return null}
+    master=ac.createGain(); master.gain.value=on?.55:0; master.connect(ac.destination);
+    noiseBuf=ac.createBuffer(1,ac.sampleRate*4,ac.sampleRate);
+    const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    // the waterfall: noise through a low band, with a slow breath in it
+    const src=ac.createBufferSource(); src.buffer=noiseBuf; src.loop=true;
+    const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=820; lp.Q.value=.4;
+    const hp=ac.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=140;
+    const g=ac.createGain(); g.gain.value=0;
+    const lfo=ac.createOscillator(); lfo.frequency.value=.09; const lg=ac.createGain(); lg.gain.value=.012; lfo.connect(lg).connect(g.gain); lfo.start();
+    src.connect(hp).connect(lp).connect(g).connect(master); src.start();
+    const src2=ac.createBufferSource(); src2.buffer=noiseBuf; src2.loop=true; src2.playbackRate.value=.93;
+    const bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2600; bp.Q.value=.7;
+    const g2=ac.createGain(); g2.gain.value=.012; src2.connect(bp).connect(g2).connect(g); src2.start();
+    g.gain.setTargetAtTime(.11,ac.currentTime,1.2);
+    fall=g;
+    return ac;
+  }
+  const now=()=>ac.currentTime;
+  const ready=()=>on&&init()&&ac.state==='running';
+  function env(g,t,a,peak,dec){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+dec)}
+  function noise(t,dur,type,f0,f1,peak,q){
+    const s=ac.createBufferSource(); s.buffer=noiseBuf; s.playbackRate.value=1;
+    const f=ac.createBiquadFilter(); f.type=type; f.Q.value=q||1; f.frequency.setValueAtTime(f0,t); if(f1) f.frequency.exponentialRampToValueAtTime(f1,t+dur);
+    const g=ac.createGain(); env(g,t,.008,peak,dur); s.connect(f).connect(g).connect(master); s.start(t,Math.random()*3); s.stop(t+dur+.05);
+  }
+  function tone(t,type,f0,f1,dur,peak,a){
+    const o=ac.createOscillator(); o.type=type; o.frequency.setValueAtTime(f0,t); if(f1) o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+    const g=ac.createGain(); env(g,t,a||.005,peak,dur); o.connect(g).connect(master); o.start(t); o.stop(t+dur+.05);
+  }
+  const api={
+    get on(){return on},
+    hide(h){if(!ac)return; if(h) ac.suspend().catch(()=>{}); else if(on) ac.resume().catch(()=>{})},
+    probe(){return {ac,master}},
+    wake(){if(!on) return; init(); if(ac&&ac.state==='suspended') ac.resume().catch(()=>{})},
+    set(v){on=v; try{localStorage.setItem('kirejiSound',v?'1':'0')}catch(e){}
+      if(v){api.wake(); if(master) master.gain.setTargetAtTime(.55,now(),.15)} else if(master){master.gain.setTargetAtTime(0,now(),.08); api.buzz(0)}},
+    buzz(level){ // level: the fly's size, 0 = gone
+      if(!ac) return; if(!on) level=0;
+      if(!bz&&level>0&&ready()){
+        const o=ac.createOscillator(); o.type='sawtooth'; o.frequency.value=190;
+        const o2=ac.createOscillator(); o2.type='square'; o2.frequency.value=381;
+        const vib=ac.createOscillator(); vib.frequency.value=13; const vg=ac.createGain(); vg.gain.value=7; vib.connect(vg); vg.connect(o.frequency); vg.connect(o2.frequency);
+        const f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=700; f.Q.value=1.3;
+        const g2=ac.createGain(); g2.gain.value=.25; const g=ac.createGain(); g.gain.value=0;
+        o.connect(f); o2.connect(g2).connect(f); f.connect(g).connect(master); o.start(); o2.start(); vib.start();
+        bz={o,o2,vib,g,f};
+      }
+      if(!bz) return;
+      const t=now(), L=Math.max(0,Math.min(1.3,level));
+      bz.g.gain.setTargetAtTime(L>0?.085*L*L:0,t,.05);
+      bz.o.frequency.setTargetAtTime(150+42*L,t,.08); bz.o2.frequency.setTargetAtTime(301+84*L,t,.08);
+      bz.f.frequency.setTargetAtTime(420+380*L,t,.08);
+      if(L===0){const b=bz; bz=null; setTimeout(()=>{try{b.o.stop();b.o2.stop();b.vib.stop()}catch(e){}},400)}
+    },
+    whip(){if(!ready())return;const t=now(); noise(t,.2,'bandpass',700,4200,.22,2.5); tone(t+.02,'sine',520,160,.12,.05)},
+    hit(){if(!ready())return;const t=now(); tone(t,'sine',210,80,.16,.22); noise(t,.09,'lowpass',1800,500,.14)},
+    gulp(){if(!ready())return;const t=now(); tone(t,'sine',240,70,.22,.2,.02); tone(t+.16,'sine',150,60,.18,.12,.02)},
+    tock(){if(!ready())return;const t=now(); tone(t,'triangle',880,720,.1,.16); tone(t,'sine',1760,1500,.05,.05)},
+    sink(){if(!ready())return;const t=now(); tone(t,'sine',190,60,.4,.16,.01); noise(t,.3,'lowpass',900,200,.06)},
+    swish(){if(!ready())return;const t=now(); noise(t,.45,'bandpass',1500,380,.09,.9)},
+    crumple(){if(!ready())return;const t=now(); for(let i=0;i<7;i++) noise(t+i*.028+Math.random()*.02,.035,'highpass',2400+Math.random()*2000,0,.09)},
+    paper(up){if(!ready())return;const t=now(), n=up?9:5; for(let i=0;i<n;i++) noise(t+i*.11+Math.random()*.05,.06,'highpass',3000,0,.03+Math.random()*.03)},
+    plop(){if(!ready())return;const t=now(); tone(t,'sine',320,1250,.07,.26,.004); noise(t+.02,.5,'lowpass',2200,300,.12);
+      tone(t+.34,'sine',420,1500,.05,.1,.004); tone(t+.62,'sine',520,1700,.04,.05,.004)}
+  };
+  return api;
+})();
+{const b=$('#snd'), paint=()=>{b.setAttribute('aria-pressed',Snd.on);$('#sndTxt').textContent=Snd.on?'Sound on':'Sound off'};
+  paint(); b.addEventListener('click',()=>{Snd.set(!Snd.on);paint()});
+  const wake=()=>Snd.wake(); addEventListener('pointerdown',wake,{capture:true}); addEventListener('keydown',wake,{capture:true});
+  document.addEventListener('visibilitychange',()=>Snd.hide(document.hidden));}
+
+/* ---------- v4 opening panels ---------- */
+const tourEl=$('#tour'), panes=$$('.tpane'); let tIdx=0;
+function goTour(i,focus){
+  const prev=tIdx; tIdx=Math.max(0,Math.min(panes.length-1,i));
+  panes.forEach((p,k)=>{const on=k===tIdx;p.classList.toggle('on',on);p.classList.toggle('back',k<tIdx);p.inert=!on;p.setAttribute('aria-hidden',on?'false':'true')});
+  const last=tIdx===panes.length-1; $('#tBack').disabled=tIdx===0; $('#tNext').hidden=last; $('#tSkip').hidden=last; $('#tArcade').hidden=!last;
+  $('#tCount').textContent=`${tIdx+1} of ${panes.length}`;
+  $$('.pips i').forEach((p,k)=>p.classList.toggle('on',k===tIdx));
+  if(focus&&prev!==tIdx) panes[tIdx].querySelector('h2').focus({preventScroll:true});
+}
+function endTour(){if(tourEl.hidden)return;tourEl.hidden=true;$('#app').classList.remove('touring')}
+$('#tNext').addEventListener('click',()=>goTour(tIdx+1,true));
+$('#tBack').addEventListener('click',()=>goTour(tIdx-1,true));
+$('#tSkip').addEventListener('click',startRound);
+document.addEventListener('keydown',e=>{
+  if(tourEl.hidden||e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key==='ArrowRight'){goTour(tIdx+1,true);e.preventDefault()}
+  else if(e.key==='ArrowLeft'){goTour(tIdx-1,true);e.preventDefault()}
+});
+{let x0=null,y0=0;const c=$('#tcard');
+  c.addEventListener('pointerdown',e=>{if(e.target.closest('button,a'))return;x0=e.clientX;y0=e.clientY});
+  c.addEventListener('pointerup',e=>{if(x0===null)return;const dx=e.clientX-x0,dy=e.clientY-y0;x0=null;
+    if(Math.abs(dx)>50&&Math.abs(dy)<60) goTour(tIdx+(dx<0?1:-1),false)});}
+/* the eddy: a flat indigo pool around the card, and three currents running round it, cut in white */
+function drawEddy(){
+  const st=$('#stone'), sv=$('#eddy'); if(!st||!sv||tourEl.hidden) return;
+  const P=parseFloat(getComputedStyle(tourEl).getPropertyValue('--P'))||34, W=st.offsetWidth, H=st.offsetHeight;
+  sv.setAttribute('viewBox',`0 0 ${W+2*P} ${H+2*P}`);
+  const q=P/34;
+  const ring=(o,amp,freq,ph)=>{ // rounded rectangle around the card, inflated by o, with a slow swell
+    const x0=P-o,y0=P-o,x1=P+W+o,y1=P+H+o,R=Math.min(10+o,(x1-x0)/2,(y1-y0)/2);
+    const segs=[[x0+R,y0,x1-R,y0],['a',x1-R,y0+R,-Math.PI/2],[x1,y0+R,x1,y1-R],['a',x1-R,y1-R,0],[x1-R,y1,x0+R,y1],['a',x0+R,y1-R,Math.PI/2],[x0,y1-R,x0,y0+R],['a',x0+R,y0+R,Math.PI]];
+    const len=2*(W+2*o-2*R)+2*(H+2*o-2*R)+2*Math.PI*R, pts=[]; let acc=0;
+    const push=(x,y,nx,ny)=>{const w=amp*Math.sin(acc/len*6.283*freq+ph);pts.push([x+nx*w,y+ny*w])};
+    segs.forEach(sg=>{
+      if(sg[0]==='a'){const [,cx,cy,a0]=sg,L=Math.PI/2*R;for(let d=0;d<L;d+=4){const a=a0+d/R;push(cx+R*Math.cos(a),cy+R*Math.sin(a),Math.cos(a),Math.sin(a));acc+=4}}
+      else{const [ax,ay,bx,by]=sg,L=Math.hypot(bx-ax,by-ay),ux=(bx-ax)/L,uy=(by-ay)/L;for(let d=0;d<L;d+=4){push(ax+ux*d,ay+uy*d,uy,-ux);acc+=4}}
+    });
+    return 'M'+pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')+'Z'};
+  const sw=v=>(v*Math.max(.7,q)).toFixed(2);
+  sv.innerHTML=
+    `<path d="${ring(30*q,2.6*q,9,.4)}" fill="#1F3A5F" stroke="#1B1A17" stroke-width="${sw(2.6)}"/>`+
+    `<path class="e e3" d="${ring(8*q,1.2*q,7,1.1)}" stroke="#4E7A9E" stroke-width="${sw(3)}"/>`+
+    `<path class="e e2" d="${ring(15*q,1.8*q,11,2.3)}" stroke="#B7CEDA" stroke-width="${sw(2)}"/>`+
+    `<path class="e e1" d="${ring(22*q,2.2*q,13,.2)}" stroke="#EAF2F5" stroke-width="${sw(2.2)}"/>`;
+}
+goTour(0,false); drawEddy();
+try{new ResizeObserver(drawEddy).observe($('#stone'))}catch(e){addEventListener('resize',drawEddy)}
+
+/* ---------- boot ---------- */
 applySeason(); renderPads(); renderSlots(); renderSeals(); resetFrog();
-requestAnimationFrame(()=>{prefill();requestAnimationFrame(frame)});
+requestAnimationFrame(frame);
 addEventListener('resize',()=>tiles.forEach(t=>{const f=t.el.querySelector('.in');t.w=f.offsetWidth;t.h=f.offsetHeight}));
 })();
 </script>
