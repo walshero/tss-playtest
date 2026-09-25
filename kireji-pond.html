@@ -1691,52 +1691,145 @@ function layStreamLines(){
 try{layStreamLines()}catch(e){}
 
 
-/* ---------- v4.1 sound: made here, in the page, no files ----------
-   A soft waterfall under everything; the fly's buzz, which thins and drops as it flees;
-   the whip and wet tock of the tongue; the gulp; paper; and the pochan of the last leap. */
+/* ---------- v4.5 sound: made here, in the page, no files ----------
+   A waterfall under everything, bright enough for a phone speaker. Each season has its own
+   creatures: the bush warbler (uguisu) and white-eyes in spring, cicadas in summer (the
+   sizzling aburazemi, the evening higurashi), the brown-eared bulbul (hiyodori) in autumn,
+   and now and then the frog. The play sounds sit on top: the fly, the tongue, the gulp, paper,
+   and the pochan of the last leap.
+   iPhone: audio unlocks on a finished tap (touchend or click), and the page asks to be treated
+   as playback so the ring/silent switch does not mute it. */
 const Snd=(()=>{
-  let on=true, ac=null, master=null, fall=null, bz=null, noiseBuf=null;
+  let on=true, ac=null, master=null, amb=null, bz=null, noiseBuf=null, timer=null, silentEl=null, lastSeason=-1;
+  const next={};
   try{const v=localStorage.getItem('kirejiSound'); if(v==='0') on=false}catch(e){}
   const AC=window.AudioContext||window.webkitAudioContext;
+  const iOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function silentWav(){ // a tenth of a second of silence, built here, looped by an <audio> element on iPhone
+    const n=4410,buf=new ArrayBuffer(44+n*2),v=new DataView(buf),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};
+    w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+    v.setUint32(24,44100,true);v.setUint32(28,88200,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);
+    return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
+  }
   function init(){
     if(ac||!AC) return ac;
+    try{if(navigator.audioSession) navigator.audioSession.type='playback'}catch(e){}
     try{ac=new AC()}catch(e){return null}
-    master=ac.createGain(); master.gain.value=on?.55:0; master.connect(ac.destination);
+    master=ac.createGain(); master.gain.value=on?.8:0; master.connect(ac.destination);
     noiseBuf=ac.createBuffer(1,ac.sampleRate*4,ac.sampleRate);
     const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
-    // the waterfall: noise through a low band, with a slow breath in it
-    const src=ac.createBufferSource(); src.buffer=noiseBuf; src.loop=true;
-    const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=820; lp.Q.value=.4;
-    const hp=ac.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=140;
-    const g=ac.createGain(); g.gain.value=0;
-    const lfo=ac.createOscillator(); lfo.frequency.value=.09; const lg=ac.createGain(); lg.gain.value=.012; lfo.connect(lg).connect(g.gain); lfo.start();
-    src.connect(hp).connect(lp).connect(g).connect(master); src.start();
-    const src2=ac.createBufferSource(); src2.buffer=noiseBuf; src2.loop=true; src2.playbackRate.value=.93;
-    const bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2600; bp.Q.value=.7;
-    const g2=ac.createGain(); g2.gain.value=.012; src2.connect(bp).connect(g2).connect(g); src2.start();
-    g.gain.setTargetAtTime(.11,ac.currentTime,1.2);
-    fall=g;
+    // the waterfall: a body of falling water (250 Hz to 2.4 kHz) and a spray above it, with a slow breath
+    const fall=ac.createGain(); fall.gain.value=0; fall.connect(master);
+    const body=ac.createBufferSource(); body.buffer=noiseBuf; body.loop=true;
+    const hp=ac.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=250;
+    const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2400; lp.Q.value=.3;
+    const gb=ac.createGain(); gb.gain.value=.9; body.connect(hp).connect(lp).connect(gb).connect(fall); body.start();
+    const spray=ac.createBufferSource(); spray.buffer=noiseBuf; spray.loop=true; spray.playbackRate.value=.91;
+    const bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=4200; bp.Q.value=.6;
+    const gs=ac.createGain(); gs.gain.value=.28; spray.connect(bp).connect(gs).connect(fall); spray.start();
+    const lfo=ac.createOscillator(); lfo.frequency.value=.08; const lg=ac.createGain(); lg.gain.value=.018; lfo.connect(lg).connect(fall.gain); lfo.start();
+    fall.gain.setTargetAtTime(.1,ac.currentTime,1.5);
+    amb=ac.createGain(); amb.gain.value=1; amb.connect(master);
+    timer=setInterval(tick,400);
     return ac;
   }
   const now=()=>ac.currentTime;
   const ready=()=>on&&init()&&ac.state==='running';
+  const rnd=(a,b)=>a+Math.random()*(b-a);
   function env(g,t,a,peak,dec){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+dec)}
-  function noise(t,dur,type,f0,f1,peak,q){
+  function noise(t,dur,type,f0,f1,peak,q,dest){
     const s=ac.createBufferSource(); s.buffer=noiseBuf; s.playbackRate.value=1;
     const f=ac.createBiquadFilter(); f.type=type; f.Q.value=q||1; f.frequency.setValueAtTime(f0,t); if(f1) f.frequency.exponentialRampToValueAtTime(f1,t+dur);
-    const g=ac.createGain(); env(g,t,.008,peak,dur); s.connect(f).connect(g).connect(master); s.start(t,Math.random()*3); s.stop(t+dur+.05);
+    const g=ac.createGain(); env(g,t,.008,peak,dur); s.connect(f).connect(g).connect(dest||master); s.start(t,Math.random()*3); s.stop(t+dur+.05);
   }
-  function tone(t,type,f0,f1,dur,peak,a){
+  function tone(t,type,f0,f1,dur,peak,a,dest){
     const o=ac.createOscillator(); o.type=type; o.frequency.setValueAtTime(f0,t); if(f1) o.frequency.exponentialRampToValueAtTime(f1,t+dur);
-    const g=ac.createGain(); env(g,t,a||.005,peak,dur); o.connect(g).connect(master); o.start(t); o.stop(t+dur+.05);
+    const g=ac.createGain(); env(g,t,a||.005,peak,dur); o.connect(g).connect(dest||master); o.start(t); o.stop(t+dur+.05);
+  }
+  function panTo(){ // each creature sits somewhere in the scene, left or right
+    if(!ac.createStereoPanner) return amb;
+    const p=ac.createStereoPanner(); p.pan.value=rnd(-.7,.7); p.connect(amb); return p;
+  }
+  function whistle(t,pts,peak,dest,harm){ // pts: [[seconds, Hz], ...]; a bird's pure whistle with a faint overtone
+    const dur=pts[pts.length-1][0], o=ac.createOscillator(), g=ac.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(pts[0][1],t); pts.slice(1).forEach(([s,f])=>o.frequency.linearRampToValueAtTime(f,t+s));
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(peak,t+Math.min(.03,dur*.2)); g.gain.setValueAtTime(peak,t+dur*.8); g.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(g).connect(dest); o.start(t); o.stop(t+dur+.02);
+    if(harm){const o2=ac.createOscillator(),g2=ac.createGain(); o2.type='sine'; o2.frequency.setValueAtTime(pts[0][1]*2,t);
+      pts.slice(1).forEach(([s,f])=>o2.frequency.linearRampToValueAtTime(f*2,t+s));
+      g2.gain.setValueAtTime(0,t); g2.gain.linearRampToValueAtTime(peak*harm,t+Math.min(.03,dur*.2)); g2.gain.linearRampToValueAtTime(0,t+dur);
+      o2.connect(g2).connect(dest); o2.start(t); o2.stop(t+dur+.02)}
+  }
+  const call={
+    uguisu(){ // hoo... hokekyo
+      const t=now()+.05, d=panTo(), k=rnd(.95,1.06);
+      whistle(t,[[0,1080*k],[.35,1140*k],[.9,1190*k],[1.05,1150*k]],.07,d,.12);
+      const b=t+1.25;
+      whistle(b,[[0,1650*k],[.09,1600*k]],.06,d,.1);
+      whistle(b+.13,[[0,2750*k],[.1,2350*k]],.065,d,.1);
+      whistle(b+.27,[[0,1900*k],[.12,2600*k],[.3,3100*k],[.36,2900*k]],.07,d,.1);
+    },
+    mejiro(){ // white-eyes: a quick, bright twitter
+      const t=now()+.05, d=panTo(), n=6+Math.floor(rnd(0,6));
+      for(let i=0;i<n;i++){const f=rnd(4200,6200); whistle(t+i*rnd(.06,.09),[[0,f],[.045,f*.8]],.045,d)}
+    },
+    abura(){ // aburazemi: frying-oil sizzle that swells and fades
+      const t=now()+.05, d=panTo(), dur=rnd(6,9);
+      const s=ac.createBufferSource(); s.buffer=noiseBuf; s.loop=true;
+      const f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=rnd(4300,5200); f.Q.value=2.2;
+      const am=ac.createGain(); am.gain.value=.55; const lfo=ac.createOscillator(); lfo.type='square'; lfo.frequency.value=rnd(40,60);
+      const lg=ac.createGain(); lg.gain.value=.45; lfo.connect(lg).connect(am.gain);
+      const g=ac.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.17,t+dur*.3); g.gain.setValueAtTime(.17,t+dur*.65); g.gain.linearRampToValueAtTime(0,t+dur);
+      s.connect(f).connect(am).connect(g).connect(d); s.start(t); lfo.start(t); s.stop(t+dur+.1); lfo.stop(t+dur+.1);
+    },
+    higurashi(){ // the evening cicada: kana-kana-kana, falling and fading
+      const t=now()+.05, d=panTo(), n=16, f0=rnd(4300,4700);
+      for(let i=0;i<n;i++){const f=f0*(1-.12*i/n), a=.045*(1-.7*i/n); whistle(t+i*.19,[[0,f*1.06],[.05,f],[.12,f*.97]],a,d,.25)}
+    },
+    hiyodori(){ // brown-eared bulbul: a loud, rising piii, then yo
+      const t=now()+.05, d=panTo(), n=1+Math.floor(rnd(0,3));
+      for(let i=0;i<n;i++){const b=t+i*.75, k=rnd(.95,1.05);
+        whistle(b,[[0,2700*k],[.28,3600*k],[.36,3500*k]],.075,d,.18);
+        whistle(b+.42,[[0,3300*k],[.16,2300*k]],.07,d,.18)}
+    },
+    frog(){ // kero kero: two or three croaks from the reeds
+      const t=now()+.05, d=panTo(), n=2+Math.floor(rnd(0,2));
+      for(let i=0;i<n;i++){const b=t+i*.26;
+        const o=ac.createOscillator(); o.type='sawtooth'; o.frequency.setValueAtTime(rnd(150,180),b); o.frequency.linearRampToValueAtTime(130,b+.17);
+        const f=ac.createBiquadFilter(); f.type='bandpass'; f.frequency.value=520; f.Q.value=2.2;
+        const am=ac.createGain(); am.gain.value=.5; const lfo=ac.createOscillator(); lfo.type='square'; lfo.frequency.value=30;
+        const lg=ac.createGain(); lg.gain.value=.5; lfo.connect(lg).connect(am.gain);
+        const g=ac.createGain(); env(g,b,.015,.36,.16);
+        o.connect(f).connect(am).connect(g).connect(d); o.start(b); lfo.start(b); o.stop(b+.25); lfo.stop(b+.25)}
+    }
+  };
+  const PLAN=[ // per season: [creature, first wait s, then every min..max s]
+    [['uguisu',3,14,26],['mejiro',9,10,18]],
+    [['abura',2,11,19],['higurashi',14,24,40]],
+    [['hiyodori',3,12,22]]
+  ];
+  function tick(){
+    if(!ready()||document.hidden) return;
+    const se=Math.max(0,Math.min(2,(typeof S!=='undefined'&&S.round)||0)), t=performance.now()/1000;
+    if(se!==lastSeason){lastSeason=se; for(const k in next) delete next[k];
+      PLAN[se].forEach(([k,first])=>next[k]=t+first); if(!next.frog) next.frog=t+rnd(25,45)}
+    PLAN[se].forEach(([k,,a,b])=>{if(t>=next[k]){call[k]();next[k]=t+rnd(a,b)}});
+    if(t>=next.frog){call.frog();next.frog=t+rnd(45,90)}
+  }
+  function unlock(){
+    if(!on) return; init(); if(!ac) return;
+    if(ac.state!=='running') ac.resume().catch(()=>{});
+    try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0)}catch(e){}
+    if(iOS&&!silentEl){try{silentEl=new Audio(silentWav());silentEl.loop=true;silentEl.setAttribute('playsinline','');silentEl.play().catch(()=>{})}catch(e){}}
+    else if(silentEl&&silentEl.paused) silentEl.play().catch(()=>{});
   }
   const api={
     get on(){return on},
-    hide(h){if(!ac)return; if(h) ac.suspend().catch(()=>{}); else if(on) ac.resume().catch(()=>{})},
-    probe(){return {ac,master}},
-    wake(){if(!on) return; init(); if(ac&&ac.state==='suspended') ac.resume().catch(()=>{})},
+    hide(h){if(!ac)return; if(h){ac.suspend().catch(()=>{}); if(silentEl) silentEl.pause()} else if(on){ac.resume().catch(()=>{}); if(silentEl) silentEl.play().catch(()=>{})}},
+    probe(){return {ac,master,call}},
+    wake:unlock,
     set(v){on=v; try{localStorage.setItem('kirejiSound',v?'1':'0')}catch(e){}
-      if(v){api.wake(); if(master) master.gain.setTargetAtTime(.55,now(),.15)} else if(master){master.gain.setTargetAtTime(0,now(),.08); api.buzz(0)}},
+      if(v){unlock(); if(master) master.gain.setTargetAtTime(.8,now(),.15)} else {if(master){master.gain.setTargetAtTime(0,now(),.08); api.buzz(0)} if(silentEl) silentEl.pause()}},
     buzz(level){ // level: the fly's size, 0 = gone
       if(!ac) return; if(!on) level=0;
       if(!bz&&level>0&&ready()){
@@ -1770,7 +1863,8 @@ const Snd=(()=>{
 })();
 {const b=$('#snd'), paint=()=>{b.setAttribute('aria-pressed',Snd.on);$('#sndTxt').textContent=Snd.on?'Sound on':'Sound off'};
   paint(); b.addEventListener('click',()=>{Snd.set(!Snd.on);paint()});
-  const wake=()=>Snd.wake(); addEventListener('pointerdown',wake,{capture:true}); addEventListener('keydown',wake,{capture:true});
+  const wake=()=>Snd.wake();
+  ['touchend','click','keydown','pointerup'].forEach(ev=>addEventListener(ev,wake,{capture:true,passive:true}));
   document.addEventListener('visibilitychange',()=>Snd.hide(document.hidden));}
 
 /* ---------- v4 opening panels ---------- */
