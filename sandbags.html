@@ -4,6 +4,14 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v39 2026-09-26, THE REFERENCE PASS (founder sent two pictures for Echigo:
+  the Narai-juku post-town street and a mountain station). Taken from them:
+  a cedar-forest mountain rises behind the town into the rain cloud (a still
+  backdrop layer behind the set, #farLayers, plus a forest band in the set);
+  the inn and the lopsided house go dark cedar so the noodle shop is the pale
+  front on the street; five hanging signboards; pots of flowers at the doors;
+  a trained pine in the gap behind the noodle shop. Not taken: the cherry
+  blossom (the forest is autumn, one season per scene).
   v38 2026-09-25, THE LENS AND THE VILLAGE LAUGHS. Two founder rulings the same
   afternoon. (1) Focus: "each scene looks like a power outage. This isn't how
   photographers or filmmakers find focus." So nothing is darkened; the far layers
@@ -1017,11 +1025,12 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
 
 <div class="wrap">
   <p class="production">A Tight Spiral Studios production for EN195</p>
-  <h1 class="gametitle">Sandbags <span class="ver">v38</span><span class="sub">a flash fiction climb</span></h1>
+  <h1 class="gametitle">Sandbags <span class="ver">v39</span><span class="sub">a flash fiction climb</span></h1>
   <p class="prompt" id="prompt">Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.</p>
 
   <div class="plate">
     <div class="skybox" id="skybox" data-piece="0" data-scene="sky" aria-hidden="true">
+      <div class="skyart" id="farLayers" aria-hidden="true"></div>
       <svg class="scenery" id="scenery" viewBox="0 40 400 160"
            preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false"
            data-art-class="studio-cut"
@@ -1124,7 +1133,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
 <div class="wrap">
   <div class="foot">
     <p>Sandbags, a Tight Spiral Studios production for EN195 Creative Writing, MassBay Community College. Stagecraft: Matt Walsh. Tight Spiral Studios &middot; walshero@gmail.com. Single-file, offline, stores nothing. A strike is never shame. That word was holding the piece up, and now you know it by feel. Excerpts from four pieces by Matt Walsh, used by the author. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.</p>
-    <p class="updated"><span id="seUpdated"></span> &middot; v38</p>
+    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v39</p>
     <div class="studiofoot">
       <svg class="spiralmark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
       <div>
@@ -1562,7 +1571,22 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
       });
       var ns=Math.max(4,Math.round(4*W/S));
       for(var k=0;k<ns;k++) sc+=skG('sx0',skBlob(rnd,W*(k+.5)/ns+(rnd()-.5)*W/ns*.4,H*(.37+rnd()*.06),S*(.07+rnd()*.05),H*.018,'#525b55',.95));
-      return [{c:o,v:5,wide:1},{c:sc,v:13},{c:skRain(rnd,W,H,Math.round(40*W/S),.3,.8),v:0}];
+      /* v39 REFERENCE PASS: the cedar mountain rises behind the town into the
+         cloud, the way it does over every post town in the valleys. A still
+         layer, drawn first, so the deck and the scud sit on its shoulders. */
+      var sv=$('scenery'), bx=$('skyLayers'), base=H*.52;
+      if(sv&&bx){ var a1=sv.getBoundingClientRect(), a0=bx.getBoundingClientRect(); if(a1.height) base=a1.top-a0.top+a1.height*.08; }
+      var mr=skR(39), mt='', far='M -10 '+skF(H)+' ', near='M -10 '+skF(H)+' ';
+      for(var mx=-10;mx<=W+20;mx+=W/9){ far+='L '+skF(mx)+' '+skF(base-H*(.15+mr()*.12))+' '; }
+      for(mx=-10;mx<=W+20;mx+=W/13){ near+='L '+skF(mx)+' '+skF(base-H*(.05+mr()*.10))+' '; }
+      far+='L '+skF(W+20)+' '+skF(H)+' Z'; near+='L '+skF(W+20)+' '+skF(H)+' Z';
+      mt+='<path d="'+far+'" fill="#71836c"/><path d="'+near+'" fill="#55694f"/>';
+      var tp='', sp=Math.max(5,S*.014);
+      for(var ty=base-H*.2;ty<H;ty+=sp*.8) for(var tx=mr()*sp;tx<W;tx+=sp*(.9+mr()*.6)){ var th=sp*(1.1+mr()*.6);
+        tp+='<path d="M'+skF(tx)+' '+skF(ty)+' l'+skF(th*.4)+' '+skF(th)+' h'+skF(-th*.8)+' z" fill="'+(mr()<.12?'#8a6a45':mr()<.5?'#465c42':'#627a5b')+'"/>'; }
+      mt+='<defs><clipPath id="mt39"><path d="'+near+'"/></clipPath></defs><g clip-path="url(#mt39)" opacity=".85">'+tp+'</g>';
+      mt+='<rect x="0" y="'+skF(base-H*.24)+'" width="'+W+'" height="'+skF(H*.3)+'" fill="#b9c1b3" opacity=".14"/>';
+      return [{c:mt,v:0,far:1},{c:o,v:5,wide:1},{c:sc,v:13},{c:skRain(rnd,W,H,Math.round(40*W/S),.3,.8),v:0}];
     },
     /* 1, fair: cumulus in perspective - big and near at the top of the frame,
        smaller and flatter toward the rooftops - and three paper birds */
@@ -1605,7 +1629,10 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
     var S=Math.min(W,H*.85);
     // v32: a still layer is drawn once at box size; a drifting layer is drawn
     // twice, side by side, and slides left by one box width, forever.
-    box.innerHTML=SKYGEN[pi](W,H,S).map(function(L){
+    var LS=SKYGEN[pi](W,H,S), far=$('farLayers');
+    /* v39: a layer marked far is a backdrop - it sits behind the set, not over it */
+    if(far) far.innerHTML=LS.filter(function(L){ return L.far; }).map(function(L){ return '<svg class="sk skfull" viewBox="0 0 '+W+' '+H+'" aria-hidden="true" focusable="false">'+L.c+'</svg>'; }).join('');
+    box.innerHTML=LS.filter(function(L){ return !L.far; }).map(function(L){
       if(!L.v) return '<svg class="sk skfull" viewBox="0 0 '+W+' '+H+'" aria-hidden="true" focusable="false">'+L.c+'</svg>';
       return '<svg class="sk skdrift" style="width:'+(2*W)+'px;--dur:'+skF(W/L.v)+'s" viewBox="0 0 '+(2*W)+' '+H+'" aria-hidden="true" focusable="false">'
         +L.c+(L.wide?'':'<g transform="translate('+W+' 0)">'+L.c+'</g>')+'</svg>';
@@ -2051,6 +2078,67 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
       + '<g class="noedge">'+rc(-130,192.2,660,2.6,'#dcb43a')+rc(-130,194.8,660,.6,'rgba(0,0,0,.25)')+'</g>';
   }
 
+
+  /* v39 REFERENCE PASS (founder 09-25, two reference pictures: the Narai-juku
+     post-town street, and a mountain station with cherry trees and a red local
+     train). What they teach the scene: the mountain is a wall of cedar forest
+     right behind the roofs, not a far grey ridge; the street reads dark cedar
+     with lit rooms, so a pale front stands out; boards hang off the fronts;
+     pots of flowers sit at every door; one old pine stands in the gap. */
+  function tssR(s){ return function(){ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+  // the forest wall: a ridge cut from dark green, stippled with cedar spires in
+  // two greens and a few maples already turning; paper, not a photo
+  function forestWall(top){
+    var r=tssR(39), o='';
+    var ridge='M-130 '+(top+30)+' L-96 '+(top+8)+' L-60 '+(top+22)+' L-20 '+(top+4)+' L22 '+(top+18)+' L64 '+(top-6)+' L104 '+(top+14)+' L146 '+(top+2)+' L190 '+(top+20)+' L236 '+(top-4)+' L282 '+(top+16)+' L326 '+(top+6)+' L370 '+(top+22)+' L410 '+(top)+' L456 '+(top+18)+' L500 '+(top+6)+' L530 '+(top+20)+' L530 200 L-130 200 Z';
+    o+='<g class="ly1">'+P(ridge,'#3f5a3e')+'</g>';
+    var cl='fw39';
+    o+='<defs><clipPath id="'+cl+'"><path d="'+ridge+'"/></clipPath></defs><g class="noedge" clip-path="url(#'+cl+')">';
+    var g=['#2f4a33','#4c6a45','#39553a','#5a7a4f'];
+    for(var y=top-8;y<150;y+=3.4){
+      for(var x=-130+r()*6;x<530;x+=4.2+r()*3.2){
+        var h=5+r()*3.5, w=h*.42, c=g[(r()*4)|0];
+        if(r()<.035){ o+='<ellipse cx="'+x.toFixed(1)+'" cy="'+(y+h*.6).toFixed(1)+'" rx="'+(w*1.3).toFixed(1)+'" ry="'+(h*.35).toFixed(1)+'" fill="'+(r()<.5?'#9a4a32':'#b7773a')+'"/>'; continue; }
+        o+='<path d="M'+x.toFixed(1)+' '+y.toFixed(1)+' l'+w.toFixed(1)+' '+h.toFixed(1)+' h-'+(2*w).toFixed(1)+' z" fill="'+c+'"/>';
+      }
+    }
+    // mist caught in the valley, rain country
+    o+='<path d="M-130 132 Q40 122 180 130 T530 128 L530 150 L-130 150 Z" fill="#c9cfc2" opacity=".28"/>';
+    o+='<path d="M-130 100 Q60 94 200 101 T530 97 L530 108 Q260 112 -130 110 Z" fill="#dfe3d8" opacity=".18"/>';
+    return o+'</g>';
+  }
+  // a hanging signboard, vertical, cord from the eave; brush marks read as a
+  // shop name at this size without pretending to be a word
+  function kanban(x,y,w,h,board,ink,seed){
+    var r=tssR(seed||7), s='', yy=y+2.2, last=-1, m=w*.5+x;
+    while(yy<y+h-3){ var k=(r()*5)|0; if(k===last) k=(k+1+((r()*3)|0))%5; last=k; var j=(r()-.5)*.6;
+      if(k===0) s+='M'+(x+w*.24)+' '+(yy+j)+' h'+(w*.52)+' M'+(m+j)+' '+(yy-.5)+' v2.6';
+      else if(k===1) s+='M'+(x+w*.3)+' '+yy+' q'+(w*.34)+' .2 '+(w*.2)+' 2.4 M'+(x+w*.66)+' '+(yy+.3)+' l-'+(w*.34)+' 1.9';
+      else if(k===2) s+='M'+(m+j)+' '+yy+' v2.5 M'+(x+w*.26)+' '+(yy+1.2)+' h'+(w*.48);
+      else if(k===3) s+='M'+(x+w*.28)+' '+(yy+.2)+' l'+(w*.18)+' 2 M'+(x+w*.72)+' '+(yy+.2)+' l-'+(w*.2)+' 2.1 M'+(x+w*.3)+' '+(yy+2.4)+' h'+(w*.4);
+      else s+='M'+(x+w*.32)+' '+(yy+.4)+' q'+(w*.36)+' -.8 '+(w*.3)+' 1 q-'+(w*.1)+' 1.4 -'+(w*.36)+' 1.3';
+      yy+=3.2+r()*.8; }
+    return '<g class="noedge">'+ln('M'+(x+w*.3)+' '+(y-2.4)+' v2.4 M'+(x+w*.7)+' '+(y-2.4)+' v2.4','var(--p-char-d)',.4)
+      +rc(x-.5,y-.5,w+1,h+1,'var(--p-timber-d)',' rx=".6"')+rc(x,y,w,h,board,' rx=".4"')+ln(s,ink,.62)+'</g>';
+  }
+  // a pot at the door: terracotta, a mound of leaves, a few flowers
+  function pot(x,g,f,seed){ return '<g transform="translate('+x+' '+g+') scale(1.6) translate('+(-x)+' '+(-g)+')">'+pot1(x,g,f,seed)+'</g>'; }
+  function pot1(x,g,f,seed){
+    var r=tssR(seed), o=P('M'+(x-2.2)+' '+(g-3.6)+' h4.4 l-.6 3.6 h-3.2 z','var(--p-terra)')+rc(x-2.5,g-4.2,5,.9,'var(--p-terra-d)');
+    o+='<ellipse cx="'+x+'" cy="'+(g-5.2)+'" rx="3" ry="2" fill="var(--p-moss-d)"/><ellipse cx="'+(x+.6)+'" cy="'+(g-5.8)+'" rx="2" ry="1.4" fill="var(--p-moss)"/>';
+    for(var i=0;i<4;i++) o+='<circle cx="'+(x-2+r()*4).toFixed(1)+'" cy="'+(g-6.8+r()*2).toFixed(1)+'" r=".62" fill="'+f+'"/>';
+    return '<g class="noedge">'+o+'</g>';
+  }
+  // the old pine in the gap, trained flat, the way the post towns keep them
+  function pine(x,g,s){
+    var o=ln('M'+x+' '+g+' q'+(-1*s)+' '+(-6*s)+' '+(2*s)+' '+(-10*s)+' q'+(3*s)+' '+(-3*s)+' '+(1*s)+' '+(-8*s)+' M'+(x+1*s)+' '+(g-9*s)+' q'+(4*s)+' '+(-1*s)+' '+(8*s)+' '+(-3*s)+' M'+(x+2.4*s)+' '+(g-14*s)+' q'+(-4*s)+' 0 '+(-8*s)+' '+(-2*s),'#4a3526',1.3*s);
+    [[x+2.6*s,g-18.6*s,6.4,1.8],[x+9*s,g-12.8*s,5,1.6],[x-6*s,g-16*s,5,1.5],[x+.4*s,g-11*s,3.6,1.2]].forEach(function(p){
+      o+='<ellipse cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" rx="'+(p[2]*s).toFixed(1)+'" ry="'+(p[3]*s).toFixed(1)+'" fill="#2f4a33"/>'
+        +'<ellipse cx="'+(p[0]-.4*s).toFixed(1)+'" cy="'+(p[1]-.5*s).toFixed(1)+'" rx="'+(p[2]*s*.72).toFixed(1)+'" ry="'+(p[3]*s*.5).toFixed(1)+'" fill="#46643f"/>'; });
+    return '<g class="noedge">'+o+'</g>';
+  }
+
+
   var SCENERY=[
    /* 0, RAMEN AT ECHIGO KAWAGUCHI. v32: the village, from the source text.
         "I wandered away from the station, down an alleyway of vending machines,
@@ -2069,8 +2157,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
         windows, a sweet shop, the vertical signal Niigata hangs so snow cannot
         sit on it. Every lit window now has a dark timber frame and mullions,
         so the light reads against pale plaster instead of dissolving into it. */
-   '<g transform="translate(0 -40)">'+'<g class="ly1">'+
-     P('M-120 110 L-84 84 L-44 100 L0 106 L34 76 L60 92 L98 52 L134 84 L170 62 L206 88 L250 56 L290 84 L330 68 L366 90 L400 74 L438 96 L474 66 L520 92 L520 200 L-120 200 Z','var(--p-sage-d)')+
+   '<g transform="translate(0 -40)">'+forestWall(78)+'<g class="ly1">'+
      P('M-120 128 L-78 112 L-36 126 L0 130 L40 110 L74 124 L118 98 L160 120 L200 104 L246 124 L288 106 L330 122 L370 108 L400 120 L444 104 L486 122 L520 110 L520 200 L-120 200 Z','var(--p-sage)')+
      '<g class="noedge" opacity=".5">'+
        P('M-120 148 Q0 142 100 147 T300 146 T520 147 L520 153 Q200 156 -120 154 Z','var(--p-moss)')+
@@ -2078,7 +2165,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
      '<g class="mass">'+village(-116,516,134,8,5,0)+'</g>'+
    '</g>'+ haze(.40) +
    '<g class="ly2">'+
-     station(12,128,74)+
+     station(12,128,74)+pine(106,120,1.35)+
      kayabuki(118,118,40,14)+
      takayuka(-106,134,30,8,'var(--p-tinred)','var(--p-tinred-d)',0,.5)+
      takayuka(-66,132,26,8,'var(--p-tingreen)','var(--p-tingreen-d)',0,.3)+
@@ -2099,12 +2186,12 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
      snowGable(22,126,58,42,48,12,'var(--p-cream)','var(--p-cream-d)','var(--p-char)','var(--p-char-d)',6,.5)+
      timber(22,126,58,40,'var(--p-timber)')+fw(33,133,11,10,1)+fw(58,133,11,10,1)+fw(47,108,8,7,1)+
      /* the long inn, eaves to the street, a row of lit rooms and a rail */
-     eaves(120,140,150,26,22,12,'var(--p-bone)','var(--p-bone-d)','var(--p-char)','var(--p-char-d)',5)+
+     eaves(120,140,150,26,22,12,'var(--p-cedar)','var(--p-cedar-d)','var(--p-char)','var(--p-char-d)',5)+
      timber(120,140,150,24,'var(--p-timber)')+
      fw(130,145,12,9,0)+fw(154,145,12,9,0)+fw(178,145,12,9,0)+fw(202,145,12,9,1)+fw(226,145,12,9,0)+fw(250,145,12,9,0)+
      '<g class="noedge">'+rc(122,157,146,1.6,'var(--p-timber-d)')+ln('M126 157 v6 M140 157 v6 M154 157 v6 M168 157 v6 M182 157 v6 M196 157 v6 M210 157 v6 M224 157 v6 M238 157 v6 M252 157 v6 M266 157 v6','var(--p-timber-d)',.8)+'</g>'+
      /* the lopsided snow roof: the long side takes all the snow; blue tin */
-     snowGable(284,126,58,42,52,12,'var(--p-cream)','var(--p-cream-d)','var(--p-tinblue)','var(--p-tinblue-d)',7,.26,1)+
+     snowGable(284,126,58,42,52,12,'var(--p-cedar)','var(--p-cedar-d)','var(--p-tinblue)','var(--p-tinblue-d)',7,.26,1)+
      cedar(284,146,58,22)+fw(292,131,11,10,0)+fw(318,131,11,10,0)+
      /* a steep green-tin gable with the ridge splitter */
      snowGable(348,134,48,34,46,10,'var(--p-bone)','var(--p-bone-d)','var(--p-tingreen)','var(--p-tingreen-d)',6,.5,1)+
@@ -2115,6 +2202,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
      /* one more lopsided roof at the end of the street, the other way round */
      snowGable(476,128,46,40,44,10,'var(--p-cedar)','var(--p-cedar-d)','var(--p-steel)','var(--p-steel-d)',6,.72,1)+
      cedar(476,128,46,38)+fw(486,134,10,9,0)+
+     kanban(-72,132,7,24,'var(--p-timber)','var(--p-cream)',3)+kanban(4,140,6,20,'var(--p-cedar-d)','var(--p-bone)',5)+kanban(66,136,8,26,'var(--p-cream)','var(--p-char-d)',11)+kanban(272,140,6,20,'var(--p-bone)','var(--p-timber-d)',17)+kanban(396,142,6,18,'var(--p-timber)','var(--p-cream)',23)+
      rc(-120,166,640,34,'var(--p-slate-d)')+
      gangi(-120,166,640,
        koshi(-104,171,40,16,0)+
@@ -2136,6 +2224,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
        koshi(412,171,34,15,0)+noren(452,170,14,'var(--p-plum)'))+
      '<g class="noedge" opacity=".28"><rect x="26" y="192" width="32" height="8" fill="var(--lit)"/><rect x="84" y="190" width="4" height="10" fill="var(--lit)"/></g>'+
      vsignal(496,160)+
+     pot(-92,199,'#e0a23a',1)+pot(-44,199,'#d8566a',2)+pot(18,199,'#e8c64a',3)+pot(66,199,'#d8566a',4)+pot(128,199,'#e0a23a',5)+pot(196,199,'#e8c64a',6)+pot(250,199,'#d8566a',7)+pot(316,199,'#e0a23a',8)+pot(404,199,'#e8c64a',9)+pot(462,199,'#d8566a',10)+
      villager(-70,199,22,'var(--p-moss-d)','var(--p-cream)','var(--p-tingreen)','var(--p-bone)','orange')+
      villager(146,199,23,'var(--p-indigo)','var(--p-gold)','var(--p-verm)','var(--p-cream)','cyan')+
      villager(294,199,24,'var(--p-plum)','var(--p-cream)','var(--p-indigo)','var(--p-bone)','pink')+
