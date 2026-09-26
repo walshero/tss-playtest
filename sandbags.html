@@ -4,6 +4,13 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v45 2026-09-26 (founder: "We don't do lollipop trees as TSP"). Every tree
+  in all four scenes is now grown, not stamped: a trunk that forks, tapering
+  limbs, ragged foliage clumps at the ends, gaps where sky and branches show.
+  Street elms up Longwood and behind Sparr's; maples and oaks in Peach
+  Cobbler's treeline and yards and on Longwood Avenue by the hospital;
+  spreading Japanese maples in Echigo.
+
   v44 2026-09-26 (founder: "Keep the tall gray building but remove the
   buildings behind Sparrs and replace with trees"). The brick blocks behind
   Sparr's and up Longwood Avenue are gone; a stand of big street and campus
@@ -1095,7 +1102,7 @@ html.se-reduce #scenery .urain{ animation:none; }
 
 <div class="wrap">
   <p class="production">A Tight Spiral Studios production for EN195</p>
-  <h1 class="gametitle">Sandbags <span class="ver">v44</span><span class="sub">a flash fiction climb</span></h1>
+  <h1 class="gametitle">Sandbags <span class="ver">v45</span><span class="sub">a flash fiction climb</span></h1>
   <p class="prompt" id="prompt">Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.</p>
 
   <div class="plate">
@@ -1203,7 +1210,7 @@ html.se-reduce #scenery .urain{ animation:none; }
 <div class="wrap">
   <div class="foot">
     <p>Sandbags, a Tight Spiral Studios production for EN195 Creative Writing, MassBay Community College. Stagecraft: Matt Walsh. Tight Spiral Studios &middot; walshero@gmail.com. Single-file, offline, stores nothing. A strike is never shame. That word was holding the piece up, and now you know it by feel. Excerpts from four pieces by Matt Walsh, used by the author. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.</p>
-    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v44</p>
+    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v45</p>
     <div class="studiofoot">
       <svg class="spiralmark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
       <div>
@@ -1519,12 +1526,63 @@ html.se-reduce #scenery .urain{ animation:none; }
     o+=rc(x+3,y-27,2.4,13,'var(--p-char)')+rc(x+w-5.4,y-27,2.4,13,'var(--p-char)');
     return o;
   }
-  function tree(x,y,r,f,fS){
-    return rc(x-2,y-r*.4,4,r*1.6,'var(--p-kraft-d)')
-      + '<g class="noedge"><circle cx="'+x+'" cy="'+(y-r*.5)+'" r="'+r+'" fill="'+f+'"/>'
-      + '<circle cx="'+(x-r*.55)+'" cy="'+(y-r*.1)+'" r="'+(r*.7)+'" fill="'+fS+'"/>'
-      + '<circle cx="'+(x+r*.6)+'" cy="'+(y-r*.15)+'" r="'+(r*.66)+'" fill="'+fS+'"/></g>';
+  /* v45 (founder: "We don't do lollipop trees as TSP"). No ball on a stick,
+     anywhere. A tree is grown: a trunk that forks, limbs that fork again and
+     taper, and foliage cut as ragged clumps at the ends of the limbs, so the
+     crown is uneven and the sky and the branches show through the gaps. Four
+     habits: the Boston street elm (a vase of limbs, a high arching canopy),
+     the maple (broad, rounded, irregular), the Japanese maple (spreading,
+     layered flat), the oak (wide, crooked). Shade clumps underneath, the body,
+     lit clumps on the sun side. */
+  function paperTree(x,g,h,o){
+    o=o||{};
+    var r=tssR(o.seed||Math.round(Math.abs(x*131+g*17+h*7))+1), form=o.form||'maple';
+    var F={elm:{d:5,sp:[12,26],len:.8,base:.26,cl:.11,up:.28,fl:.74},
+           maple:{d:4,sp:[22,40],len:.74,base:.2,cl:.2,up:.1,fl:.82},
+           momiji:{d:4,sp:[34,58],len:.72,base:.22,cl:.16,up:-.12,fl:.52},
+           oak:{d:4,sp:[28,50],len:.72,base:.2,cl:.21,up:.02,fl:.74}}[form];
+    var D=o.depth||F.d, br='', tips=[], cols=o.cols||['#2f4633','#43603f','#6d8a57'], trunk=o.trunk||'#3a2a20';
+    function grow(x0,y0,ang,len,w,dep){
+      var x1=x0+Math.cos(ang)*len, y1=y0+Math.sin(ang)*len, nx=-Math.sin(ang), ny=Math.cos(ang), w1=w*.66;
+      br+='M'+(x0+nx*w/2).toFixed(2)+' '+(y0+ny*w/2).toFixed(2)+' L'+(x1+nx*w1/2).toFixed(2)+' '+(y1+ny*w1/2).toFixed(2)+' L'+(x1-nx*w1/2).toFixed(2)+' '+(y1-ny*w1/2).toFixed(2)+' L'+(x0-nx*w/2).toFixed(2)+' '+(y0-ny*w/2).toFixed(2)+' Z ';
+      if(dep>=D){ tips.push([x1,y1,1]); return; }
+      if(dep>=D-2 && r()<.75) tips.push([x1,y1,.8]);
+      var n=r()<.3?3:2;
+      for(var i=0;i<n;i++){
+        var sp=(F.sp[0]+r()*(F.sp[1]-F.sp[0]))*Math.PI/180, side=n===2?(i?1:-1):(i-1), a=ang+side*sp+(r()-.5)*.3;
+        a+=(-Math.PI/2-a)*F.up;
+        grow(x1,y1,a,len*(F.len+(r()-.5)*.16),w1,dep+1);
+      }
+    }
+    grow(x,g,-Math.PI/2+(o.lean||0)+(r()-.5)*.1,h*F.base,Math.max(.7,h*.075),1);
+    function clump(cx,cy,rx,ry,col){
+      var n=9, pts=[], d='';
+      for(var i=0;i<n;i++){ var a=i/n*Math.PI*2, k=.68+r()*.5; pts.push([cx+Math.cos(a)*rx*k, cy+Math.sin(a)*ry*k]); }
+      d='M'+((pts[0][0]+pts[n-1][0])/2).toFixed(2)+' '+((pts[0][1]+pts[n-1][1])/2).toFixed(2);
+      for(i=0;i<n;i++){ var p=pts[i], q=pts[(i+1)%n]; d+=' Q'+p[0].toFixed(2)+' '+p[1].toFixed(2)+' '+((p[0]+q[0])/2).toFixed(2)+' '+((p[1]+q[1])/2).toFixed(2); }
+      return '<path d="'+d+' Z" fill="'+col+'"/>';
+    }
+    var sh='', mid='', hi='';
+    tips.forEach(function(t){ var cr=h*F.cl*t[2]*(.75+r()*.55), cx=t[0]+(r()-.5)*cr*.4, cy=t[1]+(r()-.5)*cr*.3;
+      sh+=clump(cx+cr*.14,cy+cr*.22,cr*1.05,cr*F.fl*1.05,cols[0]);
+      mid+=clump(cx,cy,cr,cr*F.fl,cols[1]);
+      if(r()<.5) hi+=clump(cx-cr*.28,cy-cr*.26,cr*.55,cr*F.fl*.55,cols[2]); });
+    return '<g class="noedge">'+sh+'<path d="'+br+'" fill="'+trunk+'"/>'+mid+hi+'</g>';
   }
+  // a woodland edge seen across a field: one ragged canopy made of many
+  // clumps, trunks lost in the shade underneath, never a row of balls
+  function woodland(x0,x1,top,base,cols,seed){
+    var r=tssR(seed), o='', hi='';
+    for(var x=x0;x<x1;x+=5+r()*6){ var cr=6+r()*7, cy=top+r()*(base-top)*.45;
+      o+='<path d="M'+(x-cr)+' '+base+' L'+(x-cr*.9)+' '+(cy+cr*.3).toFixed(1)+' Q'+(x-cr)+' '+(cy-cr*.6).toFixed(1)+' '+(x-cr*.2).toFixed(1)+' '+(cy-cr*.7).toFixed(1)+' Q'+(x+cr*.3).toFixed(1)+' '+(cy-cr*1.1).toFixed(1)+' '+(x+cr*.8).toFixed(1)+' '+(cy-cr*.4).toFixed(1)+' Q'+(x+cr*1.2).toFixed(1)+' '+(cy+cr*.1).toFixed(1)+' '+(x+cr)+' '+(cy+cr*.5).toFixed(1)+' L'+(x+cr)+' '+base+' Z" fill="'+cols[(r()*2)|0]+'"/>';
+      if(r()<.5) hi+='<ellipse cx="'+(x-cr*.2).toFixed(1)+'" cy="'+(cy-cr*.35).toFixed(1)+'" rx="'+(cr*.45).toFixed(1)+'" ry="'+(cr*.25).toFixed(1)+'" fill="'+cols[2]+'" opacity=".7"/>'; }
+    return '<g class="noedge">'+o+hi+'</g>';
+  }
+  // the old tree() call sites keep their footprint: r was the ball's radius
+  function tree(x,y,r,f,fS){
+    return paperTree(x,y+r*1.2,r*3.3,{form:r>=15?'elm':(r>=12?'oak':'maple'),cols:[fS,f,'color-mix(in srgb, '+f+' 62%, #fff1cf)'],trunk:'#4a3a2c'});
+  }
+
 
   /* v29 FELT FIGURES, after Row K v37: every face and hand is one bright felt
      colour per character - none a human skin tone, no features, ever. Bodies
@@ -2263,21 +2321,10 @@ html.se-reduce #scenery .urain{ animation:none; }
   // an autumn maple among the cedars. A trunk that forks, and a crown of small
   // lobes in reds and ambers, darker on the side away from the light.
   function momiji(x,g,h,r){
-    var C=[['#c24a2c','#8e3019','#e07a45'],['#cf6a2e','#9a4620','#eb9a52'],['#d99a38','#a8702a','#f0bf5e'],['#b23a28','#7d2819','#d8653d']][(r()*4)|0], o='';
-    var cy=g-h*.66, rx=h*.46, ry=h*.3, tr=Math.max(.8,h*.06);
-    // trunk and the branches that show under the crown
-    o+=ln('M'+x+' '+g+' q'+(-h*.03)+' '+(-h*.2)+' 0 '+(-h*.36)+' M'+x+' '+(g-h*.24)+' q'+(-h*.14)+' '+(-h*.06)+' '+(-h*.26)+' '+(-h*.22)+' M'+x+' '+(g-h*.3)+' q'+(h*.12)+' '+(-h*.05)+' '+(h*.28)+' '+(-h*.2)+' M'+x+' '+(g-h*.36)+' l'+(h*.04)+' '+(-h*.18),'#3a2a20',tr);
-    // the crown: shade lobes underneath, the body, lit lobes on top; a scalloped edge
-    var lobes=function(n,sx,sy,oy,rad,col){ var t=''; for(var i=0;i<n;i++){ var a=Math.PI*(1+i/(n-1)), rrr=rad*(.8+r()*.4);
-      t+='<circle cx="'+(x+Math.cos(a)*rx*sx).toFixed(1)+'" cy="'+(cy+oy+Math.sin(a)*ry*sy).toFixed(1)+'" r="'+rrr.toFixed(2)+'" fill="'+col+'"/>'; } return t; };
-    o+=lobes(9,1.05,-.35,ry*.35,h*.1,C[1]);
-    o+='<ellipse cx="'+x+'" cy="'+cy.toFixed(1)+'" rx="'+(rx*.92).toFixed(1)+'" ry="'+(ry*.85).toFixed(1)+'" fill="'+C[0]+'"/>';
-    o+=lobes(11,1,1,0,h*.1,C[0]);
-    o+=lobes(6,.6,.75,-ry*.1,h*.07,C[2]);
-    // gaps where the branches show through
-    o+=ln('M'+(x-rx*.35)+' '+(cy+ry*.3)+' l'+(rx*.25)+' '+(-ry*.3)+' M'+(x+rx*.2)+' '+(cy+ry*.35)+' l'+(rx*.2)+' '+(-ry*.35),'#3a2a20',tr*.6,.8);
-    return o;
+    var C=[['#8e3019','#c24a2c','#e07a45'],['#9a4620','#cf6a2e','#eb9a52'],['#a8702a','#d99a38','#f0bf5e'],['#7d2819','#b23a28','#d8653d']][(r()*4)|0];
+    return paperTree(x,g,h*1.1,{form:'momiji',cols:C,trunk:'#3a2a20',seed:Math.round(x*7+g)});
   }
+
 
   // v41 (founder: "Use the real hiragana for ramen"): the noodle shop's
   // hanging board reads らーめん, top to bottom, cut from the letterforms of
@@ -2558,7 +2605,7 @@ html.se-reduce #scenery .urain{ animation:none; }
     // street trees and lamps, both sides, receding
     [.14,.34,.52,.66,.76].forEach(function(t,i){
       [72.4,139.6].forEach(function(x,k){ var p=daP(x,150,t), h=30*(1-t);
-        if((i+k)%2===0){ o+='<g class="noedge">'+rc(p[0]-.5*(1-t),p[1]-h*.5,1.1*(1-t)+.3,h*.5,'#2b211c')+'<ellipse cx="'+p[0].toFixed(1)+'" cy="'+(p[1]-h*.66).toFixed(1)+'" rx="'+(h*.26).toFixed(1)+'" ry="'+(h*.24).toFixed(1)+'" fill="#26352c"/><ellipse cx="'+(p[0]-h*.08).toFixed(1)+'" cy="'+(p[1]-h*.72).toFixed(1)+'" rx="'+(h*.16).toFixed(1)+'" ry="'+(h*.13).toFixed(1)+'" fill="#324437"/></g>'; }
+        if((i+k)%2===0){ o+=paperTree(p[0],p[1],h,{form:'elm',depth:4,cols:['#1b2620','#26352c','#3a4a37'],trunk:'#2b211c',seed:700+i*3+k}); }
         else { o+='<g class="noedge">'+rc(p[0]-.3,p[1]-h*.8,.7*(1-t)+.2,h*.8,'#3e4e5d')+'</g><g class="lit glow"><ellipse cx="'+(p[0]+(k?-1:1)*h*.08).toFixed(1)+'" cy="'+(p[1]-h*.8).toFixed(1)+'" rx="'+(h*.07+.3).toFixed(1)+'" ry="'+(h*.03+.2).toFixed(1)+'"/></g>'; }
       }); });
     return o;
@@ -2604,17 +2651,13 @@ html.se-reduce #scenery .urain{ animation:none; }
      and up Longwood are gone; big street and campus trees stand there
      instead, dark at night, their undersides warmed by the lamps. */
   function daTrees(){
-    var r=skR(107), o='', lit='';
-    [[-120,62,30],[-84,50,34],[-50,58,30],[-18,46,36],[16,54,32],[48,44,34],[80,60,26],[104,68,22],[128,76,16]].forEach(function(t){
-      var x=t[0], top=t[1], rr=t[2], cy=top+rr*.9;
-      o+=rc(x-1.6,cy,3.2,150-cy,'#1c1714');
-      for(var k=0;k<9;k++){ var a=Math.PI*(k/8), dx=Math.cos(a)*rr*.62, dy=-Math.sin(a)*rr*.5;
-        o+='<circle cx="'+(x+dx+(r()-.5)*4).toFixed(1)+'" cy="'+(cy+dy+(r()-.5)*4).toFixed(1)+'" r="'+(rr*(.34+r()*.14)).toFixed(1)+'" fill="'+(k%3?'#1f2c26':'#253529')+'"/>'; }
-      o+='<ellipse cx="'+x+'" cy="'+(cy+rr*.12).toFixed(1)+'" rx="'+(rr*.78).toFixed(1)+'" ry="'+(rr*.46).toFixed(1)+'" fill="#1d2924"/>';
-      lit+='<ellipse cx="'+(x+(r()-.5)*6).toFixed(1)+'" cy="'+(cy+rr*.42).toFixed(1)+'" rx="'+(rr*.5).toFixed(1)+'" ry="'+(rr*.14).toFixed(1)+'" fill="#6a5a36" opacity=".55"/>';
+    var o='';
+    [[-120,150,92],[-84,150,104],[-50,150,94],[-18,150,108],[16,150,100],[48,150,106],[80,150,86],[104,150,78],[128,150,62]].forEach(function(t,i){
+      o+=paperTree(t[0],t[1],t[2],{form:i%3===1?'oak':'elm',cols:['#151e1a','#1d2a24','#35432f'],trunk:'#141110',seed:900+i});
     });
-    return '<g class="ly1">'+o+'<g class="noedge">'+lit+'</g></g>';
+    return '<g class="ly1">'+o+'</g>';
   }
+
   var DA_FAR='<g class="ly1"><g transform="translate(0 40) scale(.62)">'+
      box(240,0,74,160,10,'var(--p-brick-d)','var(--p-char-d)','var(--p-char-d)')+
      '<g class="noedge" fill="var(--p-char-d)">'+win(248,10,5,10,6,9,6.5,6)+'</g>'+
@@ -2746,6 +2789,7 @@ html.se-reduce #scenery .urain{ animation:none; }
    '</g>'+ haze(.22) +
    '<g class="ly1">'+
      P('M-124 126 L-64 114 L0 132 L56 118 L124 128 L192 114 L264 126 L336 112 L400 124 L456 112 L524 126 L524 200 L-124 200 Z','var(--p-moss-d)')+
+     woodland(-130,530,104,140,['#5f6b3e','#6c7446','#a59a5a'],61)+
      tree(-108,124,13,'var(--p-moss)','var(--p-moss-d)')+tree(-78,116,15,'var(--p-terra)','var(--p-terra-d)')+tree(-46,122,13,'var(--p-sage)','var(--p-sage-d)')+tree(-14,126,12,'var(--p-moss)','var(--p-moss-d)')+
      tree(424,118,14,'var(--p-moss)','var(--p-moss-d)')+tree(456,112,15,'var(--p-gold)','var(--p-gold-d)')+tree(486,118,13,'var(--p-sage)','var(--p-sage-d)')+tree(516,122,14,'var(--p-moss)','var(--p-moss-d)')+
      tree(18,130,12,'var(--p-moss)','var(--p-moss-d)')+tree(46,120,15,'var(--p-sage)','var(--p-sage-d)')+tree(78,126,12,'var(--p-moss)','var(--p-moss-d)')+
