@@ -4,6 +4,20 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v40 2026-09-26, EVERY ROOF DIFFERENT (founder: "Build echigo with all
+  different roofs", with a photograph of Magome-juku on the Nakasendo). Echigo
+  is rebuilt on print C of the ukiyo-e mock-ups (studio pick; founder had not
+  chosen): the sheet fills the sky box, a low horizon, the mountain two thirds
+  of the frame, the town in three rows stepping down the slope, and fourteen
+  houses with fourteen roof types: hisashi machiya, kura, the noodle shop with
+  udatsu firewalls, stone-weighted shingles, an irimoya inn, a tin lean-to,
+  hipped tile, a split-ridge tin gable, a copper shrine roof, a lopsided snow
+  roof, a brewer's ridge vent, a flat slab, hipped tin, a kayabuki farmhouse
+  and a gassho A-frame. Grey kawara drawn in channels and courses, onigawara
+  at the ridge ends, a stone lantern, pots. The Shinkansen now runs on a
+  viaduct behind the middle row instead of the foreground platform (flag).
+  The crash gag's villager and can moved down with the vending machines.
+
   v39 2026-09-26, THE REFERENCE PASS (founder sent two pictures for Echigo:
   the Narai-juku post-town street and a mountain station). Taken from them:
   a cedar-forest mountain rises behind the town into the rain cloud (a still
@@ -1007,6 +1021,14 @@ html{ background:var(--bg); }
 }
 html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-reduce .skybox.gagging #scenery .fx *{ animation:none !important; }
 </style>
+<style>
+/* v40: Echigo fills the sky box; Hiroshige's rain is long lines, not dashes */
+.skybox[data-piece="0"] .scenery{ height:100% !important; }
+#scenery .urain{ stroke-dasharray:46 20; animation:urain .8s linear infinite; }
+@keyframes urain{ to{ stroke-dashoffset:-66; } }
+@media (prefers-reduced-motion: reduce){ #scenery .urain{ animation:none; } }
+html.se-reduce #scenery .urain{ animation:none; }
+</style>
 </head>
 <body>
 <div id="backdrop" aria-hidden="true"></div>
@@ -1025,7 +1047,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
 
 <div class="wrap">
   <p class="production">A Tight Spiral Studios production for EN195</p>
-  <h1 class="gametitle">Sandbags <span class="ver">v39</span><span class="sub">a flash fiction climb</span></h1>
+  <h1 class="gametitle">Sandbags <span class="ver">v40</span><span class="sub">a flash fiction climb</span></h1>
   <p class="prompt" id="prompt">Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.</p>
 
   <div class="plate">
@@ -1133,7 +1155,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
 <div class="wrap">
   <div class="foot">
     <p>Sandbags, a Tight Spiral Studios production for EN195 Creative Writing, MassBay Community College. Stagecraft: Matt Walsh. Tight Spiral Studios &middot; walshero@gmail.com. Single-file, offline, stores nothing. A strike is never shame. That word was holding the piece up, and now you know it by feel. Excerpts from four pieces by Matt Walsh, used by the author. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.</p>
-    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v39</p>
+    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v40</p>
     <div class="studiofoot">
       <svg class="spiralmark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
       <div>
@@ -1586,6 +1608,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
         tp+='<path d="M'+skF(tx)+' '+skF(ty)+' l'+skF(th*.4)+' '+skF(th)+' h'+skF(-th*.8)+' z" fill="'+(mr()<.12?'#8a6a45':mr()<.5?'#465c42':'#627a5b')+'"/>'; }
       mt+='<defs><clipPath id="mt39"><path d="'+near+'"/></clipPath></defs><g clip-path="url(#mt39)" opacity=".85">'+tp+'</g>';
       mt+='<rect x="0" y="'+skF(base-H*.24)+'" width="'+W+'" height="'+skF(H*.3)+'" fill="#b9c1b3" opacity=".14"/>';
+      /* v40: the Echigo sheet paints its own sky */ return [];
       return [{c:mt,v:0,far:1},{c:o,v:5,wide:1},{c:sc,v:13},{c:skRain(rnd,W,H,Math.round(40*W/S),.3,.8),v:0}];
     },
     /* 1, fair: cumulus in perspective - big and near at the top of the frame,
@@ -1650,6 +1673,8 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
   // the set is cropped rather than the sides ever showing sky.
   function fitScene(){
     var sv=$('scenery'); if(!sv) return;
+    // v40: Echigo is one sheet that fills the sky box; a phone crops it to its middle
+    if(pi===0){ sv.setAttribute('viewBox','0 0 400 250'); sv.setAttribute('preserveAspectRatio','xMidYMax slice'); return; }
     var r=sv.getBoundingClientRect(); if(!r.width||!r.height) return;
     var a=r.width/r.height, vw=Math.max(340,Math.min(620,160*a)), h=vw/a, x0=200-vw/2;
     if(pi===3 && vw<400) x0-=(400-vw)/2;
@@ -2139,6 +2164,198 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
   }
 
 
+  /* v40 EVERY ROOF DIFFERENT (founder 09-26: "Build echigo with all different
+     roofs", with a photograph of Magome-juku on the Nakasendo: grey kawara
+     roofs stepping down a hill, deep eaves, a stone lantern, pots, a hanging
+     board, mountains behind). Composition is print C of the ukiyo-e mock-ups,
+     "Evening Rain Under the Mountain" (founder did not choose; studio pick):
+     a low horizon, the mountain two thirds of the frame, the town in three
+     rows stepping down the slope. No two roofs share a type:
+       front  hisashi machiya, kura, noodle shop with udatsu, stone-weighted
+              shingle (ishi-okiyane), irimoya inn, tin lean-to, hipped tile
+       middle split-ridge tin gable, copper shrine roof with curved eaves,
+              lopsided snow roof, brewer's roof with a raised ridge vent,
+              flat concrete slab, hipped tin
+       back   kayabuki farmhouse, gassho A-frame
+     The sheet fills the sky box, 400 x 250; a phone crops it to the middle. */
+  var UK={ tile:'#4a4e57', tileD:'#2e3138', tileL:'#6b707a', board:'#8a8173', boardD:'#5f584d', copper:'#5e9585', copperL:'#86b8a6', copperD:'#3c6b5e', rust:'#8a4a2e', rustD:'#62331f' };
+  var RID=0;
+  function ukClip(d,tex){ var id='rf'+(RID++); return '<defs><clipPath id="'+id+'"><path d="'+d+'"/></clipPath></defs><g class="noedge" clip-path="url(#'+id+')">'+tex+'</g>'; }
+  function ukGrad(id,stops,x,y,w,h,extra){
+    var s=''; stops.forEach(function(t){ s+='<stop offset="'+t[0]+'" stop-color="'+t[1]+'"'+(t[2]!=null?' stop-opacity="'+t[2]+'"':'')+'/>'; });
+    return '<defs><linearGradient id="'+id+'" x1="0" y1="0" x2="0" y2="1">'+s+'</linearGradient></defs><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="url(#'+id+')"'+(extra||'')+'/>';
+  }
+  function ukGlow(id,cx,cy,rx,ry,col,op){
+    return '<defs><radialGradient id="'+id+'"><stop offset="0" stop-color="'+col+'" stop-opacity="'+op+'"/><stop offset="1" stop-color="'+col+'" stop-opacity="0"/></radialGradient></defs><ellipse cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+id+')"/>';
+  }
+  function ukRain(seed,n,x0,x1,y0,y1,ang,len,col,w){
+    var r=tssR(seed), d='';
+    for(var i=0;i<n;i++){ var x=x0+r()*(x1-x0), y=y0+r()*(y1-y0), l=len*(.6+r()*.8);
+      d+='M'+x.toFixed(1)+' '+y.toFixed(1)+' l'+(l*Math.sin(ang)).toFixed(1)+' '+(l*Math.cos(ang)).toFixed(1)+' '; }
+    return '<g class="noedge urain">'+ln(d,col,w)+'</g>';
+  }
+  function ukForest(d,id,seed,base,cols,y0,y1,step){
+    var r=tssR(seed), o='';
+    for(var y=y0;y<y1;y+=step*.8) for(var x=-20+r()*step;x<420;x+=step*(.8+r()*.7)){
+      var h=step*(1.3+r()*.8), w=h*.4;
+      if(r()<.03){ o+='<ellipse cx="'+x.toFixed(1)+'" cy="'+(y+h*.6).toFixed(1)+'" rx="'+(w*1.3).toFixed(1)+'" ry="'+(h*.35).toFixed(1)+'" fill="'+(r()<.5?'#8f4a34':'#a8733c')+'"/>'; continue; }
+      o+='<path d="M'+x.toFixed(1)+' '+y.toFixed(1)+' l'+w.toFixed(1)+' '+h.toFixed(1)+' h-'+(2*w).toFixed(1)+' z" fill="'+cols[(r()*cols.length)|0]+'"/>';
+    }
+    return P(d,base)+'<defs><clipPath id="'+id+'"><path d="'+d+'"/></clipPath></defs><g class="noedge" clip-path="url(#'+id+')">'+o+'</g>';
+  }
+  function ukSeal(x,y,s){
+    return '<g class="noedge" transform="translate('+x+' '+y+') scale('+s+')"><rect x="0" y="0" width="48" height="48" rx="4" fill="#a8391f"/><use href="#tss-spiral" style="stroke:#f1e4c8;stroke-width:3.6;fill:none"/></g>';
+  }
+  function ukLean(svg,x,y,a){ return '<g transform="rotate('+a+' '+x+' '+y+')">'+svg+'</g>'; }
+
+  // kawara: the channels running down the slope and the courses across it
+  function kawara(x0,y0,x1,y1,pitch){
+    var v='',h='';
+    for(var x=x0;x<x1;x+=(pitch||2)) v+='M'+x.toFixed(1)+' '+y0.toFixed(1)+' V'+y1.toFixed(1)+' ';
+    for(var y=y0+2.2;y<y1;y+=2.6) h+='M'+x0.toFixed(1)+' '+y.toFixed(1)+' H'+x1.toFixed(1)+' ';
+    return ln(v,UK.tileD,.7,.6)+ln(h,UK.tileL,.45,.45);
+  }
+  // a ridge with onigawara, the tall end tiles that turn up at each end
+  function ridge(x0,x1,y,col){
+    return rc(x0,y-2.4,x1-x0,3,col)+P('M'+x0+' '+(y+.6)+' l-1.2 -5 l3.4 1.4 v3.6 z',col)+P('M'+x1+' '+(y+.6)+' l1.2 -5 l-3.4 1.4 v3.6 z',col);
+  }
+  // 1. eaves to the street, tiled, plain gable (kirizuma)
+  function roofKiri(x,y,w,rh,e){
+    var d='M'+(x-e)+' '+(y+1)+' L'+(x+w+e)+' '+(y+1)+' L'+(x+w+e-3)+' '+(y-rh)+' L'+(x-e+3)+' '+(y-rh)+' Z';
+    return P(d,UK.tile)+ukClip(d,kawara(x-e,y-rh,x+w+e,y+1))+'<g class="noedge">'+rc(x-e,y,w+2*e,1.6,UK.tileD)+'</g>'+ridge(x-e+3,x+w+e-3,y-rh,UK.tileD);
+  }
+  // 2. irimoya: a hipped skirt with a small gable riding on top
+  function roofIrimoya(x,y,w,rh,e,wall){
+    var m=y-rh*.5, d1='M'+(x-e)+' '+(y+1)+' L'+(x+w+e)+' '+(y+1)+' L'+(x+w*.88)+' '+m+' L'+(x+w*.12)+' '+m+' Z';
+    var d2='M'+(x+w*.1)+' '+(m+1)+' L'+(x+w*.9)+' '+(m+1)+' L'+(x+w*.84)+' '+(y-rh)+' L'+(x+w*.16)+' '+(y-rh)+' Z';
+    return P(d1,UK.tile)+ukClip(d1,kawara(x-e,m,x+w+e,y+1))
+      +P('M'+(x+w*.12)+' '+(m+.4)+' L'+(x+w*.16)+' '+(y-rh)+' L'+(x+w*.22)+' '+(m+.4)+' Z',wall)+P('M'+(x+w*.88)+' '+(m+.4)+' L'+(x+w*.84)+' '+(y-rh)+' L'+(x+w*.78)+' '+(m+.4)+' Z',wall)
+      +P(d2,UK.tile)+ukClip(d2,kawara(x+w*.1,y-rh,x+w*.9,m+1))
+      +'<g class="noedge">'+rc(x-e,y,w+2*e,1.6,UK.tileD)+rc(x+w*.1,m,w*.8,1.4,UK.tileD)+'</g>'+ridge(x+w*.16,x+w*.84,y-rh,UK.tileD);
+  }
+  // 3. yosemune: hipped all round, the hips running down to the corners
+  function roofHip(x,y,w,rh,e,f,fD,tin){
+    var d='M'+(x-e)+' '+(y+1)+' L'+(x+w+e)+' '+(y+1)+' L'+(x+w*.72)+' '+(y-rh)+' L'+(x+w*.28)+' '+(y-rh)+' Z', tex;
+    if(tin){ tex=''; for(var sx=x-e;sx<x+w+e;sx+=3) tex+='M'+sx.toFixed(1)+' '+(y-rh)+' V'+(y+1)+' '; tex=ln(tex,fD,.6,.7); }
+    else tex=kawara(x-e,y-rh,x+w+e,y+1);
+    return P(d,f)+ukClip(d,tex)+'<g class="noedge">'+ln('M'+(x-e)+' '+(y+1)+' L'+(x+w*.28)+' '+(y-rh)+' M'+(x+w+e)+' '+(y+1)+' L'+(x+w*.72)+' '+(y-rh),fD,1.4)+'</g>'+rc(x+w*.28,y-rh-1.6,w*.44,2.4,fD);
+  }
+  // 4. ishi-okiyane: shallow board roof held down with battens and river stones
+  function roofIshi(x,y,w,rh,e){
+    var d='M'+(x-e)+' '+(y+1)+' L'+(x+w+e)+' '+(y+1)+' L'+(x+w+e-2)+' '+(y-rh)+' L'+(x-e+2)+' '+(y-rh)+' Z', b='', st='', r=tssR(41);
+    for(var sx=x-e;sx<x+w+e;sx+=3.2) b+='M'+sx.toFixed(1)+' '+(y-rh)+' V'+(y+1)+' ';
+    var o=P(d,UK.board)+ukClip(d,ln(b,'#a39a8b',.5,.6));
+    [y-rh*.7,y-rh*.25].forEach(function(by){ o+=rc(x-e+1,by,w+2*e-2,1.1,UK.boardD);
+      for(var sx=x-e+3;sx<x+w+e-2;sx+=5+r()*3) st+='<ellipse cx="'+sx.toFixed(1)+'" cy="'+(by-.6).toFixed(1)+'" rx="'+(1.3+r()*.8).toFixed(1)+'" ry="'+(1+r()*.4).toFixed(1)+'" fill="'+(r()<.5?'#9b978d':'#7d7a73')+'"/>'; });
+    return o+'<g class="noedge">'+st+rc(x-e,y,w+2*e,1.2,UK.boardD)+'</g>';
+  }
+  // 5. katanagare: one slope, corrugated tin, the gable end to us
+  function roofShed(x,y,w,rise,e,wall,f,fD){
+    var o=P('M'+x+' '+y+' L'+(x+w)+' '+(y-rise)+' L'+(x+w)+' '+y+' Z',wall);
+    var d='M'+(x-e)+' '+(y+1)+' L'+(x+w+e)+' '+(y-rise-3)+' L'+(x+w+e)+' '+(y-rise+2.4)+' L'+(x-e)+' '+(y+6.4)+' Z';
+    return o+P(d,f)+'<g class="noedge">'+ln('M'+(x-e)+' '+(y+2.4)+' L'+(x+w+e)+' '+(y-rise-1.6)+' M'+(x-e)+' '+(y+4.4)+' L'+(x+w+e)+' '+(y-rise+.4),fD,.6)+'</g>';
+  }
+  // 6. copper, the shrine kind: eaves that sweep up at the ends, green with age
+  function roofCopper(x,y,w,rh,e){
+    var d='M'+(x-e-4)+' '+(y-3)+' Q'+(x+w/2)+' '+(y+3)+' '+(x+w+e+4)+' '+(y-3)+' Q'+(x+w+e-4)+' '+(y-rh*.35)+' '+(x+w*.8)+' '+(y-rh)+' L'+(x+w*.2)+' '+(y-rh)+' Q'+(x-e+4)+' '+(y-rh*.35)+' '+(x-e-4)+' '+(y-3)+' Z', s='';
+    for(var sx=x-e;sx<x+w+e;sx+=3.6) s+='M'+sx.toFixed(1)+' '+(y-rh)+' V'+(y+2)+' ';
+    return P(d,UK.copper)+ukClip(d,ln(s,UK.copperL,.6,.6))+ridge(x+w*.2,x+w*.8,y-rh,UK.copperD)
+      +'<g class="noedge">'+ln('M'+(x+w*.3)+' '+(y-rh-2)+' l-3 -4 M'+(x+w*.7)+' '+(y-rh-2)+' l3 -4',UK.copperD,1)+'</g>';
+  }
+  // 7. koshi-yane: a brewer's tile roof with a small raised roof over the ridge vent
+  function roofVent(x,y,w,rh,e){
+    return roofKiri(x,y,w,rh,e)+rc(x+w*.3,y-rh-6,w*.4,6,'#1f2025')+roofKiri(x+w*.28,y-rh-5,w*.44,5,2);
+  }
+  // 8. flat: a concrete slab with a parapet, the house built in 1978
+  function roofFlat(x,y,w){ return rc(x-2,y-3,w+4,3,'var(--p-granite-d)')+rc(x-2,y-6,w+4,3,'var(--p-granite)')+rc(x+w*.62,y-12,10,6,'var(--p-steel)'); }
+  // 9. gassho: the steep thatched A-frame, windows up in the gable
+  function gassho(x,g,w,h){
+    var o=rc(x+w*.1,g-10,w*.8,10,'var(--p-cedar-d)');
+    o+=P('M'+(x-3)+' '+(g-8)+' L'+(x+w/2)+' '+(g-8-h)+' L'+(x+w+3)+' '+(g-8)+' Z','var(--p-thatch)');
+    o+=P('M'+(x+w*.2)+' '+(g-8)+' L'+(x+w/2)+' '+(g-8-h*.8)+' L'+(x+w*.8)+' '+(g-8)+' Z','var(--p-cedar)');
+    o+='<g class="noedge">'+ln('M'+(x+w/2)+' '+(g-8-h)+' L'+(x-3)+' '+(g-8)+' M'+(x+w/2)+' '+(g-8-h)+' L'+(x+w+3)+' '+(g-8),'var(--p-thatch-d)',1.6)+'</g>';
+    return o+fw(x+w*.4,g-8-h*.45,w*.2,5,1)+fw(x+w*.3,g-8-h*.2,w*.14,5,0)+fw(x+w*.56,g-8-h*.2,w*.14,5,1);
+  }
+  // an udatsu: the raised firewall at the end of a roof, plastered, tile-capped
+  function udatsu(x,y,h){ return rc(x,y-h,4.4,h,'var(--p-white)')+rc(x-1,y-h-1.6,6.4,2,UK.tileD)+rc(x,y-3,4.4,1.2,'var(--p-white-d)'); }
+  // a stone lantern, lit
+  function toro(x,g){
+    return rc(x-4,g-3,8,3,'var(--p-granite-d)')+rc(x-1.6,g-12,3.2,9,'var(--p-granite)')+rc(x-3.4,g-14,6.8,2,'var(--p-granite-d)')
+      +rc(x-3,g-20,6,6,'var(--p-granite)')+'<g class="lit glow">'+lr(x-1.8,g-19,3.6,4)+'</g>'
+      +P('M'+(x-6)+' '+(g-20)+' L'+x+' '+(g-25)+' L'+(x+6)+' '+(g-20)+' Z','var(--p-granite-d)')+'<circle cx="'+x+'" cy="'+(g-25.6)+'" r="1.2" fill="var(--p-granite)"/>';
+  }
+  function narrator(x,y,s){ return figure(x,y,s,{felt:'yellow',coat:'var(--p-char)',coatD:'var(--p-char-d)',legs:'var(--p-char-d)',hair:'var(--p-bone)'}); }
+
+  function echigoTown(){
+    var o='';
+    // sky and mountain: night indigo grading to a pale break over the ridge
+    o+=ukGrad('ukCsky',[[0,'#141d31'],[.22,'#2c3d5f'],[.46,'#6f7a95'],[.62,'#b8b2ab'],[1,'#b8b2ab']],-10,-10,420,270);
+    o+='<g class="ly1">'+P('M-10 178 L40 152 L92 122 L128 100 L150 88 L176 58 L204 40 L222 44 L240 36 L262 58 L292 82 L310 80 L338 112 L372 134 L410 150 L410 200 L-10 200 Z','#5a6880')+'</g>';
+    o+=ukGrad('ukCm1',[[0,'#b8b2ab',0],[.5,'#b8b2ab',.55],[1,'#b8b2ab',0]],-10,98,420,26);
+    o+='<g class="ly1">'+ukForest('M-10 162 L28 136 L70 146 L112 118 L158 132 L200 106 L238 124 L286 110 L330 130 L372 120 L410 136 L410 205 L-10 205 Z','ukCf',17,'#243632',['#1d2e2a','#2f453c','#26392f','#3a5244'],102,205,4)+'</g>';
+    o+=ukGrad('ukCm2',[[0,'#9aa0a6',0],[.5,'#9aa0a6',.45],[1,'#9aa0a6',0]],-10,138,420,22);
+    // back row, up the slope
+    o+='<g class="ly2">'+kayabuki(22,150,42,16)+gassho(252,170,40,44)+'</g>';
+    // the viaduct and the E7, between the back row and the middle row
+    o+='<g class="ly2">'+rc(-10,158,420,2.4,'var(--p-granite-d)');
+    for(var px=4;px<410;px+=28) o+=rc(px,160,2.4,12,'#4a4f55');
+    o+='</g>'+shinkansen(214,158);
+    // middle row
+    var m='';
+    m+=snowGable(-8,164,44,24,30,7,'var(--p-cedar)','var(--p-cedar-d)','var(--p-tingreen)','var(--p-tingreen-d)',5,.5,1)+cedar(-8,164,44,24)+fw(4,170,9,7,1)+fw(20,170,9,7,0);
+    m+=rc(42,170,52,18,'var(--p-timber)')+rc(46,170,3,18,'var(--p-verm)')+rc(87,170,3,18,'var(--p-verm)')+'<g class="lit glow">'+lr(54,174,30,8)+'</g>'+roofCopper(42,170,52,18,5);
+    m+=snowGable(150,164,50,24,34,8,'var(--p-cream)','var(--p-cream-d)','var(--p-tinblue)','var(--p-tinblue-d)',6,.26,1)+fw(160,170,9,8,1)+fw(182,170,9,8,0);
+    m+=rc(206,166,60,22,'var(--p-white)')+rc(206,178,60,10,'var(--p-char)')+fw(216,169,8,6,1)+fw(244,169,8,6,0)+roofVent(206,166,60,12,5);
+    m+=rc(296,158,44,30,'var(--p-granite)')+'<g class="noedge">'+rc(302,163,12,8,'var(--p-steel-d)')+rc(322,163,12,8,'var(--p-steel-d)')+rc(302,176,12,8,'var(--p-steel-d)')+'</g>'+'<g class="lit glow">'+lr(322,176,12,8)+'</g>'+roofFlat(296,158,44);
+    m+=rc(346,168,62,20,'var(--p-cedar)')+cedar(346,168,62,20)+fw(356,172,9,7,1)+fw(390,172,9,7,1)+roofHip(346,168,62,18,5,UK.rust,UK.rustD,1);
+    o+='<g class="ly2">'+m+'</g>'+haze(.1);
+    // front row, the street
+    var f='';
+    // hisashi machiya: two storeys, a pent roof between them, slotted plaster upstairs
+    f+=rc(-12,195,58,19,'var(--p-cedar)')+koshi(-6,199,40,13,1)+rc(-12,180,58,15,'var(--p-cream)')
+      +'<g class="noedge">'+rc(0,184,20,7,'var(--p-timber-d)')+ln('M3 184 v7 M6 184 v7 M9 184 v7 M12 184 v7 M15 184 v7 M18 184 v7','var(--p-cream)',1)+'</g>'+fw(30,184,8,7,1)
+      +P('M-16 199 L50 199 L48 193 L-14 193 Z',UK.tile)+ukClip('M-16 199 L50 199 L48 193 L-14 193 Z',kawara(-16,193,50,199))+roofKiri(-12,180,58,12,4);
+    // the kura
+    f+=kura(50,180,40,34,6)+sugidama(70,184);
+    // the noodle shop, eaves to the street, udatsu at both ends
+    f+=rc(106,188,56,26,'var(--p-cream)')+timber(106,188,56,25,'var(--p-timber)')+fw(114,192,10,7,1)+fw(144,192,10,7,1)
+      +'<g class="lit glow">'+lr(110,203,26,11)+'</g>'
+      +'<g class="noedge">'+rc(109,202,28,1.4,'var(--p-timber-d)')+'<ellipse cx="116" cy="211" rx="3.4" ry="1.8" fill="var(--p-cream)"/><ellipse cx="124" cy="211" rx="3.4" ry="1.8" fill="var(--p-cream)"/><ellipse cx="132" cy="211" rx="3.4" ry="1.8" fill="var(--p-cream)"/>'
+      +'<ellipse cx="116" cy="210.2" rx="3.4" ry=".8" fill="var(--p-terra)"/><ellipse cx="124" cy="210.2" rx="3.4" ry=".8" fill="var(--p-terra)"/><ellipse cx="132" cy="210.2" rx="3.4" ry=".8" fill="var(--p-terra)"/>'
+      +ln('M115 209.6 l2.6 -5 M117 209.6 l2.6 -5 M123 209.6 l2.6 -5 M125 209.6 l2.6 -5 M131 209.6 l2.6 -5 M133 209.6 l2.6 -5','var(--p-kraft-d)',.5)+'</g>'
+      +noren(140,202,18,'var(--p-indigo)')+roofKiri(106,188,56,16,5)+udatsu(100,188,12)+udatsu(163.6,188,12)+kanban(98,192,6,18,'var(--p-timber)','var(--p-cream)',11);
+    // stone-weighted shingles over a cedar house
+    f+=rc(168,192,50,22,'var(--p-cedar)')+cedar(168,192,50,22)+fw(176,196,9,7,1)+fw(200,196,9,7,0)+roofIshi(168,192,50,8,6);
+    // the inn: irimoya, a row of lit rooms
+    f+=rc(228,186,66,28,'var(--p-bone)')+timber(228,186,66,27,'var(--p-timber)')+fw(234,190,9,7,1)+fw(248,190,9,7,1)+fw(262,190,9,7,0)+fw(276,190,9,7,1)
+      +'<g class="lit glow">'+lr(236,203,20,11)+'</g>'+noren(262,202,22,'var(--p-verm-d)')+roofIrimoya(228,186,66,26,6,'var(--p-bone)');
+    // a lean-to in red tin
+    f+=rc(300,190,40,24,'var(--p-white)')+fw(308,196,9,7,1)+rc(324,200,10,14,'var(--p-timber)')+roofShed(300,190,40,16,4,'var(--p-white)','var(--p-tinred)','var(--p-tinred-d)');
+    // hipped tile over white plaster
+    f+=rc(348,188,62,26,'var(--p-white)')+timber(348,188,62,25,'var(--p-timber)')+fw(356,192,10,7,0)+fw(376,192,10,7,1)+fw(394,192,10,7,1)+koshi(356,203,30,10,1)+roofHip(348,188,62,18,5,UK.tile,UK.tileD,0);
+    // in front: the vending machines, the stone lantern, pots
+    f+=vending(204,214,'var(--p-white)','var(--p-white-d)')+vending(222,214,'var(--p-verm)','var(--p-verm-d)')+toro(176,214)
+      +pot(94,214,'#d8566a',4)+pot(298,214,'#e0a23a',8)+pot(344,214,'#e8c64a',9);
+    o+='<g class="ly3">'+f+'</g>';
+    // the street, black and wet, every light laid on it
+    o+='<g class="ly3">'+rc(-10,214,420,46,'#1b2028')+'</g>';
+    var sp=''; [[123,.9,26],[146,.6,18],[176,.6,16],[228,.5,14],[246,.55,16],[18,.4,14],[386,.4,14],[312,.35,12],[272,.45,14]].forEach(function(s){
+      sp+='<rect x="'+(s[0]-2.6)+'" y="215" width="5.2" height="'+(s[2]*1.4)+'" fill="url(#ukCr)" opacity="'+s[1]+'"/>'; });
+    o+='<defs><linearGradient id="ukCr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd58a" stop-opacity=".9"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></linearGradient><filter id="ukCb" x="-50%" y="-10%" width="200%" height="120%"><feGaussianBlur stdDeviation="1.2 2"/></filter></defs>';
+    o+='<g class="noedge"><g filter="url(#ukCb)">'+sp+'</g>'+ukGlow('ukCg',128,214,40,8,'#ffcf7a',.45)+'</g>';
+    var pp=ukLean(villager(60,236,18,'var(--p-indigo)','var(--p-gold)','#c9b48a','var(--p-cream)','cyan'),60,236,-4)
+      +ukLean(villager(292,232,16,'var(--p-plum)','var(--p-cream)','var(--p-verm)','var(--p-bone)','pink'),292,232,-4)
+      +ukLean(villager(372,234,17,'var(--p-moss-d)','var(--p-cream)','var(--p-tingreen)','var(--p-bone)','orange'),372,234,-4)
+      +narrator(150,240,24);
+    o+='<g class="ly3">'+pp+'</g>';
+    o+='<g class="fx noedge">'+chochin(108,204)+chochin(160,204)+chochin(232,200)+chochin(292,200)
+      +'<rect class="pulse" x="205.2" y="190.6" width="10.6" height="11" fill="#fff6d8" opacity=".35"/><rect class="pulse" x="223.2" y="190.6" width="10.6" height="11" fill="#fff6d8" opacity=".35" style="animation-delay:-1.4s"/></g>';
+    o+=ukRain(31,170,-40,420,-10,250,.08,80,'rgba(214,222,236,.38)',.45);
+    o+='<g class="noedge keylight">'+ukGlow('kl0',128,206,60,34,'#ffd58a',.5)+'</g>';
+    o+=ukSeal(382,232,.2);
+    return o;
+  }
+
   var SCENERY=[
    /* 0, RAMEN AT ECHIGO KAWAGUCHI. v32: the village, from the source text.
         "I wandered away from the station, down an alleyway of vending machines,
@@ -2157,91 +2374,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
         windows, a sweet shop, the vertical signal Niigata hangs so snow cannot
         sit on it. Every lit window now has a dark timber frame and mullions,
         so the light reads against pale plaster instead of dissolving into it. */
-   '<g transform="translate(0 -40)">'+forestWall(78)+'<g class="ly1">'+
-     P('M-120 128 L-78 112 L-36 126 L0 130 L40 110 L74 124 L118 98 L160 120 L200 104 L246 124 L288 106 L330 122 L370 108 L400 120 L444 104 L486 122 L520 110 L520 200 L-120 200 Z','var(--p-sage)')+
-     '<g class="noedge" opacity=".5">'+
-       P('M-120 148 Q0 142 100 147 T300 146 T520 147 L520 153 Q200 156 -120 154 Z','var(--p-moss)')+
-       P('M-120 160 Q20 155 140 160 T380 158 T520 159 L520 165 Q200 168 -120 166 Z','var(--p-moss)')+'</g>'+
-     '<g class="mass">'+village(-116,516,134,8,5,0)+'</g>'+
-   '</g>'+ haze(.40) +
-   '<g class="ly2">'+
-     station(12,128,74)+pine(106,120,1.35)+
-     kayabuki(118,118,40,14)+
-     takayuka(-106,134,30,8,'var(--p-tinred)','var(--p-tinred-d)',0,.5)+
-     takayuka(-66,132,26,8,'var(--p-tingreen)','var(--p-tingreen-d)',0,.3)+
-     takayuka(174,132,28,8,'var(--p-tinblue)','var(--p-tinblue-d)',0,.5)+
-     takayuka(214,128,32,8,'var(--p-tinred)','var(--p-tinred-d)',0,.28)+
-     takayuka(262,132,26,8,'var(--p-steel)','var(--p-steel-d)',0,.5,'var(--p-bone-d)')+
-     takayuka(418,130,30,8,'var(--p-tingreen)','var(--p-tingreen-d)',0,.5)+
-     takayuka(466,134,28,8,'var(--p-tinblue)','var(--p-tinblue-d)',0,.3)+
-     polesline([-70,92,176,262,348,440,500],84,128)+
-   '</g>'+ haze(.14) +
-   '<g class="ly3">'+
-     /* a cedar machiya, gable to the street, red tin, a lit koshi upstairs */
-     snowGable(-110,122,56,46,50,12,'var(--p-cedar)','var(--p-cedar-d)','var(--p-tinred)','var(--p-tinred-d)',7,.5,1)+
-     cedar(-110,122,56,44)+koshi(-100,130,36,12,0)+fw(-88,106,10,8,0)+
-     /* the sake brewer's kura, cedar ball out */
-     kura(-46,126,48,40,10)+
-     /* the noodle shop: cream plaster, heavy tile, two lit windows upstairs */
-     snowGable(22,126,58,42,48,12,'var(--p-cream)','var(--p-cream-d)','var(--p-char)','var(--p-char-d)',6,.5)+
-     timber(22,126,58,40,'var(--p-timber)')+fw(33,133,11,10,1)+fw(58,133,11,10,1)+fw(47,108,8,7,1)+
-     /* the long inn, eaves to the street, a row of lit rooms and a rail */
-     eaves(120,140,150,26,22,12,'var(--p-cedar)','var(--p-cedar-d)','var(--p-char)','var(--p-char-d)',5)+
-     timber(120,140,150,24,'var(--p-timber)')+
-     fw(130,145,12,9,0)+fw(154,145,12,9,0)+fw(178,145,12,9,0)+fw(202,145,12,9,1)+fw(226,145,12,9,0)+fw(250,145,12,9,0)+
-     '<g class="noedge">'+rc(122,157,146,1.6,'var(--p-timber-d)')+ln('M126 157 v6 M140 157 v6 M154 157 v6 M168 157 v6 M182 157 v6 M196 157 v6 M210 157 v6 M224 157 v6 M238 157 v6 M252 157 v6 M266 157 v6','var(--p-timber-d)',.8)+'</g>'+
-     /* the lopsided snow roof: the long side takes all the snow; blue tin */
-     snowGable(284,126,58,42,52,12,'var(--p-cedar)','var(--p-cedar-d)','var(--p-tinblue)','var(--p-tinblue-d)',7,.26,1)+
-     cedar(284,146,58,22)+fw(292,131,11,10,0)+fw(318,131,11,10,0)+
-     /* a steep green-tin gable with the ridge splitter */
-     snowGable(348,134,48,34,46,10,'var(--p-bone)','var(--p-bone-d)','var(--p-tingreen)','var(--p-tingreen-d)',6,.5,1)+
-     fw(356,139,9,9,0)+fw(378,139,9,9,1)+
-     /* the sweet shop, eaves to the street, red tin */
-     eaves(404,138,62,28,20,10,'var(--p-white)','var(--p-white-d)','var(--p-tinred)','var(--p-tinred-d)',5)+
-     cedar(404,152,62,14)+fw(414,143,12,8,0)+fw(444,143,12,8,1)+
-     /* one more lopsided roof at the end of the street, the other way round */
-     snowGable(476,128,46,40,44,10,'var(--p-cedar)','var(--p-cedar-d)','var(--p-steel)','var(--p-steel-d)',6,.72,1)+
-     cedar(476,128,46,38)+fw(486,134,10,9,0)+
-     kanban(-72,132,7,24,'var(--p-timber)','var(--p-cream)',3)+kanban(4,140,6,20,'var(--p-cedar-d)','var(--p-bone)',5)+kanban(66,136,8,26,'var(--p-cream)','var(--p-char-d)',11)+kanban(272,140,6,20,'var(--p-bone)','var(--p-timber-d)',17)+kanban(396,142,6,18,'var(--p-timber)','var(--p-cream)',23)+
-     rc(-120,166,640,34,'var(--p-slate-d)')+
-     gangi(-120,166,640,
-       koshi(-104,171,40,16,0)+
-       '<g class="noedge">'+rc(-40,172,9,11,'var(--p-kraft)',' rx="2"')+rc(-30,176,9,7,'var(--p-kraft-d)',' rx="2"')+rc(-20,174,9,9,'var(--p-kraft)',' rx="2"')+'</g>'+
-       sugidama(-6,171)+
-       '<g class="lit glow">'+lr(26,170,32,18)+'</g>'+
-       '<g class="noedge">'+rc(26,184,32,2,'var(--p-timber)')+rc(24.6,168.6,34.8,1.6,'var(--p-timber-d)')+rc(24.6,168.6,1.6,20.8,'var(--p-timber-d)')+rc(57.8,168.6,1.6,20.8,'var(--p-timber-d)')+
-         '<ellipse cx="33" cy="182" rx="4.2" ry="2.4" fill="var(--p-cream)"/><ellipse cx="42" cy="182" rx="4.2" ry="2.4" fill="var(--p-cream)"/><ellipse cx="51" cy="182" rx="4.2" ry="2.4" fill="var(--p-cream)"/>'+
-         '<ellipse cx="33" cy="180.8" rx="4.2" ry="1.1" fill="var(--p-terra)"/><ellipse cx="42" cy="180.8" rx="4.2" ry="1.1" fill="var(--p-terra)"/><ellipse cx="51" cy="180.8" rx="4.2" ry="1.1" fill="var(--p-terra)"/></g>'+
-       '<g class="noedge">'+ln('M31 178.6 l3.6 -7.4 M33 178.8 l3.8 -7.2 M40 178.6 l3.6 -7.4 M42 178.8 l3.8 -7.2 M49 178.6 l3.6 -7.4 M51 178.8 l3.8 -7.2','var(--p-kraft-d)',.7)+
-         ln('M34.4 180 q.6 -3.4 1.4 -6 M43.4 180 q.6 -3.4 1.4 -6 M52.4 180 q.6 -3.4 1.4 -6','var(--p-gold)',.6)+'</g>'+
-       noren(62,170,17,'var(--p-indigo)')+
-       rc(84,172,3.4,7,'var(--p-verm)',' rx="1.4"')+
-       '<g class="lit glow"><ellipse cx="85.7" cy="175.5" rx="1.6" ry="2.4"/></g>'+
-       shoji(150,171,42,19)+
-       vending(204,191,'var(--p-white)','var(--p-white-d)')+
-       vending(222,191,'var(--p-verm)','var(--p-verm-d)')+
-       noren(300,170,20,'var(--p-verm-d)')+
-       koshi(412,171,34,15,0)+noren(452,170,14,'var(--p-plum)'))+
-     '<g class="noedge" opacity=".28"><rect x="26" y="192" width="32" height="8" fill="var(--lit)"/><rect x="84" y="190" width="4" height="10" fill="var(--lit)"/></g>'+
-     vsignal(496,160)+
-     pot(-92,199,'#e0a23a',1)+pot(-44,199,'#d8566a',2)+pot(18,199,'#e8c64a',3)+pot(66,199,'#d8566a',4)+pot(128,199,'#e0a23a',5)+pot(196,199,'#e8c64a',6)+pot(250,199,'#d8566a',7)+pot(316,199,'#e0a23a',8)+pot(404,199,'#e8c64a',9)+pot(462,199,'#d8566a',10)+
-     villager(-70,199,22,'var(--p-moss-d)','var(--p-cream)','var(--p-tingreen)','var(--p-bone)','orange')+
-     villager(146,199,23,'var(--p-indigo)','var(--p-gold)','var(--p-verm)','var(--p-cream)','cyan')+
-     villager(294,199,24,'var(--p-plum)','var(--p-cream)','var(--p-indigo)','var(--p-bone)','pink')+
-     villager(334,198,21,'var(--p-char)','var(--p-terra)','var(--p-char-d)','var(--p-bone-d)','purple')+
-     villager(374,199,23,'var(--p-indigo-d)','var(--p-verm)','var(--p-cream)','var(--p-kraft-d)','coral')+
-     villager(440,199,22,'var(--p-terra-d)','var(--p-bone)','var(--p-verm)','var(--p-cream)','blue')+
-     '<g class="noedge"><ellipse cx="60" cy="196" rx="62" ry="7" fill="var(--lit)" opacity=".30"/><ellipse cx="52" cy="196" rx="30" ry="4" fill="#ffe2a0" opacity=".35"/></g>'+figure(104,199,34,{felt:'yellow',coat:'var(--p-char)',coatD:'var(--p-char-d)',legs:'var(--p-char-d)',hair:'var(--p-bone)'})+
-   '</g>'+ rainWide() +
-   '<g class="fx noedge">'+
-     ln('M88 169.2 Q170 173 262 169.2','var(--p-char-d)',.5)+
-     chochin(100,170)+chochin(122,171)+chochin(144,171.6)+chochin(240,171)+chochin(258,170)+chochin(-60,170)+chochin(470,171)+
-     '<g><path class="steam" d="M68 166 q-2 -4 0 -8 q2 -4 0 -8" fill="none" style="stroke:rgba(245,240,228,.8);stroke-width:1.4;stroke-linecap:round"/>'+
-       '<path class="steam" d="M73 166 q2 -4 0 -8 q-2 -4 0 -8" fill="none" style="stroke:rgba(245,240,228,.8);stroke-width:1.4;stroke-linecap:round"/>'+
-       '<path class="steam" d="M78 166 q-2 -4 0 -8 q2 -4 0 -8" fill="none" style="stroke:rgba(245,240,228,.8);stroke-width:1.4;stroke-linecap:round"/></g>'+
-     '<rect class="pulse" x="205.2" y="167.6" width="10.6" height="11" fill="#fff6d8" opacity=".35"/>'+
-     '<rect class="pulse" x="223.2" y="167.6" width="10.6" height="11" fill="#fff6d8" opacity=".35" style="animation-delay:-1.4s"/>'+
-   '<g class="noedge keylight"><defs><radialGradient id="kl0"><stop offset="0" stop-color="#ffd58a" stop-opacity="0.55"/><stop offset=".55" stop-color="#ffd58a" stop-opacity="0.193"/><stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient></defs><ellipse cx="56" cy="160" rx="70" ry="48" fill="url(#kl0)"/></g>'+'</g>'+'</g>'+ echigoPlatform(),
+   echigoTown(),
 
    /* 1, BLACK SPOTS ON THE CROSSWALK. Longwood Avenue, on the way to the
         hospital, late seventies, bright morning. Children's Hospital's 1914
@@ -2646,7 +2779,7 @@ html.se-reduce .skybox.gagging #sceneLayers, html.se-reduce #gag *, html.se-redu
   function startGag(){
     var sb=$('skybox'), g=$('gag'); if(!g) return;
     var html='';
-    if(pi===0) html=gagEchigo();
+    if(pi===0) html='<g transform="translate(0 63)">'+gagEchigo()+'</g>';  // v40: the machines moved down the new street
     else if(pi===1) html=gagCrosswalk();
     else if(pi===2) html=gagPeach();
     else {
