@@ -4,6 +4,13 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v41 2026-09-26 (founder: "Use the real hiragana for ramen. What are the
+  yellow and red ovals? If foliage, go real tree."). The noodle shop's hanging
+  board, after the one in the Magome photograph, now reads らーめん top to
+  bottom, stored as letter outlines from Noto Serif CJK JP Bold (OFL) so no
+  font is needed on the device. The ovals were autumn maples in the cedar
+  forest; each is now a tree: a forked trunk and a crown of red and amber lobes.
+
   v40 2026-09-26, EVERY ROOF DIFFERENT (founder: "Build echigo with all
   different roofs", with a photograph of Magome-juku on the Nakasendo). Echigo
   is rebuilt on print C of the ukiyo-e mock-ups (studio pick; founder had not
@@ -1047,7 +1054,7 @@ html.se-reduce #scenery .urain{ animation:none; }
 
 <div class="wrap">
   <p class="production">A Tight Spiral Studios production for EN195</p>
-  <h1 class="gametitle">Sandbags <span class="ver">v40</span><span class="sub">a flash fiction climb</span></h1>
+  <h1 class="gametitle">Sandbags <span class="ver">v41</span><span class="sub">a flash fiction climb</span></h1>
   <p class="prompt" id="prompt">Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.</p>
 
   <div class="plate">
@@ -1155,7 +1162,7 @@ html.se-reduce #scenery .urain{ animation:none; }
 <div class="wrap">
   <div class="foot">
     <p>Sandbags, a Tight Spiral Studios production for EN195 Creative Writing, MassBay Community College. Stagecraft: Matt Walsh. Tight Spiral Studios &middot; walshero@gmail.com. Single-file, offline, stores nothing. A strike is never shame. That word was holding the piece up, and now you know it by feel. Excerpts from four pieces by Matt Walsh, used by the author. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.</p>
-    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v40</p>
+    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v41</p>
     <div class="studiofoot">
       <svg class="spiralmark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
       <div>
@@ -2198,10 +2205,43 @@ html.se-reduce #scenery .urain{ animation:none; }
     var r=tssR(seed), o='';
     for(var y=y0;y<y1;y+=step*.8) for(var x=-20+r()*step;x<420;x+=step*(.8+r()*.7)){
       var h=step*(1.3+r()*.8), w=h*.4;
-      if(r()<.03){ o+='<ellipse cx="'+x.toFixed(1)+'" cy="'+(y+h*.6).toFixed(1)+'" rx="'+(w*1.3).toFixed(1)+'" ry="'+(h*.35).toFixed(1)+'" fill="'+(r()<.5?'#8f4a34':'#a8733c')+'"/>'; continue; }
       o+='<path d="M'+x.toFixed(1)+' '+y.toFixed(1)+' l'+w.toFixed(1)+' '+h.toFixed(1)+' h-'+(2*w).toFixed(1)+' z" fill="'+cols[(r()*cols.length)|0]+'"/>';
     }
     return P(d,base)+'<defs><clipPath id="'+id+'"><path d="'+d+'"/></clipPath></defs><g class="noedge" clip-path="url(#'+id+')">'+o+'</g>';
+  }
+  // v41 (founder: "What are the yellow and red ovals? If foliage, go real tree"):
+  // an autumn maple among the cedars. A trunk that forks, and a crown of small
+  // lobes in reds and ambers, darker on the side away from the light.
+  function momiji(x,g,h,r){
+    var C=[['#c24a2c','#8e3019','#e07a45'],['#cf6a2e','#9a4620','#eb9a52'],['#d99a38','#a8702a','#f0bf5e'],['#b23a28','#7d2819','#d8653d']][(r()*4)|0], o='';
+    var cy=g-h*.66, rx=h*.46, ry=h*.3, tr=Math.max(.8,h*.06);
+    // trunk and the branches that show under the crown
+    o+=ln('M'+x+' '+g+' q'+(-h*.03)+' '+(-h*.2)+' 0 '+(-h*.36)+' M'+x+' '+(g-h*.24)+' q'+(-h*.14)+' '+(-h*.06)+' '+(-h*.26)+' '+(-h*.22)+' M'+x+' '+(g-h*.3)+' q'+(h*.12)+' '+(-h*.05)+' '+(h*.28)+' '+(-h*.2)+' M'+x+' '+(g-h*.36)+' l'+(h*.04)+' '+(-h*.18),'#3a2a20',tr);
+    // the crown: shade lobes underneath, the body, lit lobes on top; a scalloped edge
+    var lobes=function(n,sx,sy,oy,rad,col){ var t=''; for(var i=0;i<n;i++){ var a=Math.PI*(1+i/(n-1)), rrr=rad*(.8+r()*.4);
+      t+='<circle cx="'+(x+Math.cos(a)*rx*sx).toFixed(1)+'" cy="'+(cy+oy+Math.sin(a)*ry*sy).toFixed(1)+'" r="'+rrr.toFixed(2)+'" fill="'+col+'"/>'; } return t; };
+    o+=lobes(9,1.05,-.35,ry*.35,h*.1,C[1]);
+    o+='<ellipse cx="'+x+'" cy="'+cy.toFixed(1)+'" rx="'+(rx*.92).toFixed(1)+'" ry="'+(ry*.85).toFixed(1)+'" fill="'+C[0]+'"/>';
+    o+=lobes(11,1,1,0,h*.1,C[0]);
+    o+=lobes(6,.6,.75,-ry*.1,h*.07,C[2]);
+    // gaps where the branches show through
+    o+=ln('M'+(x-rx*.35)+' '+(cy+ry*.3)+' l'+(rx*.25)+' '+(-ry*.3)+' M'+(x+rx*.2)+' '+(cy+ry*.35)+' l'+(rx*.2)+' '+(-ry*.35),'#3a2a20',tr*.6,.8);
+    return o;
+  }
+
+  // v41 (founder: "Use the real hiragana for ramen"): the noodle shop's
+  // hanging board reads らーめん, top to bottom, cut from the letterforms of
+  // Noto Serif CJK JP Bold (SIL Open Font License) and stored as outlines, so
+  // it needs no font on the player's device. The long-vowel bar is turned
+  // upright, the way it is set in vertical writing.
+  var RAMEN=["M0.335 0.91 0.337 0.93C0.588 0.953 0.877 0.874 0.877 0.679C0.877 0.5720000000000001 0.797 0.462 0.636 0.462C0.5 0.462 0.376 0.544 0.305 0.5900000000000001C0.297 0.595 0.293 0.593 0.292 0.5820000000000001C0.291 0.552 0.302 0.511 0.307 0.472C0.311 0.44 0.316 0.419 0.314 0.39C0.311 0.362 0.296 0.33699999999999997 0.296 0.32099999999999995C0.296 0.31299999999999994 0.3 0.30499999999999994 0.318 0.30300000000000005C0.343 0.29900000000000004 0.40900000000000003 0.29100000000000004 0.456 0.29400000000000004C0.501 0.29800000000000004 0.525 0.30899999999999994 0.558 0.30899999999999994C0.591 0.30899999999999994 0.605 0.29200000000000004 0.605 0.264C0.605 0.20599999999999996 0.5730000000000001 0.16300000000000003 0.516 0.13C0.47500000000000003 0.10599999999999998 0.41300000000000003 0.08999999999999997 0.314 0.09699999999999998L0.31 0.11199999999999999C0.372 0.133 0.42 0.15200000000000002 0.446 0.19299999999999995C0.455 0.20499999999999996 0.454 0.21399999999999997 0.442 0.21999999999999997C0.40900000000000003 0.238 0.315 0.262 0.271 0.269C0.23600000000000002 0.275 0.225 0.30599999999999994 0.225 0.33299999999999996C0.225 0.358 0.226 0.375 0.223 0.40399999999999997C0.218 0.451 0.202 0.55 0.195 0.597C0.189 0.636 0.182 0.658 0.182 0.677C0.182 0.7 0.19 0.721 0.20800000000000002 0.74C0.227 0.762 0.246 0.773 0.265 0.773C0.298 0.773 0.311 0.733 0.336 0.698C0.393 0.626 0.513 0.504 0.625 0.504C0.711 0.504 0.758 0.5700000000000001 0.758 0.64C0.758 0.722 0.709 0.802 0.537 0.864C0.491 0.881 0.41300000000000003 0.9 0.335 0.91Z", "M0.615 0.673C0.615 0.635 0.591 0.62 0.5840000000000001 0.548C0.575 0.471 0.5609999999999999 0.247 0.5609999999999999 0.17100000000000004C0.5609999999999999 0.10099999999999998 0.5640000000000001 0.06599999999999995 0.5640000000000001 0.026000000000000023C0.5640000000000001 -0.016000000000000014 0.55 -0.040000000000000036 0.521 -0.040000000000000036C0.478 -0.040000000000000036 0.447 0.01200000000000001 0.447 0.07199999999999995C0.447 0.09599999999999997 0.455 0.14100000000000001 0.461 0.20799999999999996C0.46599999999999997 0.269 0.486 0.571 0.486 0.6779999999999999C0.486 0.731 0.459 0.748 0.419 0.778L0.425 0.795C0.449 0.798 0.478 0.801 0.501 0.792C0.55 0.774 0.615 0.712 0.615 0.673Z", "M0.49 0.718C0.519 0.718 0.539 0.705 0.539 0.6799999999999999C0.539 0.645 0.516 0.622 0.491 0.607C0.507 0.5820000000000001 0.522 0.556 0.535 0.528C0.5750000000000001 0.443 0.598 0.386 0.617 0.32899999999999996C0.744 0.358 0.8 0.463 0.8 0.5609999999999999C0.8 0.702 0.714 0.836 0.423 0.896L0.426 0.916C0.792 0.905 0.92 0.77 0.92 0.581C0.92 0.425 0.809 0.30100000000000005 0.634 0.277L0.645 0.239C0.655 0.20599999999999996 0.672 0.19299999999999995 0.672 0.17100000000000004C0.672 0.132 0.582 0.09199999999999997 0.543 0.09199999999999997C0.517 0.09199999999999997 0.488 0.10099999999999998 0.458 0.12L0.46 0.136C0.482 0.137 0.502 0.14 0.518 0.14500000000000002C0.534 0.15000000000000002 0.544 0.15700000000000003 0.543 0.17899999999999994C0.542 0.20199999999999996 0.538 0.235 0.529 0.273C0.445 0.28 0.375 0.30699999999999994 0.32 0.33999999999999997L0.315 0.31899999999999995C0.304 0.277 0.279 0.258 0.252 0.238C0.225 0.21799999999999997 0.182 0.20299999999999996 0.135 0.19399999999999995L0.127 0.20399999999999996C0.167 0.246 0.202 0.28700000000000003 0.218 0.33199999999999996L0.24 0.399C0.182 0.451 0.094 0.548 0.094 0.696C0.094 0.767 0.126 0.839 0.199 0.839C0.265 0.839 0.311 0.803 0.35100000000000003 0.772C0.373 0.755 0.399 0.729 0.426 0.6970000000000001C0.446 0.708 0.47000000000000003 0.718 0.49 0.718ZM0.517 0.32299999999999995C0.502 0.378 0.48 0.439 0.449 0.499C0.439 0.519 0.427 0.538 0.41500000000000004 0.556C0.398 0.5389999999999999 0.381 0.517 0.365 0.488C0.34600000000000003 0.455 0.337 0.42 0.329 0.387C0.388 0.345 0.451 0.32699999999999996 0.517 0.32299999999999995ZM0.35100000000000003 0.639C0.334 0.658 0.316 0.675 0.3 0.688C0.275 0.709 0.248 0.725 0.22 0.725C0.194 0.725 0.17400000000000002 0.7 0.17400000000000002 0.65C0.17400000000000002 0.597 0.2 0.52 0.257 0.453C0.268 0.485 0.278 0.516 0.289 0.5409999999999999C0.303 0.573 0.322 0.607 0.35100000000000003 0.639Z", "M0.665 0.919C0.804 0.919 0.924 0.822 0.9460000000000001 0.587L0.93 0.583C0.889 0.6910000000000001 0.8 0.8089999999999999 0.6940000000000001 0.8089999999999999C0.653 0.8089999999999999 0.626 0.792 0.626 0.742C0.626 0.687 0.628 0.642 0.625 0.595C0.619 0.518 0.5720000000000001 0.475 0.487 0.475C0.455 0.475 0.41000000000000003 0.486 0.362 0.51C0.355 0.514 0.353 0.511 0.357 0.505C0.397 0.437 0.484 0.32399999999999995 0.535 0.272C0.5630000000000001 0.243 0.595 0.23199999999999998 0.595 0.20899999999999996C0.595 0.16900000000000004 0.542 0.10599999999999998 0.463 0.09499999999999997C0.441 0.09099999999999997 0.404 0.09499999999999997 0.38 0.10399999999999998L0.378 0.119C0.396 0.126 0.423 0.139 0.438 0.15200000000000002C0.449 0.16200000000000003 0.453 0.17600000000000005 0.443 0.19599999999999995C0.41300000000000003 0.254 0.262 0.506 0.196 0.62C0.14100000000000001 0.715 0.08700000000000001 0.788 0.08700000000000001 0.84C0.08700000000000001 0.876 0.108 0.914 0.146 0.914C0.183 0.914 0.201 0.887 0.212 0.857C0.229 0.81 0.246 0.749 0.271 0.6910000000000001C0.307 0.609 0.377 0.52 0.458 0.52C0.512 0.52 0.527 0.554 0.527 0.596C0.527 0.66 0.515 0.715 0.516 0.784C0.517 0.866 0.5690000000000001 0.919 0.665 0.919Z"];
+  function ramenSign(x,y,w,h){
+    var c=Math.min(w*.78,(h-5)/4), gx=x+(w-c)/2, o='';
+    o+=ln('M'+(x+w*.3)+' '+(y-3)+' v3 M'+(x+w*.7)+' '+(y-3)+' v3','var(--p-char-d)',.5);
+    o+=P('M'+(x-1.4)+' '+(y+.6)+' L'+(x+w/2)+' '+(y-2.6)+' L'+(x+w+1.4)+' '+(y+.6)+' Z','var(--p-timber-d)');
+    o+=rc(x-.6,y,w+1.2,h+.6,'var(--p-timber-d)')+rc(x,y+.6,w,h-.6,'#f1ead8');
+    RAMEN.forEach(function(d,i){ o+='<path transform="translate('+gx.toFixed(2)+' '+(y+2.6+i*c).toFixed(2)+') scale('+c.toFixed(3)+')'+(i===1?' translate(.06 0)':'')+'" d="'+d+'" fill="#1d1a17"/>'; });
+    return '<g class="noedge">'+o+'</g>';
   }
   function ukSeal(x,y,s){
     return '<g class="noedge" transform="translate('+x+' '+y+') scale('+s+')"><rect x="0" y="0" width="48" height="48" rx="4" fill="#a8391f"/><use href="#tss-spiral" style="stroke:#f1e4c8;stroke-width:3.6;fill:none"/></g>';
@@ -2300,6 +2340,9 @@ html.se-reduce #scenery .urain{ animation:none; }
     o+='<g class="ly2">'+rc(-10,158,420,2.4,'var(--p-granite-d)');
     for(var px=4;px<410;px+=28) o+=rc(px,160,2.4,12,'#4a4f55');
     o+='</g>'+shinkansen(214,158);
+    // v41: the maples stand in the gaps between the roofs, trunks showing
+    var mr=tssR(52), mp=''; [[122,176,40],[210,170,30],[292,164,34],[344,170,30],[-2,166,30]].forEach(function(t){ mp+=momiji(t[0],t[1],t[2],mr); });
+    o+='<g class="ly3"><g class="noedge">'+mp+'</g></g>';
     // middle row
     var m='';
     m+=snowGable(-8,164,44,24,30,7,'var(--p-cedar)','var(--p-cedar-d)','var(--p-tingreen)','var(--p-tingreen-d)',5,.5,1)+cedar(-8,164,44,24)+fw(4,170,9,7,1)+fw(20,170,9,7,0);
@@ -2323,7 +2366,7 @@ html.se-reduce #scenery .urain{ animation:none; }
       +'<g class="noedge">'+rc(109,202,28,1.4,'var(--p-timber-d)')+'<ellipse cx="116" cy="211" rx="3.4" ry="1.8" fill="var(--p-cream)"/><ellipse cx="124" cy="211" rx="3.4" ry="1.8" fill="var(--p-cream)"/><ellipse cx="132" cy="211" rx="3.4" ry="1.8" fill="var(--p-cream)"/>'
       +'<ellipse cx="116" cy="210.2" rx="3.4" ry=".8" fill="var(--p-terra)"/><ellipse cx="124" cy="210.2" rx="3.4" ry=".8" fill="var(--p-terra)"/><ellipse cx="132" cy="210.2" rx="3.4" ry=".8" fill="var(--p-terra)"/>'
       +ln('M115 209.6 l2.6 -5 M117 209.6 l2.6 -5 M123 209.6 l2.6 -5 M125 209.6 l2.6 -5 M131 209.6 l2.6 -5 M133 209.6 l2.6 -5','var(--p-kraft-d)',.5)+'</g>'
-      +noren(140,202,18,'var(--p-indigo)')+roofKiri(106,188,56,16,5)+udatsu(100,188,12)+udatsu(163.6,188,12)+kanban(98,192,6,18,'var(--p-timber)','var(--p-cream)',11);
+      +noren(140,202,18,'var(--p-indigo)')+roofKiri(106,188,56,16,5)+udatsu(100,188,12)+udatsu(163.6,188,12)+ramenSign(92,181,10,31);
     // stone-weighted shingles over a cedar house
     f+=rc(168,192,50,22,'var(--p-cedar)')+cedar(168,192,50,22)+fw(176,196,9,7,1)+fw(200,196,9,7,0)+roofIshi(168,192,50,8,6);
     // the inn: irimoya, a row of lit rooms
@@ -2335,7 +2378,7 @@ html.se-reduce #scenery .urain{ animation:none; }
     f+=rc(348,188,62,26,'var(--p-white)')+timber(348,188,62,25,'var(--p-timber)')+fw(356,192,10,7,0)+fw(376,192,10,7,1)+fw(394,192,10,7,1)+koshi(356,203,30,10,1)+roofHip(348,188,62,18,5,UK.tile,UK.tileD,0);
     // in front: the vending machines, the stone lantern, pots
     f+=vending(204,214,'var(--p-white)','var(--p-white-d)')+vending(222,214,'var(--p-verm)','var(--p-verm-d)')+toro(176,214)
-      +pot(94,214,'#d8566a',4)+pot(298,214,'#e0a23a',8)+pot(344,214,'#e8c64a',9);
+      +pot(84,214,'#d8566a',4)+pot(298,214,'#e0a23a',8)+pot(344,214,'#e8c64a',9);
     o+='<g class="ly3">'+f+'</g>';
     // the street, black and wet, every light laid on it
     o+='<g class="ly3">'+rc(-10,214,420,46,'#1b2028')+'</g>';
@@ -2355,7 +2398,6 @@ html.se-reduce #scenery .urain{ animation:none; }
     o+=ukSeal(382,232,.2);
     return o;
   }
-
   var SCENERY=[
    /* 0, RAMEN AT ECHIGO KAWAGUCHI. v32: the village, from the source text.
         "I wandered away from the station, down an alleyway of vending machines,
