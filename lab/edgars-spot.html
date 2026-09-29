@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en" data-light="bright">
+<!--
+  EDGAR'S SPOT v0.1 (LAB). Tight Spiral Productions, 2026-09-29.
+  Convening: convening/EDGARS-SPOT-CONVENING.md (founder "Go", 2026-09-29, defaults D1-D6).
+  Art: CHOREOGRAPHED-CHAOS-ART-SPEC-2026-09-29.md ("The Spilled Shaker"): the cover's red,
+  overhead tabletop objects, every word on a kitchen ticket. The objects here are
+  studio-drawn stand-ins sized and named for the photo shoot (spec section 7); each
+  <g data-cc="..."> slot swaps for its cc-<object>-<state>.webp when the shots exist.
+  Source: Choreographed Chaos: Every Table in the Restaurant Counts, Steve & Karen
+  Waller (Damianos Publishing, 2026), adapted with permission. The playable regulars
+  are composites of habits the book describes. The closing card quotes the Wallers
+  from the 2026-03-23 manuscript; check it against the printed book before Live.
+  Floors: single file, offline, no external hosts, no emoji, 20px body, 48px targets,
+  dark host law on both axes, backdrop as element, paint-contract guard.
+-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="A Choreographed Chaos game. Work twelve evenings across a year at a small cafe, set the room from memory before the doors open, and learn what turns a table number into a regular.">
+<title>Edgar's Spot v0.1</title>
+<style>
+/* ---- TOKENS. Each is ATMOSPHERE or TEXT, never both (art spec section 3). ---- */
+:root{
+  /* atmosphere */
+  --field:#F70201; --wall:#680202; --kraft:#E0C1A3; --wood:#8C5842; --wood-dk:#5E3A2B;
+  --porcelain:#FDFCF9; --shade:rgba(56,2,2,.42); --stroke:#231F20; --salmon:#E98A6B;
+  --amber:#B0701E; --pine:#2F5D3A; --fill-yellow:#FFF066;
+  /* text grounds */
+  --ticket:#FBF7F0; --chrome:#680202;
+  /* text */
+  --ink:#231F20; --ink-2:#3B3331; --onchrome:#FBF7F0; --onyellow:#231F20;
+  --rule-line:#231F20; --chip-line:#FBF7F0; --yellow-line:#231F20;
+  --tap:52px;
+  --sans:"Helvetica Neue",Arial,system-ui,sans-serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+html[data-light="soft"]{ --ticket:#EBE1D0; --ink:#231F20; --ink-2:#3B3331; }
+html[data-light="dim"]{ --ticket:#D9CBB5; --ink:#231F20; --ink-2:#352E2C; }
+
+/* ---- DARK HOST LAW, axis 1: the media query, every stop mirrored (complete sets) ---- */
+@media (prefers-color-scheme: dark){
+  :root{ --field:#3A0706; --wall:#1E0202; --chrome:#1E0202; --shade:rgba(0,0,0,.55);
+    --ticket:#2A2422; --ink:#F4EEE6; --ink-2:#E2D8CC; --onchrome:#FBF7F0; --rule-line:#F4EEE6; color-scheme:dark; }
+  html[data-light="soft"]{ --ticket:#3E3532; --ink:#F4EEE6; --ink-2:#E8DED2; }
+  html[data-light="dim"]{ --ticket:#544946; --ink:#F4EEE6; --ink-2:#F0E8DE; }
+}
+/* ---- DARK HOST LAW, axis 2: the script attribute, same values ---- */
+html[data-scheme="dark"]{ --field:#3A0706; --wall:#1E0202; --chrome:#1E0202; --shade:rgba(0,0,0,.55);
+  --ticket:#2A2422; --ink:#F4EEE6; --ink-2:#E2D8CC; --onchrome:#FBF7F0; --rule-line:#F4EEE6; color-scheme:dark; }
+html[data-scheme="dark"][data-light="soft"]{ --ticket:#3E3532; --ink:#F4EEE6; --ink-2:#E8DED2; }
+html[data-scheme="dark"][data-light="dim"]{ --ticket:#544946; --ink:#F4EEE6; --ink-2:#F0E8DE; }
+
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; padding:0; }
+body{ font:20px/1.45 var(--sans); color:var(--ink); background:var(--field); min-height:100vh; }
+/* BACKDROP-AS-ELEMENT: the red field is a real element, never body paint alone */
+#backdrop{ position:fixed; inset:0; background:var(--field); z-index:0; }
+.se-chrome, main, .se-rail{ position:relative; z-index:1; }
+
+/* ---- chrome: ticket tabs on oxblood ---- */
+.se-chrome{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding:calc(6px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 4px calc(8px + env(safe-area-inset-left));
+  background:var(--chrome); color:var(--onchrome); position:sticky; top:0; z-index:5; }
+.se-chrome h1{ flex:1 1 100%; order:2; margin:0 2px 2px; font:700 24px/1.1 var(--sans);
+  letter-spacing:.02em; color:var(--onchrome); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.chip{ font:700 18px/1 var(--mono); color:var(--onchrome); border:2px solid var(--chip-line);
+  border-radius:4px; padding:4px 7px; letter-spacing:.04em; }
+.tab{ display:inline-flex; align-items:center; min-height:var(--tap); padding:8px 10px;
+  font:700 18px/1 var(--mono); color:var(--ink); background:var(--ticket);
+  border:0; border-radius:4px 4px 0 0; text-decoration:none; cursor:pointer; }
+.tabs{ display:flex; gap:6px; order:1; flex:1; }
+.corner{ order:1; display:flex; gap:6px; }
+#tHead:focus{ outline:none; }
+.tab:focus-visible,.stamp:focus-visible,.se-rail a:focus-visible,.se-rail button:focus-visible{
+  outline:3px solid var(--fill-yellow); outline-offset:2px; }
+
+/* ---- layout ---- */
+main{ max-width:1100px; margin:0 auto; padding:10px 10px 18px; display:grid; gap:12px; }
+@media (min-width:900px){ main{ grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); align-items:start; } }
+.stage{ position:relative; }
+.stage svg{ display:block; width:100%; height:auto; max-height:78vh; }
+
+/* ---- the ticket: every readable word lives here ---- */
+.ticket{ background:var(--ticket); color:var(--ink); padding:16px 16px 18px; position:relative;
+  box-shadow:6px 8px 0 var(--shade); border-radius:0 0 3px 3px; }
+.ticket::before{ content:""; position:absolute; left:0; right:0; top:-10px; height:10px;
+  background:
+    linear-gradient(135deg, transparent 50%, var(--ticket) 50%) 0 0/14px 10px repeat-x,
+    linear-gradient(225deg, transparent 50%, var(--ticket) 50%) 0 0/14px 10px repeat-x; }
+.ticket h2{ font:700 22px/1.2 var(--mono); margin:0 0 8px; letter-spacing:.02em; color:var(--ink); }
+.ticket p{ margin:0 0 10px; color:var(--ink); }
+.ticket .when{ font:700 20px/1.3 var(--mono); color:var(--ink-2); margin-bottom:6px; }
+.ticket .said{ font-style:italic; }
+.ticket .notice{ border-left:5px solid var(--rule-line); padding-left:10px; }
+.ticket .rule{ border:0; border-top:2px dashed var(--rule-line); margin:12px 0; }
+.ticket ul{ margin:0 0 10px; padding-left:22px; }
+.ticket li{ margin:0 0 4px; }
+.acts{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.row{ display:flex; flex-wrap:wrap; gap:8px; }
+.stamp{ min-height:var(--tap); padding:10px 14px; font:700 20px/1.25 var(--sans); text-align:left;
+  color:var(--ink); background:var(--ticket); border:3px solid var(--rule-line); border-radius:4px; cursor:pointer; }
+.stamp.go{ border-width:4px; letter-spacing:.02em; }
+.stamp[aria-pressed="true"]{ background:var(--fill-yellow); color:var(--onyellow); border-color:var(--yellow-line); }
+.stamp[disabled]{ border-style:dashed; cursor:default; }
+.stamp small{ display:block; font:400 18px/1.3 var(--sans); }
+.cal{ border-collapse:collapse; font:700 18px/1 var(--mono); margin:6px 0 10px; }
+.cal th,.cal td{ padding:3px 2px; text-align:center; color:var(--ink); width:1.15em; }
+.cal th:first-child,.cal td:first-child{ text-align:left; padding-right:6px; font:700 18px/1.2 var(--sans); }
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.credit{ font-size:18px; }
+
+/* ---- bottom rail ---- */
+.se-rail{ display:flex; gap:10px; justify-content:center; padding:14px 14px calc(14px + env(safe-area-inset-bottom)); background:var(--chrome); }
+.se-rail a,.se-rail button{ display:inline-flex; align-items:center; min-height:var(--tap); padding:10px 18px; font:700 18px/1 var(--mono);
+  color:var(--ink); background:var(--ticket); border:0; border-radius:4px; text-decoration:none; cursor:pointer; }
+
+/* ---- motion: stop-motion drop at 12 fps (art spec section 9) ---- */
+.drop{ animation:drop .34s steps(4) both; transform-box:fill-box; transform-origin:center; }
+@keyframes drop{ from{ transform:translate(-6px,-9px) scale(1.18); opacity:.2; } to{ transform:none; opacity:1; } }
+.tip{ animation:tip .5s steps(6) both; transform-box:fill-box; transform-origin:center; }
+@keyframes tip{ from{ transform:rotate(0deg); } to{ transform:rotate(-78deg); } }
+.glow{ animation:glow 1.6s steps(8) infinite alternate; }
+@keyframes glow{ from{ opacity:.55; } to{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){ .drop,.tip,.glow{ animation:none!important; } }
+</style>
+</head>
+<body>
+<div id="backdrop" aria-hidden="true"></div>
+
+<header class="se-chrome">
+  <nav class="tabs" aria-label="Studio">
+    <a class="tab" href="../index.html">Studio</a>
+    <a class="tab" href="../arcade.html">Cabinet</a>
+  </nav>
+  <div class="corner">
+    <button class="tab" id="lightBtn" type="button" aria-label="Ticket light: Bright">Bright</button>
+    <button class="tab" id="soundBtn" type="button" aria-pressed="true">Sound</button>
+  </div>
+  <h1>Edgar's Spot <span class="chip">v0.1</span> <span class="chip tsp-lab">LAB</span></h1>
+</header>
+
+<main>
+  <div class="stage">
+    <svg id="room" viewBox="0 0 400 506" role="img" aria-labelledby="roomTitle" data-art-class="studio-cut">
+      <title id="roomTitle">The cafe from above: a bar with three stools on the left, a high-top beside it, a table by the wall, a four-top in the middle, a corner table, and the kitchen pass at the top.</title>
+      <defs>
+        <filter id="hard" x="-30%" y="-30%" width="170%" height="170%">
+          <feDropShadow dx="4" dy="5" stdDeviation="0.6" flood-color="#380202" flood-opacity=".55"/>
+        </filter>
+      </defs>
+      <rect x="0" y="0" width="400" height="506" fill="var(--field)"/>
+      <!-- walls, with the door gap at the bottom -->
+      <path d="M4 4 H396 V502 H200 M130 502 H4 Z" fill="none" stroke="var(--wall)" stroke-width="8"/>
+      <path d="M130 502 A70 70 0 0 1 196 438" fill="none" stroke="var(--wall)" stroke-width="3" stroke-dasharray="6 5"/>
+      <rect x="128" y="426" width="6" height="76" fill="var(--wall)" id="doorLeaf"/>
+      <!-- kitchen pass -->
+      <g filter="url(#hard)">
+        <rect x="110" y="12" width="276" height="34" rx="3" fill="var(--wood)"/>
+        <rect x="118" y="18" width="186" height="22" fill="var(--wood-dk)"/>
+      </g>
+      <!-- ticket spike with the notes -->
+      <g id="spike" filter="url(#hard)">
+        <circle cx="140" cy="29" r="9" fill="var(--stroke)"/>
+        <rect id="spikeTicket" x="126" y="10" width="28" height="38" fill="var(--porcelain)" transform="rotate(-8 140 29)"/>
+        <line x1="140" y1="29" x2="140" y2="8" stroke="#9A9A9A" stroke-width="2"/>
+      </g>
+      <!-- count board (salmon) -->
+      <g id="countBoard" filter="url(#hard)">
+        <rect x="318" y="14" width="60" height="30" fill="var(--porcelain)"/>
+        <path d="M326 29 q12 -10 26 0 q-14 10 -26 0 z M352 29 l8 -6 v12 z" fill="var(--salmon)" stroke="var(--stroke)" stroke-width="1.2"/>
+        <g id="countTicks"></g>
+      </g>
+      <!-- bar -->
+      <g filter="url(#hard)">
+        <rect x="12" y="62" width="46" height="408" rx="4" fill="var(--wood)"/>
+        <rect x="18" y="68" width="34" height="396" rx="3" fill="none" stroke="var(--wood-dk)" stroke-width="2"/>
+      </g>
+      <g id="vase"></g>
+      <!-- stools -->
+      <g id="stools"></g>
+      <!-- tables -->
+      <g id="tables"></g>
+      <!-- objects layer: holds, guests, chaos -->
+      <g id="objects"></g>
+    </svg>
+  </div>
+
+  <section class="ticket" id="ticket" aria-live="polite">
+    <h2 id="tHead">Loading</h2>
+    <div id="tBody"></div>
+    <div class="acts" id="tActs"></div>
+  </section>
+</main>
+
+<nav class="se-rail" aria-label="Page navigation">
+  <button type="button" onclick="history.back()">Back</button>
+  <a href="../index.html">Home</a>
+</nav>
+
+<script>
+(function(){
+"use strict";
+var root = document.documentElement;
+
+/* ================= DARK HOST LAW, script axis ================= */
+try{ if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) root.setAttribute("data-scheme","dark"); }catch(e){}
+
+/* ================= PAINT-CONTRACT GUARD =================
+   Measure the resolved ticket ink against the resolved ticket paper. Below 4.5:1,
+   force the light Bright kit inline so a hostile host cannot orphan the words. */
+function relLum(s){
+  var m = s && s.match(/(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?)/);
+  if(!m) return null;
+  function f(v){ v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055,2.4); }
+  return 0.2126*f(+m[1])+0.7152*f(+m[2])+0.0722*f(+m[3]);
+}
+var KIT = {"--ticket":"#FBF7F0","--ink":"#231F20","--ink-2":"#3B3331","--field":"#F70201","--chrome":"#680202","--onchrome":"#FBF7F0"};
+function paintGuard(){
+  try{
+    var b=document.body, t=document.getElementById("ticket");
+    for(var k in KIT) b.style.removeProperty(k);
+    var a=relLum(getComputedStyle(t).color), c=relLum(getComputedStyle(t).backgroundColor);
+    if(a!==null && c!==null){
+      var r=(Math.max(a,c)+0.05)/(Math.min(a,c)+0.05);
+      if(r<4.5){ for(var k2 in KIT) b.style.setProperty(k2,KIT[k2],"important"); }
+    }
+  }catch(e){}
+}
+
+/* ================= STORAGE (per player, optional) ================= */
+var KEY="tsp-edgars-spot-v0";
+function load(){ try{ var s=localStorage.getItem(KEY); return s?JSON.parse(s):null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function wipe(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+
+/* ================= SOUND (Studio Ears): a door bell per guest, one low bell for the plaque ================= */
+var AC=null, soundOn=true;
+function bell(freq, dur, gain){
+  if(!soundOn) return;
+  try{
+    if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+    var t=AC.currentTime, ratios=[1,2.76,5.4,8.93], amps=[1,.45,.22,.1];
+    ratios.forEach(function(r,i){
+      var o=AC.createOscillator(), g=AC.createGain();
+      o.type="sine"; o.frequency.value=freq*r;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(gain*amps[i], t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t+dur/(1+i*0.6));
+      o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t+dur);
+    });
+  }catch(e){}
+}
+function doorBell(){ bell(1318,1.1,0.08); setTimeout(function(){ bell(1568,0.9,0.05); },140); }
+function templeBell(){ bell(196,5.5,0.22); }
+
+/* ================= THE ROOM ================= */
+var PLACES = {
+  HT:{label:"the high-top by the bar", short:"High-top", x:128, y:112, kind:"table", r:27},
+  T2:{label:"Table 2, by the wall", short:"Table 2 (wall)", x:332, y:100, kind:"table", w:62, h:62},
+  T4:{label:"Table 4, the four-top", short:"Table 4 (four-top)", x:212, y:262, kind:"table", w:96, h:78},
+  T3:{label:"Table 3, in the corner", short:"Table 3 (corner)", x:332, y:414, kind:"table", w:62, h:62},
+  S1:{label:"the first bar stool", short:"Stool 1", x:80, y:190, kind:"stool"},
+  S2:{label:"the middle bar stool", short:"Stool 2", x:80, y:288, kind:"stool"},
+  S3:{label:"the end bar stool", short:"Stool 3 (end)", x:80, y:386, kind:"stool"},
+  BAR:{label:"the bar", short:"The bar", x:35, y:112, kind:"bar"},
+  COUNT:{label:"the count board", short:"Count board", x:348, y:29, kind:"board"}
+};
+var TABLES=["HT","T2","T4","T3"], STOOLS=["S1","S2","S3"];
+
+var HOLDS = [
+  {id:"bread", label:"Bread plates", sub:"Holds a table the way a reservation would", where:TABLES},
+  {id:"stool", label:"Save a bar stool", sub:"A folded napkin on the seat", where:STOOLS},
+  {id:"crayons", label:"Crayons and paper", sub:"Set at a table", where:TABLES},
+  {id:"highchair", label:"A highchair", sub:"Pulled up to a table", where:["T2","T4","T3"]},
+  {id:"candle", label:"A candle", sub:"Lit at a table", where:TABLES},
+  {id:"salmon", label:"One salmon off the count", sub:"The kitchen keeps a portion back", where:["COUNT"]},
+  {id:"malt", label:"The single malt, out on the bar", sub:"Bottle down from the top shelf", where:["BAR"]}
+];
+function holdById(id){ for(var i=0;i<HOLDS.length;i++) if(HOLDS[i].id===id) return HOLDS[i]; }
+
+/* ================= THE YEAR ================= */
+var EVENINGS = [
+  {label:"Late September, a Thursday.", season:"fall"},
+  {label:"One week later.", season:"fall"},
+  {label:"The next Thursday.", season:"fall"},
+  {label:"Two weeks later. The maples on the street have turned.", season:"fall"},
+  {label:"Two weeks later. There was frost on the windows this morning.", season:"fall"},
+  {label:"A month later. Snow is coming down on the sidewalk.", season:"winter"},
+  {label:"A month later. It is January, and the door lets the cold in.", season:"winter"},
+  {label:"Six weeks later. The snow along the curb has gone gray.", season:"winter"},
+  {label:"Two months later. It is April, and the flower boxes are back out.", season:"spring"},
+  {label:"Two months later. It is June, and the door stays propped open.", season:"summer"},
+  {label:"Two months later. August heat sits on the street until dark.", season:"summer"},
+  {label:"A year, near enough. It is late September again.", season:"fall"}
+];
+
+/* ================= THE REGULARS (composites of habits in the book) =================
+   Each regular: schedule (evening indexes), a seat, what they need once known,
+   facts revealed on stage, and greeting lines. */
+var R = {
+  F:{ name:"Mr. Ferris", seat:"HT", time:"5:45", sched:[0,1,2,3,4,5,6,7,8,9,10,11] },
+  P:{ name:"Pauline", seat:"S3", time:"5:30", sched:[0,1,3,4,6,7,9,11] },
+  B:{ name:"The Brennans", seat:"T4", time:"5:15", sched:[0,2,3,5,6,8,9,11] },
+  D:{ name:"Mr. Dunne", seat:"T2", time:"6:15", sched:[1,3,4,6,7,9,10,11] },
+  M:{ name:"The Marshes", seat:"T3", time:"7:00", sched:[1,2,4,5,7,8,10,11] }
+};
+var ORDER=["F","P","B","D","M"];
+
+/* current drink (what a good greeting must remember) */
+function fDrink(e){ return e>=7 ? "Hot tea with lemon" : "Decaf with cream"; }
+function pDrink(v){ return v>=6 ? "Sparkling water" : "A glass of the house red"; }
+
+/* facts: revealed on stage. 'when' decides if the fact can show on this visit. */
+var FACTS = {
+  F:[
+    {id:"F1", when:function(v,e){return v===1;}, t:"The man with the cane takes the high-top by the bar. The woman with him says it is an easier seat for him."},
+    {id:"F2", when:function(v,e){return v===1;}, t:"She orders an iced tea for herself and a decaf with cream for him. She calls him Dad."},
+    {id:"F3", when:function(v,e){return v===2;}, t:"He shakes your hand on the way out. Walt Ferris. His daughter is Joan. They never call ahead."},
+    {id:"F4", when:function(v,e){return e===6;}, t:"Joan says her father is off coffee for the winter. “Decaf keeps me up now,” he says. “Hot tea, with lemon.”"}
+  ],
+  P:[
+    {id:"P1", when:function(v,e){return v===1;}, t:"The woman with the paperback takes the end stool at the bar. She orders a glass of the house red and leaves at eight."},
+    {id:"P2", when:function(v,e){return v===2;}, t:"The bartender calls her Pauline. When the end stool is taken, she stands at the corner of the bar instead of sitting in the middle."},
+    {id:"P3", when:function(v,e){return v===5;}, t:"Pauline orders sparkling water tonight. “For a while,” she says, and goes back to her book."}
+  ],
+  B:[
+    {id:"B1", when:function(v,e){return v===1;}, t:"The family of four takes Table 4. The four-year-old is out of her chair before the menus land. She wants something to draw on."},
+    {id:"B2", when:function(v,e){return v===2;}, t:"The mother introduces herself: Kate Brennan. The kids are Lucy and Sam. “Bread first,” she says, “before anything.”"},
+    {id:"B3", when:function(v,e){return e>=3 && e<=4;}, t:"Kate says the baby is due before Christmas."},
+    {id:"B4", when:function(v,e){return e>=5;}, t:"The Brennans have a baby now. Kate needs both hands free, and a highchair at the table."}
+  ],
+  D:[
+    {id:"D1", when:function(v,e){return v===1;}, t:"A man in a work jacket takes the wall table and orders the salmon without opening the menu. “Cooked through. No pink.”"},
+    {id:"D2", when:function(v,e){return v===2;}, t:"He pays with a card that says Frank Dunne. On the way out he asks whether the salmon runs out on Thursdays. It does."}
+  ],
+  M:[
+    {id:"M1", when:function(v,e){return v===1;}, t:"The couple takes the corner table, Table 3. He sits with his back to the wall and drinks a single malt, neat. She drinks white wine."},
+    {id:"M2", when:function(v,e){return v===2;}, t:"They never book. He introduces them at the door: Don and Ruth Marsh."},
+    {id:"M3", when:function(v,e){return e===7;}, t:"Ruth mentions that their fortieth anniversary falls in April."}
+  ]
+};
+
+/* what each regular needs from the room, once they are known (visit 2 on) */
+function needMet(k, v, e, holds){
+  function has(id,place){ return holds.some(function(h){ return h.id===id && h.place===place; }); }
+  if(v<2) return false;
+  if(k==="F") return has("bread","HT");
+  if(k==="P") return has("stool","S3");
+  if(k==="D") return has("salmon","COUNT");
+  if(k==="B") return e>=6 ? has("highchair","T4") : (has("crayons","T4") || (e===5 && has("highchair","T4")));
+  if(k==="M") return e===8 ? has("candle","T3") : (has("bread","T3") || has("malt","BAR") || has("candle","T3"));
+  return false;
+}
+
+/* the recurring moment, told as what people do */
+var MOMENT = {
+  F:function(v,e,h){ return "The bread plates are already on the high-top. He hooks his cane on the edge and sits. Joan sits across from him."; },
+  P:function(v,e,h){ return "The napkin is on the end stool. She moves it to the bar, sits, and opens her book."; },
+  D:function(v,e,h){ return "The count board says salmon, zero. The kitchen kept one back. It goes out cooked through."; },
+  B:function(v,e,h){ return e>=6 ? "The highchair is already at Table 4. Kate sets the baby in it and has both hands back." : "Crayons and paper are waiting at Table 4. Lucy is drawing before her coat is off."; },
+  M:function(v,e,h){ return e===8 ? "A candle is lit at Table 3. Ruth looks at it, then at Don. He does not say anything. He takes her hand." : (h.some(function(x){return x.id==="malt";}) ? "The single malt is already down on the bar. The bartender pours it before Don sits." : "Bread plates hold the corner table. Don sits with his back to the wall."); }
+};
+/* what happens when the room was not ready */
+var UNMET = {
+  F:"The high-top is free tonight, as it happens. Joan helps him up onto the stool.",
+  P:"Someone has the end stool. Pauline stands at the corner of the bar with her book.",
+  D:"The count board says salmon, zero. He looks at it, then orders the chicken.",
+  B:function(e){ return e>=5 ? "There is no highchair. Kate holds the baby on her lap through dinner." : "The four-year-old wanders to the bar looking for something to draw on."; },
+  M:function(e){ return e===8 ? "Table 3 is set the same as any Thursday." : "A walk-in has the corner table. The Marshes take the table in the middle."; }
+};
+
+/* greetings: [{t, k:good|usual|wrong|assume|cold, r:response}] */
+function greetings(k, v, e){
+  var o=[];
+  if(k==="F"){
+    if(v===1) o=[
+      {k:"good", t:"“Good evening. The high-top is free, if that suits.”", r:"She steers him to the high-top. He hooks his cane on the edge."},
+      {k:"assume", t:"“Table for you and your wife?”", r:"The woman laughs once. “I’m his daughter.” They order quickly and leave early."},
+      {k:"cold", t:"“Do you have a reservation?”", r:"“We don’t,” she says. They take the high-top anyway."}];
+    else{
+      var d=fDrink(e), nm = v>=3 ? "Mr. Ferris" : "";
+      o=[{k:"good", t:"“Good evening"+(nm?", "+nm:"")+". "+d+", and an iced tea"+(v>=3?" for Joan":"")+"?”", r:"He nods and hangs up his coat. Joan is already reading the specials."},
+         {k:"wrong", t:"“Good evening"+(v>=3?", Mr. Dunne":"")+". "+(e>=7?"Decaf with cream":"A glass of the house red")+"?”", r:"Joan corrects you, politely. He watches the room."}];
+      o.push(v===4 ? {k:"assume", t:"“Will your wife be joining you tonight?”", r:"Joan looks at you for a second too long. “It’s just us,” she says."}
+                   : {k:"usual", t:"“The usual"+(v>=3?", Mr. Ferris":"")+"?”", r:"“Sure,” he says. Joan orders for both of them anyway."});
+    }
+  }
+  if(k==="P"){
+    if(v===1) o=[
+      {k:"good", t:"“Good evening. Sit anywhere at the bar you like.”", r:"She takes the end stool and opens her paperback."},
+      {k:"assume", t:"“Just one? Is someone meeting you?”", r:"“Just me,” she says. She keeps her coat on."},
+      {k:"cold", t:"“Do you have a reservation?”", r:"“For the bar?” She sits down anyway."}];
+    else{
+      var dr=pDrink(v), nm2 = v>=3 ? ", Pauline" : "";
+      o=[{k:"good", t:"“Good evening"+nm2+". "+dr+"?”", r:"She nods and turns a page."},
+         {k:"wrong", t:"“Good evening"+nm2+". "+(v>=6?"A glass of the house red":"The single malt, neat")+"?”", r:"“Not tonight,” she says, and orders."},
+         {k:"usual", t:"“The usual"+nm2+"?”", r:"“I suppose so,” she says."}];
+    }
+  }
+  if(k==="B"){
+    if(v===1) o=[
+      {k:"good", t:"“Good evening. Table 4 is big enough for everyone.”", r:"They take Table 4. The four-year-old is out of her chair already."},
+      {k:"assume", t:"“What can I get for Mom and Dad?”", r:"“I’m their aunt,” says the man. The mother laughs. He does not."},
+      {k:"cold", t:"“How many in your party?”", r:"The mother counts heads out loud for you. The kids join in."}];
+    else{
+      var nm3 = v>=3 ? "Kate" : "";
+      o=[{k:"good", t:"“Good evening"+(nm3?", "+nm3:"")+". Bread is on its way.”", r:"Kate sits down for the first time since she came in."},
+         {k:"wrong", t:"“Good evening. Would the kids like the salmon?”", r:"Lucy makes a face. Kate orders chicken fingers."},
+         {k:"usual", t:"“The usual for the Brennans?”", r:"“Whatever that is,” Kate says, and orders."}];
+    }
+  }
+  if(k==="D"){
+    if(v===1) o=[
+      {k:"good", t:"“Good evening. Wherever you like.”", r:"He takes the wall table and orders the salmon."},
+      {k:"cold", t:"“Do you have a reservation?”", r:"“No,” he says. He takes the wall table."},
+      {k:"assume", t:"“Is anyone joining you?”", r:"“No,” he says, a little short."}];
+    else o=[
+      {k:"good", t:"“Good evening"+(v>=3?", Mr. Dunne":"")+". The salmon, cooked through?”", r:"“That’s right,” he says, and unfolds his napkin."},
+      {k:"wrong", t:"“Good evening. The salmon, medium rare?”", r:"“Cooked through,” he says. “No pink.”"},
+      {k:"usual", t:"“The usual"+(v>=3?", Mr. Dunne":"")+"?”", r:"He shrugs. “If you know what it is.”"}];
+  }
+  if(k==="M"){
+    if(v===1) o=[
+      {k:"good", t:"“Good evening. The corner table is open.”", r:"He takes the seat with his back to the wall."},
+      {k:"cold", t:"“Do you have a reservation?”", r:"“We never do,” she says."},
+      {k:"assume", t:"“Celebrating something tonight?”", r:"“It’s Thursday,” he says."}];
+    else if(e===8) o=[
+      {k:"good", t:"“Good evening, Don. Ruth. Happy fortieth.”", r:"Ruth puts her hand on your arm for a second."},
+      {k:"wrong", t:"“Good evening. Single malt on the rocks?”", r:"“Neat,” Don says."},
+      {k:"usual", t:"“The usual table?”", r:"“Please,” Ruth says."}];
+    else o=[
+      {k:"good", t:"“Good evening"+(v>=3?", Don. Ruth":"")+". A single malt, neat, and a white?”", r:"Don nods. Ruth is already taking off her gloves."},
+      {k:"wrong", t:"“Good evening. Two glasses of the house red?”", r:"“No,” Ruth says, and orders for both of them."},
+      {k:"usual", t:"“The usual"+(v>=3?", Don":"")+"?”", r:"“I suppose,” he says."}];
+  }
+  return shuffle(o, e*7+v*3+k.charCodeAt(0));
+}
+function shuffle(a, seed){
+  var s=seed||1, out=a.slice();
+  for(var i=out.length-1;i>0;i--){ s=(s*9301+49297)%233280; var j=Math.floor(s/233280*(i+1)); var t=out[i]; out[i]=out[j]; out[j]=t; }
+  return out;
+}
+
+/* the one-night newcomers (evening index 2): Relationships, Don't Assume */
+var NEWCOMERS = { e:2, time:"8:10",
+  arrive:"A young man and an older woman come in late, holding hands. They ask for anything quiet.",
+  opts:[
+    {k:"assume", t:"“Would your mother like to start with something?”", r:"“I’m his wife,” she says. They finish their entrees and leave without dessert. They do not come back."},
+    {k:"good", t:"“What can I get you both?”", r:"They order a bottle of wine and stay for dessert."},
+    {k:"cold", t:"“Do you have a reservation?”", r:"“No,” he says. You find them a table by the door."}]
+};
+
+/* ================= STATE ================= */
+var S;
+function fresh(){
+  S = { e:0, phase:"before", holds:[], notes:[], seen:{}, plaque:null, plaqueE:null,
+        reg:{}, cal:{}, q:[], qi:0, step:0, tonight:[], lines:[], picking:null, ended:false };
+  ORDER.forEach(function(k){ S.reg[k]={visits:0, miss:0, gone:false, skipped:false, tipped:false, returnTried:false}; S.cal[k]=[]; });
+}
+
+/* ================= DRAWING ================= */
+var NS="http://www.w3.org/2000/svg";
+function el(tag, attrs, parent){ var n=document.createElementNS(NS,tag); for(var a in attrs) n.setAttribute(a, attrs[a]); if(parent) parent.appendChild(n); return n; }
+function clear(id){ var g=document.getElementById(id); while(g.firstChild) g.removeChild(g.firstChild); return g; }
+
+function drawTables(){
+  var g=clear("tables");
+  TABLES.forEach(function(id){
+    var p=PLACES[id], grp=el("g",{filter:"url(#hard)","data-cc":"table-"+id},g);
+    if(p.r){
+      el("circle",{cx:p.x,cy:p.y,r:p.r+4,fill:"var(--wood)"},grp);
+      el("circle",{cx:p.x,cy:p.y,r:p.r,fill:"var(--kraft)"},grp);
+    }else{
+      /* chairs */
+      var cw=18;
+      el("rect",{x:p.x-cw/2,y:p.y-p.h/2-16,width:cw,height:12,rx:3,fill:"var(--wood)"},g);
+      el("rect",{x:p.x-cw/2,y:p.y+p.h/2+4,width:cw,height:12,rx:3,fill:"var(--wood)"},g);
+      if(id==="T4"){
+        el("rect",{x:p.x-p.w/2-16,y:p.y-cw/2,width:12,height:cw,rx:3,fill:"var(--wood)"},g);
+        el("rect",{x:p.x+p.w/2+4,y:p.y-cw/2,width:12,height:cw,rx:3,fill:"var(--wood)"},g);
+      }
+      el("rect",{x:p.x-p.w/2-3,y:p.y-p.h/2-3,width:p.w+6,height:p.h+6,rx:4,fill:"var(--wood)"},grp);
+      el("rect",{x:p.x-p.w/2,y:p.y-p.h/2,width:p.w,height:p.h,rx:3,fill:"var(--kraft)"},grp);
+    }
+    shakers(g, id);
+  });
+  if(S.plaque){ var pp=PLACES[S.plaque]; var py = pp.r ? pp.y+pp.r+1 : pp.y+pp.h/2+1;
+    el("rect",{x:pp.x-14,y:py-3,width:28,height:7,rx:1.5,fill:"var(--fill-yellow)",stroke:"var(--stroke)","stroke-width":"1","data-cc":"plaque"},g); }
+}
+function shakers(g, id){
+  var p=PLACES[id], tipped=false;
+  ORDER.forEach(function(k){ if(R[k].seat===id && S.reg[k].tipped) tipped=true; });
+  var sx=p.x+(p.r? -6 : p.w/2-14), sy=p.y+(p.r? -14 : -p.h/2+12);
+  var grp=el("g",{"data-cc":"shakers"},g);
+  el("circle",{cx:sx,cy:sy,r:4.2,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp);
+  if(tipped){
+    var pep=el("ellipse",{cx:sx+10,cy:sy+3,rx:6.5,ry:3.8,fill:"var(--stroke)","class":"tip"},grp);
+    for(var i=0;i<9;i++) el("circle",{cx:sx+14+i*1.9+(i%3), cy:sy+5+((i*7)%5), r:0.9, fill:"var(--stroke)"},grp);
+  }else el("circle",{cx:sx+10,cy:sy,r:4.2,fill:"var(--stroke)"},grp);
+}
+function drawStools(){
+  var g=clear("stools");
+  STOOLS.forEach(function(id){
+    var p=PLACES[id], grp=el("g",{filter:"url(#hard)","data-cc":"stool-"+id},g);
+    el("circle",{cx:p.x,cy:p.y,r:17,fill:"var(--wood)"},grp);
+    el("circle",{cx:p.x,cy:p.y,r:13,fill:"var(--kraft)"},grp);
+  });
+  var t=S.reg.P && S.reg.P.tipped;
+  if(t){ el("ellipse",{cx:40,cy:400,rx:6.5,ry:3.8,fill:"var(--stroke)","class":"tip"},g); }
+}
+function drawVase(){
+  var g=clear("vase"), s=EVENINGS[Math.min(S.e,11)].season, cx=35, cy=446;
+  var grp=el("g",{filter:"url(#hard)","data-cc":"vase-"+s},g);
+  el("circle",{cx:cx,cy:cy,r:7,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp);
+  if(s==="winter"){ for(var i=0;i<6;i++){ var a=i*Math.PI/3; el("line",{x1:cx,y1:cy,x2:cx+Math.cos(a)*14,y2:cy+Math.sin(a)*14,stroke:"var(--pine)","stroke-width":"3","stroke-linecap":"round"},grp);} }
+  else{
+    var petal = s==="summer" ? "var(--porcelain)" : (s==="spring" ? "var(--fill-yellow)" : "var(--amber)");
+    for(var j=0;j<7;j++){ var b=j*2*Math.PI/7; el("ellipse",{cx:cx+Math.cos(b)*9,cy:cy+Math.sin(b)*9,rx:5,ry:3,transform:"rotate("+(b*180/Math.PI)+" "+(cx+Math.cos(b)*9)+" "+(cy+Math.sin(b)*9)+")",fill:petal,stroke:"var(--stroke)","stroke-width":"0.6"},grp); }
+    el("circle",{cx:cx,cy:cy,r:4,fill: s==="summer" ? "var(--fill-yellow)" : "var(--wood-dk)"},grp);
+  }
+}
+function drawCount(){
+  var g=clear("countTicks"), held=S.holds.some(function(h){return h.id==="salmon";});
+  if(held){ el("rect",{x:357,y:18,width:18,height:22,fill:"var(--fill-yellow)",stroke:"var(--stroke)","stroke-width":"1","class":"drop","data-cc":"salmon-hold"},g); }
+}
+
+/* objects placed as holds, and the evidence of guests who came */
+function drawHold(g, h, anim){
+  var p=PLACES[h.place], c=anim?"drop":"", grp=el("g",{filter:"url(#hard)","data-cc":h.id,"class":c},g);
+  var ox=p.x, oy=p.y;
+  if(h.id==="bread"){
+    var dx = p.r ? 10 : 16;
+    [[-dx,6],[dx,-6]].forEach(function(d){ el("circle",{cx:ox+d[0],cy:oy+d[1],r:8,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp); el("circle",{cx:ox+d[0],cy:oy+d[1],r:4.5,fill:"none",stroke:"var(--kraft)","stroke-width":"1.2"},grp); });
+  }
+  if(h.id==="stool"){ el("path",{d:"M"+(ox-9)+" "+(oy+6)+" L"+ox+" "+(oy-8)+" L"+(ox+9)+" "+(oy+6)+" Z",fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp); }
+  if(h.id==="crayons"){
+    el("rect",{x:ox-18,y:oy-4,width:24,height:18,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1",transform:"rotate(-8 "+ox+" "+oy+")"},grp);
+    ["var(--fill-yellow)","var(--pine)","var(--wall)"].forEach(function(col,i){ el("rect",{x:ox+10,y:oy-6+i*6,width:14,height:3.5,rx:1,fill:col,stroke:"var(--stroke)","stroke-width":"0.5"},grp); });
+  }
+  if(h.id==="highchair"){ var hx = ox + (h.place==="T4" ? 0 : 0), hy = oy + (PLACES[h.place].h/2+22);
+    el("rect",{x:hx-13,y:hy-11,width:26,height:22,rx:5,fill:"var(--kraft)",stroke:"var(--wood-dk)","stroke-width":"3"},grp);
+    el("rect",{x:hx-10,y:hy-15,width:20,height:6,rx:2,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp); }
+  if(h.id==="candle"){ el("circle",{cx:ox,cy:oy,r:6,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp); el("circle",{cx:ox,cy:oy,r:2.6,fill:"var(--fill-yellow)","class":"glow"},grp); }
+  if(h.id==="malt"){ el("circle",{cx:ox,cy:oy,r:9,fill:"var(--amber)",stroke:"var(--stroke)","stroke-width":"1.2"},grp); el("circle",{cx:ox,cy:oy,r:3.5,fill:"var(--wood-dk)"},grp); }
+}
+function drawGuest(g, k, anim){
+  var p=PLACES[R[k].seat], grp=el("g",{filter:"url(#hard)","class":anim?"drop":"","data-cc":"guest-"+k},g), x=p.x, y=p.y;
+  function napkin(ax,ay){ el("rect",{x:ax-6,y:ay-4,width:12,height:8,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"0.8"},grp); }
+  function cup(ax,ay,fill){ el("circle",{cx:ax,cy:ay,r:5.5,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp); el("circle",{cx:ax,cy:ay,r:3.2,fill:fill},grp); }
+  if(k==="F"){ el("path",{d:"M"+(x+22)+" "+(y-24)+" q9 -2 9 7 v30",fill:"none",stroke:"var(--wood-dk)","stroke-width":"4","stroke-linecap":"round"},grp);
+    cup(x-12,y+9, S.e>=7 ? "var(--fill-yellow)" : "var(--wood)"); cup(x+10,y+11,"var(--amber)"); }
+  if(k==="P"){ el("rect",{x:26,y:p.y-12,width:18,height:24,fill:"var(--fill-yellow)",stroke:"var(--stroke)","stroke-width":"1",transform:"rotate(10 35 "+p.y+")"},grp);
+    cup(44,p.y+18, S.reg.P.visits>=6 ? "var(--porcelain)" : "var(--wall)"); }
+  if(k==="D"){ el("circle",{cx:x,cy:y-12,r:12,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp);
+    el("path",{d:"M"+(x-8)+" "+(y-12)+" q8 -7 16 0 q-8 7 -16 0 z",fill:"var(--salmon)"},grp); napkin(x,y+16); }
+  if(k==="B"){ [[-28,-18],[28,-18],[-28,18],[28,18]].forEach(function(d){ el("circle",{cx:x+d[0],cy:y+d[1],r:9,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":"1"},grp); }); }
+  if(k==="M"){ cup(x-12,y+12,"var(--amber)"); el("circle",{cx:x+12,cy:y+12,r:5.5,fill:"var(--fill-yellow)",stroke:"var(--stroke)","stroke-width":"1"},grp); napkin(x,y-16); }
+}
+function drawObjects(anim){
+  var g=clear("objects");
+  S.holds.forEach(function(h){ if(h.id!=="salmon") drawHold(g,h,anim && h===S.holds[S.holds.length-1]); });
+  var pr=S.present||[]; pr.forEach(function(k,i){ drawGuest(g,k, S.newGuest && i===pr.length-1); }); S.newGuest=false;
+}
+function drawAll(anim){ drawTables(); drawStools(); drawVase(); drawCount(); drawObjects(anim); }
+
+/* ================= TICKET RENDERING ================= */
+var tHead=document.getElementById("tHead"), tBody=document.getElementById("tBody"), tActs=document.getElementById("tActs");
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;"); }
+function ticket(head, bodyHtml, acts, focus){
+  tHead.textContent=head; tBody.innerHTML=bodyHtml; tActs.innerHTML="";
+  acts.forEach(function(a){
+    if(a.row){ var r=document.createElement("div"); r.className="row"; a.row.forEach(function(b){ r.appendChild(btn(b)); }); tActs.appendChild(r); }
+    else tActs.appendChild(btn(a));
+  });
+  paintGuard();
+  if(focus!==false){ var ae=document.activeElement; if(!ae || ae===document.body){ var f=tActs.querySelector("button"); if(f && S && S.started){ try{ f.focus({preventScroll:true}); }catch(e){} } } }
+  if(S) S.started=true;
+}
+function btn(a){
+  var b=document.createElement("button"); b.type="button"; b.className="stamp"+(a.go?" go":"");
+  b.innerHTML=esc(a.t)+(a.sub?"<small>"+esc(a.sub)+"</small>":"");
+  if(a.pressed!==undefined) b.setAttribute("aria-pressed", a.pressed?"true":"false");
+  if(a.disabled) b.disabled=true;
+  b.addEventListener("click", a.fn); return b;
+}
+
+/* ================= BEFORE THE DOORS OPEN ================= */
+function knownNotes(){ return S.notes.map(function(id){ return factText(id); }); }
+function factText(id){ for(var k in FACTS) for(var i=0;i<FACTS[k].length;i++) if(FACTS[k][i].id===id) return FACTS[k][i].t; return ""; }
+
+function before(){
+  S.phase="before"; S.present=[]; save(); drawAll(!!S.anim); S.anim=false;
+  var ev=EVENINGS[S.e], html="";
+  html+='<p class="when">'+esc(ev.label)+" Five o’clock.</p>";
+  if(S.e===0) html+="<p>The café opens at five-thirty. Sixty seats, and you are the one at the door. You can set up to three things before anyone comes in, or none. Nobody has told you who will come.</p>";
+  else html+="<p>The café opens at five-thirty. You can set up to three things before anyone comes in.</p>";
+  html+='<hr class="rule"><p><strong>Your notes on the spike</strong></p>';
+  if(S.notes.length){ html+="<ul>"; knownNotes().forEach(function(n){ html+="<li>"+esc(n)+"</li>"; }); html+="</ul>"; }
+  else html+="<p>The spike is empty.</p>";
+  if(S.holds.length){ html+='<hr class="rule"><p><strong>Set so far ('+S.holds.length+" of 3)</strong></p><ul>"; S.holds.forEach(function(h){ html+="<li>"+esc(holdById(h.id).label)+", "+esc(PLACES[h.place].label)+"</li>"; }); html+="</ul>"; }
+  var acts=[];
+  if(S.picking){
+    var h=holdById(S.picking);
+    html+='<hr class="rule"><p><strong>'+esc(h.label)+": where?</strong></p>";
+    acts.push({row:h.where.map(function(pl){ return {t:PLACES[pl].short, fn:function(){ placeHold(h.id,pl); }}; })});
+    acts.push({t:"Never mind", fn:function(){ S.picking=null; before(); }});
+  }else if(S.pickingPlaque){
+    html+='<hr class="rule"><p><strong>The brass plaque: which table?</strong> The room only ever gets one. It stays where you put it.</p>';
+    acts.push({row:TABLES.map(function(pl){ return {t:PLACES[pl].short, fn:function(){ S.plaque=pl; S.plaqueE=S.e; S.pickingPlaque=false; templeBell(); before(); }}; })});
+    acts.push({t:"Not yet", fn:function(){ S.pickingPlaque=false; before(); }});
+  }else{
+    if(S.holds.length<3){
+      acts.push({row:HOLDS.filter(function(h){ return !S.holds.some(function(x){ return x.id===h.id && h.where.length===1; }); })
+        .map(function(h){ return {t:h.label, sub:h.sub, fn:function(){ S.picking=h.id; before(); }}; })});
+    }
+    if(S.holds.length) acts.push({row:S.holds.map(function(h,i){ return {t:"Take back: "+holdById(h.id).label+" ("+PLACES[h.place].short+")", fn:function(){ S.holds.splice(i,1); before(); }}; })});
+    if(S.e>=7 && !S.plaque) acts.push({t:"Mount the brass plaque on a table", sub:"Once in the year. It stays.", fn:function(){ S.pickingPlaque=true; before(); }});
+    acts.push({t:"Turn the sign to Open", go:true, fn:openDoors});
+  }
+  ticket("Before the doors open", html, acts);
+}
+function placeHold(id, place){
+  if(S.holds.length>=3) return;
+  S.holds = S.holds.filter(function(h){ return !(h.id===id && h.place===place); });
+  S.holds.push({id:id, place:place}); S.picking=null; S.anim=true;
+  before();
+}
+
+/* ================= SERVICE ================= */
+function openDoors(){
+  S.phase="service"; S.q=[]; S.qi=0; S.step=0; S.tonight=[]; S.present=[]; S.lines=[];
+  ORDER.forEach(function(k){
+    var st=S.reg[k];
+    if(R[k].sched.indexOf(S.e)<0) return;
+    if(st.gone){
+      if(S.e>=9 && !st.returnTried){ st.returnTried=true; S.q.push({k:k, ret:true}); }
+      else S.cal[k][S.e]="gone";
+      return;
+    }
+    if(st.miss>=2 && !st.skipped){ st.skipped=true; S.cal[k][S.e]="skip"; return; }
+    S.q.push({k:k});
+  });
+  if(S.e===NEWCOMERS.e) S.q.push({k:"N"});
+  S.q.sort(function(a,b){ return tm(a.k)-tm(b.k); });
+  nextArrival();
+}
+function tm(k){ var t = k==="N" ? NEWCOMERS.time : R[k].time; var p=t.split(":"); return (+p[0])*60+(+p[1]); }
+function clock(k){ var t = k==="N" ? NEWCOMERS.time : R[k].time; return t; }
+
+function nextArrival(){
+  if(S.qi>=S.q.length){ return sevenOClock(); }
+  var a=S.q[S.qi], k=a.k; doorBell();
+  if(k==="N"){
+    ticket(clock(k)+". The door opens.", "<p>"+esc(NEWCOMERS.arrive)+"</p>",
+      NEWCOMERS.opts.map(function(o){ return {t:o.t, fn:function(){ afterNew(o); }}; }));
+    return;
+  }
+  var st=S.reg[k]; st.visits++;
+  var v=st.visits, met=needMet(k,v,S.e,S.holds), html="";
+  a.met=met;
+  if(a.ret) html+="<p>"+esc(returnLine(k))+"</p>";
+  html+="<p>"+esc(arriveLine(k,v))+"</p>";
+  if(v>=2) html+="<p>"+esc(met ? MOMENT[k](v,S.e,S.holds) : (typeof UNMET[k]==="function" ? UNMET[k](S.e) : UNMET[k]))+"</p>";
+  S.present.push(k); S.newGuest=true; drawObjects(false);
+  var opts=greetings(k,v,S.e);
+  ticket(clock(k)+". The door opens.", html, opts.map(function(o){ return {t:o.t, fn:function(){ afterGreet(a,o); }}; }));
+}
+function arriveLine(k, v){
+  if(v===1) return {F:"An older man with a cane comes in with a woman of about forty. She looks past the tables to the high-top by the bar.",
+    P:"A woman on her own comes in with a paperback. She goes straight to the bar and looks at the end stool.",
+    B:"A family of four comes in out of the cold. The four-year-old runs ahead to the biggest table.",
+    D:"A man in a work jacket comes in alone and looks at the chalkboard before he looks at you.",
+    M:"A couple in their sixties comes in without a reservation and asks for the corner table."}[k];
+  return {F:"Mr. Ferris comes in on Joan’s arm, cane first.", P:"Pauline comes in with a different paperback.",
+    B:"The Brennans come in, all of them at once.", D:"Frank Dunne comes in, still in his work jacket.",
+    M:"The Marshes come in, Ruth first, Don holding the door."}[k]
+    .replace("Frank Dunne", v>=3 ? "Frank Dunne" : "The man in the work jacket")
+    .replace("Mr. Ferris comes", v>=3 ? "Mr. Ferris comes" : "The man with the cane comes")
+    .replace("on Joan’s arm", v>=3 ? "on Joan’s arm" : "on his daughter’s arm")
+    .replace("Pauline comes", v>=3 ? "Pauline comes" : "The woman with the paperback comes")
+    .replace("The Brennans come", v>=3 ? "The Brennans come" : "The family from Table 4 comes")
+    .replace("The Marshes come in, Ruth first, Don", v>=3 ? "The Marshes come in, Ruth first, Don" : "The corner-table couple comes in, she first, he");
+}
+function returnLine(k){ return {F:"You have not seen the man with the cane in a long while.", P:"You have not seen Pauline since the winter.",
+  B:"You have not seen the Brennans in months.", D:"You have not seen Frank Dunne in months.", M:"You have not seen the Marshes since the spring."}[k]; }
+
+function afterGreet(a, o){
+  var k=a.k, st=S.reg[k], hit = a.met || o.k==="good";
+  if(o.k==="assume"){ st.miss+=2; hit=false; }
+  else if(hit){ st.miss=0; st.skipped=false; st.tipped=false; if(a.ret) st.gone=false; }
+  else { st.miss+=1; }
+  if(!hit){ st.tipped=true; if(st.miss>=3){ st.gone=true; } }
+  S.cal[k][S.e]= hit ? "hit" : "miss";
+  var html="<p class=\"said\">"+esc(o.t)+"</p><p>"+esc(o.r)+"</p>";
+  var nf=revealFacts(k, st.visits);
+  nf.forEach(function(f){ html+='<p class="notice"><strong>You notice.</strong> '+esc(f.t)+"</p>"; });
+  drawTables(); drawStools();
+  S.qi++;
+  ticket(clock(k)+". "+tableName(k), html, [{t: S.qi<S.q.length ? "The door again" : "Keep going", go:true, fn:nextArrival}]);
+}
+function tableName(k){ return {F:"The high-top", P:"The end of the bar", B:"Table 4", D:"Table 2", M:"Table 3"}[k]; }
+function afterNew(o){
+  var html="<p class=\"said\">"+esc(o.t)+"</p><p>"+esc(o.r)+"</p>";
+  if(o.k==="assume") html+='<p class="notice"><strong>You notice.</strong> You guessed a relationship out loud, and the guess was wrong.</p>';
+  S.qi++;
+  ticket(NEWCOMERS.time+". A table by the door", html, [{t: S.qi<S.q.length ? "The door again" : "Keep going", go:true, fn:nextArrival}]);
+}
+function revealFacts(k, v){
+  var out=[];
+  FACTS[k].forEach(function(f){ if(S.seen[f.id]===undefined && f.when(v,S.e) && out.length<2){ S.seen[f.id]=S.e; out.push(f); S.tonight.push(f.id); } });
+  return out;
+}
+
+/* seven o'clock: bread plates nobody came for come off the tables */
+function sevenOClock(){
+  var html="", lines=[];
+  S.holds.forEach(function(h){
+    if(h.id==="bread"){
+      var owner=null; ORDER.forEach(function(k){ if(R[k].seat===h.place) owner=k; });
+      var came = owner && S.present.indexOf(owner)>=0;
+      if(!came) lines.push("Seven o’clock. Nobody came for "+PLACES[h.place].label+". You take the bread plates back to the kitchen.");
+    }
+  });
+  var away=[]; ORDER.forEach(function(k){ var c=S.cal[k][S.e]; if(c==="skip") away.push(k); });
+  html+= lines.length ? lines.map(function(l){ return "<p>"+esc(l)+"</p>"; }).join("") : "<p>Seven o’clock. The room is as full as it gets on a Thursday.</p>";
+  away.forEach(function(k){ html+="<p>"+esc(awayLine(k))+"</p>"; });
+  S.holds = S.holds.filter(function(h){ return !(h.id==="bread" && !ORDER.some(function(k){ return R[k].seat===h.place && S.present.indexOf(k)>=0; })); });
+  drawObjects(false);
+  ticket("Later in the evening", html, [{t:"Close up for the night", go:true, fn:closeUp}]);
+}
+function awayLine(k){ return {F:"The man with the cane does not come in tonight.", P:"The end stool stays empty tonight.",
+  B:"Table 4 goes to a party of strangers tonight.", D:"Nobody orders the salmon cooked through tonight.", M:"Someone else has the corner table tonight."}[k]; }
+
+/* ================= CLOSE: three lines on the spike ================= */
+function closeUp(){
+  S.phase="close"; S.present=[]; save();
+  var pool = S.notes.slice();
+  S.tonight.forEach(function(id){ if(pool.indexOf(id)<0) pool.push(id); });
+  if(S.pick===undefined || S.pick===null) S.pick = S.notes.slice(0,3);
+  var html='<p>You write tomorrow’s notes from memory and push them onto the spike. Three lines fit on a ticket.</p>';
+  if(!pool.length) html+="<p>You noticed nothing worth writing down tonight.</p>";
+  html+=calendarHtml(false);
+  var acts=[];
+  pool.forEach(function(id){
+    var on=S.pick.indexOf(id)>=0;
+    acts.push({t:factText(id), pressed:on, disabled:(!on && S.pick.length>=3), fn:function(){
+      var i=S.pick.indexOf(id); if(i>=0) S.pick.splice(i,1); else if(S.pick.length<3) S.pick.push(id); closeUpRender();
+    }});
+  });
+  acts.push({t:"Pin the ticket and lock up ("+S.pick.length+" of 3 lines)", go:true, fn:lockUp});
+  ticket("Close. Notes for next time", html, acts);
+}
+function closeUpRender(){ var y=window.scrollY; closeUp(); window.scrollTo(0,y); }
+function lockUp(){
+  S.notes = S.pick.slice(0,3); S.pick=null;
+  S.holds = [];
+  S.e++;
+  if(S.e>=EVENINGS.length){ S.phase="end"; save(); return ending(); }
+  save(); before();
+}
+
+/* ================= THE CALENDAR (the only record) ================= */
+function calendarHtml(full){
+  var mark={hit:"●",miss:"○",skip:"–",gone:"×"};
+  var h='<p><strong>The year so far</strong> (filled: you had it right; open: they came and you missed; dash: they stayed away; cross: they stopped coming)</p><table class="cal"><thead><tr><th scope="col">Regular</th>';
+  for(var i=0;i<12;i++) h+='<th scope="col">'+(i+1)+"</th>";
+  h+="</tr></thead><tbody>";
+  ORDER.forEach(function(k){
+    h+='<tr><th scope="row">'+esc(knownName(k))+"</th>";
+    for(var i=0;i<12;i++){ var c=S.cal[k][i]; var lab = c ? {hit:"had it right",miss:"missed",skip:"stayed away",gone:"stopped coming"}[c] : (i<=S.e && R[k].sched.indexOf(i)<0 ? "not expected" : "");
+      h+='<td>'+(c?mark[c]:"")+(lab?'<span class="sr"> '+lab+"</span>":"")+"</td>"; }
+    h+="</tr>";
+  });
+  return h+"</tbody></table>";
+}
+function knownName(k){
+  var named = {F:"F3",P:"P2",B:"B2",D:"D2",M:"M2"}[k];
+  if(S.seen[named]!==undefined) return {F:"Ferris",P:"Pauline",B:"Brennans",D:"Dunne",M:"Marshes"}[k];
+  var first = {F:"F1",P:"P1",B:"B1",D:"D1",M:"M1"}[k];
+  if(S.seen[first]!==undefined) return {F:"The cane",P:"The paperback",B:"Table 4",D:"Wall table",M:"Corner"}[k];
+  return "Not met";
+}
+
+/* ================= THE END: the plaque, then stop ================= */
+var PLAQUE_NAME={F:"Walt\u2019s Spot",B:"The Brennans\u2019 Spot",D:"Frank\u2019s Spot",M:"Don and Ruth\u2019s Spot"};
+function ending(){
+  S.ended=true; S.present=[];
+  var html="";
+  if(S.plaque){
+    var owner=null; ORDER.forEach(function(k){ if(R[k].seat===S.plaque) owner=k; });
+    var here = owner && S.cal[owner][11]==="hit";
+    if(here) S.present=[owner];
+    drawAll(false); templeBell();
+    var who = owner ? {F:"Mr. Ferris hooks his cane on the edge of the high-top. Joan sits across from him.",
+      B:"Lucy is too old for crayons now. She draws anyway, at Table 4.", D:"Frank Dunne unfolds his napkin at the wall table. The salmon comes out cooked through.",
+      M:"Don sits with his back to the wall. Ruth takes off her gloves."}[owner] : "";
+    html+="<p>"+esc(here ? who : "The plaque catches the light from the kitchen. Nobody is sitting there tonight.")+"</p>";
+    html+='<p><strong>The brass plaque on the edge of the table reads:</strong> '+esc(owner ? PLAQUE_NAME[owner] : "Reserved")+"</p>";
+  }else{
+    drawAll(false);
+    html+="<p>The high-top by the bar is still just a table.</p>";
+  }
+  ticket("A year of Thursdays", html, [{t:"Turn the chairs up", go:true, fn:afterword}]);
+}
+function afterword(){
+  var html=calendarHtml(true);
+  html+='<hr class="rule"><p><strong>This happened.</strong> Steve and Karen Waller ran a sixty-seat caf\u00e9 outside Boston. An older gentleman with a cane and his daughter came in three or four times a week for five years, and always sat at the same high-top.</p>';
+  html+='<p class="said">\u201CAfter about two years, we put a brass plaque on the high-top table\u2019s edge that said \u2018Edgar\u2019s Spot,\u2019 telling the world this was his spot.\u201D</p>';
+  html+='<p class="said">\u201CAnd his daughter, Nancy, always sat across from him.\u201D</p>';
+  html+='<p class="credit">From <em>Choreographed Chaos: Every Table in the Restaurant Counts</em> by Steve and Karen Waller (Damianos Publishing, 2026), adapted with permission. The regulars you served are composites of habits the book describes. Tight Spiral Productions. Play. Notice. Design.</p>';
+  ticket("Steve and Karen Waller", html, [{t:"Work the year again", go:true, fn:function(){ wipe(); fresh(); before(); window.scrollTo(0,0); }}]);
+}
+
+/* ================= CORNER CONTROLS ================= */
+var LIGHTS=["bright","soft","dim"], LNAME={bright:"Bright",soft:"Soft",dim:"Dim"};
+var lightBtn=document.getElementById("lightBtn"), soundBtn=document.getElementById("soundBtn");
+function setLight(l){ root.setAttribute("data-light",l); lightBtn.textContent=LNAME[l]; lightBtn.setAttribute("aria-label","Ticket light: "+LNAME[l]); try{ localStorage.setItem(KEY+"-light",l); }catch(e){} paintGuard(); }
+lightBtn.addEventListener("click", function(){ var cur=root.getAttribute("data-light")||"bright"; setLight(LIGHTS[(LIGHTS.indexOf(cur)+1)%3]); });
+soundBtn.addEventListener("click", function(){ soundOn=!soundOn; soundBtn.textContent=soundOn?"Sound":"Muted"; soundBtn.setAttribute("aria-pressed", soundOn?"true":"false"); });
+try{ var sl=localStorage.getItem(KEY+"-light"); if(sl && LIGHTS.indexOf(sl)>=0) setLight(sl); }catch(e){}
+new MutationObserver(paintGuard).observe(root,{attributes:true,attributeFilter:["data-light","data-scheme","class"]});
+
+/* ================= BOOT: the room first, no wall ================= */
+var saved=load();
+if(saved && saved.reg && typeof saved.e==="number"){ S=saved; S.picking=null; S.pickingPlaque=false; }
+else fresh();
+if(S.phase==="end" || S.e>=EVENINGS.length) ending();
+else if(S.phase==="close"){ closeUp(); drawAll(false); }
+else { S.holds = S.phase==="before" ? S.holds : []; before(); }
+setTimeout(paintGuard, 400);
+
+/* test hook for the studio playthrough agent */
+window.__edgar = { state:function(){ return S; }, greet:greetings };
+})();
+</script>
+</body>
+</html>
