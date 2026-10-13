@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Flok v28</title>
+<title>Flok v29</title>
 <style>
 :root{
   color-scheme:dark;
@@ -503,6 +503,55 @@ html.train-tight #sc-train .brief-role{display:none}
 html.train-tight #sc-train .brief{padding-top:8px;padding-bottom:8px;margin-bottom:6px}
 html.train-tight #sc-train .feed-more{padding:2px}
 html.train-tight #sc-train .meter-wrap{margin-top:4px;margin-bottom:4px}
+
+/* ── v29 THE OPENING IS HER STORY. The founder's image rule (>50% image) against v27's
+   17%: her post fills the opening the way a story fills a phone, and stays VISIBLE (a
+   photo hidden under a panel would pass the gate and fail the rule). Text sits on scrims;
+   Studio Eyes measures the real pixels. The footer lives under the fold. */
+#sc-hire{align-self:stretch;width:auto}
+.story{position:relative;width:100%;height:calc(100svh - 168px);min-height:470px;max-height:880px;border-radius:22px;overflow:hidden;
+  isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.story-stage{position:relative;flex:1 1 auto;display:flex;flex-direction:column;isolation:isolate;min-height:0}
+/* the photo runs 70px under the panel's feathered edge, framed on treeline and water */
+.story-img{position:absolute;left:0;right:0;top:0;bottom:-70px;width:100%;height:calc(100% + 70px);object-fit:cover;object-position:50% 72%;z-index:-2}
+.story-stage::before{content:"";position:absolute;left:0;right:0;top:0;height:270px;z-index:-1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,8,14,.88) 0,rgba(4,8,14,.74) 150px,rgba(4,8,14,.3) 215px,rgba(4,8,14,0) 270px)}
+.story-top{padding:10px 14px 0;text-align:left}
+.story-bars{display:flex;gap:4px;margin-bottom:10px}
+.story-bars span{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.4)}
+.story-bars span.on{background:#fff}
+.story-who{display:flex;align-items:center;gap:10px;color:#fff;font-size:18px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.story-who b{font-weight:800}
+.story-who .avatar{width:34px;height:34px}
+.story-clock{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums}
+.story .cold-h{color:#fff;text-align:left;margin:14px 0 0;max-width:15ch;text-shadow:0 2px 10px rgba(0,0,0,.55)}
+.story-cap{position:relative;z-index:1;color:#fff;font-size:19px;font-weight:600;margin:auto 16px 6px;text-align:left;
+  text-shadow:0 1px 4px rgba(0,0,0,.85);align-self:flex-start;background:rgba(4,8,14,.62);padding:4px 10px;border-radius:10px;margin-bottom:48px}
+.story-panel{position:relative;z-index:1;padding:4px 16px 16px;display:flex;flex-direction:column;align-items:center;background:rgba(8,12,18,.94)}
+.story-panel::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:40px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(8,12,18,0),rgba(8,12,18,.94))}
+.story-panel .cold-meter{margin:4px auto 12px}
+#sc-hire .cold-foot{margin:18px auto 4px}
+#sc-hire .cold-foot .brand-tile.mini{vertical-align:middle}
+@media (max-height:760px){.story .cold-h{font-size:26px;margin-top:10px}.story-cap{font-size:18px}.story-panel .cold-meter{margin-bottom:8px}}
+
+/* ── v29 the clock */
+.phone-clock{order:2;color:var(--feed-ink);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;margin-left:auto;margin-right:12px}
+.phone-top .app{order:1}
+.phone-top .bell{order:3}
+.rank-clock{color:var(--ink);font-size:19px;font-weight:700;margin:16px 0 0}
+.rank-clock b{font-variant-numeric:tabular-nums;font-weight:900}
+.reveal-clock{color:var(--ink);font-size:clamp(20px,5.4vw,24px);font-weight:700;margin:6px auto 4px;max-width:24ch;text-wrap:balance}
+.reveal-clock b{font-weight:900}
+/* ── v29 decoys are inert: the bell is a control only on the alerts lever */
+.bell.inert-bell{pointer-events:none;cursor:default}
+/* ── v29 sound: one control, beside the only action that makes a sound */
+.snd-row{display:flex;justify-content:flex-end;margin-bottom:6px}
+.snd{min-height:44px;padding:8px 16px;border-radius:22px;background:var(--panel);border:1px solid var(--edge);color:var(--ink);font:inherit;font-size:18px;font-weight:800;cursor:pointer}
+.snd[aria-pressed="false"]{border-style:dashed}
+.snd:focus-visible{outline:3px solid var(--phos);outline-offset:2px}
+/* ── v29 polite voice, off screen, after every control in the page */
+.say-live{position:fixed;left:-10000px;bottom:0;width:1px;height:1px;overflow:hidden}
 /* ── v26: screenshot post ── */
 .fc-shot{background:#f4f5f8;border:1px solid #c9ced8;padding:8px 14px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:6px;color:#2a2f38;font-size:18px;line-height:1.25;text-align:left}
 .fc-shot .shot-bar,.fc-shot .shot-row{color:#2a2f38}
@@ -560,20 +609,27 @@ html.train-tight #sc-train .meter-wrap{margin-top:4px;margin-bottom:4px}
 <div class="app-shell">
 
 <section class="screen on" id="sc-hire" aria-label="Your job">
-  <div class="cold-eyebrow"><span class="brand-tile mini" aria-hidden="true"><svg viewBox="0 0 48 48" role="presentation" focusable="false"><circle cx="33" cy="15" r="6.5" fill="#fff"/><circle cx="19" cy="25" r="5" fill="#fff" opacity=".82"/><circle cx="9" cy="34" r="3.6" fill="#fff" opacity=".6"/></svg></span>flok growth team &middot; night shift</div>
-  <h1 class="cold-h">She opened flok to post one&nbsp;photo.</h1>
-  <div class="cold-phone phone">
-    <div class="phone-top"><div class="app">flok<span class="dot">.</span></div><div class="cold-clock">10:52 PM</div></div>
-    <div class="cold-card" id="coldCard"></div>
+  <div class="story">
+   <div class="story-stage">
+    <img class="story-img" id="storyImg" alt="Her post: a still lake at golden hour, autumn trees reflected in the water" decoding="async">
+    <div class="story-top">
+      <div class="story-bars" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
+      <div class="story-who"><span id="storyAv"></span><b>north_trail</b><span class="story-now">now</span><span class="story-clock">10:52 PM</span></div>
+      <h1 class="cold-h">She opened flok to post one&nbsp;photo.</h1>
+    </div>
+    <p class="story-cap">golden hour at the lake. no filter.</p>
+   </div>
+    <div class="story-panel">
+      <div class="cold-meter">
+        <p class="cold-job"><b>Your job:</b> keep her here past midnight.</p>
+        <div class="meter" aria-hidden="true"><div class="meter-fill" id="coldFill" style="width:6%"></div><div class="meter-target" style="left:80%"></div></div>
+        <div class="cold-scale" aria-hidden="true"><span>on flok <b class="now" id="coldMin">4:12</b></span><span>midnight</span></div>
+      </div>
+      <button class="big-btn" type="button" onclick="startTraining()" aria-describedby="coldSr">Start your shift</button>
+      <span id="coldSr" hidden>It is 10:52 PM. She has been on flok for about four minutes.</span>
+    </div>
   </div>
-  <div class="cold-meter">
-    <p class="cold-job"><b>Your job:</b> keep her here past midnight.</p>
-    <div class="meter" aria-hidden="true"><div class="meter-fill" id="coldFill" style="width:6%"></div><div class="meter-target" style="left:80%"></div></div>
-    <div class="cold-scale" aria-hidden="true"><span>on flok <b class="now" id="coldMin">4:12</b></span><span>midnight</span></div>
-  </div>
-  <button class="big-btn" type="button" onclick="startTraining()" aria-describedby="coldSr">Start your shift</button>
-  <span id="coldSr" hidden>It is 10:52 PM. She has been on flok for about four minutes.</span>
-  <p class="cold-foot">Five tricks real apps use, one at a time. Offline. The people are invented; the photos are real. <button class="link-btn" type="button" onclick="openAbout('hire')">About the photos</button></p>
+  <p class="cold-foot"><span class="brand-tile mini" aria-hidden="true"><svg viewBox="0 0 48 48" role="presentation" focusable="false"><circle cx="33" cy="15" r="6.5" fill="#fff"/><circle cx="19" cy="25" r="5" fill="#fff" opacity=".82"/><circle cx="9" cy="34" r="3.6" fill="#fff" opacity=".6"/></svg></span> flok growth team, night shift. Five tricks real apps use, one at a time. Offline. The people are invented; the photos are real. <button class="link-btn" type="button" onclick="openAbout('hire')">About the photos</button></p>
 </section>
 
 <section class="screen" id="sc-train" aria-label="Training">
@@ -585,6 +641,7 @@ html.train-tight #sc-train .meter-wrap{margin-top:4px;margin-bottom:4px}
   <div class="train-phone">
     <div class="phone">
       <div class="phone-top">
+        <div class="phone-clock" id="phoneClock" aria-label="Time on her phone">10:53 PM</div>
         <div class="app">flok<span class="dot">.</span></div>
         <div class="bell zero" id="bell" role="button" tabindex="0" aria-label="Notifications — tap to clear" onclick="clearBell()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();clearBell();}">0</div>
       </div>
@@ -614,15 +671,16 @@ html.train-tight #sc-train .meter-wrap{margin-top:4px;margin-bottom:4px}
       </div>
     </div>
   </div>
-  <button class="big-btn advance" type="button" id="advanceBtn" onclick="nextLever()">Next &rarr;</button>
+  <button class="big-btn advance" type="button" id="advanceBtn" onclick="nextLever()" aria-disabled="true">Next &rarr;</button>
 </section>
 
 <section class="screen" id="sc-rank" aria-label="Promotion">
   <div class="rankcard">
     <div class="star" aria-hidden="true">&#9733;</div>
-    <div class="earned">Promoted</div>
+    <div class="earned" id="rankEarned">Promoted</div>
     <div class="title" id="rankTitle">Junior</div>
     <div class="of">Growth Team</div>
+    <p class="rank-clock"><b id="rankClock">11:06 PM</b> &middot; she&rsquo;s still on flok</p>
   </div>
   <button class="big-btn" type="button" onclick="afterRank()" style="margin-top:26px">Continue &rarr;</button>
 </section>
@@ -637,6 +695,7 @@ html.train-tight #sc-train .meter-wrap{margin-top:4px;margin-bottom:4px}
 
 <section class="screen" id="sc-flip-seat" aria-label="Your telemetry">
   <div class="big-glyph" aria-hidden="true">&#9680;</div>
+  <p class="reveal-clock"><b>12:09 AM.</b> She&rsquo;s still on flok. You kept her past midnight.</p>
   <p class="reveal-line">While you trained the machine, it measured you.</p>
   <div class="tele">
     <div class="tele-pair">
@@ -657,7 +716,8 @@ html.train-tight #sc-train .meter-wrap{margin-top:4px;margin-bottom:4px}
 </span>
 
 <!-- BOTTOM NAV RAIL — Back + Home -->
-<p class="se-stamp" style="margin:.45rem .9rem;justify-content:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:18px;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><span class="se-updated" id="seUpdated">Last updated recently</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v28 <span style="opacity:.75">the verb is on screen</span></span>  </p>
+<p class="se-stamp" style="margin:.45rem .9rem;justify-content:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:18px;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><span class="se-updated" id="seUpdated">Last updated recently</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v29 <span style="opacity:.75">past midnight</span></span>  </p>
+<p id="sayLive" class="say-live" aria-live="polite"></p>
 <nav class="se-rail" aria-label="Page navigation">
   <button type="button" onclick="history.back()" aria-label="Back">Back</button>
   <a href="index.html" aria-label="Home">Home</a>
@@ -800,7 +860,7 @@ function setMeter(v){
   const L=LEVERS[step];
   if(!hit&&meterVal>=L.target){
     hit=true;
-    document.getElementById('advanceBtn').classList.add('ready');
+    document.getElementById('advanceBtn').classList.add('ready');document.getElementById('advanceBtn').removeAttribute('aria-disabled');
     document.getElementById('flipWrap').classList.remove('locked');
     document.getElementById('meterAria').classList.add('hit');
     const h=document.getElementById('actHint');h.textContent='Target hit.';h.classList.add('good');
@@ -831,7 +891,7 @@ function paintTrain(){
   document.getElementById('flip').classList.remove('flipped');
   document.getElementById('flipWrap').classList.add('locked');
   document.getElementById('meterAria').classList.remove('hit');
-  document.getElementById('advanceBtn').classList.remove('ready');
+  document.getElementById('advanceBtn').classList.remove('ready');document.getElementById('advanceBtn').setAttribute('aria-disabled','true');
   const h=document.getElementById('actHint');
   h.innerHTML='<b class="hint-tag">'+L.name+' &mdash; '+L.tag+'.</b>'
             +(L.bridge?'<span class="hint-why">'+L.bridge+'</span>':'')
@@ -848,10 +908,20 @@ function paintTrain(){
   if(L.type==='send')startStreakClock();
   if(L.type==='release')startNotify();
   setMeter(26);
+  document.getElementById('phoneClock').textContent=LEVER_CLOCK[Math.min(step,LEVER_CLOCK.length-1)];
+  // v29 DECISION, NOT DECORATION (Horvath): a control that does nothing on this lever is
+  // not a control on this lever. The bell is live only on the alerts lever; the feed
+  // takes focus only where scrolling or the inbox is the verb.
+  var bell=document.getElementById('bell'), bellLive=L.type==='release';
+  bell.classList.toggle('inert-bell',!bellLive);
+  if(bellLive){bell.setAttribute('role','button');bell.tabIndex=0;bell.removeAttribute('aria-hidden');}
+  else{bell.removeAttribute('role');bell.removeAttribute('tabindex');bell.setAttribute('aria-hidden','true');}
+  var fd=document.getElementById('feed');
+  if(L.type==='scroll'||L.type==='flip')fd.tabIndex=0; else fd.removeAttribute('tabindex');
   const z=document.getElementById('actZone');
   if(L.type==='tap')z.innerHTML='<button class="act-btn" type="button" onclick="doTap()">'+L.verb+'</button>';
   else if(L.type==='send')z.innerHTML='<button class="act-btn" type="button" onclick="doSend()">'+L.verb+'</button>';
-  else if(L.type==='release')z.innerHTML='<button class="act-btn" type="button" onclick="doRelease()">'+L.verb+'</button>';
+  else if(L.type==='release')z.innerHTML='<div class="snd-row"><button class="snd" type="button" aria-pressed="'+SND.on+'" onclick="toggleSound(this)">'+(SND.on?'Sound on':'Sound off')+'</button></div><button class="act-btn" type="button" onclick="doRelease()">'+L.verb+'</button>';
   else if(L.type==='flip')z.innerHTML='<button class="knob" type="button" id="knob" onclick="doFlip(this)" aria-pressed="false"><span class="knob-face"><span>'+L.verb+'</span><span class="knob-switch" aria-hidden="true"></span></span></button>';
   else z.innerHTML='';
   requestAnimationFrame(function(){fitTrain();}); setTimeout(function(){fitTrain();},350);
@@ -873,7 +943,7 @@ function fitTrain(tight){
   var top=brief.getBoundingClientRect().top+scrollY-8;
   var over=(end.getBoundingClientRect().bottom+scrollY+10-top)-innerHeight;
   if(over>0){
-    var fh=feed.getBoundingClientRect().height, nh=Math.max(220,fh-over), cut=fh-nh;
+    var fh=feed.getBoundingClientRect().height, nh=Math.max(tight?180:220,fh-over), cut=fh-nh;
     feed.style.height=nh+'px';
     root.style.setProperty('--train-media',Math.max(110,160-cut)+'px');
     // tier 2, short phones (SE): the role line repeats the rank pill; drop it and the gaps
@@ -951,26 +1021,57 @@ function doSend(){
   feed.scrollTop=0;
   bump(15);
 }
+// ── v29 SOUND (Murch seat, founder call 2026-10-13). One quiet two-note tick per
+// notification, synthesized, no files. Nothing sounds before a tap (Ears E1): the
+// context is made inside doRelease. The Sound control sits beside Release and drops the
+// master gain to zero (E2/E3). Used only on the interrupt lever: it is the trick's own
+// sound, never a reward (claude/WIN-STATE-AND-JUICE-RESEARCH-2026-09-26.md, Dixon 2014).
+var SND={ctx:null,g:null,on:true};
+try{SND.on=localStorage.getItem('flok-sound')!=='off';}catch(e){}
+function sndCtx(){
+  if(!SND.ctx){var A=window.AudioContext||window.webkitAudioContext;if(!A)return null;
+    SND.ctx=new A();SND.g=SND.ctx.createGain();SND.g.gain.value=SND.on?1:0;SND.g.connect(SND.ctx.destination);}
+  if(SND.ctx.state==='suspended')SND.ctx.resume();
+  return SND.ctx;
+}
+function ping(at,f){
+  var c=sndCtx();if(!c||!SND.on)return;
+  var t=c.currentTime+at,o=c.createOscillator(),e=c.createGain();
+  o.type='sine';o.frequency.setValueAtTime(f,t);
+  e.gain.setValueAtTime(0.0001,t);e.gain.exponentialRampToValueAtTime(0.16,t+0.008);e.gain.exponentialRampToValueAtTime(0.0001,t+0.15);
+  o.connect(e);e.connect(SND.g);o.start(t);o.stop(t+0.17);
+}
+function notifyTicks(n){for(var i=0;i<n;i++){ping(i*0.12,1320);ping(i*0.12+0.05,1760);}}
+function toggleSound(b){
+  SND.on=!SND.on;try{localStorage.setItem('flok-sound',SND.on?'on':'off');}catch(e){}
+  if(SND.g)SND.g.gain.value=SND.on?1:0;
+  b.setAttribute('aria-pressed',String(SND.on));b.textContent=SND.on?'Sound on':'Sound off';
+}
 // ── L4: feel the red dot's pull yourself, THEN plant it on the cohort. ──
 function startNotify(){
-  bellCount=2;setBell(bellCount,true);        // opens with an unread dot already itching
+  dotCleared=false;bellCount=2;setBell(bellCount,true);        // opens with an unread dot already itching
 }
 function clearBell(){
   if(LEVERS[step].type!=='release'||bellCount<=0)return;
   // You couldn't leave it sitting. The reward is in the CLEAR — anticipatory dopamine,
   // paid out the instant the dot hits zero. That reflex is the whole product.
-  bellCount=0;setBell(0,false);
+  bellCount=0;setBell(0,false);dotCleared=true;
   const h=document.getElementById('actHint');
   if(!h.classList.contains('good'))h.innerHTML='<b class="hint-tag">You cleared it.</b>'
     +'<span class="hint-why">That reflex to zero the dot is the hook.</span>'
     +'<span class="hint-do">Now plant a batch on the cohort — a sample lands back on you.</span>';
   bump(12);
 }
+var dotCleared=false;
 function doRelease(){
+  // v29 (Horvath seat): the brief says clear the dot, THEN release. Release alone used to win.
+  if(!dotCleared){const h=document.getElementById('actHint');
+    h.innerHTML='<b class="hint-tag">Clear the red dot first.</b><span class="hint-do">Tap the red number at the top of the phone.</span>';return;}
   T.alerts++;
   // Plant a batch on the cohort — and one pings back to your own console. Watch what you
   // do next. You will clear it. You can't leave a red dot sitting either.
   bellCount+=3;setBell(bellCount,true);
+  notifyTicks(3);
   const feed=document.getElementById('feed');
   feed.insertAdjacentHTML('afterbegin',cardHTMLU('opened the app again. not sure why.',false,3+(T.alerts%5),'now'));
   while(feed.querySelectorAll('.feed-card').length>6)feed.lastElementChild.remove();
@@ -1011,8 +1112,18 @@ function onFeedScroll(){
   }
 }
 function flipCard(){document.getElementById('flip').classList.toggle('flipped');}
+// v29: the clock the opening promised. Lever starts and promotions, 10:53 PM to 12:09 AM.
+// v29 (Ear persona seat): screen changes that carry story are spoken, politely, once.
+function say(t){var e=document.getElementById('sayLive');if(!e)return;e.textContent='';setTimeout(function(){e.textContent=t;},60);}
+const LEVER_CLOCK=['10:53 PM','11:07 PM','11:22 PM','11:38 PM','11:53 PM'];
+const RANK_CLOCK=['11:06 PM','11:21 PM','11:37 PM','11:52 PM','12:09 AM'];
 function nextLever(){
   if(!hit)return;stopStreakClock();step++;
+  document.getElementById('rankClock').textContent=RANK_CLOCK[Math.min(step-1,RANK_CLOCK.length-1)];
+  // the fifth card is not a promotion (there is no sixth rank): it is the end of the shift
+  var last=step>=LEVERS.length;
+  document.getElementById('rankEarned').textContent=last?'Shift over':'Promoted';
+  say((last?'Shift over. ':'Promoted: '+RANK_TITLES[Math.min(step,RANK_TITLES.length-1)]+'. ')+RANK_CLOCK[Math.min(step-1,RANK_CLOCK.length-1)]+'. She is still on flok.');
   document.getElementById('rankTitle').textContent=RANK_TITLES[Math.min(step,RANK_TITLES.length-1)];
   go('rank');
 }
@@ -1031,7 +1142,7 @@ function afterRank(){
     }else{ r.textContent=''; }
     document.getElementById('tScreens').textContent=T.screens;
     document.getElementById('tAlerts').textContent=T.alerts;
-    go('flip-seat');
+    go('flip-seat');say('12:09 AM. She is still on flok. You kept her past midnight. While you trained the machine, it measured you.');
   }
 }
 const SCREENS=['hire','train','rank','flip-seat','about'];
@@ -1055,7 +1166,8 @@ function go(id){
 
 // ── v27 cold open: her first post, and her minutes ticking in real time.
 (function(){
-  var c=document.getElementById('coldCard'); if(c) c.innerHTML=cardHTMLU(R1_POSTS[0],false,4,'now');
+  var si=document.getElementById('storyImg'); if(si) si.src=IMG.lake;
+  var sa=document.getElementById('storyAv'); if(sa) sa.innerHTML=avatar(R1_USER.hue);
   var sec=252, m=document.getElementById('coldMin'), f=document.getElementById('coldFill');
   var still=document.documentElement.classList.contains('still')||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
   if(still||!m) return;
