@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="audience" content="Ages 11 and up: middle school, high school, college, community theater, anyone learning to stage a scene">
+<meta name="spec-source" content="claude/DRAMATICAL-MOVES-RESEARCH-2026-09-24.md">
+<title>Dress Rehearsal: Dramatical Moves</title>
+<!--
+  DRESS REHEARSAL: DRAMATICAL MOVES (temp title, founder 2026-09-24), v1.
+  Tight Spiral Studios. The wide-audience sibling of Dress Rehearsal (EN195,
+  row-k-dress-rehearsal.html). Same engine idea: a character has a secret, the
+  player stages it, the house says whether Row K could see it. Wider in two ways:
+  nine stagecraft moves instead of three, and six scenes pitched at ages 11 and up.
+
+  Research behind it: claude/DRAMATICAL-MOVES-RESEARCH-2026-09-24.md
+  (existing resources and games, the gap, NCAS Theatre codes, trauma-informed
+  design rules, public-domain excerpts checked against Folger, Gutenberg,
+  ibiblio and Standard Ebooks).
+
+  Trauma-informed rules applied (SAMHSA six principles; Landy's aesthetic
+  distance; DBP "as if"; Theatrical Intimacy Education):
+   1 everyday stakes only  2 the player directs invented people, never casts
+   themselves  3 cruelty shown by its effect, never its words (the group chat
+   text never appears)  4 a one-line content note on every playbill tile
+   5 skip any scene, any time, no penalty  6 directing is the distance
+   7 every scene ends with a step-out beat and a craft question, never a
+   feelings question  8 the scene says how long it takes; no jump scares, and
+   sound starts OFF.
+
+  Stagecraft lineage (names only in the footer, by founder ruling 2026-09-19):
+  David Mamet, George Saunders, Nick Fore, Heather Sellers, Matt Walsh.
+  Floors: single file, offline, no network fetches, no emoji, scene first,
+  20px body / 18px floor, 48px targets, back + home on every screen, dark
+  fork on both axes, backdrop as element, reduced motion, keyboard operable.
+-->
+<style>
+  :root{
+    --paper:#FAF6EE; --ink:#1F1B16; --card:#FFFFFF; --line:#5A5245;
+    --teal:#0F5F5A; --teal-ink:#FAF6EE; --accent:#9A4412; --soft:#F1E6D2;
+    --show:#284F2E; --tell:#8C2A1E; --invis:#46465A; --chip-ink:#FAF6EE;
+    --focus:#0F5F5A; --shadow:rgba(34,28,19,0.16);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#17140F; --ink:#F5F1E8; --card:#241F18; --line:#BDB3A1;
+      --teal:#8FD6CC; --teal-ink:#10201E; --accent:#F0B27A; --soft:#2E271E;
+      --focus:#8FD6CC; --shadow:rgba(0,0,0,0.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"], body[data-scheme="dark"]{
+    --paper:#17140F; --ink:#F5F1E8; --card:#241F18; --line:#BDB3A1;
+    --teal:#8FD6CC; --teal-ink:#10201E; --accent:#F0B27A; --soft:#2E271E;
+    --focus:#8FD6CC; --shadow:rgba(0,0,0,0.5); color-scheme: dark;
+  }
+  body[data-scheme="light"]{
+    --paper:#FAF6EE; --ink:#1F1B16; --card:#FFFFFF; --line:#5A5245;
+    --teal:#0F5F5A; --teal-ink:#FAF6EE; --accent:#9A4412; --soft:#F1E6D2;
+    --focus:#0F5F5A; --shadow:rgba(34,28,19,0.16); color-scheme: light;
+  }
+  *{ box-sizing:border-box; margin:0; }
+  html{ background:var(--paper); }
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:20px; line-height:1.5; min-height:100vh;
+  }
+  /* BACKDROP-AS-ELEMENT: the floor is a real element, never body background alone */
+  #backdrop{ position:fixed; inset:0; background:var(--paper); z-index:0; }
+  #app{ position:relative; z-index:1; max-width:1040px; margin:0 auto; padding:0 16px 48px; color:var(--ink); }
+
+  /* top bar: back, home, dark, sound. Words, not icons. */
+  .bar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 0; }
+  .bar .spacer{ flex:1 1 auto; }
+  button, .btn{
+    font:inherit; font-size:20px; min-height:48px; min-width:48px; padding:8px 18px;
+    border-radius:10px; border:2px solid var(--ink); background:var(--card); color:var(--ink);
+    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  }
+  button.primary, .btn.primary{ background:var(--teal); color:var(--teal-ink); border-color:var(--teal); font-weight:bold; }
+  button.small{ font-size:18px; padding:6px 14px; }
+  button:focus-visible, a:focus-visible, textarea:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible{
+    outline:4px solid var(--focus); outline-offset:3px; }
+  button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); }
+  a{ color:var(--teal); text-underline-offset:3px; }
+
+  h1,h2,h3{ line-height:1.2; }
+  h1:focus, h2:focus{ outline:none; }
+  .eyebrow{ font-size:18px; letter-spacing:.12em; text-transform:uppercase; font-weight:bold; color:var(--ink); }
+  p{ margin:0 0 12px; }
+
+  /* THE STAGE. The picture is the page: it takes the width and most of the height. */
+  .stagewrap{ position:relative; border-radius:14px; overflow:hidden; background:#1a1511; box-shadow:0 6px 22px var(--shadow); }
+  .stagewrap svg{ display:block; width:100%; height:auto; }
+  .actor, .fxlayer > g{ transition:transform .7s cubic-bezier(.3,.7,.3,1), opacity .5s ease; }
+  .lightlayer rect, .lightlayer circle{ transition:opacity .6s ease, fill .6s ease; }
+  .drop{ animation:drop .55s cubic-bezier(.3,1.4,.5,1); transform-box:fill-box; transform-origin:50% 0; }
+  @keyframes drop{ from{ transform:translateY(-60px); opacity:0; } to{ transform:none; opacity:1; } }
+  .rain line{ animation:rain 1.1s linear infinite; }
+  @keyframes rain{ from{ transform:translateY(-40px);} to{ transform:translateY(40px);} }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation:none !important; transition:none !important; }
+  }
+
+  /* playbill */
+  .title{ text-align:center; padding:8px 0 4px; }
+  .title .big{ font-size:clamp(40px, 8vw, 72px); font-weight:bold; letter-spacing:.04em; }
+  .title .sub{ font-size:clamp(24px, 4vw, 34px); font-style:italic; }
+  .lede{ font-size:22px; max-width:760px; margin:14px auto 18px; text-align:center; }
+  .tiles{ display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:16px; margin-top:12px; }
+  .tile{
+    display:flex; flex-direction:column; align-items:stretch; text-align:left; padding:0; overflow:hidden;
+    border:2px solid var(--ink); border-radius:14px; background:var(--card); color:var(--ink); gap:0;
+  }
+  .tile .thumb{ background:#1a1511; }
+  .tile .thumb svg{ display:block; width:100%; height:auto; }
+  .tile .words{ padding:12px 14px 14px; }
+  .tile .name{ font-size:22px; font-weight:bold; display:block; }
+  .tile .note{ font-size:18px; display:block; margin-top:4px; }
+  .tile .status{ font-size:18px; display:inline-block; margin-top:8px; font-weight:bold; }
+  .rowlinks{ display:flex; flex-wrap:wrap; gap:12px; margin:22px 0 8px; justify-content:center; }
+
+  /* scene frame: want / in the way / secret */
+  .frame3{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:12px; margin:16px 0; }
+  .frame3 > div{ background:var(--card); border:2px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .frame3 .secret{ background:var(--teal); color:var(--teal-ink); border-color:var(--teal); }
+  .frame3 b{ display:block; font-size:18px; letter-spacing:.1em; text-transform:uppercase; }
+  .place{ font-size:21px; margin:16px 0 4px; }
+  .notice{ font-size:18px; border-left:6px solid var(--accent); padding:4px 0 4px 12px; margin:10px 0; }
+
+  /* move cards */
+  .movehead{ margin:18px 0 6px; }
+  .movehead h2{ font-size:28px; }
+  .cards{ display:grid; gap:12px; margin:12px 0; }
+  .cardbtn{
+    display:block; width:100%; text-align:left; font-size:20px; line-height:1.45; padding:14px 16px;
+    border:2px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink);
+  }
+  .cardbtn[aria-pressed="true"]{ border:4px solid var(--teal); background:var(--card); color:var(--ink); padding:12px 14px; }
+  .chip{ display:inline-block; font-size:18px; font-weight:bold; letter-spacing:.08em; padding:2px 10px; border-radius:8px; color:var(--chip-ink); margin-right:8px; }
+  .chip.SHOW{ background:var(--show); } .chip.TELL{ background:var(--tell); } .chip.INVISIBLE{ background:var(--invis); }
+  .react{ background:var(--soft); border:2px solid var(--line); border-radius:12px; padding:14px 16px; margin:12px 0; }
+  .react .who{ font-size:18px; font-weight:bold; letter-spacing:.06em; display:block; margin-bottom:4px; }
+  .actions{ display:flex; flex-wrap:wrap; gap:12px; margin:14px 0; }
+
+  /* review */
+  .verdict{ font-size:24px; margin:16px 0; font-weight:bold; }
+  table.review{ width:100%; border-collapse:collapse; margin:10px 0 16px; }
+  table.review th, table.review td{ border-bottom:2px solid var(--line); padding:10px 8px; vertical-align:top; text-align:left; font-size:19px; }
+  table.review th{ font-size:18px; letter-spacing:.08em; text-transform:uppercase; }
+  .stepout{ background:var(--card); border:2px dashed var(--line); border-radius:12px; padding:14px 16px; margin:14px 0; }
+
+  /* moves book */
+  .book{ display:grid; gap:16px; margin-top:12px; }
+  .entry{ background:var(--card); border:2px solid var(--line); border-radius:14px; padding:16px; }
+  .entry h2{ font-size:26px; margin-bottom:6px; }
+  .entry .seen{ font-size:18px; font-weight:bold; }
+  .entry blockquote{ margin:10px 0; padding:8px 14px; border-left:6px solid var(--teal); font-style:italic; }
+  .entry cite{ display:block; font-style:normal; font-size:18px; margin-top:4px; }
+  .entry .glyph svg{ width:88px; height:88px; float:right; margin:0 0 8px 12px; }
+
+  /* your turn, teachers */
+  label{ display:block; font-weight:bold; margin:12px 0 4px; }
+  input[type=text], textarea, select{
+    font:inherit; font-size:20px; width:100%; padding:10px 12px; border:2px solid var(--ink); border-radius:10px;
+    background:var(--card); color:var(--ink);
+  }
+  textarea{ min-height:96px; }
+  .check{ display:flex; gap:10px; align-items:flex-start; font-weight:normal; margin:6px 0; min-height:44px; }
+  .check input{ width:28px; height:28px; margin-top:2px; flex:none; }
+  .panel{ background:var(--card); border:2px solid var(--line); border-radius:14px; padding:16px; margin:14px 0; }
+  .panel h2{ font-size:26px; margin-bottom:8px; }
+  .panel ul{ padding-left:24px; } .panel li{ margin:6px 0; }
+  footer{ margin-top:36px; padding-top:14px; border-top:2px solid var(--line); font-size:18px; }
+  .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  @media (max-width:480px){ .bar button{ font-size:18px; padding:6px 12px; } }
+  @media print{ .bar, .actions, footer, #backdrop{ display:none !important; } body{ background:#fff; color:#000; } }
+</style>
+</head>
+<body>
+<div id="backdrop" aria-hidden="true"></div>
+<div id="app">
+  <nav class="bar" aria-label="Game controls">
+    <button id="nav-back" type="button">Back</button>
+    <button id="nav-home" type="button">Playbill</button>
+    <span class="spacer"></span>
+    <button id="nav-dark" type="button" aria-pressed="false">Dark</button>
+    <button id="nav-sound" type="button" aria-pressed="false">Sound off</button>
+  </nav>
+  <main id="screen" tabindex="-1"></main>
+  <div id="live" class="sr" aria-live="polite"></div>
+  <footer>
+    <p><b>Dress Rehearsal: Dramatical Moves.</b> A Tight Spiral Studios game. Play. Notice. Design.</p>
+    <p>Stagecraft lineage: David Mamet, George Saunders, Nick Fore, Heather Sellers, Matt Walsh.</p>
+  </footer>
+</div>
+<script>
+"use strict";
+/* ============================================================
+   ART: cut-paper stage. Every set is layered paper with hand-cut
+   edges (displacement) and two-step drop shadows, so the stage reads
+   as a miniature built out of card stock, not flat vector.
+   ============================================================ */
+var W = 1000, H = 620;
+
+function defs(){
+  function cut(id, seed, scale, s1, o1x, o1y, s2, o2x, o2y){
+    return '<filter id="'+id+'" x="-10%" y="-10%" width="125%" height="125%" color-interpolation-filters="sRGB">'
+     +'<feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" seed="'+seed+'" result="n"/>'
+     +'<feDisplacementMap in="SourceGraphic" in2="n" scale="'+scale+'" xChannelSelector="R" yChannelSelector="G" result="d"/>'
+     +'<feTurbulence type="fractalNoise" baseFrequency="0.06 0.12" numOctaves="3" seed="'+(seed+3)+'" result="f"/>'
+     +'<feColorMatrix in="f" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .08 0" result="g"/>'
+     +'<feComposite in="g" in2="d" operator="in" result="gc"/>'
+     +'<feMerge result="p"><feMergeNode in="d"/><feMergeNode in="gc"/></feMerge>'
+     +'<feGaussianBlur in="d" stdDeviation="'+s1+'" result="b1"/><feOffset in="b1" dx="'+o1x+'" dy="'+o1y+'" result="q1"/>'
+     +'<feFlood flood-color="#0c0806" flood-opacity=".45"/><feComposite in2="q1" operator="in" result="sh1"/>'
+     +'<feGaussianBlur in="d" stdDeviation="'+s2+'" result="b2"/><feOffset in="b2" dx="'+o2x+'" dy="'+o2y+'" result="q2"/>'
+     +'<feFlood flood-color="#0c0806" flood-opacity=".26"/><feComposite in2="q2" operator="in" result="sh2"/>'
+     +'<feMerge><feMergeNode in="sh2"/><feMergeNode in="sh1"/><feMergeNode in="p"/></feMerge></filter>';
+  }
+  return '<defs>'
+   + cut("cutFar", 4, 2.2, 0.9, 1, 1.6, 2.5, 1.6, 3)
+   + cut("cut", 9, 2.8, 1.6, 2, 3, 5, 3, 8)
+   + cut("cutNear", 2, 3.2, 2.2, 3, 4, 8, 5, 13)
+   + '<radialGradient id="glowWarm"><stop offset="0" stop-color="#fff3c4" stop-opacity=".95"/><stop offset=".45" stop-color="#ffd27a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>'
+   + '<radialGradient id="glowBlue"><stop offset="0" stop-color="#d8f0ff" stop-opacity=".95"/><stop offset=".4" stop-color="#7cc4ff" stop-opacity=".45"/><stop offset="1" stop-color="#7cc4ff" stop-opacity="0"/></radialGradient>'
+   + '<radialGradient id="glowWhite"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset=".5" stop-color="#fff6de" stop-opacity=".35"/><stop offset="1" stop-color="#fff6de" stop-opacity="0"/></radialGradient>'
+   + '<linearGradient id="velvet" x1="0" x2="1"><stop offset="0" stop-color="#5a1119"/><stop offset=".25" stop-color="#8d2230"/><stop offset=".5" stop-color="#5f131c"/><stop offset=".75" stop-color="#912635"/><stop offset="1" stop-color="#5a1119"/></linearGradient>'
+   + '<linearGradient id="skyDusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d5a8e"/><stop offset=".6" stop-color="#d98f7a"/><stop offset="1" stop-color="#f3c28e"/></linearGradient>'
+   + '<linearGradient id="skyGray" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6f7b86"/><stop offset="1" stop-color="#aab4ba"/></linearGradient>'
+   + '<linearGradient id="skySummer" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fa6c8"/><stop offset=".7" stop-color="#f1c890"/><stop offset="1" stop-color="#f6d9a6"/></linearGradient>'
+   + '<clipPath id="opening"><rect x="50" y="34" width="900" height="532"/></clipPath>'
+   + '</defs>';
+}
+
+/* the proscenium and the house: curtains, lip, three heads in the dark */
+var HOUSE = {
+  marge:{ name:"MARGE, ROW C", role:"retired stage manager", x:520 },
+  dev:{ name:"DEV, ROW K", role:"theater major, takes notes in the dark", x:830 },
+  teddy:{ name:"TEDDY, ROW A", role:"age nine, here for his sister", x:190 }
+};
+function proscenium(speaker){
+  var s = '';
+  s += '<path fill-rule="evenodd" fill="#2a1712" d="M0 0 H1000 V620 H0 Z M50 34 H950 V566 H50 Z"/>';
+  s += '<g filter="url(#cutNear)">';
+  s += '<path fill="url(#velvet)" d="M50 34 H190 C170 150 150 300 128 566 H50 Z"/>';
+  s += '<path fill="url(#velvet)" d="M950 34 H810 C830 150 850 300 872 566 H950 Z"/>';
+  s += '<path fill="#7a1b27" d="M50 34 H950 V74 Q900 112 850 74 Q800 112 750 74 Q700 112 650 74 Q600 112 550 74 Q500 112 450 74 Q400 112 350 74 Q300 112 250 74 Q200 112 150 74 Q100 112 50 74 Z"/>';
+  s += '<path d="M50 44 H950" stroke="#d9a441" stroke-width="5"/>';
+  s += '</g>';
+  s += '<g filter="url(#cut)"><rect x="40" y="556" width="920" height="18" rx="3" fill="#6b4a2e"/></g>';
+  /* heads */
+  function head(id, x, r, hair){
+    var on = speaker === id;
+    var h = '<g filter="url(#cutFar)">';
+    h += '<path fill="#0b0806" d="M'+(x-r*1.9)+' 620 Q'+(x-r*1.6)+' '+(620-r*1.1)+' '+x+' '+(620-r*1.15)+' Q'+(x+r*1.6)+' '+(620-r*1.1)+' '+(x+r*1.9)+' 620 Z"/>';
+    h += '<circle cx="'+x+'" cy="'+(620-r*1.6)+'" r="'+r+'" fill="#0b0806"/>';
+    h += hair;
+    if (on) h += '<circle cx="'+x+'" cy="'+(620-r*1.6)+'" r="'+(r+7)+'" fill="none" stroke="#ffd27a" stroke-width="5"/><path d="M'+(x-r*1.9)+' 620 Q'+(x-r*1.6)+' '+(620-r*1.1)+' '+x+' '+(620-r*1.15)+' Q'+(x+r*1.6)+' '+(620-r*1.1)+' '+(x+r*1.9)+' 620" fill="none" stroke="#ffd27a" stroke-width="5"/>';
+    h += '</g>';
+    return h;
+  }
+  s += head("teddy", 190, 26, '<path fill="#0b0806" d="M170 566 l6 -14 l6 12 l6 -14 l6 12 l6 -14 l6 14 z"/>');
+  s += head("marge", 520, 30, '<circle cx="520" cy="552" r="16" fill="#0b0806"/>');
+  s += head("dev", 830, 32, '<path fill="#0b0806" d="M796 575 q34 -34 70 0 l18 4 l-4 8 h-84 z"/>');
+  return s;
+}
+
+/* ---------- people ---------- */
+function person(a){
+  var h = a.h, r = h*0.085, s = '';
+  var hy = -h + r, tt = -h*0.8, tb = -h*0.43, sw = h*0.13, hw = h*0.105;
+  var legW = h*0.075, gap = h*0.02;
+  var acc = a.acc || [];
+  var has = function(k){ return acc.indexOf(k) >= 0; };
+  var shirt = has("coat") ? "#3f4a5c" : a.shirt;
+  /* cape sits behind everything */
+  if (has("cape")){
+    s += '<g filter="url(#cut)"><path fill="#7d2fa0" d="M'+(-sw-4)+' '+(tt+6)+' L'+(-sw-34)+' '+(-h*0.12)+' L'+(sw+34)+' '+(-h*0.12)+' L'+(sw+4)+' '+(tt+6)+' Z"/>';
+    var capeTop = tt+14, capeBot = -h*0.14;
+    for (var i=0;i<24;i++){ var fy = ((i*7)%24)/24, cy = capeTop + fy*(capeBot-capeTop), half = sw + 4 + fy*30 - 6, fx = ((i*11)%24)/24;
+      var cx = -half + fx*2*half; s += '<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="3.2" fill="#f4d9ff"/>'; }
+    s += '</g>';
+  }
+  s += '<g filter="url(#cut)">';
+  /* legs and shoes */
+  s += '<rect x="'+(-gap-legW)+'" y="'+tb+'" width="'+legW+'" height="'+(-tb-6)+'" rx="4" fill="'+a.pants+'"/>';
+  s += '<rect x="'+gap+'" y="'+tb+'" width="'+legW+'" height="'+(-tb-6)+'" rx="4" fill="'+a.pants+'"/>';
+  if (has("shorts")){ s += '<rect x="'+(-gap-legW)+'" y="'+(tb+h*0.14)+'" width="'+(legW*2+gap*2)+'" height="'+(-tb-h*0.14-6)+'" fill="'+a.skin+'"/><rect x="'+(-gap-legW)+'" y="'+(tb+h*0.14)+'" width="'+legW+'" height="3" fill="'+a.pants+'"/>'; }
+  s += '<ellipse cx="'+(-gap-legW/2-3)+'" cy="-5" rx="'+(legW*0.85)+'" ry="7" fill="#221c18"/>';
+  s += '<ellipse cx="'+(gap+legW/2+3)+'" cy="-5" rx="'+(legW*0.85)+'" ry="7" fill="#221c18"/>';
+  /* torso */
+  var tlen = has("coat") ? tb + h*0.08 : tb;
+  s += '<path fill="'+shirt+'" d="M'+(-sw)+' '+(tt+8)+' Q0 '+(tt-6)+' '+sw+' '+(tt+8)+' L'+hw+' '+tlen+' L'+(-hw)+' '+tlen+' Z"/>';
+  if (has("coat")) s += '<path d="M0 '+(tt+2)+' V'+tlen+'" stroke="#cfd6de" stroke-width="3"/><path fill="#56637a" d="M-16 '+(tt+2)+' l16 22 l16 -22 z"/>';
+  /* arms */
+  var armLen = h*0.34;
+  s += '<rect x="'+(-sw-h*0.055)+'" y="'+(tt+10)+'" width="'+(h*0.058)+'" height="'+armLen+'" rx="6" fill="'+shirt+'" transform="rotate(6 '+(-sw)+' '+(tt+10)+')"/>';
+  s += '<rect x="'+(sw-2)+'" y="'+(tt+10)+'" width="'+(h*0.058)+'" height="'+armLen+'" rx="6" fill="'+shirt+'" transform="rotate(-6 '+sw+' '+(tt+10)+')"/>';
+  s += '<circle cx="'+(-sw-h*0.01)+'" cy="'+(tt+10+armLen)+'" r="'+(h*0.032)+'" fill="'+a.skin+'"/>';
+  s += '<circle cx="'+(sw+h*0.03)+'" cy="'+(tt+10+armLen)+'" r="'+(h*0.032)+'" fill="'+a.skin+'"/>';
+  /* neck, head, hair */
+  s += '<rect x="-6" y="'+(hy+r-4)+'" width="12" height="'+(tt-hy-r+10)+'" fill="'+a.skin+'"/>';
+  s += '<circle cx="0" cy="'+hy+'" r="'+r+'" fill="'+a.skin+'"/>';
+  var hc = a.hair;
+  if (a.style === "short") s += '<path fill="'+hc+'" d="M'+(-r-1)+' '+(hy+2)+' A'+(r+1)+' '+(r+1)+' 0 0 1 '+(r+1)+' '+(hy+2)+' Q0 '+(hy-r*0.35)+' '+(-r-1)+' '+(hy+2)+' Z"/>';
+  if (a.style === "long") s += '<path fill="'+hc+'" d="M'+(-r-3)+' '+(hy+r*1.5)+' V'+hy+' A'+(r+3)+' '+(r+3)+' 0 0 1 '+(r+3)+' '+hy+' V'+(hy+r*1.5)+' H'+(r-4)+' V'+(hy-r*0.1)+' Q0 '+(hy-r*0.6)+' '+(-r+4)+' '+(hy-r*0.1)+' V'+(hy+r*1.5)+' Z"/>';
+  if (a.style === "bun") s += '<circle cx="0" cy="'+(hy-r-6)+'" r="'+(r*0.45)+'" fill="'+hc+'"/><path fill="'+hc+'" d="M'+(-r-1)+' '+hy+' A'+(r+1)+' '+(r+1)+' 0 0 1 '+(r+1)+' '+hy+' Q0 '+(hy-r*0.4)+' '+(-r-1)+' '+hy+' Z"/>';
+  if (a.style === "curly"){ for (var k=0;k<7;k++){ var ang = Math.PI*(1.05+k*0.15); s += '<circle cx="'+(Math.cos(ang)*r*0.95).toFixed(1)+'" cy="'+(hy+Math.sin(ang)*r*0.95).toFixed(1)+'" r="'+(r*0.42).toFixed(1)+'" fill="'+hc+'"/>'; } }
+  if (a.style === "cap") s += '<path fill="'+hc+'" d="M'+(-r-1)+' '+(hy-2)+' A'+(r+1)+' '+(r+1)+' 0 0 1 '+(r+1)+' '+(hy-2)+' Z"/><rect x="'+(a.facing<0?-r-16:r-6)+'" y="'+(hy-6)+'" width="22" height="7" rx="3" fill="'+hc+'"/>';
+  if (a.style === "gray") s += '<path fill="#c9c4bb" d="M'+(-r-2)+' '+(hy+r*0.5)+' A'+(r+2)+' '+(r+2)+' 0 0 1 '+(r+2)+' '+(hy+r*0.5)+' Q'+(r*0.6)+' '+(hy-r*0.6)+' 0 '+(hy-r*0.5)+' Q'+(-r*0.6)+' '+(hy-r*0.6)+' '+(-r-2)+' '+(hy+r*0.5)+' Z"/>';
+  /* eyes: two small dots, looking the way they face */
+  var ex = (a.facing||1)*r*0.22;
+  s += '<circle cx="'+(ex-r*0.3)+'" cy="'+(hy+1)+'" r="2.6" fill="#1b1512"/><circle cx="'+(ex+r*0.3)+'" cy="'+(hy+1)+'" r="2.6" fill="#1b1512"/>';
+  /* apron over the top */
+  if (has("apron")){
+    s += '<path fill="#fbfaf5" d="M'+(-hw+2)+' '+(tt+30)+' H'+(hw-2)+' L'+(hw+4)+' '+(tb+h*0.2)+' H'+(-hw-4)+' Z"/>';
+    s += '<path d="M'+(-hw)+' '+(tt+62)+' H'+hw+' M'+(-hw-2)+' '+(tb+8)+' H'+(hw+2)+' M0 '+(tt+30)+' V'+(tb+h*0.2)+'" stroke="#bdb6a6" stroke-width="2"/>';
+  }
+  s += '</g>';
+  /* things in hand */
+  var hx = sw+h*0.03, hy2 = tt+10+armLen;
+  if (has("ball")) s += '<g filter="url(#cut)"><circle cx="'+(hx+4)+'" cy="'+(hy2-6)+'" r="12" fill="#f7f3ea"/><path d="M'+(hx-3)+' '+(hy2-16)+' q6 10 0 20 M'+(hx+11)+' '+(hy2-16)+' q-6 10 0 20" stroke="#c0392b" stroke-width="2" fill="none"/></g>';
+  if (has("clipboard")) s += '<g filter="url(#cut)"><rect x="'+(hx-10)+'" y="'+(hy2-58)+'" width="40" height="54" rx="3" fill="#a77b4a"/><rect x="'+(hx-5)+'" y="'+(hy2-50)+'" width="30" height="40" fill="#fbfaf5"/><path d="M'+(hx)+' '+(hy2-40)+' h20 M'+(hx)+' '+(hy2-32)+' h20 M'+(hx)+' '+(hy2-24)+' h14" stroke="#555" stroke-width="2"/></g>';
+  if (has("phone")) s += '<g filter="url(#cut)"><rect x="'+(hx-4)+'" y="'+(hy2-26)+'" width="18" height="30" rx="3" fill="#1d2127"/><rect x="'+(hx-1)+'" y="'+(hy2-22)+'" width="12" height="20" fill="#9fd8ff"/></g>';
+  if (has("notebook")) s += '<g filter="url(#cut)"><rect x="'+(-26)+'" y="'+(hy2-24)+'" width="52" height="36" rx="2" fill="#f1e3a8"/><path d="M-20 '+(hy2-14)+' h40 M-20 '+(hy2-6)+' h40 M-20 '+(hy2+2)+' h28" stroke="#6b83a8" stroke-width="2"/></g>';
+  if (has("flashlight")) s += '<g filter="url(#cut)"><rect x="'+(hx-4)+'" y="'+(hy2-10)+'" width="30" height="12" rx="3" fill="#c6c1b4" transform="rotate(-25 '+hx+' '+hy2+')"/></g>';
+  if (has("tray")) s += '<g filter="url(#cut)"><rect x="'+(hx-40)+'" y="'+(hy2-14)+'" width="70" height="10" rx="3" fill="#b8bec4"/><rect x="'+(hx-34)+'" y="'+(hy2-24)+'" width="16" height="12" fill="#f3d55b"/><rect x="'+(hx-14)+'" y="'+(hy2-24)+'" width="16" height="12" fill="#f3d55b"/><rect x="'+(hx+6)+'" y="'+(hy2-24)+'" width="16" height="12" fill="#f3d55b"/></g>';
+  return s;
+}
+
+/* ---------- props that cards bring on ---------- */
+var PROPS = {
+  glove:function(x,y){ return '<g filter="url(#cut)"><path fill="#8a5a2b" d="M'+x+' '+y+' q-4 -34 14 -40 q6 -14 16 -2 q10 -10 16 4 q12 -4 12 12 q8 14 -4 26 z"/><path d="M'+(x+10)+' '+(y-10)+' q14 -6 30 0" stroke="#5e3b18" stroke-width="3" fill="none"/></g>'; },
+  bag:function(x,y){ return '<g filter="url(#cut)"><rect x="'+(x-34)+'" y="'+(y-88)+'" width="68" height="88" rx="6" fill="#4f5b52"/><rect x="'+(x-38)+'" y="'+(y-94)+'" width="76" height="12" rx="4" fill="#3c463f"/><path fill="#d8c7a0" d="M'+(x-18)+' '+(y-92)+' l6 -40 l24 -4 l10 40 z"/><path d="M'+(x-8)+' '+(y-120)+' h22 M'+(x-6)+' '+(y-110)+' h18" stroke="#8e7d58" stroke-width="2"/></g>'; },
+  bike:function(x,y){ return '<g filter="url(#cut)"><circle cx="'+(x-60)+'" cy="'+(y-26)+'" r="26" fill="none" stroke="#2c2b2e" stroke-width="7"/><circle cx="'+(x+60)+'" cy="'+(y-26)+'" r="26" fill="none" stroke="#2c2b2e" stroke-width="7"/><path d="M'+(x-60)+' '+(y-26)+' L'+(x-10)+' '+(y-60)+' L'+(x+40)+' '+(y-60)+' L'+(x+60)+' '+(y-26)+' M'+(x-10)+' '+(y-60)+' L'+x+' '+(y-26)+' L'+(x+40)+' '+(y-60)+'" stroke="#c0392b" stroke-width="7" fill="none" stroke-linejoin="round"/><rect x="'+(x-22)+'" y="'+(y-70)+'" width="26" height="8" rx="3" fill="#2c2b2e"/></g>'; },
+  bus:function(x,y){ return '<g filter="url(#cutNear)"><rect x="'+x+'" y="'+(y-250)+'" width="260" height="236" rx="18" fill="#e2b33c"/><rect x="'+(x+20)+'" y="'+(y-226)+'" width="220" height="92" rx="8" fill="#a7c4d4"/><rect x="'+(x+20)+'" y="'+(y-120)+'" width="90" height="100" fill="#8aa7b8"/><circle cx="'+(x+60)+'" cy="'+(y-10)+'" r="22" fill="#2a2724"/><circle cx="'+(x+210)+'" cy="'+(y-10)+'" r="22" fill="#2a2724"/><rect x="'+(x+150)+'" y="'+(y-246)+'" width="70" height="18" rx="3" fill="#2a2724"/><text x="'+(x+185)+'" y="'+(y-232)+'" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="13" fill="#ffd36b">39 FOREST HILLS</text></g>'; },
+  clock:function(x,y){ return '<g filter="url(#cut)"><circle cx="'+x+'" cy="'+y+'" r="26" fill="#fbfaf5" stroke="#3a332c" stroke-width="5"/><path d="M'+x+' '+y+' V'+(y-16)+' M'+x+' '+y+' h12" stroke="#3a332c" stroke-width="4" stroke-linecap="round"/></g>'; }
+};
+
+/* ---------- effects layer: signs, bubbles, ghosts, sounds ---------- */
+function esc(t){ return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function wrap(text, n){
+  var words = String(text).split(/\s+/), lines = [], cur = "";
+  words.forEach(function(w){ if ((cur+" "+w).trim().length > n && cur){ lines.push(cur); cur = w; } else cur = (cur+" "+w).trim(); });
+  if (cur) lines.push(cur); return lines;
+}
+function sign(text){
+  var lines = wrap(text.toUpperCase(), 24), lh = 42, w = 620, hgt = 36 + lines.length*lh, x = 500 - w/2, y = 96;
+  var s = '<g class="drop"><path d="M'+(x+40)+' 34 V'+y+' M'+(x+w-40)+' 34 V'+y+'" stroke="#2a2724" stroke-width="3"/>';
+  s += '<g filter="url(#cutNear)"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hgt+'" rx="6" fill="#fbf4e0"/><rect x="'+(x+8)+'" y="'+(y+8)+'" width="'+(w-16)+'" height="'+(hgt-16)+'" rx="4" fill="none" stroke="#8c2a1e" stroke-width="4"/></g>';
+  lines.forEach(function(l,i){ s += '<text x="500" y="'+(y+52+i*lh)+'" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="32" fill="#1f1b16">'+esc(l)+'</text>'; });
+  return s + '</g>';
+}
+var PLACED = [];
+function bubble(ax, top, text, ghost){
+  var lines = ghost ? [""] : wrap(text, 24), lh = 40;
+  var longest = lines.reduce(function(m,l){ return Math.max(m, l.length); }, 0);
+  var w = ghost ? 400 : Math.max(180, Math.min(470, longest*16 + 50)), hgt = 30 + lines.length*lh;
+  var x = Math.max(200, Math.min(800 - w, ax - w/2)), y = Math.max(92, top - hgt - 36);
+  PLACED.forEach(function(r){ if (x < r.x + r.w && x + w > r.x && y < r.y + r.h && y + hgt > r.y) y = Math.max(92, r.y - hgt - 16); });
+  PLACED.push({ x:x, y:y, w:w, h:hgt }); ax = Math.max(x + 30, Math.min(x + w - 30, ax));
+  var s = '<g class="drop">';
+  if (ghost){
+    s += '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hgt+'" rx="'+(hgt/2)+'" fill="rgba(255,255,255,.10)" stroke="#e9e3d6" stroke-width="3" stroke-dasharray="10 9"/>';
+    s += '<circle cx="'+(ax-6)+'" cy="'+(y+hgt+14)+'" r="9" fill="none" stroke="#e9e3d6" stroke-width="3" stroke-dasharray="5 5"/>';
+    s += '<text x="'+(x+w/2)+'" y="'+(y+hgt/2+9)+'" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="30" fill="#f2ede2">Row K sees nothing here.</text>';
+  } else {
+    s += '<g filter="url(#cutNear)"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hgt+'" rx="16" fill="#fffdf6"/><path fill="#fffdf6" d="M'+(ax-14)+' '+(y+hgt-2)+' L'+(ax)+' '+(y+hgt+26)+' L'+(ax+16)+' '+(y+hgt-2)+' Z"/></g>';
+    lines.forEach(function(l,i){ s += '<text x="'+(x+22)+'" y="'+(y+46+i*lh)+'" font-family="Georgia,serif" font-size="32" fill="#1f1b16">'+esc(l)+'</text>'; });
+  }
+  return s + '</g>';
+}
+function tag(ax, ay, text){
+  var lines = wrap(text.toUpperCase(), 14), w = 270, hgt = 18 + lines.length*32, x = ax - w/2;
+  var s = '<g class="drop" filter="url(#cutNear)"><rect x="'+x+'" y="'+ay+'" width="'+w+'" height="'+hgt+'" rx="4" fill="#fbf4e0" stroke="#8c2a1e" stroke-width="3"/>';
+  lines.forEach(function(l,i){ s += '<text x="'+ax+'" y="'+(ay+38+i*32)+'" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="26" fill="#1f1b16">'+esc(l)+'</text>'; });
+  return s + '</g>';
+}
+function burst(x, y, word){
+  var pts = [], n = 18, sx = Math.max(1.6, word.length*0.25);
+  x = Math.max(210 + 78*sx, Math.min(790 - 78*sx, x));
+  for (var i=0;i<n*2;i++){ var rr = i%2 ? 50 : 80, a = Math.PI*i/n; pts.push((x+Math.cos(a)*rr*sx).toFixed(0)+","+(y+Math.sin(a)*rr*0.8).toFixed(0)); }
+  return '<g class="drop"><g filter="url(#cutNear)"><polygon points="'+pts.join(" ")+'" fill="#ffe08a"/></g><text x="'+x+'" y="'+(y+11)+'" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="36" fill="#1f1b16">'+esc(word)+'</text></g>';
+}
+function arrow(x1,y1,x2,y2){
+  return '<g class="drop" filter="url(#cutNear)"><path d="M'+x1+' '+y1+' Q'+((x1+x2)/2)+' '+(Math.min(y1,y2)-120)+' '+x2+' '+y2+'" stroke="#fbf4e0" stroke-width="12" fill="none" stroke-linecap="round"/><circle cx="'+x2+'" cy="'+y2+'" r="16" fill="#fbf4e0"/></g>';
+}
+</script>
+<script>
+"use strict";
+/* ---------- the sets, one per scene, all cut paper ---------- */
+function clapboard(x, y, w, h, fill, line){
+  var s = '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+fill+'"/>';
+  for (var yy = y+14; yy < y+h; yy += 14) s += '<path d="M'+x+' '+yy+' h'+w+'" stroke="'+line+'" stroke-width="2"/>';
+  return s;
+}
+function win(x, y, w, h, lit, broken){
+  var s = '<rect x="'+(x-5)+'" y="'+(y-5)+'" width="'+(w+10)+'" height="'+(h+10)+'" fill="#f3efe4"/>';
+  s += '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+(lit?"#f7d98c":"#3d4a5a")+'"/>';
+  s += '<path d="M'+(x+w/2)+' '+y+' V'+(y+h)+' M'+x+' '+(y+h/2)+' H'+(x+w)+'" stroke="#f3efe4" stroke-width="5"/>';
+  if (broken){
+    var cx = x+w*0.3, cy = y+h*0.28;
+    s += '<path fill="#151a22" d="M'+(cx-14)+' '+(cy-8)+' L'+(cx-2)+' '+(cy-18)+' L'+(cx+12)+' '+(cy-6)+' L'+(cx+16)+' '+(cy+10)+' L'+(cx)+' '+(cy+16)+' L'+(cx-16)+' '+(cy+8)+' Z"/>';
+    s += '<path d="M'+cx+' '+cy+' l-22 -28 M'+cx+' '+cy+' l30 -20 M'+cx+' '+cy+' l26 24 M'+cx+' '+cy+' l-26 26 M'+cx+' '+cy+' l4 36" stroke="#e8eef4" stroke-width="2"/>';
+  }
+  return s;
+}
+var SETS = {
+  /* Dorchester triple-decker, front steps, dusk */
+  stoop:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="url(#skyDusk)"/>';
+    s += '<g filter="url(#cutFar)"><path fill="#4b4466" d="M50 330 V250 h70 v-30 h90 v40 h60 v-60 h100 V330 Z"/><path fill="#4b4466" d="M780 330 V210 h80 v40 h90 V330 Z"/></g>';
+    s += '<g filter="url(#cut)">' + clapboard(470, 120, 420, 380, "#8fa9a6", "#7a9491");
+    s += win(530,150,70,90,true) + win(700,150,70,90,false) + win(530,270,70,90,false) + win(700,270,70,90,true) + win(700,400,70,80,false,true);
+    s += '<path fill="#5d6b6e" d="M455 120 L680 70 L905 120 Z"/></g>';
+    s += '<g filter="url(#cut)"><rect x="470" y="470" width="190" height="14" fill="#6d5a45"/><path d="M480 470 v-60 M540 470 v-60 M600 470 v-60 M650 470 v-60 M478 412 h180" stroke="#efe9dc" stroke-width="7"/></g>';
+    s += '<g filter="url(#cut)"><rect x="290" y="484" width="190" height="16" fill="#8b8177"/><rect x="270" y="500" width="210" height="16" fill="#978d82"/><rect x="250" y="516" width="230" height="16" fill="#a39a8f"/><rect x="230" y="532" width="250" height="16" fill="#aea599"/></g>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="548" width="900" height="18" fill="#9b9993"/></g>';
+    return s;
+  },
+  /* backstage at a middle school talent show */
+  backstage:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="#221c19"/>';
+    s += '<g filter="url(#cutFar)">';
+    for (var i=0;i<6;i++){ var x = 120 + i*52; s += '<path d="M'+x+' 34 V'+(330+i*18)+'" stroke="#b9a37a" stroke-width="4"/><path fill="#8c7a58" d="M'+(x-16)+' '+(330+i*18)+' h32 l6 46 h-44 z"/>'; }
+    s += '</g>';
+    s += '<g filter="url(#cut)"><path fill="url(#velvet)" d="M700 34 H950 V566 H660 C690 420 700 250 700 34 Z"/></g>';
+    s += '<rect x="640" y="34" width="60" height="532" fill="url(#glowWarm)" opacity=".35"/>';
+    s += '<g filter="url(#cut)"><path d="M540 548 V300" stroke="#3a3632" stroke-width="8"/><path d="M516 548 l24 -30 l24 30" stroke="#3a3632" stroke-width="7" fill="none"/><rect x="520" y="270" width="40" height="34" rx="6" fill="#4a4540"/></g>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="520" width="900" height="46" fill="#5b4330"/>';
+    for (var j=0;j<9;j++) s += '<path d="M'+(50+j*100)+' 520 v46" stroke="#4a3526" stroke-width="3"/>';
+    s += '<path d="M300 536 l24 16 M324 536 l-24 16 M760 536 l24 16 M784 536 l-24 16" stroke="#e8d27a" stroke-width="6"/></g>';
+    s += '<g filter="url(#cut)"><rect x="200" y="470" width="60" height="10" rx="3" fill="#6f5a45"/><path d="M206 480 l-8 70 M254 480 l8 70" stroke="#6f5a45" stroke-width="7"/></g>';
+    return s;
+  },
+  /* a bus shelter on Centre Street, rain */
+  shelter:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="url(#skyGray)"/>';
+    s += '<g filter="url(#cutFar)"><path fill="#7c8791" d="M50 360 V200 h110 v-50 h120 v90 h80 v-40 h140 v-30 h120 v70 h110 v-60 h120 v220 Z"/>';
+    for (var i=0;i<14;i++) s += '<rect x="'+(80+i*62)+'" y="'+(230+(i%3)*30)+'" width="22" height="26" fill="#9aa6b0"/>';
+    s += '</g>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="440" width="900" height="126" fill="#5a5f64"/><path d="M60 500 h60 M180 500 h60 M300 500 h60 M420 500 h60 M540 500 h60 M660 500 h60 M780 500 h60" stroke="#e9d27a" stroke-width="6"/></g>';
+    s += '<g filter="url(#cut)"><rect x="50" y="530" width="900" height="36" fill="#8d9195"/></g>';
+    s += '<g filter="url(#cut)"><rect x="300" y="250" width="420" height="16" rx="3" fill="#2f3e46"/><rect x="310" y="266" width="10" height="272" fill="#2f3e46"/><rect x="700" y="266" width="10" height="272" fill="#2f3e46"/>';
+    s += '<rect x="322" y="276" width="376" height="170" fill="#cfe2e8" opacity=".35"/><rect x="360" y="468" width="300" height="14" rx="3" fill="#6d4b2e"/><path d="M380 482 v50 M640 482 v50" stroke="#3b2f26" stroke-width="7"/></g>';
+    s += '<g filter="url(#cut)"><path d="M820 540 V260" stroke="#6b6f73" stroke-width="7"/><circle cx="820" cy="250" r="30" fill="#2d6aa3"/><text x="820" y="260" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="28" fill="#ffffff">39</text></g>';
+    s += '<g class="rain" stroke="#dfe8ee" stroke-width="2" opacity=".55">';
+    for (var r=0;r<40;r++){ var rx = 60 + (r*97)%880, ry = 50 + (r*53)%460; s += '<line x1="'+rx+'" y1="'+ry+'" x2="'+(rx-6)+'" y2="'+(ry+22)+'"/>'; }
+    s += '</g>';
+    return s;
+  },
+  /* a kitchen in Waltham, seven in the morning */
+  kitchen:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="#e8d9a8"/>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="34" width="900" height="30" fill="#d9c894"/>';
+    for (var i=0;i<5;i++) s += '<rect x="'+(250+i*96)+'" y="74" width="88" height="120" rx="4" fill="#7d9a86"/><circle cx="'+(250+i*96+76)+'" cy="160" r="4" fill="#d8c07a"/>';
+    s += '</g>';
+    s += '<g filter="url(#cut)">' + win(740, 110, 150, 150, true) + '</g>';
+    s += '<rect x="690" y="90" width="260" height="260" fill="url(#glowWhite)" opacity=".7"/>';
+    s += '<g filter="url(#cut)"><rect x="60" y="150" width="140" height="398" rx="10" fill="#e9ecef"/><path d="M60 320 h140" stroke="#c9cdd1" stroke-width="4"/><rect x="180" y="200" width="8" height="60" rx="3" fill="#aab0b6"/><rect x="180" y="340" width="8" height="80" rx="3" fill="#aab0b6"/></g>';
+    s += '<g filter="url(#cut)"><rect x="220" y="330" width="700" height="24" fill="#bfae8a"/><rect x="230" y="354" width="680" height="194" fill="#7d9a86"/>';
+    for (var d=0;d<5;d++) s += '<rect x="'+(250+d*132)+'" y="372" width="110" height="160" rx="4" fill="#6f8b78"/>';
+    s += '<rect x="560" y="316" width="130" height="14" rx="3" fill="#b8bec4"/>';
+    for (var q=0;q<5;q++) s += '<rect x="'+(568+q*24)+'" y="302" width="20" height="16" fill="#f3d55b"/>';
+    s += '</g>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="548" width="900" height="18" fill="#9c8467"/></g>';
+    s += '<g filter="url(#cut)"><rect x="236" y="470" width="64" height="78" rx="6" fill="#8e9398"/><rect x="230" y="462" width="76" height="12" rx="4" fill="#6e7378"/></g>';
+    return s;
+  },
+  /* a finished basement in Braintree, after midnight */
+  basement:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="#5d4330"/>';
+    s += '<g filter="url(#cutFar)">';
+    for (var i=0;i<18;i++) s += '<rect x="'+(50+i*50)+'" y="34" width="46" height="480" fill="'+(i%2?"#6a4c36":"#634630")+'"/>';
+    s += '<rect x="50" y="34" width="900" height="26" fill="#d8d2c4"/></g>';
+    s += '<g filter="url(#cut)"><rect x="80" y="250" width="130" height="290" rx="8" fill="#8a8f93"/><rect x="100" y="290" width="90" height="60" rx="4" fill="#6d7276"/><circle cx="145" cy="400" r="16" fill="#c0c4c7"/><path d="M110 250 V120 h60" stroke="#8a8f93" stroke-width="16" fill="none"/></g>';
+    s += '<g filter="url(#cut)"><rect x="300" y="330" width="200" height="140" rx="10" fill="#1d1f24"/><rect x="314" y="344" width="172" height="112" rx="6" fill="#23405e"/><path fill="#16283b" d="M314 420 q40 -18 86 0 q44 18 86 0 v36 h-172 z"/><rect x="380" y="470" width="40" height="40" fill="#2a2220"/></g>';
+    s += '<rect x="250" y="280" width="300" height="260" fill="url(#glowBlue)" opacity=".7"/>';
+    s += '<g filter="url(#cut)"><rect x="620" y="420" width="300" height="110" rx="20" fill="#8a3f36"/><rect x="600" y="400" width="54" height="130" rx="20" fill="#7a3530"/><rect x="890" y="400" width="54" height="130" rx="20" fill="#7a3530"/><rect x="650" y="380" width="250" height="60" rx="16" fill="#944a40"/></g>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="514" width="900" height="52" fill="#7c6d5c"/></g>';
+    s += '<g filter="url(#cut)"><rect x="240" y="530" width="150" height="30" rx="14" fill="#3f7aa8"/><rect x="420" y="534" width="150" height="28" rx="14" fill="#c4973a"/><rect x="80" y="536" width="140" height="28" rx="14" fill="#5f8f5a"/></g>';
+    return s;
+  },
+  /* a back porch in Somerville, the last week of June */
+  porch:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="url(#skySummer)"/>';
+    s += '<g filter="url(#cutFar)"><path fill="#6c8c6a" d="M50 420 q120 -40 240 -10 q140 30 280 -10 q180 -40 380 10 V566 H50 Z"/></g>';
+    s += '<g filter="url(#cutFar)"><path d="M620 170 L940 200" stroke="#f3efe4" stroke-width="3"/><rect x="680" y="176" width="44" height="54" fill="#d86a4a" transform="rotate(4 700 176)"/><rect x="760" y="184" width="40" height="46" fill="#5b88b8" transform="rotate(4 780 184)"/><rect x="840" y="190" width="38" height="60" fill="#f2d16b" transform="rotate(4 860 190)"/></g>';
+    s += '<g filter="url(#cut)">' + clapboard(50, 80, 300, 440, "#c9a77a", "#b6936a") + win(110, 130, 80, 100, true) + win(230, 130, 80, 100, false) + win(110, 290, 80, 100, false) + '</g>';
+    s += '<g filter="url(#cut)"><rect x="330" y="410" width="290" height="14" fill="#8d6b4b"/><path d="M340 410 v-70 M420 410 v-70 M500 410 v-70 M580 410 v-70 M336 342 h280" stroke="#f3efe4" stroke-width="7"/></g>';
+    s += '<g filter="url(#cut)"><rect x="380" y="424" width="200" height="30" fill="#a88461"/><rect x="380" y="454" width="220" height="30" fill="#b08c69"/><rect x="380" y="484" width="240" height="32" fill="#b99573"/><rect x="380" y="516" width="260" height="32" fill="#c19e7c"/></g>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="548" width="900" height="18" fill="#5e7f52"/></g>';
+    return s;
+  },
+  /* a school hallway, for the warm-up */
+  hallway:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="#d9dccd"/>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="34" width="900" height="40" fill="#c7cab9"/></g>';
+    s += '<g filter="url(#cut)">';
+    for (var i=0;i<12;i++){ var x = 70 + i*72; s += '<rect x="'+x+'" y="170" width="66" height="360" fill="'+(i%3===1?"#4e7a9a":"#5a86a6")+'"/><path d="M'+(x+10)+' 200 h46 M'+(x+10)+' 212 h46 M'+(x+10)+' 224 h46" stroke="#3d6582" stroke-width="3"/><rect x="'+(x+50)+'" y="330" width="6" height="30" fill="#c9d3da"/>'; }
+    s += '</g>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="530" width="900" height="36" fill="#b7ab93"/>';
+    for (var t=0;t<18;t++) s += '<path d="M'+(50+t*50)+' 530 v36" stroke="#a69a82" stroke-width="2"/>';
+    s += '</g>';
+    return s;
+  },
+  /* the playbill: an empty stage and its ghost light */
+  ghost:function(){
+    var s = '<rect x="50" y="34" width="900" height="532" fill="#15110e"/>';
+    s += '<g filter="url(#cutFar)"><rect x="50" y="470" width="900" height="96" fill="#3d2e22"/>';
+    for (var j=0;j<9;j++) s += '<path d="M'+(50+j*100)+' 470 v96" stroke="#2f2319" stroke-width="3"/>';
+    s += '</g>';
+    s += '<circle cx="500" cy="300" r="260" fill="url(#glowWarm)" opacity=".55"/>';
+    s += '<g filter="url(#cut)"><path d="M500 540 V330" stroke="#4a4540" stroke-width="10"/><path d="M462 548 l38 -26 l38 26" stroke="#4a4540" stroke-width="9" fill="none"/><path d="M478 330 h44 l-6 -22 h-32 z" fill="#5c5650"/><path d="M482 306 q18 -50 36 0" fill="none" stroke="#6b6560" stroke-width="5"/></g>';
+    s += '<circle cx="500" cy="286" r="22" fill="#fff4cc"/><circle cx="500" cy="286" r="80" fill="url(#glowWarm)"/>';
+    return s;
+  }
+};
+
+/* ---------- a few glyphs for the Moves Book, same paper hand ---------- */
+var GLYPH = {
+  PROP:'<circle cx="44" cy="46" r="24" fill="#f7f3ea"/><path d="M34 26 q10 20 0 40 M54 26 q-10 20 0 40" stroke="#c0392b" stroke-width="3" fill="none"/>',
+  BLOCKING:'<ellipse cx="30" cy="62" rx="9" ry="14" fill="#3a332c"/><ellipse cx="52" cy="40" rx="9" ry="14" fill="#3a332c"/><ellipse cx="34" cy="20" rx="7" ry="10" fill="#3a332c" opacity=".5"/>',
+  LINE:'<rect x="10" y="16" width="68" height="44" rx="12" fill="#fffdf6" stroke="#3a332c" stroke-width="3"/><path d="M26 60 l-4 16 l16 -16" fill="#fffdf6" stroke="#3a332c" stroke-width="3"/><path d="M22 34 h44 M22 44 h28" stroke="#3a332c" stroke-width="3"/>',
+  PAUSE:'<path d="M26 12 h36 M26 76 h36 M30 12 q0 22 14 32 q-14 10 -14 32 M58 12 q0 22 -14 32 q14 10 14 32" stroke="#3a332c" stroke-width="4" fill="#f1e3a8"/>',
+  LIGHT:'<path d="M30 14 h28 l8 26 h-44 z" fill="#3a332c"/><path d="M22 40 L6 84 H82 L66 40 Z" fill="#ffd27a" opacity=".85"/>',
+  SOUND:'<path d="M14 34 h14 l18 -16 v52 l-18 -16 h-14 z" fill="#3a332c"/><path d="M56 30 q10 14 0 28 M64 22 q18 22 0 44" stroke="#3a332c" stroke-width="4" fill="none"/>',
+  COSTUME:'<path d="M44 16 q10 0 10 10 q0 8 -10 10 v6 L78 64 H10 L44 42" stroke="#3a332c" stroke-width="4" fill="none"/>',
+  EXIT:'<rect x="22" y="10" width="44" height="70" fill="#7e3a22"/><rect x="28" y="16" width="32" height="64" fill="#b06a4a"/><circle cx="54" cy="50" r="3" fill="#f3d55b"/>',
+  PICTURE:'<rect x="10" y="56" width="26" height="26" fill="#7d9a86"/><rect x="50" y="36" width="30" height="46" fill="#7d9a86"/><circle cx="23" cy="44" r="7" fill="#3a332c"/><circle cx="65" cy="22" r="7" fill="#3a332c"/>'
+};
+</script>
+<script>
+"use strict";
+/* SOURCE-VERBATIM-BEGIN  Shakespeare, Hamlet 5.1 and 1.2, Folger text - public domain */
+var Q_YORICK = "Alas, poor Yorick! I knew him, Horatio—a fellow of infinite jest, of most excellent fancy.";
+var Q_KIN = "KING: But now, my cousin Hamlet and my son— / HAMLET (aside): A little more than kin and less than kind.";
+/* SOURCE-VERBATIM-END */
+/* ============================================================
+   THE NINE MOVES. Each one appears in two scenes.
+   ============================================================ */
+var MOVES = {
+  PROP:{ name:"Prop", ask:"Pick the object. Somebody has to use it, and Row K has to be able to see it.",
+    what:"An object earns its spot on stage when somebody uses it. If a prop just sits there getting looked at, it's decoration.",
+    test:"Row K can see an object if it's bigger than a hand, or if somebody does something with it that's bigger than a hand.",
+    quotes:[
+      { q:Q_YORICK, c:"Shakespeare, Hamlet, Act 5, Scene 1, as Hamlet holds the skull. Folger Shakespeare text.", u:"https://www.folger.edu/explore/shakespeares-works/hamlet/read/5/1/" },
+      { q:"One must not put a loaded rifle on the stage if no one is thinking of firing it.", c:"Anton Chekhov, letter to A. S. Lazarev-Gruzinsky, 1 November 1889. Modern English translation.", u:"https://en.wikipedia.org/wiki/Chekhov%27s_gun" }
+    ],
+    deeper:[ { t:"Objects of Character, Drama-Based Pedagogy, UT Austin", u:"https://dbp.theatredance.utexas.edu/teaching-strategies" } ] },
+  BLOCKING:{ name:"Blocking", ask:"Pick where the body goes. Feet tell the truth before mouths do.",
+    what:"Blocking is where the bodies go, and when. A character who wants to leave but can't will drift toward the door without meaning to.",
+    test:"Turn the sound off in your head. If the scene still makes sense, the blocking is working.",
+    quotes:[ { q:"Suit the action to the word, the word to the action, with this special observance, that you o'erstep not the modesty of nature.", c:"Shakespeare, Hamlet, Act 3, Scene 2, Hamlet's advice to the players. Folger Shakespeare text.", u:"https://www.folger.edu/explore/shakespeares-works/hamlet/read/3/2/" } ],
+    deeper:[ { t:"Spolin Games Online: free videos of the Where, Who and What games", u:"https://spolingamesonline.org/" }, { t:"Understanding Viewpoints, Dramatics magazine", u:"https://dramatics.org/understanding-viewpoints/" } ] },
+  LINE:{ name:"The Line", ask:"Pick what gets said out loud. The secret has to stay under the words.",
+    what:"Subtext is what a character means underneath what the character says. The audience comes for the part under the words.",
+    test:"If the line says the secret out loud, it's a tell. If the line only makes sense once you know the secret, it's subtext.",
+    quotes:[ { q:Q_KIN, c:"Shakespeare, Hamlet, Act 1, Scene 2. Folger Shakespeare text.", u:"https://www.folger.edu/explore/shakespeares-works/hamlet/read/1/2/" } ],
+    deeper:[ { t:"A playwriting exercise for subtext, Theatrefolk", u:"https://www.theatrefolk.com/blog/playwriting-exercise-subtext" } ] },
+  PAUSE:{ name:"The Pause", ask:"Pick the silence. The audience should hear what almost got said.",
+    what:"A pause is a line with no words in it. It works when the audience can tell what the character almost said.",
+    test:"If nobody on stage wants to fill the silence, it's a pause. If everybody is just waiting for the next cue, it's dead air.",
+    quotes:[ { q:"[The clock strikes twelve.] The clock was striking then too [a pause].", c:"Anton Chekhov, The Three Sisters, Act I, Olga's opening speech. Translated by Constance Garnett, 1916.", u:"https://www.ibiblio.org/eldritch/ac/sisters.htm" } ],
+    deeper:[ { t:"Tempo, Duration and Silence in Viewpoints, Dramatics magazine", u:"https://dramatics.org/understanding-viewpoints/" } ] },
+  LIGHT:{ name:"Light", ask:"Pick the light. It tells the house where to look.",
+    what:"Light tells the house where to look. A small light in a dark room is louder than a big light in a bright one.",
+    test:"Point at the brightest thing on stage. That's what the scene is about right now.",
+    quotes:[ { q:"But soft, what light through yonder window breaks? / It is the East, and Juliet is the sun.", c:"Shakespeare, Romeo and Juliet, Act 2, Scene 2. Folger Shakespeare text.", u:"https://www.folger.edu/explore/shakespeares-works/romeo-and-juliet/read/2/2/" } ],
+    deeper:[ { t:"Virtual Light Labs by Matt Kizer (the Color Lab and Gobo Lab are free)", u:"https://scenicandlighting.com/lightlabs/" } ] },
+  SOUND:{ name:"Sound", ask:"Pick the sound. Somebody on stage has to answer it.",
+    what:"A sound cue comes from somewhere in the world of the play. It works best when somebody on stage has to answer it.",
+    test:"If a character reacts to the sound, the house hears it twice: once in the ear and once in the body.",
+    quotes:[ { q:"[Knocking within.] MACBETH: Whence is that knocking?", c:"Shakespeare, Macbeth, Act 2, Scene 2. Project Gutenberg text.", u:"https://www.gutenberg.org/cache/epub/1533/pg1533.txt" } ],
+    deeper:[ { t:"Theater collection, Kennedy Center Digital Learning", u:"https://www.kennedy-center.org/education/resources-for-educators/classroom-resources/collections/collections/theater/" } ] },
+  COSTUME:{ name:"Costume", ask:"Pick what they're wearing. Clothes tell the house where somebody has been.",
+    what:"Clothes tell the house where somebody has been, what they're hoping for, and what they grabbed in a hurry.",
+    test:"Could a stranger across the room guess one true thing about this person from their clothes?",
+    quotes:[ { q:"Remember who commended thy yellow stockings and wished to see thee ever cross-gartered.", c:"Shakespeare, Twelfth Night, Act 2, Scene 5, the forged letter that sends Malvolio out in yellow stockings. Folger Shakespeare text.", u:"https://www.folger.edu/explore/shakespeares-works/twelfth-night/read/2/5/" } ],
+    deeper:[ { t:"National Theatre Learning: free videos and resource packs", u:"https://www.nationaltheatre.org.uk/learn-explore/schools/" } ] },
+  EXIT:{ name:"Entrance and Exit", ask:"Pick who comes or goes. What they leave behind stays on stage.",
+    what:"Whoever comes in changes the room. Whoever leaves changes it more, and whatever they leave behind keeps acting after they're gone.",
+    test:"After the exit, look at the empty spot. Is anything still there doing work?",
+    quotes:[
+      { q:"[Exit, pursued by a bear.]", c:"Shakespeare, The Winter's Tale, Act 3, Scene 3. Project Gutenberg text.", u:"https://www.gutenberg.org/cache/epub/1539/pg1539.txt" },
+      { q:"The sound of a door shutting is heard from below.", c:"Henrik Ibsen, A Doll's House, the last stage direction of the play. Translated by R. Farquharson Sharp. Standard Ebooks.", u:"https://standardebooks.org/ebooks/henrik-ibsen/a-dolls-house/r-farquharson-sharp/text/act-3" }
+    ],
+    deeper:[ { t:"Stage directions and parts of a theater, Kennedy Center Digital Learning", u:"https://www.kennedy-center.org/education/resources-for-educators/classroom-resources/collections/collections/theater/" } ] },
+  PICTURE:{ name:"Stage Picture", ask:"Pick the stage picture. Height and distance show who is winning.",
+    what:"Freeze any moment of a scene. From how high people are and how far apart they stand, the house should be able to tell who is winning.",
+    test:"Take a photo in your head from Row K. Does the photo tell the story with the sound off?",
+    quotes:[ { q:"Enter Juliet above.", c:"Shakespeare, Romeo and Juliet, Act 2, Scene 2, the stage direction for the balcony (an editor's direction in the Folger text).", u:"https://www.folger.edu/explore/shakespeares-works/romeo-and-juliet/read/2/2/" } ],
+    deeper:[ { t:"Frozen Picture, Drama-Based Pedagogy, UT Austin", u:"https://dbp.theatredance.utexas.edu/teaching-strategies" }, { t:"Image Theatre, from Augusto Boal's Games for Actors and Non-Actors", u:"https://en.wikipedia.org/wiki/Image_theatre" } ] }
+};
+var MOVE_ORDER = ["PROP","BLOCKING","LINE","PAUSE","LIGHT","SOUND","COSTUME","EXIT","PICTURE"];
+
+/* ============================================================
+   THE SIX SCENES. Every card is SHOW, TELL or INVISIBLE.
+   The house in order of the three slots: Marge, Dev, Teddy.
+   ============================================================ */
+var CRITIC = ["marge","dev","teddy"];
+var SCENES = [
+ { id:"window", title:"The Window", note:"Somebody tells a neighbor a small lie.", set:"stoop", who:"Kevin",
+   place:"It is just after supper on the front steps of a triple-decker in Dorchester. Mrs. Doherty has come out onto her porch, and she is holding a baseball.",
+   want:"Kevin wants Mrs. Doherty to go back inside.",
+   way:"She is holding the ball, and she isn't going anywhere.",
+   secret:"Kevin broke her window.",
+   actors:[
+     { id:"kevin", name:"Kevin", x:360, y:548, h:176, skin:"#e8b894", hair:"#5a3a22", style:"cap", shirt:"#c0392b", pants:"#34495e", facing:1, acc:[] },
+     { id:"doherty", name:"Mrs. Doherty", x:600, y:470, h:214, skin:"#f0c9a8", hair:"#c9c4bb", style:"gray", shirt:"#7d5fa0", pants:"#4a4a58", facing:-1, acc:["ball"] } ],
+   moves:["PROP","BLOCKING","LINE"],
+   cards:{
+     PROP:[
+       { kind:"TELL", text:"Kevin holds up a sign he made in marker: SORRY ABOUT YOUR WINDOW. LOVE, KEVIN.", fx:[{t:"sign", text:"Sorry about your window. Love, Kevin."}],
+         react:"The sign did the confessing, so Kevin had nothing left to do. He stood there holding his own verdict." },
+       { kind:"INVISIBLE", text:"Kevin remembers the exact sound the glass made.", fx:[{t:"ghost", a:"kevin"}],
+         react:"I can't see a sound he remembers, dear. From Row C I can barely hear the sounds he's making now." },
+       { kind:"SHOW", text:"Kevin's baseball glove lies on the step next to him, empty. When Mrs. Doherty looks down at him, he pushes it behind his back with his heel.", fx:[{t:"prop", kind:"glove", x:300, y:546}],
+         react:"He shoved the empty glove behind him with his heel. Row C saw the heel, and now Row C knows whose ball that is." } ],
+     BLOCKING:[
+       { kind:"TELL", text:"Kevin walks downstage, points at the broken window, then points at his own chest.", fx:[{t:"move", a:"kevin", x:430}, {t:"arrow", a:"kevin", x:735, y:440}],
+         react:"He pointed at the window and then at himself. My notes say he drew us a map to the ending." },
+       { kind:"INVISIBLE", text:"Kevin feels his stomach drop all the way to the sidewalk.", fx:[{t:"ghost", a:"kevin"}],
+         react:"His stomach dropped, apparently. From Row K it looked like a boy standing on a sidewalk." },
+       { kind:"SHOW", text:"Every time Mrs. Doherty turns the ball over in her hand, Kevin takes one step backward, until he is standing out by the curb.", fx:[{t:"move", a:"kevin", x:180}],
+         react:"He took one step back every time she turned the ball. By the end he was practically in Quincy. He left without leaving." } ],
+     LINE:[
+       { kind:"TELL", text:"KEVIN: Okay, I'm going to be honest. It was me, and it was my ball.", fx:[{t:"say", a:"kevin", text:"Okay, I'm going to be honest. It was me, and it was my ball."}],
+         react:"He just said it. I wanted to figure it out myself." },
+       { kind:"INVISIBLE", text:"KEVIN (thinking): Please don't notice the tape on that ball. Please don't notice my name on the tape.", fx:[{t:"ghost", a:"kevin"}],
+         react:"Was he supposed to be talking? I didn't hear anything." },
+       { kind:"SHOW", text:"KEVIN: That's a nice ball, Mrs. Doherty. Somebody must really miss that ball.", fx:[{t:"say", a:"kevin", text:"That's a nice ball, Mrs. Doherty. Somebody must really miss that ball."}],
+         react:"He said somebody must miss that ball. He's the somebody. I knew it the whole time." } ] },
+   win:"The house walked out arguing about the glove. Nobody on stage said the word window, and everybody in the lobby knew.",
+   stepout:"The lights come up. The kid playing Kevin drops the glove in the prop bin and goes home to a house with all its windows.",
+   craft:"Which of your three choices would still work if the audience couldn't hear a word?" },
+
+ { id:"talent", title:"The Talent Show", note:"Stage fright gets played for laughs.", set:"backstage", who:"Jas",
+   place:"It is the talent show at a middle school in Framingham, and we are backstage. Out front, a boy is playing Hot Cross Buns on the recorder for the second time, because the first time did not go well.",
+   want:"Jas wants to go on last, or never.",
+   way:"Ms. Pike has a clipboard, and the clipboard says Jas is next.",
+   secret:"Jas signed up for the talent show, and she has no act.",
+   actors:[
+     { id:"jas", name:"Jas", x:380, y:548, h:180, skin:"#8d5a3b", hair:"#1b1512", style:"curly", shirt:"#e0a23a", pants:"#2e3b4e", facing:1, acc:[] },
+     { id:"pike", name:"Ms. Pike", x:560, y:548, h:212, skin:"#d9a47e", hair:"#6b4a2e", style:"bun", shirt:"#2f6f6a", pants:"#3a332c", facing:-1, acc:["clipboard"] } ],
+   moves:["COSTUME","SOUND","PAUSE"],
+   cards:{
+     COSTUME:[
+       { kind:"TELL", text:"Jas wears a sash across her chest that says NO TALENT AT THIS TIME.", fx:[{t:"tag", a:"jas", text:"No talent at this time"}],
+         react:"The sash explained the whole show. I could have left at intermission and known the ending." },
+       { kind:"INVISIBLE", text:"Jas wishes, very hard, that she had stuck with tap lessons in third grade.", fx:[{t:"ghost", a:"jas"}],
+         react:"She wished for tap lessons. Wishes don't carry to Row C, dear. Sequins do." },
+       { kind:"SHOW", text:"Jas has a sequin cape on, borrowed from her cousin. Under the cape she has on gym shorts, one sock, and sneakers with the laces tucked in.", fx:[{t:"acc", a:"jas", add:"cape"}, {t:"acc", a:"jas", add:"shorts"}],
+         react:"She put a sequin cape over gym shorts. That kid got dressed for the part of her life and ran out of costume at the waist." } ],
+     SOUND:[
+       { kind:"TELL", text:"A voice on the loudspeaker announces: JAS HAS NOTHING PREPARED.", fx:[{t:"sound", word:"ATTENTION", x:300, y:330, tone:"chime"}, {t:"sign", text:"Jas has nothing prepared."}],
+         react:"The loudspeaker said it for her. My notes say the sound guy has the best part in this play." },
+       { kind:"INVISIBLE", text:"Jas can hear her heartbeat, loud and fast, and nobody else can.", fx:[{t:"ghost", a:"jas"}],
+         react:"She could hear her heart, supposedly. Row K heard the air conditioning." },
+       { kind:"SHOW", text:"The recorder boy squeaks his last note, and the crowd claps. Jas claps too. She keeps clapping after everyone else stops.", fx:[{t:"sound", word:"CLAP CLAP CLAP", x:640, y:230, tone:"applause"}],
+         react:"She kept clapping after the room stopped. You only clap that long for something you want to keep going." } ],
+     PAUSE:[
+       { kind:"TELL", text:"Jas holds up a card that says DRAMATIC PAUSE, and she holds it there.", fx:[{t:"tag", a:"jas", text:"Dramatic pause"}],
+         react:"The card said PAUSE and then there was a pause. That's cheating." },
+       { kind:"INVISIBLE", text:"Jas pauses inside her head for what feels like a year.", fx:[{t:"ghost", a:"jas"}],
+         react:"Nothing happened for a while. My sister said it was deep." },
+       { kind:"SHOW", text:"Ms. Pike says, “Jas, you're up.” Jas looks at the curtain. She looks at Ms. Pike. She bends down and reties a shoe that was already tied. Then she says, “Cool.”", fx:[{t:"beat", a:"jas"}, {t:"say", a:"jas", text:"Cool."}],
+         react:"She tied her shoe that was already tied. I do that when my mom asks about homework." } ] },
+   win:"Every row in the building figured out there was no act, and nobody on stage ever said so. Row A wants the cape.",
+   stepout:"The house lights come up. The kid playing Jas gives the cape back to her cousin, who wants to know why there's glitter in the pocket.",
+   craft:"Where did the silence do more work than a line could have?" },
+
+ { id:"chat", title:"The Group Chat", note:"Somebody sent a mean text. The words never appear on stage.", set:"shelter", who:"Theo",
+   place:"It is raining at the bus shelter on Centre Street in Jamaica Plain, and the 39 is late. Nico's phone is dead, so Theo has just handed Nico his own phone to text Nico's mom.",
+   want:"Theo wants his phone back, fast.",
+   way:"Nico is his best friend, and Nico is still typing.",
+   secret:"This morning, Theo sent a mean joke about Nico to the group chat. It's still on that phone.",
+   actors:[
+     { id:"theo", name:"Theo", x:420, y:548, h:184, skin:"#f1c7a3", hair:"#c98b3a", style:"short", shirt:"#3d6e9e", pants:"#2b2b33", facing:1, acc:[] },
+     { id:"nico", name:"Nico", x:590, y:548, h:188, skin:"#b07a52", hair:"#1b1512", style:"short", shirt:"#8a3f7a", pants:"#3a3a44", facing:-1, acc:["phone"] },
+     { id:"kai", name:"Kai", x:-160, y:548, h:180, skin:"#e6b48c", hair:"#2a1d15", style:"long", shirt:"#5f8f5a", pants:"#2e3b4e", facing:1, acc:[], off:true } ],
+   moves:["LIGHT","BLOCKING","EXIT"],
+   cards:{
+     LIGHT:[
+       { kind:"TELL", text:"The stage goes red, and a sign lights up over Theo's head: GUILTY.", fx:[{t:"light", dim:0.15, tint:"#b0182a", tintOp:0.42}, {t:"sign", text:"Guilty"}],
+         react:"The stage went red and a sign said GUILTY. I've worked with subtle lighting designers, and I've worked with that one." },
+       { kind:"INVISIBLE", text:"The light doesn't change, but Theo feels like it's shining right on him.", fx:[{t:"ghost", a:"theo"}],
+         react:"He felt lit up. The board operator never got the memo, so neither did we." },
+       { kind:"SHOW", text:"The shelter goes dim. The phone buzzes in Nico's hand, and its small blue light is the only light on either of their faces.", fx:[{t:"light", dim:0.62, glow:{a:"nico", grad:"glowBlue", r:150}}, {t:"sound", word:"BZZT", x:330, y:200, tone:"buzz"}],
+         react:"One little blue screen lit that whole gray shelter. I watched that phone the way he watched it." } ],
+     BLOCKING:[
+       { kind:"TELL", text:"Theo turns to the audience, mimes typing on a phone, then mimes being very sorry.", fx:[{t:"tag", a:"theo", text:"Miming: sorry"}],
+         react:"He mimed sorry at us. We're not the ones he owes it to." },
+       { kind:"INVISIBLE", text:"Theo regrets the joke from the inside out.", fx:[{t:"ghost", a:"theo"}],
+         react:"Regret from the inside out is a fine sentence. Nobody has ever staged a sentence." },
+       { kind:"SHOW", text:"Theo slides to the far end of the bench. Then he slides back, and keeps going, until his shoulder is against Nico's and he can see the screen too.", fx:[{t:"move", a:"theo", x:538}],
+         react:"He went to the far end of the bench, came back, and ended up shoulder to shoulder with the screen. He was trying to get there before Nico did." } ],
+     EXIT:[
+       { kind:"TELL", text:"Kai runs in out of the rain, yells, “Did you see what Theo wrote about you?” and runs back out.", fx:[{t:"enter", a:"kai", x:210}, {t:"say", a:"kai", text:"Did you see what Theo wrote about you?"}],
+         react:"Then that kid came in and said it. Why was he even there?" },
+       { kind:"INVISIBLE", text:"Across town, the kid who started the group chat is laughing at something.", fx:[{t:"ghost", a:"theo"}],
+         react:"Who's laughing? Where? I only saw two guys at a bus stop." },
+       { kind:"SHOW", text:"The 39 pulls up. Theo gets on without his phone. The doors close.", fx:[{t:"prop", kind:"bus", x:650, y:560}, {t:"exit", a:"theo", x:1180}, {t:"sound", word:"HISSS", x:520, y:180, tone:"bus"}],
+         react:"He left his phone. He left it. I think he wanted Nico to see it. Or he didn't. I'm going to be thinking about this." } ] },
+   win:"The bus left and the phone stayed. The house argued in the lobby about whether Theo wanted Nico to read it, and that argument is the play.",
+   stepout:"The lights come up and the rain cue stops. The kid playing Theo gets his phone back. There is nothing on it but a picture of a dog.",
+   craft:"The mean joke never appeared on stage. What did the audience watch instead?" },
+
+ { id:"bake", title:"The Bake Sale", note:"Somebody tells a harmless lie in a kitchen.", set:"kitchen", who:"Dad",
+   place:"It is seven in the morning in a kitchen in Waltham. The school bake sale opens at eight, and Ms. Hanrahan from the PTA has come early to pick up Dad's famous lemon squares.",
+   want:"Dad wants to hand over the tray and shut the door.",
+   way:"Ms. Hanrahan wants the recipe, and she has brought an index card and a pen.",
+   secret:"Dad burned the whole batch at eleven last night. He bought these at Market Basket at six.",
+   actors:[
+     { id:"dad", name:"Dad", x:430, y:548, h:222, skin:"#5e3b26", hair:"#1b1512", style:"short", shirt:"#b5523b", pants:"#2e3b4e", facing:1, acc:[] },
+     { id:"hanrahan", name:"Ms. Hanrahan", x:790, y:548, h:208, skin:"#f0c9a8", hair:"#b33a1f", style:"long", shirt:"#3f6e8c", pants:"#3a332c", facing:-1, acc:[] } ],
+   moves:["PROP","COSTUME","LINE"],
+   cards:{
+     PROP:[
+       { kind:"TELL", text:"The tray has a sticker on it: STORE BOUGHT, DO NOT TELL.", fx:[{t:"tag", x:625, y:230, text:"Store bought. Do not tell."}],
+         react:"The sticker confessed before the tray left the counter. A prop isn't supposed to do the actor's talking for him." },
+       { kind:"INVISIBLE", text:"Dad can still smell the burned batch, even with the window open.", fx:[{t:"ghost", a:"dad"}],
+         react:"I can't smell a burned batch from Row C. I can smell the popcorn in the lobby." },
+       { kind:"SHOW", text:"A Market Basket bag is sticking out of the trash can. Dad pushes it down with his foot. It comes back up. He pushes it down again.", fx:[{t:"prop", kind:"bag", x:268, y:500}, {t:"move", a:"dad", x:350}],
+         react:"That bag kept coming back up out of the trash like it had something to say. Every time his foot came down, Row C leaned in." } ],
+     COSTUME:[
+       { kind:"TELL", text:"Dad is wearing an apron that says I DID NOT BAKE THESE.", fx:[{t:"tag", a:"dad", text:"I did not bake these"}],
+         react:"The apron read like a caption. When the clothes do the talking, the actor has nothing to play." },
+       { kind:"INVISIBLE", text:"Dad feels like a fraud in his own kitchen.", fx:[{t:"ghost", a:"dad"}],
+         react:"He felt like a fraud. He looked like a dad in an apron." },
+       { kind:"SHOW", text:"Dad has on a brand-new white apron with the fold lines still pressed into it. Under the apron, his winter coat is zipped to the chin.", fx:[{t:"acc", a:"dad", add:"coat"}, {t:"acc", a:"dad", add:"apron"}],
+         react:"The fold lines were still in the apron, and his coat was zipped. He was at a store an hour ago. Nobody said so." } ],
+     LINE:[
+       { kind:"TELL", text:"DAD: I'll be honest with you, Ms. Hanrahan. These are from the store.", fx:[{t:"say", a:"dad", text:"I'll be honest with you, Ms. Hanrahan. These are from the store."}],
+         react:"He just told her. Now there's no play. Can we go?" },
+       { kind:"INVISIBLE", text:"DAD (thinking): Don't ask for the recipe. Do not ask for the recipe.", fx:[{t:"ghost", a:"dad"}],
+         react:"He was thinking something twice. I saw his lips move. That's all I got." },
+       { kind:"SHOW", text:"MS. HANRAHAN: What's your secret? DAD: It's lemons, mostly. I use a lot of lemons.", fx:[{t:"say", a:"hanrahan", text:"What's your secret?"}, {t:"say", a:"dad", text:"It's lemons, mostly. I use a lot of lemons."}],
+         react:"It's lemons, mostly. That's what my dad would say. My dad can't bake." } ] },
+   win:"The house went home talking about the bag in the trash. Nobody mentioned the recipe, and Ms. Hanrahan never got it.",
+   stepout:"The lights come up. The actor playing Dad eats one of the lemon squares, which are from the store, and which are very good.",
+   craft:"Which object in this scene told the truth while the character lied?" },
+
+ { id:"sleepover", title:"The Sleepover", note:"Everybody watches a scary movie. Nothing jumps out at you.", set:"basement", who:"Mia",
+   place:"It is after midnight in a finished basement in Braintree. Six sleeping bags face the TV. The movie is about a lake, and there is something in the lake.",
+   want:"Mia wants everyone to think she has seen worse.",
+   way:"Priya just asked who wants to go upstairs, alone, in the dark, for more popcorn.",
+   secret:"Mia is scared out of her mind.",
+   actors:[
+     { id:"priya", name:"Priya", x:470, y:540, h:184, skin:"#a8744f", hair:"#1b1512", style:"long", shirt:"#c05a1e", pants:"#2e3b4e", facing:1, acc:[] },
+     { id:"mia", name:"Mia", x:700, y:540, h:180, skin:"#f3cfb0", hair:"#2a1d15", style:"long", shirt:"#6b5aa8", pants:"#4a6b8a", facing:-1, acc:[] } ],
+   moves:["LIGHT","SOUND","PICTURE"],
+   cards:{
+     LIGHT:[
+       { kind:"TELL", text:"A spotlight finds Mia, and a sign drops from the ceiling: MIA IS AFRAID.", fx:[{t:"light", dim:0.45, glow:{a:"mia", grad:"glowWhite", r:190}}, {t:"sign", text:"Mia is afraid."}],
+         react:"The spotlight and the sign showed up together like a fire drill. I jumped, and not for the right reason." },
+       { kind:"INVISIBLE", text:"The dark feels darker to Mia than it does to anybody else.", fx:[{t:"ghost", a:"mia"}],
+         react:"Dark is dark from Row C, dear. I need her to do something in it." },
+       { kind:"SHOW", text:"The TV is the only light in the room. When the music gets quiet, the screen goes black for a second, and a flashlight clicks on under Mia's sleeping bag.", fx:[{t:"light", dim:0.66, glow:{a:"mia", grad:"glowWarm", r:120}}, {t:"acc", a:"mia", add:"flashlight"}],
+         react:"The flashlight clicked on under the sleeping bag. I haven't been that scared since a Mousetrap in Wakefield in 1987." } ],
+     SOUND:[
+       { kind:"TELL", text:"A voice from the speakers announces: MIA WOULD LIKE TO GO HOME NOW.", fx:[{t:"sound", word:"ATTENTION", x:300, y:330, tone:"chime"}, {t:"sign", text:"Mia would like to go home now."}],
+         react:"The speakers said it for her. The speakers aren't in the cast." },
+       { kind:"INVISIBLE", text:"Mia imagines the lake music getting closer.", fx:[{t:"ghost", a:"mia"}],
+         react:"She imagined music. The sound board played none." },
+       { kind:"SHOW", text:"The furnace in the corner kicks on with a long metal groan. Every head turns toward it. Mia is the only one who laughs.", fx:[{t:"sound", word:"GROOOAN", x:330, y:180, tone:"groan"}],
+         react:"The furnace groaned, and she laughed first. You only laugh first if you were already braced for it." } ],
+     PICTURE:[
+       { kind:"TELL", text:"MIA: I'm taking the high ground on the couch, for safety reasons.", fx:[{t:"move", a:"mia", x:880, y:405}, {t:"say", a:"mia", text:"I'm taking the high ground on the couch, for safety reasons."}],
+         react:"She said high ground. My brother says that. He's scared of everything." },
+       { kind:"INVISIBLE", text:"Mia feels very, very small.", fx:[{t:"ghost", a:"mia"}],
+         react:"She felt small? She looked regular size to me." },
+       { kind:"SHOW", text:"Everyone else lies on the floor. Mia sits up on the arm of the couch with her feet off the carpet, and she stays up there until the credits.", fx:[{t:"move", a:"mia", x:880, y:405}],
+         react:"She kept her feet off the floor the whole time. The floor is where the lake is. Everybody knows that." } ] },
+   win:"The whole house jumped at a furnace and then laughed at itself. Mia laughed first, and that's how they knew.",
+   stepout:"The lights come up. The furnace is a painted flat, and the kid playing Mia helps carry it out to the truck.",
+   craft:"How high off the floor was Mia at the start, and how high at the end?" },
+
+ { id:"move", title:"The Move", note:"Nobody says goodbye out loud.", set:"porch", who:"Leo",
+   place:"It is the last week of June on a back porch in Somerville. Sam has a notebook with a list of everything they are going to do this summer.",
+   want:"Leo wants one more regular afternoon.",
+   way:"The list goes all the way to August.",
+   secret:"Leo's family is moving to Ohio in two weeks, and Leo hasn't told Sam.",
+   actors:[
+     { id:"sam", name:"Sam", x:420, y:424, h:178, skin:"#f0c9a8", hair:"#8a5a2b", style:"curly", shirt:"#2f6f6a", pants:"#34495e", facing:1, acc:["notebook"] },
+     { id:"leo", name:"Leo", x:520, y:424, h:182, skin:"#7a4a2e", hair:"#1b1512", style:"short", shirt:"#d0a13a", pants:"#3a3a44", facing:-1, acc:[] } ],
+   moves:["PICTURE","PAUSE","EXIT"],
+   cards:{
+     PICTURE:[
+       { kind:"TELL", text:"Leo stands on one side of the stage under a paper sign that says OHIO. Sam stands on the other side, under one that says HERE.", fx:[{t:"move", a:"leo", x:820, y:548}, {t:"tag", a:"leo", text:"Ohio"}, {t:"tag", a:"sam", text:"Here"}],
+         react:"Two signs hung over two kids like a map. I felt like I was at Logan." },
+       { kind:"INVISIBLE", text:"Leo feels the distance between them getting longer.", fx:[{t:"ghost", a:"leo"}],
+         react:"Distance I can stage, dear. I need the feet to go with it." },
+       { kind:"SHOW", text:"Sam sits on the top step with the notebook. Leo sits one step down, then two, reading the list upside down.", fx:[{t:"move", a:"leo", x:560, y:484}],
+         react:"Every time Sam read another item, Leo sat a little lower. By August he'd have been in the grass." } ],
+     PAUSE:[
+       { kind:"TELL", text:"Sam starts to read the list out loud. Leo says, “I'm moving to Ohio,” before Sam gets to the first item.", fx:[{t:"say", a:"leo", text:"I'm moving to Ohio."}],
+         react:"He said Ohio before the first item. The rest of the list had nowhere to go." },
+       { kind:"INVISIBLE", text:"Leo stops for a long time, somewhere deep inside, where nobody can see.", fx:[{t:"ghost", a:"leo"}],
+         react:"Per my notes, he stopped deep inside. Per Row K, he sat there." },
+       { kind:"SHOW", text:"Sam reads, “Fourth of July, we watch the good fireworks from your roof.” Leo starts to say something. He doesn't. Sam puts a check mark next to it anyway.", fx:[{t:"say", a:"sam", text:"Fourth of July, we watch the good fireworks from your roof."}, {t:"beat", a:"leo"}],
+         react:"He started to say it and stopped, and Sam checked the box anyway. I wrote nothing down. I didn't want to miss it." } ],
+     EXIT:[
+       { kind:"TELL", text:"Leo walks off, and a stagehand hangs a sign where he was standing: GONE TO OHIO.", fx:[{t:"exit", a:"leo", x:1180}, {t:"sign", text:"Gone to Ohio"}],
+         react:"The sign said GONE TO OHIO. Ohio is real. My cousin lives there. It's fine." },
+       { kind:"INVISIBLE", text:"Leo leaves in his mind a long time before he leaves on his feet.", fx:[{t:"ghost", a:"leo"}],
+         react:"He left in his mind? He was standing right there." },
+       { kind:"SHOW", text:"Leo's mother calls him from inside. He goes. He leaves his bike lying on its side in the grass, and Sam looks at the bike for a long time.", fx:[{t:"exit", a:"leo", x:-180}, {t:"prop", kind:"bike", x:680, y:552, rot:10}],
+         react:"He left his bike. You don't leave your bike. Sam knows. I think Sam knows." } ] },
+   win:"The lights went down on a bike in the grass. Nobody in the house said Ohio until they got to the parking lot.",
+   stepout:"The lights come up. The kid playing Leo comes back for the bike.",
+   craft:"What was the last thing the audience looked at, and who put it there?" }
+];
+
+/* ============================================================
+   WARM-UP: ONE LINE, THREE WAYS (after Theatrefolk's subtext drill)
+   ============================================================ */
+var WARM = {
+  set:"hallway",
+  actors:[
+    { id:"rosa", name:"Rosa", x:420, y:548, h:182, skin:"#c68a62", hair:"#2a1d15", style:"bun", shirt:"#b5523b", pants:"#34495e", facing:1, acc:[] },
+    { id:"ana", name:"Ana", x:600, y:548, h:180, skin:"#e8b894", hair:"#6b4a2e", style:"long", shirt:"#3f6e8c", pants:"#2b2b33", facing:-1, acc:[] } ],
+  line:"I like your shoes.",
+  meanings:["She means it, plain and simple.","She wishes the shoes were hers.","She knows exactly where those shoes came from."],
+  rounds:[
+    { text:"Rosa says, “I like your shoes.” Then she looks down at her own sneakers, which are held together with duct tape.",
+      fx:[{t:"say", a:"rosa", text:"I like your shoes."}, {t:"tag", x:420, y:470, text:"Duct tape"}], answer:1,
+      right:"The words stayed the same. The tape on her own sneakers changed what they meant.",
+      wrong:"Look at her feet. The line is about Ana's shoes, but the tape is about Rosa's." },
+    { text:"Rosa says, “I like your shoes.” Then she holds up an empty shoebox with her own name written on the lid.",
+      fx:[{t:"say", a:"rosa", text:"I like your shoes."}, {t:"prop", kind:"box", x:470, y:420}], answer:2,
+      right:"It's the same five words, and now it's an accusation. The box did that, not the line.",
+      wrong:"Look at the name on the lid of the box." },
+    { text:"Rosa says, “I like your shoes.” Then she kneels down and ties Ana's loose lace before Ana can trip on it.",
+      fx:[{t:"say", a:"rosa", text:"I like your shoes."}, {t:"move", a:"rosa", x:540, y:560}], answer:0,
+      right:"It's the same line again, and this time she means it. You can tell because she did something for Ana that cost her a knee on a dirty floor.",
+      wrong:"Watch what her hands do after the line." } ],
+  close:"The words never changed once. The stage changed three times."
+};
+
+/* ============================================================
+   YOUR TURN: preloaded first, then yours
+   ============================================================ */
+var EXAMPLE = {
+  who:"Bea", want:"Bea wants to win the science fair.", way:"Her volcano won't erupt, and the judges are two tables away.",
+  secret:"Bea's older brother built the volcano.",
+  moves:["PROP","LINE","EXIT"],
+  cards:[
+    "Bea reads her talking points off an index card taped to the back of the volcano. The handwriting isn't hers.",
+    "JUDGE: How did you get the lava this color? BEA: I used science, mostly.",
+    "Her brother walks through the back of the gym, sees the volcano, and gives it a small thumbs-up. Bea turns the volcano so it faces the wall."
+  ]
+};
+</script>
+<script>
+"use strict";
+PROPS.box = function(x,y){ return '<g filter="url(#cutNear)"><rect x="'+(x-60)+'" y="'+(y-30)+'" width="120" height="56" rx="3" fill="#d58a3a"/><rect x="'+(x-66)+'" y="'+(y-42)+'" width="132" height="18" rx="3" fill="#e79c4c"/><text x="'+x+'" y="'+(y+6)+'" text-anchor="middle" font-family="Verdana,Arial,sans-serif" font-weight="bold" font-size="24" fill="#1f1b16">ROSA</text></g>'; };
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var S = {
+  screen:"home", scene:0, slot:0, trial:null,
+  kept:{},        /* scene id -> [card, card, card] */
+  opened:{},      /* scene id -> verdict key */
+  seen:{},        /* move id -> true once staged */
+  warm:{ round:0, pick:null },
+  turn:null,
+  sound:false, history:[]
+};
+function rng(seed){ return function(){ seed = (seed*9301+49297)%233280; return seed/233280; }; }
+var ORDER = {};
+function shuffled(list, key){
+  if (!ORDER[key]){ var r = rng(Date.now()%100000 + key.length*37), idx = list.map(function(_,i){return i;});
+    for (var i=idx.length-1;i>0;i--){ var j = Math.floor(r()*(i+1)); var t = idx[i]; idx[i] = idx[j]; idx[j] = t; } ORDER[key] = idx; }
+  return ORDER[key].map(function(i){ return list[i]; });
+}
+
+/* ============================================================
+   SOUND: synthesized, never loaded. Starts off.
+   ============================================================ */
+var AC = null;
+function tone(kind){
+  if (!S.sound) return;
+  try{
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    var t = AC.currentTime, g = AC.createGain(); g.connect(AC.destination);
+    function osc(type, f1, f2, dur, vol, start){
+      var o = AC.createOscillator(), gg = AC.createGain(); o.type = type;
+      o.frequency.setValueAtTime(f1, t+start); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t+start+dur);
+      gg.gain.setValueAtTime(0.0001, t+start); gg.gain.exponentialRampToValueAtTime(vol, t+start+0.02); gg.gain.exponentialRampToValueAtTime(0.0001, t+start+dur);
+      o.connect(gg); gg.connect(g); o.start(t+start); o.stop(t+start+dur+0.05);
+    }
+    function noise(dur, vol, start, lp){
+      var b = AC.createBuffer(1, Math.floor(AC.sampleRate*dur), AC.sampleRate), d = b.getChannelData(0);
+      for (var i=0;i<d.length;i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 2);
+      var src = AC.createBufferSource(), f = AC.createBiquadFilter(), gg = AC.createGain();
+      src.buffer = b; f.type = "lowpass"; f.frequency.value = lp || 2400; gg.gain.value = vol;
+      src.connect(f); f.connect(gg); gg.connect(g); src.start(t+start);
+    }
+    if (kind === "chime"){ osc("sine", 660, 0, .5, .18, 0); osc("sine", 523, 0, .7, .16, .35); }
+    if (kind === "applause"){ for (var i=0;i<14;i++) noise(.09, .35, i*0.11 + Math.random()*0.04, 3000); }
+    if (kind === "buzz"){ osc("square", 110, 0, .18, .06, 0); osc("square", 110, 0, .18, .06, .3); }
+    if (kind === "groan"){ osc("sawtooth", 70, 48, 1.6, .08, 0); noise(1.4, .08, 0, 300); }
+    if (kind === "bus"){ noise(1.1, .22, 0, 1800); osc("sawtooth", 55, 50, 1.0, .05, 0); }
+  }catch(e){}
+}
+
+/* ============================================================
+   THE STAGE RENDERER
+   fx are applied in order: bodies move, costumes change, props arrive,
+   then light, then what hangs in the air (signs, bubbles, ghosts, sound).
+   ============================================================ */
+function stageModel(actors, fxList){
+  var A = {};
+  actors.forEach(function(a){ A[a.id] = JSON.parse(JSON.stringify(a)); A[a.id].hidden = !!a.off; });
+  var props = [], light = null, air = [];
+  fxList.forEach(function(f){
+    var a = f.a ? A[f.a] : null;
+    if (f.t === "move" && a){ a.x = f.x; if (f.y != null) a.y = f.y; }
+    else if (f.t === "exit" && a){ a.x = f.x; a.gone = true; }
+    else if (f.t === "enter" && a){ a.x = f.x; a.hidden = false; }
+    else if (f.t === "acc" && a){ if (a.acc.indexOf(f.add) < 0) a.acc.push(f.add); }
+    else if (f.t === "prop") props.push(f);
+    else if (f.t === "light") light = f;
+    else air.push(f);
+  });
+  return { A:A, props:props, light:light, air:air };
+}
+function stageSVG(setName, actors, fxList, opts){
+  opts = opts || {};
+  var M = stageModel(actors, fxList), s = ''; PLACED = [];
+  s += '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+esc(opts.label || "The stage")+'">';
+  s += defs();
+  s += '<g clip-path="url(#opening)">';
+  s += SETS[setName]();
+  M.props.forEach(function(p){ if (p.kind !== "bus") s += '<g'+(p.rot?' transform="rotate('+p.rot+' '+p.x+' '+p.y+')"':'')+' class="drop">'+PROPS[p.kind](p.x, p.y)+'</g>'; });
+  Object.keys(M.A).forEach(function(id){
+    var a = M.A[id]; if (a.hidden) return;
+    var from = opts.prev && opts.prev[id] ? opts.prev[id] : { x:a.x, y:a.y };
+    s += '<g class="actor" data-id="'+id+'" data-x="'+a.x+'" data-y="'+a.y+'" style="transform:translate('+from.x+'px,'+from.y+'px)'+(a.gone?';opacity:1':'')+'">'+person(a)+'</g>';
+  });
+  M.props.forEach(function(p){ if (p.kind === "bus") s += '<g class="drop">'+PROPS.bus(p.x, p.y)+'</g>'; });
+  if (M.light){
+    var L = M.light;
+    s += '<g class="lightlayer">';
+    if (L.dim) s += '<rect x="50" y="34" width="900" height="532" fill="#05070c" opacity="'+L.dim+'"/>';
+    if (L.tint) s += '<rect x="50" y="34" width="900" height="532" fill="'+L.tint+'" opacity="'+(L.tintOp||.3)+'" style="mix-blend-mode:multiply"/>';
+    if (L.glow){ var ga = L.glow.a ? M.A[L.glow.a] : null, gx = ga ? ga.x+ga.h*0.14 : L.glow.x, gy = ga ? ga.y-ga.h*0.62 : L.glow.y;
+      s += '<circle cx="'+gx+'" cy="'+gy+'" r="'+L.glow.r+'" fill="url(#'+L.glow.grad+')" style="mix-blend-mode:screen"/>'; }
+    s += '</g>';
+  }
+  M.air.forEach(function(f){
+    var a = f.a ? M.A[f.a] : null;
+    if (f.t === "sign") s += sign(f.text);
+    if (f.t === "say" && a) s += bubble(a.x, a.y - a.h, f.text, false);
+    if (f.t === "ghost" && a) s += bubble(a.x, a.y - a.h, "", true);
+    if (f.t === "tag") s += a ? tag(a.x, a.y - a.h*0.72, f.text) : tag(f.x, f.y, f.text);
+    if (f.t === "arrow" && a) s += arrow(a.x + 30, a.y - a.h*0.7, f.x, f.y);
+    if (f.t === "sound") s += burst(f.x, f.y, f.word);
+    if (f.t === "beat" && a){
+      var bx = a.x, by = a.y - a.h - 40;
+      s += '<g class="drop" filter="url(#cutNear)"><circle cx="'+(bx-34)+'" cy="'+by+'" r="12" fill="#fbf4e0"/><circle cx="'+bx+'" cy="'+by+'" r="12" fill="#fbf4e0"/><circle cx="'+(bx+34)+'" cy="'+by+'" r="12" fill="#fbf4e0"/></g>';
+      s += '<text x="'+bx+'" y="'+(by-28)+'" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="26" fill="#fbf4e0">a long beat</text>';
+    }
+  });
+  s += '</g>';
+  s += proscenium(opts.speaker || null);
+  s += '</svg>';
+  return s;
+}
+/* keep bodies where they were, then let them walk to where the card sends them */
+var LAST = {};
+function mountStage(el, key, setName, actors, fxList, opts){
+  opts = opts || {};
+  opts.prev = LAST[key] || null;
+  el.innerHTML = stageSVG(setName, actors, fxList, opts);
+  var pos = {};
+  el.querySelectorAll(".actor").forEach(function(g){ pos[g.getAttribute("data-id")] = { x:+g.getAttribute("data-x"), y:+g.getAttribute("data-y") }; });
+  LAST[key] = pos;
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    el.querySelectorAll(".actor").forEach(function(g){ g.style.transform = "translate("+g.getAttribute("data-x")+"px,"+g.getAttribute("data-y")+"px)"; });
+  }); });
+  (fxList || []).forEach(function(f){ if (f.t === "sound" && opts.play) tone(f.tone); });
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+var $screen = document.getElementById("screen");
+function h(tag, attrs, html){ var e = document.createElement(tag); if (attrs) Object.keys(attrs).forEach(function(k){ e.setAttribute(k, attrs[k]); }); if (html != null) e.innerHTML = html; return e; }
+function btn(label, fn, cls){ var b = h("button", { type:"button", "class":cls||"" }, label); b.addEventListener("click", fn); return b; }
+function say(msg){ var l = document.getElementById("live"); l.textContent = ""; setTimeout(function(){ l.textContent = msg; }, 60); }
+function go(screen, extra, noHistory){
+  if (!noHistory) S.history.push({ screen:S.screen, scene:S.scene, slot:S.slot });
+  S.screen = screen; if (extra) Object.keys(extra).forEach(function(k){ S[k] = extra[k]; });
+  render(); window.scrollTo(0,0);
+  var hd = $screen.querySelector("h1, h2"); if (hd){ hd.setAttribute("tabindex","-1"); hd.focus({ preventScroll:true }); }
+}
+function render(){
+  $screen.innerHTML = "";
+  ({ home:renderHome, intro:renderIntro, move:renderMove, review:renderReview, warm:renderWarm, book:renderBook, turn:renderTurn, teach:renderTeach })[S.screen]();
+}
+function sceneFx(sc, uptoSlot, trial){
+  var list = [], kept = S.kept[sc.id] || [];
+  for (var i=0;i<uptoSlot;i++) if (kept[i]) list = list.concat(kept[i].fx);
+  if (trial) list = list.concat(trial.fx);
+  return list;
+}
+function stageLabel(sc, cards){
+  var t = sc.title + ". " + sc.place;
+  cards.forEach(function(c){ if (c) t += " Staged: " + c.text; });
+  return t;
+}
+
+/* ---------- PLAYBILL ---------- */
+function renderHome(){
+  var wrap = h("div");
+  var st = h("div", { "class":"stagewrap" });
+  wrap.appendChild(st);
+  mountStage(st, "home", "ghost", [], [], { label:"An empty stage with a single ghost light burning in the middle of it." });
+  var t = h("header", { "class":"title" });
+  t.innerHTML = '<h1><span class="big">DRESS REHEARSAL</span><br><span class="sub">Dramatical Moves</span></h1>';
+  wrap.appendChild(t);
+  wrap.appendChild(h("p", { "class":"lede" }, "Every character on this stage is keeping a secret. Stage it so the back row knows, and make sure nobody says it."));
+  var tiles = h("div", { "class":"tiles" });
+  var warm = h("button", { type:"button", "class":"tile" });
+  warm.innerHTML = '<span class="thumb">'+stageSVG("hallway", WARM.actors, [{t:"say", a:"rosa", text:"I like your shoes."}], { label:"Warm-up: two kids in a school hallway." })+'</span><span class="words"><span class="name">Warm-up. One Line, Three Ways</span><span class="note">The same five words mean three different things. It takes about two minutes.</span></span>';
+  warm.addEventListener("click", function(){ S.warm = { round:0, pick:null }; go("warm"); });
+  tiles.appendChild(warm);
+  SCENES.forEach(function(sc, i){
+    var b = h("button", { type:"button", "class":"tile" });
+    var status = S.opened[sc.id] ? (S.opened[sc.id] === "win" ? "Opened. The house got it." : "Rehearsed. Worth another run.") : "Three moves: " + sc.moves.map(function(m){ return MOVES[m].name; }).join(", ") + ".";
+    b.innerHTML = '<span class="thumb">'+stageSVG(sc.set, sc.actors, [], { label:"Scene "+(i+1)+": "+sc.title })+'</span><span class="words"><span class="name">Scene '+(i+1)+'. '+esc(sc.title)+'</span><span class="note">'+esc(sc.note)+'</span><span class="status">'+esc(status)+'</span></span>';
+    b.addEventListener("click", function(){ go("intro", { scene:i }); });
+    tiles.appendChild(b);
+  });
+  wrap.appendChild(tiles);
+  var links = h("div", { "class":"rowlinks" });
+  var seenCount = Object.keys(S.seen).length;
+  links.appendChild(btn("The Moves Book ("+seenCount+" of 9 staged)", function(){ go("book"); }, "primary"));
+  links.appendChild(btn("Your Turn: write a scene", function(){ go("turn"); }));
+  links.appendChild(btn("For teachers", function(){ go("teach"); }));
+  wrap.appendChild(links);
+  $screen.appendChild(wrap);
+}
+
+/* ---------- SCENE INTRO ---------- */
+function renderIntro(){
+  var sc = SCENES[S.scene], wrap = h("div");
+  var st = h("div", { "class":"stagewrap" }); wrap.appendChild(st);
+  mountStage(st, "scene-"+sc.id, sc.set, sc.actors, [], { label:stageLabel(sc, []) });
+  wrap.appendChild(h("p", { "class":"eyebrow" }, "Scene "+(S.scene+1)+" of 6"));
+  wrap.appendChild(h("h2", null, esc(sc.title)));
+  wrap.appendChild(h("p", { "class":"place" }, esc(sc.place)));
+  var f = h("div", { "class":"frame3" });
+  f.innerHTML = '<div><b>Wants</b>'+esc(sc.want)+'</div><div><b>In the way</b>'+esc(sc.way)+'</div><div class="secret"><b>The secret</b>'+esc(sc.secret)+'</div>';
+  wrap.appendChild(f);
+  wrap.appendChild(h("p", { "class":"notice" }, "About this scene: "+esc(sc.note)+" You'll make three choices, "+sc.moves.map(function(m){ return MOVES[m].name.toLowerCase(); }).join(", then ")+". It takes about three minutes. You can skip any scene."));
+  var act = h("div", { "class":"actions" });
+  act.appendChild(btn("Stage the secret", function(){ S.kept[sc.id] = []; LAST["scene-"+sc.id] = null; go("move", { slot:0, trial:null }); }, "primary"));
+  act.appendChild(btn("Skip this scene", function(){ go(S.scene < 5 ? "intro" : "home", { scene:Math.min(S.scene+1, 5) }); }));
+  wrap.appendChild(act);
+  $screen.appendChild(wrap);
+}
+
+/* ---------- ONE MOVE ---------- */
+function renderMove(){
+  var sc = SCENES[S.scene], mv = sc.moves[S.slot], M = MOVES[mv], wrap = h("div");
+  var kept = S.kept[sc.id] || [];
+  var st = h("div", { "class":"stagewrap" }); wrap.appendChild(st);
+  var fx = sceneFx(sc, S.slot, S.trial);
+  mountStage(st, "scene-"+sc.id, sc.set, sc.actors, fx, { speaker:S.trial ? CRITIC[S.slot] : null, play:!!S.trial, label:stageLabel(sc, kept.slice(0,S.slot).concat([S.trial])) });
+  var hd = h("div", { "class":"movehead" });
+  hd.innerHTML = '<p class="eyebrow">'+esc(sc.title)+'. Move '+(S.slot+1)+' of 3</p><h2>'+esc(M.name)+'</h2><p>'+esc(M.ask)+'</p><p><b>The secret:</b> '+esc(sc.secret)+'</p>';
+  wrap.appendChild(hd);
+  var cards = h("div", { "class":"cards", role:"group", "aria-label":"Pick one card" });
+  shuffled(sc.cards[mv], sc.id+mv).forEach(function(c){
+    var b = h("button", { type:"button", "class":"cardbtn", "aria-pressed": S.trial === c ? "true" : "false" });
+    b.innerHTML = (S.trial === c ? '<span class="chip '+c.kind+'">'+c.kind+'</span>' : '') + esc(c.text);
+    b.addEventListener("click", function(){ S.trial = c; render(); say(HOUSE[CRITIC[S.slot]].name + ": " + c.react); var r = $screen.querySelector(".react"); if (r) r.scrollIntoView({ block:"nearest", behavior:"smooth" }); });
+    cards.appendChild(b);
+  });
+  wrap.appendChild(cards);
+  if (S.trial){
+    var who = HOUSE[CRITIC[S.slot]];
+    var r = h("div", { "class":"react" });
+    var why = { SHOW:"This one shows. The house can see it or hear it, and nobody said the secret.", TELL:"This one tells. It hands the house the secret and leaves them nothing to figure out.", INVISIBLE:"This one is invisible. It happens inside a character, where the audience can't go." }[S.trial.kind];
+    r.innerHTML = '<span class="who">'+esc(who.name)+', '+esc(who.role)+'</span><p>'+esc(S.trial.react)+'</p><p><span class="chip '+S.trial.kind+'">'+S.trial.kind+'</span>'+esc(why)+'</p>';
+    wrap.appendChild(r);
+    var act = h("div", { "class":"actions" });
+    act.appendChild(btn(S.slot < 2 ? "Keep it and go on" : "Keep it and open the show", function(){
+      var k = S.kept[sc.id] || (S.kept[sc.id] = []); k[S.slot] = S.trial; S.seen[mv] = true;
+      if (S.slot < 2) go("move", { slot:S.slot+1, trial:null }, true); else go("review", { trial:null }, true);
+    }, "primary"));
+    act.appendChild(btn("Try another card", function(){ S.trial = null; render(); var c = $screen.querySelector(".cardbtn"); if (c) c.focus(); }));
+    wrap.appendChild(act);
+  }
+  var act2 = h("div", { "class":"actions" });
+  act2.appendChild(btn("Skip this scene", function(){ go(S.scene < 5 ? "intro" : "home", { scene:Math.min(S.scene+1, 5), trial:null }); }, "small"));
+  wrap.appendChild(act2);
+  $screen.appendChild(wrap);
+}
+
+/* ---------- OPENING NIGHT ---------- */
+function renderReview(){
+  var sc = SCENES[S.scene], kept = S.kept[sc.id] || [], wrap = h("div");
+  var st = h("div", { "class":"stagewrap" }); wrap.appendChild(st);
+  mountStage(st, "scene-"+sc.id, sc.set, sc.actors, sceneFx(sc, 3, null), { label:stageLabel(sc, kept) });
+  var kinds = kept.map(function(c){ return c.kind; });
+  var key = kinds.every(function(k){ return k === "SHOW"; }) ? "win" : kinds.every(function(k){ return k === "TELL"; }) ? "memo" : kinds.indexOf("INVISIBLE") >= 0 ? "inside" : "told";
+  S.opened[sc.id] = key;
+  var verdict = {
+    win: sc.win,
+    memo: "The house knows the secret and felt nothing about it. It played like a memo with the lights on.",
+    inside: "Part of this play happened inside "+sc.who+", where nobody bought a seat.",
+    told: "The parts you staged landed. The parts that got announced died on arrival."
+  }[key];
+  wrap.appendChild(h("p", { "class":"eyebrow" }, "Opening night. "+esc(sc.title)));
+  wrap.appendChild(h("h2", null, key === "win" ? "The house got it." : "The review is in."));
+  wrap.appendChild(h("p", { "class":"verdict" }, esc(verdict)));
+  var tb = '<table class="review"><thead><tr><th scope="col">Move</th><th scope="col">What you staged</th><th scope="col">From the house</th></tr></thead><tbody>';
+  kept.forEach(function(c, i){ var who = HOUSE[CRITIC[i]]; tb += '<tr><td><b>'+esc(MOVES[sc.moves[i]].name)+'</b><br><span class="chip '+c.kind+'">'+c.kind+'</span></td><td>'+esc(c.text)+'</td><td><b>'+esc(who.name)+':</b> '+esc(c.react)+'</td></tr>'; });
+  tb += '</tbody></table>';
+  wrap.appendChild(h("div", null, tb));
+  var so = h("div", { "class":"stepout" });
+  so.innerHTML = '<p class="eyebrow">Step out of the scene</p><p>'+esc(sc.stepout)+'</p><p><b>A question for the director:</b> '+esc(sc.craft)+'</p>';
+  wrap.appendChild(so);
+  var act = h("div", { "class":"actions" });
+  if (S.scene < 5) act.appendChild(btn("Next scene: "+SCENES[S.scene+1].title, function(){ go("intro", { scene:S.scene+1 }); }, "primary"));
+  else act.appendChild(btn("Write your own scene", function(){ go("turn"); }, "primary"));
+  act.appendChild(btn("Run it again", function(){ S.kept[sc.id] = []; LAST["scene-"+sc.id] = null; go("move", { slot:0, trial:null }, true); }));
+  act.appendChild(btn("Read the Moves Book", function(){ go("book"); }));
+  wrap.appendChild(act);
+  $screen.appendChild(wrap);
+}
+
+/* ---------- WARM-UP ---------- */
+function renderWarm(){
+  var wrap = h("div"), W0 = WARM, R = W0.rounds[S.warm.round];
+  var st = h("div", { "class":"stagewrap" }); wrap.appendChild(st);
+  if (!R){
+    mountStage(st, "warm", W0.set, W0.actors, [], { label:"Two kids in a school hallway." });
+    wrap.appendChild(h("h2", null, "One Line, Three Ways"));
+    wrap.appendChild(h("p", { "class":"verdict" }, esc(W0.close)));
+    wrap.appendChild(h("p", null, "That's subtext. The line is the part the audience hears. The meaning is the part they figure out from everything around it."));
+    var a0 = h("div", { "class":"actions" });
+    a0.appendChild(btn("Start Scene 1: The Window", function(){ go("intro", { scene:0 }); }, "primary"));
+    a0.appendChild(btn("Back to the playbill", function(){ go("home"); }));
+    wrap.appendChild(a0); $screen.appendChild(wrap); return;
+  }
+  mountStage(st, "warm", W0.set, W0.actors, R.fx, { speaker:S.warm.pick != null ? "dev" : null, label:R.text });
+  wrap.appendChild(h("p", { "class":"eyebrow" }, "Warm-up. Round "+(S.warm.round+1)+" of 3"));
+  wrap.appendChild(h("h2", null, "What does Rosa mean?"));
+  wrap.appendChild(h("p", { "class":"place" }, esc(R.text)));
+  var cards = h("div", { "class":"cards", role:"group", "aria-label":"Pick what she means" });
+  W0.meanings.forEach(function(m, i){
+    var b = h("button", { type:"button", "class":"cardbtn", "aria-pressed": S.warm.pick === i ? "true" : "false" }, esc(m));
+    b.addEventListener("click", function(){ S.warm.pick = i; render(); say(i === R.answer ? R.right : R.wrong); });
+    cards.appendChild(b);
+  });
+  wrap.appendChild(cards);
+  if (S.warm.pick != null){
+    var ok = S.warm.pick === R.answer;
+    var r = h("div", { "class":"react" });
+    r.innerHTML = '<span class="who">DEV, ROW K, theater major, takes notes in the dark</span><p>'+esc(ok ? R.right : R.wrong)+'</p>';
+    wrap.appendChild(r);
+    var a = h("div", { "class":"actions" });
+    if (ok) a.appendChild(btn(S.warm.round < 2 ? "Next way" : "See what changed", function(){ S.warm = { round:S.warm.round+1, pick:null }; go("warm", null, true); }, "primary"));
+    else a.appendChild(btn("Look again", function(){ S.warm.pick = null; render(); }, "primary"));
+    wrap.appendChild(a);
+  }
+  $screen.appendChild(wrap);
+}
+
+/* ---------- THE MOVES BOOK ---------- */
+function renderBook(){
+  var wrap = h("div");
+  var st = h("div", { "class":"stagewrap" }); wrap.appendChild(st);
+  mountStage(st, "book", "ghost", [], [], { label:"The empty stage and its ghost light." });
+  wrap.appendChild(h("h2", null, "The Moves Book"));
+  wrap.appendChild(h("p", null, "Here are nine moves a director can make. Each one comes with a test for Row K, a line from a play that's old enough to belong to everybody, and a place to go deeper."));
+  var book = h("div", { "class":"book" });
+  MOVE_ORDER.forEach(function(k){
+    var M = MOVES[k], e = h("section", { "class":"entry", "aria-labelledby":"mv-"+k });
+    var g = GLYPH[k === "EXIT" ? "EXIT" : k];
+    var html = '<span class="glyph"><svg viewBox="0 0 88 88" aria-hidden="true">'+g+'</svg></span>';
+    html += '<h2 id="mv-'+k+'">'+esc(M.name)+'</h2>';
+    html += '<p class="seen">'+(S.seen[k] ? "You've staged this one." : "You haven't staged this one yet.")+'</p>';
+    html += '<p>'+esc(M.what)+'</p><p><b>The Row K test:</b> '+esc(M.test)+'</p>';
+    M.quotes.forEach(function(q){ html += '<blockquote>'+esc(q.q)+'<cite>'+esc(q.c)+' <a href="'+q.u+'" target="_blank" rel="noopener">Read the text</a></cite></blockquote>'; });
+    html += '<p><b>Go deeper:</b> '+M.deeper.map(function(d){ return '<a href="'+d.u+'" target="_blank" rel="noopener">'+esc(d.t)+'</a>'; }).join("; ")+'</p>';
+    e.innerHTML = html; book.appendChild(e);
+  });
+  wrap.appendChild(book);
+  $screen.appendChild(wrap);
+}
+
+/* ---------- YOUR TURN ---------- */
+function renderTurn(){
+  if (!S.turn) S.turn = JSON.parse(JSON.stringify(EXAMPLE));
+  var T = S.turn, wrap = h("div");
+  var st = h("div", { "class":"stagewrap" }); wrap.appendChild(st);
+  mountStage(st, "turn", "ghost", [], [], { label:"The empty stage, waiting for your scene." });
+  wrap.appendChild(h("h2", null, "Your Turn"));
+  wrap.appendChild(h("p", null, "Here's a scene somebody already started. Read it, then clear it and write your own. Give a character a secret, pick three moves, and write one card for each move that Row K could see or hear."));
+  var form = h("div", { "class":"panel" });
+  function field(key, label, area){
+    form.appendChild(h("label", { "for":"f-"+key }, label));
+    var el = h(area ? "textarea" : "input", area ? { id:"f-"+key } : { id:"f-"+key, type:"text" });
+    el.value = T[key] || ""; el.addEventListener("input", function(){ T[key] = el.value; });
+    form.appendChild(el);
+  }
+  field("who", "Who is the character?");
+  field("want", "What do they want?");
+  field("way", "What's in the way?");
+  field("secret", "What's the secret?", true);
+  [0,1,2].forEach(function(i){
+    form.appendChild(h("label", { "for":"m-"+i }, "Move "+(i+1)));
+    var sel = h("select", { id:"m-"+i });
+    MOVE_ORDER.forEach(function(k){ var o = h("option", { value:k }, esc(MOVES[k].name)); if (T.moves[i] === k) o.selected = true; sel.appendChild(o); });
+    sel.addEventListener("change", function(){ T.moves[i] = sel.value; hint.textContent = MOVES[sel.value].ask; });
+    form.appendChild(sel);
+    var hint = h("p", null, esc(MOVES[T.moves[i]].ask)); form.appendChild(hint);
+    form.appendChild(h("label", { "for":"c-"+i }, "Write the card: what does the audience see or hear?"));
+    var ta = h("textarea", { id:"c-"+i }); ta.value = T.cards[i] || ""; ta.addEventListener("input", function(){ T.cards[i] = ta.value; });
+    form.appendChild(ta);
+    var fs = h("fieldset", { style:"border:none;padding:0;margin:6px 0 14px" });
+    fs.appendChild(h("legend", { "class":"sr" }, "Row K test for move "+(i+1)));
+    ["Row K could see it or hear it from the last row.","A character does something with it, or does it.","The secret never gets said out loud."].forEach(function(q, j){
+      var lab = h("label", { "class":"check" }); var cb = h("input", { type:"checkbox" }); lab.appendChild(cb); lab.appendChild(document.createTextNode(q)); fs.appendChild(lab);
+    });
+    form.appendChild(fs);
+  });
+  wrap.appendChild(form);
+  var act = h("div", { "class":"actions" });
+  act.appendChild(btn("Clear it and write my own", function(){ S.turn = { who:"", want:"", way:"", secret:"", moves:["PROP","BLOCKING","LINE"], cards:["","",""] }; render(); var f = document.getElementById("f-who"); if (f) f.focus(); }, "primary"));
+  act.appendChild(btn("Copy my scene", function(){
+    var t = "Character: "+T.who+"\nWants: "+T.want+"\nIn the way: "+T.way+"\nSecret: "+T.secret+"\n\n" + T.moves.map(function(m,i){ return MOVES[m].name.toUpperCase()+": "+(T.cards[i]||""); }).join("\n\n") + "\n\nDress Rehearsal: Dramatical Moves";
+    var done = function(){ say("Your scene is copied. Paste it anywhere."); };
+    try{ navigator.clipboard.writeText(t).then(done, function(){ fallbackCopy(t); done(); }); }catch(e){ fallbackCopy(t); done(); }
+  }));
+  wrap.appendChild(act);
+  wrap.appendChild(h("p", null, "Trade with a partner. Your partner sits in Row K and reads your cards without the secret, then guesses it. If they guess it, you staged it. If you had to tell them, you told."));
+  $screen.appendChild(wrap);
+}
+function fallbackCopy(t){ var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); }catch(e){} ta.remove(); }
+
+/* ---------- FOR TEACHERS ---------- */
+function renderTeach(){
+  var wrap = h("div");
+  var st = h("div", { "class":"stagewrap" }); wrap.appendChild(st);
+  mountStage(st, "teach", "hallway", WARM.actors, [], { label:"Two kids in a school hallway." });
+  wrap.appendChild(h("h2", null, "For teachers"));
+  var p = '';
+  p += '<section class="panel"><h2>What students do</h2><p>Students get a character with a secret, and they stage it with nine moves a director can make. Every card they pick is SHOW, TELL or INVISIBLE, and three people in the audience say what they could and couldn\'t see. It works for ages 11 and up, from middle school English to a community theater green room.</p>'
+    + '<ul><li><b>Warm-up, 4 minutes.</b> One Line, Three Ways. The words never change, and the meaning does.</li><li><b>One scene per pair, 8 minutes.</b> One student reads the cards out loud, and the other one picks. They switch at the next scene.</li><li><b>Your Turn, 8 minutes.</b> Pairs write three SHOW cards for a new secret, then trade with a partner who sits in Row K and guesses the secret.</li></ul></section>';
+  p += '<section class="panel"><h2>What it teaches</h2><ul><li><b>Objective, obstacle, secret.</b> Every scene opens with what the character wants, what\'s in the way, and what they won\'t say. That\'s Stanislavski\'s objective and obstacle, with the secret as the thing the tactics protect.</li><li><b>Subtext.</b> The Line and the warm-up both put the meaning under the words.</li><li><b>Show, don\'t tell, for the stage.</b> The test is physical: can the back row see it or hear it?</li><li><b>Stage picture.</b> Height and distance carry the relationship.</li><li><b>Responding.</b> The house reactions model the kind of note a director gives. They say what the audience saw, not whether the player is good.</li></ul></section>';
+  p += '<section class="panel"><h2>Standards</h2><p>National Core Arts Standards, Theatre, grades 6 to 12.</p><table class="review"><thead><tr><th scope="col">Code</th><th scope="col">Where it shows up</th></tr></thead><tbody>'
+    + '<tr><td>TH:Cr1.1.6-8 a, b, c; HS I.a</td><td>Solving staging and design problems; a character\'s inner thoughts and objectives. Every scene.</td></tr>'
+    + '<tr><td>TH:Cr3.1 HS Proficient</td><td>Refining technical choices to support the story. Light, Sound, Costume.</td></tr>'
+    + '<tr><td>TH:Pr4.1.7.a, 8.a, 8.b</td><td>Staging choices, pacing, objectives and tactics. Blocking, The Pause, the Wants and In the Way frame.</td></tr>'
+    + '<tr><td>TH:Pr5.1.6-8.b</td><td>Choosing and using technical elements. Light, Sound, Costume.</td></tr>'
+    + '<tr><td>TH:Re7.1, Re8.1, Re9.1</td><td>Responding to, interpreting and evaluating artistic choices. The house, the review, and Row K in Your Turn.</td></tr>'
+    + '</tbody></table><p>Standards text: <a href="https://nationalartsstandards.org/sites/default/files/2021-11/Theatre%20at%20a%20Glance.pdf" target="_blank" rel="noopener">Theatre at a Glance, NCAS</a>. Free assessments that line up with these standards: <a href="https://learn.schooltheatre.org/middle-grades-model-cornerstone-assessments" target="_blank" rel="noopener">EdTA Model Cornerstone Assessments</a>.</p></section>';
+  p += '<section class="panel"><h2>How the game handles hard stuff</h2><ul>'
+    + '<li>The stakes stay everyday: a broken window, a talent show, a mean text, a bake sale, a scary movie, a move. There\'s no violence, abuse, self-harm or death in any scene.</li>'
+    + '<li>Players direct invented people. The game never asks a player about their own life.</li>'
+    + '<li>Cruelty shows up by its effect. The mean text in The Group Chat never appears on stage, and that\'s the lesson of the scene.</li>'
+    + '<li>Every scene carries a one-line note on the playbill, says how long it takes, and has a skip button with no penalty.</li>'
+    + '<li>Sound starts off. Nothing jumps out, including in The Sleepover.</li>'
+    + '<li>Every scene ends by stepping out: the lights come up, the actor puts the prop away, and the question is about craft, not feelings.</li>'
+    + '</ul><p>These rules come from SAMHSA\'s six principles of a trauma-informed approach, Robert Landy\'s work on aesthetic distance, Drama-Based Pedagogy\'s "as if," and theatrical intimacy practice. Sources: <a href="https://www.ncbi.nlm.nih.gov/books/NBK601490/box/ch3.b16/?report=objectonly" target="_blank" rel="noopener">SAMHSA principles (NCBI)</a>; <a href="https://en.wikipedia.org/wiki/Aesthetic_distance" target="_blank" rel="noopener">aesthetic distance</a>; <a href="https://dbp.theatredance.utexas.edu/about/drama-based-pedagogy-theory-and-background" target="_blank" rel="noopener">DBP theory and background</a>.</p></section>';
+  p += '<section class="panel"><h2>Why drama in an English class</h2><p>A meta-analysis of 47 studies found drama-based teaching raised achievement, most of all when classroom teachers led it over more than five lessons in English or science (<a href="https://eric.ed.gov/?id=EJ1052099" target="_blank" rel="noopener">Lee, Patall, Cawthon and Steingut, ERIC</a>). A study of acting training found gains in empathy and theory of mind for teenagers (<a href="https://www.artsedsearch.org/study/enhancing-empathy-and-theory-of-mind/" target="_blank" rel="noopener">Goldstein and Winner, 2012, ArtsEdSearch</a>).</p></section>';
+  p += '<section class="panel"><h2>Free places to go deeper</h2><ul>'
+    + '<li><a href="https://dbp.theatredance.utexas.edu/teaching-strategies" target="_blank" rel="noopener">Drama-Based Pedagogy strategy bank, UT Austin</a>. Frozen Picture, Objects of Character, Voices in the Head.</li>'
+    + '<li><a href="https://spolingamesonline.org/" target="_blank" rel="noopener">Spolin Games Online</a>. Viola Spolin\'s Where, Who and What games on video.</li>'
+    + '<li><a href="https://www.theatrefolk.com/blog/playwriting-exercise-subtext" target="_blank" rel="noopener">Theatrefolk\'s subtext exercise</a>, which the warm-up borrows from.</li>'
+    + '<li><a href="https://scenicandlighting.com/lightlabs/" target="_blank" rel="noopener">Matt Kizer\'s Virtual Light Labs</a>. The Color Lab and Gobo Lab are free.</li>'
+    + '<li><a href="https://www.nationaltheatre.org.uk/learn-explore/schools/" target="_blank" rel="noopener">National Theatre Learning</a>. Free videos and packs.</li>'
+    + '<li><a href="https://www.kennedy-center.org/education/resources-for-educators/classroom-resources/collections/collections/theater/" target="_blank" rel="noopener">Kennedy Center Digital Learning, theater collection</a>.</li>'
+    + '</ul></section>';
+  p += '<section class="panel"><h2>Credits</h2><p>Scenes, cards and the house are original. The lines in the Moves Book come from plays in the public domain, quoted from the Folger Shakespeare, Project Gutenberg, the Constance Garnett translation of The Three Sisters and the R. Farquharson Sharp translation of A Doll\'s House. The Chekhov letter is a modern translation, credited as one. Stagecraft lineage: David Mamet, George Saunders, Nick Fore, Heather Sellers, Matt Walsh.</p></section>';
+  wrap.appendChild(h("div", null, p));
+  $screen.appendChild(wrap);
+}
+
+/* ============================================================
+   CONTROLS: back, playbill, dark, sound
+   ============================================================ */
+document.getElementById("nav-home").addEventListener("click", function(){ S.trial = null; go("home"); });
+document.getElementById("nav-back").addEventListener("click", function(){
+  var p = S.history.pop();
+  if (!p){ go("home", null, true); return; }
+  S.screen = p.screen; S.scene = p.scene; S.slot = p.slot; S.trial = null; render(); window.scrollTo(0,0);
+  var hd = $screen.querySelector("h1, h2"); if (hd){ hd.setAttribute("tabindex","-1"); hd.focus({ preventScroll:true }); }
+});
+(function(){
+  var dk = document.getElementById("nav-dark");
+  var mq = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  function isDark(){ var s = document.body.getAttribute("data-scheme"); if (s) return s === "dark";
+    var th = document.documentElement.getAttribute("data-theme"); if (th) return th === "dark";
+    return getComputedStyle(document.documentElement).colorScheme.indexOf("dark") >= 0 || (mq && mq.matches); }
+  function label(){ var d = isDark(); dk.textContent = d ? "Light" : "Dark"; dk.setAttribute("aria-pressed", "false"); dk.setAttribute("aria-label", d ? "Switch to light" : "Switch to dark"); }
+  dk.addEventListener("click", function(){ document.body.setAttribute("data-scheme", isDark() ? "light" : "dark"); label(); });
+  label();
+  var sd = document.getElementById("nav-sound");
+  sd.addEventListener("click", function(){ S.sound = !S.sound; sd.textContent = S.sound ? "Sound on" : "Sound off"; sd.setAttribute("aria-pressed", S.sound ? "true" : "false"); if (S.sound) tone("chime"); });
+})();
+render();
+</script>
+</body>
+</html>

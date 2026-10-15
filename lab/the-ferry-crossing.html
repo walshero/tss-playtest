@@ -1,0 +1,697 @@
+<meta charset="utf-8">
+<title>The Ferry Crossing</title>
+<meta name="description" content="Six crossings on a river that is not on the map: what you keep, what you give, and what you can see by the end.">
+<style>
+:root{
+  --bg:#e6dabd;--card:#f1e8d3;--ink:#17140f;--line:#3a342a;--accent:#0f5f5a;--amber:#b8741f;
+  --sky1:#e3d6b6;--sky2:#efc9a2;--water:#2f5a66;--water2:#1c3a45;--mtn1:#9aa0b3;--mtn2:#636b84;--mtn3:#2f3447;
+  --land:#1b1a17;--fig:#17140f;--stone:#6b6a66;--lamp:#e0a54c;--fog:#f3ead6;--moon:#f7f0dc;--dim:#0b0a08;
+  --fs:20px;color-scheme:light;
+}
+:root[data-stop="2"]{--bg:#f4ede0;--card:#fbf7ee;--ink:#0d0b08;--sky1:#efe6cf;--sky2:#f5d6b8;--fog:#faf5ea}
+:root[data-stop="3"]{--bg:#ffffff;--card:#ffffff;--ink:#000000;--line:#000000;--sky1:#ffffff;--sky2:#fbe9d6;--fog:#ffffff;--fig:#000000;--land:#000000}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#22242a;--card:#2f3238;--ink:#efe9dc;--line:#c9c4b8;--accent:#7fd1c8;--amber:#e0a54c;
+    --sky1:#1a1c24;--sky2:#43303b;--water:#193640;--water2:#0c1c23;--mtn1:#565c6e;--mtn2:#3a3f50;--mtn3:#20232d;
+    --land:#0c0d10;--fig:#e6dfcf;--stone:#4a4c52;--lamp:#f0b35a;--fog:#4c5060;--moon:#eee6d2;--dim:#000000;color-scheme:dark}
+  :root:not([data-theme="light"])[data-stop="2"]{--bg:#141519;--card:#202227;--ink:#f6f2e8;--sky1:#101117;--sky2:#2e2028;--fog:#3d404c}
+  :root:not([data-theme="light"])[data-stop="3"]{--bg:#000000;--card:#141414;--ink:#ffffff;--line:#ffffff;--sky1:#000000;--sky2:#1a1218;--fog:#31343d;--fig:#ffffff}
+}
+:root[data-theme="dark"]{--bg:#22242a;--card:#2f3238;--ink:#efe9dc;--line:#c9c4b8;--accent:#7fd1c8;--amber:#e0a54c;
+  --sky1:#1a1c24;--sky2:#43303b;--water:#193640;--water2:#0c1c23;--mtn1:#565c6e;--mtn2:#3a3f50;--mtn3:#20232d;
+  --land:#0c0d10;--fig:#e6dfcf;--stone:#4a4c52;--lamp:#f0b35a;--fog:#4c5060;--moon:#eee6d2;--dim:#000000;color-scheme:dark}
+:root[data-theme="dark"][data-stop="2"]{--bg:#141519;--card:#202227;--ink:#f6f2e8;--sky1:#101117;--sky2:#2e2028;--fog:#3d404c}
+:root[data-theme="dark"][data-stop="3"]{--bg:#000000;--card:#141414;--ink:#ffffff;--line:#ffffff;--sky1:#000000;--sky2:#1a1218;--fog:#31343d;--fig:#ffffff}
+:root[data-size="2"]{--fs:23px}:root[data-size="3"]{--fs:26px}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink)}
+body{margin:0;font:var(--fs)/1.5 "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif}
+.backdrop{position:fixed;inset:0;background:var(--bg);z-index:0}
+.shell{position:relative;z-index:1;min-height:100vh;color:var(--ink)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:4px solid var(--accent);outline-offset:3px}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:10px;align-items:center;padding:10px 16px;background:var(--bg);border-bottom:2px solid var(--line)}
+.bar .spacer{flex:1}
+.btn{min-height:48px;min-width:48px;padding:8px 18px;border:2px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink);cursor:pointer;font-size:max(18px,.9em);line-height:1.2}
+.btn[aria-disabled="true"]{opacity:.55;cursor:default}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);box-shadow:inset 6px 0 0 var(--amber);padding-left:24px}
+.brand{font-variant:small-caps;letter-spacing:.08em;font-size:max(18px,.9em)}
+@media(max-width:560px){.brand{display:none}}
+body[data-screen="title"] .brand{visibility:hidden}
+
+.comfort{position:absolute;right:16px;top:calc(100% + 8px);width:min(340px,calc(100vw - 32px));background:var(--card);border:2px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.comfort h3{margin:0;font-size:max(18px,.9em);font-variant:small-caps;letter-spacing:.06em}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg .btn[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* stage layout */
+.stage{display:grid;grid-template-columns:1fr}
+.art{position:relative;height:clamp(360px,60vh,680px);overflow:hidden;border-bottom:2px solid var(--line);background:var(--sky1)}
+.art svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+body[data-screen="end"] .art{height:auto;aspect-ratio:1000/440;position:relative;top:0;border-right:0;border-bottom:2px solid var(--line)}
+.panel{padding-block:22px 44px;padding-inline:16px;max-width:42rem;display:grid;gap:18px;align-content:start;animation:rise .5s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(min-width:960px){
+  .stage{grid-template-columns:minmax(0,1.7fr) minmax(380px,1fr)}
+  .art{height:calc(100vh - 72px);position:sticky;top:72px;border-bottom:0;border-right:2px solid var(--line)}
+  body[data-screen="end"] .art{height:calc(100vh - 72px);aspect-ratio:auto;position:sticky;top:72px}
+  .panel{padding-inline:36px;padding-block:36px}
+}
+.eyebrow{margin:0;font-variant:small-caps;letter-spacing:.1em;font-size:max(18px,.85em)}
+.river{display:block;width:100%;max-width:420px;height:34px}
+.carry{margin:0;font-size:max(18px,.9em);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.carry svg{width:26px;height:26px;flex:none}
+.carry .glyphs{display:inline-flex;gap:6px}
+h1,h2{font-weight:700;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(44px,7.5vw,72px);font-style:italic;letter-spacing:-.01em}
+h1 .rule{display:block;width:120px;height:6px;margin-top:10px;background:var(--amber);border-radius:3px}
+h2{font-size:clamp(32px,4.4vw,44px)}
+h1:focus,h2:focus,h3:focus{outline:none}
+.prompt{margin:0;font-size:1.1em}
+.prompt::first-letter{font-size:1.6em;line-height:1;float:left;padding-right:6px;padding-top:4px;font-style:italic}
+.choices{display:grid;gap:12px;counter-reset:c}
+.choice{display:grid;grid-template-columns:52px 1fr;align-items:center;gap:6px;width:100%;text-align:left;min-height:64px;padding:12px 16px 12px 0;border:2px solid var(--line);border-radius:4px;background:var(--card);color:var(--ink);cursor:pointer;font-size:1em;line-height:1.35;transition:transform .15s ease,box-shadow .15s ease}
+.choice::before{counter-increment:c;content:counter(c,upper-roman);font-variant:small-caps;font-weight:700;font-size:max(18px,.9em);text-align:center;color:var(--amber);border-right:2px solid var(--line);padding:6px 0;margin-right:10px}
+.choice:hover{transform:translateX(4px);box-shadow:-6px 0 0 var(--amber)}
+.chosen{margin:0;font-style:italic}
+.result{margin:0;font-size:1.1em;padding-left:14px;border-left:4px solid var(--amber)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.theory{border-top:2px solid var(--line);padding-top:18px;display:grid;gap:14px}
+.theory h3{margin:0;font-size:1.2em}
+.theory dl{margin:0;display:grid;gap:12px}
+.theory dt{font-variant:small-caps;letter-spacing:.06em;font-weight:700;font-size:max(18px,.9em)}
+.theory dd{margin:0}
+.theory blockquote{margin:0;padding:10px 0 10px 18px;border-left:4px solid var(--ink);font-style:italic}
+.theory cite{display:block;font-style:normal;font-size:max(18px,.85em);margin-top:6px}
+.principle{margin:0;padding:16px 18px;border:3px solid var(--ink);border-left:12px solid var(--amber);border-radius:4px;font-size:1.1em}
+.foot{font-variant:small-caps;letter-spacing:.08em;font-size:18px;margin:0}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:max(18px,.9em)}
+th,td{text-align:left;padding:10px 8px;border-bottom:2px solid var(--line);vertical-align:top}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+.legend li{display:flex;align-items:center;gap:8px}
+
+/* ---------- ART ---------- */
+.fig{fill:var(--fig)}.land{fill:var(--land)}.stone{fill:var(--stone)}.lampf{fill:var(--lamp)}.fogf{fill:url(#fogGrad)}.moonf{fill:var(--moon)}.dimf{fill:var(--dim)}
+.m1{fill:var(--mtn1)}.m2{fill:var(--mtn2)}.m3{fill:var(--mtn3)}
+.sfig{stroke:var(--fig);fill:none}.slamp{stroke:var(--lamp);fill:none}.smoon{stroke:var(--moon);fill:none}.sstone{stroke:var(--stone);fill:none}
+.g0{stop-color:var(--lamp);stop-opacity:.9}.g1{stop-color:var(--lamp);stop-opacity:0}
+.f0{stop-color:var(--fog);stop-opacity:.8}.fm1{stop-color:var(--fog);stop-opacity:.6}.fm2{stop-color:var(--fog);stop-opacity:.22}.f1{stop-color:var(--fog);stop-opacity:0}
+.s0{stop-color:var(--sky1)}.s1{stop-color:var(--sky2)}
+.w0{stop-color:var(--water)}.w1{stop-color:var(--water2)}
+#scene *{transition:opacity 1.2s ease,transform 1.4s ease,stroke-dashoffset 2s ease}
+#scene.instant *{transition:none!important;animation:none!important}
+.prop{display:none}
+#scene[data-stage="1"] .p1,#scene[data-stage="3"] .p3,#scene[data-stage="4"] .p4,#scene[data-stage="5"] .p5,#scene[data-stage="6"] .p6{display:inline}
+#dim{opacity:0}
+#dusk{opacity:0}
+#scene[data-stage="6"] #dusk{opacity:.55}
+#scene[data-stage="6"] #moon,#scene[data-stage="6"] #moonPath{opacity:.35}
+/* fog = sight */
+#fog{opacity:.85;transition:opacity 2.4s ease}
+#scene[data-fog="1"] #fog{opacity:.68}#scene[data-fog="2"] #fog{opacity:.51}#scene[data-fog="3"] #fog{opacity:.34}#scene[data-fog="4"] #fog{opacity:.17}#scene[data-fog="5"] #fog{opacity:0}
+/* carried things */
+.token,.purse{opacity:1}
+#scene[data-name="0"] .token{opacity:0}
+#scene[data-coin="0"] .purse{opacity:0}
+#lampGlow,#lampFlame,#lampReflect{opacity:1}
+#scene[data-lamp="0"] #lampGlow,#scene[data-lamp="0"] #lampFlame,#scene[data-lamp="0"] #lampBody,#scene[data-lamp="0"] #lampReflect{opacity:0}
+/* boat per stage */
+#boatpos{transform:translate(0,0)}
+#scene[data-stage="3"] #boatpos{transform:translate(60px,-30px)}
+#scene[data-stage="4"] #boatpos,#scene[data-stage="5"] #boatpos{transform:translate(190px,-60px)}
+#scene[data-stage="6"] #boatpos{transform:translate(240px,-95px)}
+#shoreTraveler{opacity:1}#shoreShadow{opacity:0}
+#boatTraveler{opacity:0}
+#scene[data-stage="3"] #shoreTraveler,#scene[data-stage="4"] #shoreTraveler,#scene[data-stage="5"] #shoreTraveler,#scene[data-stage="6"] #shoreTraveler,
+#scene[data-stage="3"] #shoreShadow,#scene[data-stage="4"] #shoreShadow,#scene[data-stage="5"] #shoreShadow,#scene[data-stage="6"] #shoreShadow{opacity:0}
+#scene[data-stage="3"] #boatTraveler,#scene[data-stage="4"] #boatTraveler,#scene[data-stage="5"] #boatTraveler,#scene[data-stage="6"] #boatTraveler{opacity:1}
+#boatMove{transform:translate(0,0)}
+#coinFly{opacity:0;transform:translate(0,0)}
+#tokenFly{opacity:0;transform:translate(0,0)}
+#lampFly{opacity:0;transform:translate(0,0)}
+#namePath{stroke-dasharray:420;stroke-dashoffset:420}
+/* ambient */
+@keyframes drift{0%{transform:translateX(0)}50%{transform:translateX(26px)}100%{transform:translateX(0)}}
+@keyframes drift2{0%{transform:translateX(0)}50%{transform:translateX(-22px)}100%{transform:translateX(0)}}
+@keyframes flick{0%,100%{opacity:1}45%{opacity:.84}60%{opacity:.95}}
+@keyframes ripple{0%{transform:translateX(0)}100%{transform:translateX(-90px)}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(3px) rotate(.4deg)}}
+@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(2.5deg)}}
+#fog .f1,#fog .f3,#fog .f5{animation:drift 14s ease-in-out infinite}
+#fog .f2,#fog .f4,#fog .f6{animation:drift2 18s ease-in-out infinite}
+#lampFlick{animation:flick 3.4s ease-in-out infinite}
+#ripples{animation:ripple 26s linear infinite}
+#boatBob{animation:bob 5s ease-in-out infinite;transform-origin:100px 15px}
+#reeds{animation:sway 6s ease-in-out infinite;transform-origin:180px 600px;transform-box:view-box}
+/* parallax layers move by JS via --px */
+#far{transform:translate(calc(var(--px,0)*-6px),calc(var(--py,0)*-3px))}
+#mid{transform:translate(calc(var(--px,0)*-3px),calc(var(--py,0)*-2px))}
+#near{transform:translate(calc(var(--px,0)*8px),calc(var(--py,0)*4px))}
+#far,#mid,#near{transition:transform .6s ease}
+
+/* STAGE 1 */
+#stranger{opacity:1}#mapGlow{opacity:0}#sentFigure{opacity:0;transform:translate(0,0)}#mapHeld{opacity:0}
+#scene[data-stage="1"][data-out="a"] #mapGlow{opacity:1}
+#scene[data-stage="1"][data-out="a"] #stranger{opacity:0;transition-delay:1.2s}
+#scene[data-stage="1"][data-out="a"] #mapHeld{opacity:1;transition-delay:1.2s}
+#scene[data-stage="1"][data-out="b"] #stranger{opacity:0;transition-delay:1s}
+#scene[data-stage="1"][data-out="c"] #stranger{opacity:0;transition-delay:.6s}
+#scene[data-stage="1"][data-out="c"] #sentFigure{opacity:1;transform:translate(150px,80px);transition:opacity .6s ease,transform 1.6s ease-in-out .4s}
+#scene[data-stage="1"][data-out="c"] #boatpos{opacity:1}
+#scene[data-stage="1"] #boatpos{opacity:0}
+#scene[data-stage="1"][data-out="c"] #boatMove{transform:translate(340px,-110px) scale(.8);transition:transform 3.4s ease-in-out 2s}
+#scene[data-stage="1"][data-out="c"] #dim{opacity:.3;transition-delay:3.5s}
+/* STAGE 2 */
+#scene[data-stage="2"][data-out="a"] #coinFly{opacity:0;transform:translate(192px,58px);transition:transform .9s ease,opacity .25s ease .9s}
+#scene[data-stage="2"][data-out="a"] #coinFly{animation:coinshow .9s linear both}
+@keyframes coinshow{0%,99%{opacity:1}100%{opacity:0}}
+#scene[data-stage="2"][data-out="a"] #shoreTraveler,#scene[data-stage="2"][data-out="a"] #shoreShadow{opacity:0;transition-delay:1.4s}
+#scene[data-stage="2"][data-out="a"] #boatTraveler{opacity:1;transition-delay:1.4s}
+#scene[data-stage="2"][data-out="a"] #boatMove{transform:translate(300px,-95px) scale(.86);transition:transform 3.2s ease-in-out 2s}
+#scene[data-stage="2"][data-out="b"] #tokenFly{opacity:1;transform:translate(180px,190px);transition:opacity .2s ease,transform 1.6s ease-in .2s}
+#scene[data-stage="2"][data-out="b"] #namePath{stroke-dashoffset:0;transition-delay:1.6s}
+#scene[data-stage="2"][data-out="b"] #shoreTraveler{opacity:0;transition-delay:2.6s}
+#scene[data-stage="2"][data-out="b"] #shoreShadow{opacity:.45;transition-delay:2.6s}
+#scene[data-stage="2"][data-out="b"] #boatTraveler{opacity:1;transition-delay:2.6s}
+#scene[data-stage="2"][data-out="b"] #boatMove{transform:translate(260px,-80px) scale(.9);transition:transform 3.2s ease-in-out 3s}
+#scene[data-stage="2"][data-out="c"] #lampFly{opacity:1;transform:translate(150px,-10px);transition:opacity .2s ease,transform 1.4s ease}
+#scene[data-stage="2"][data-out="c"] #lampFly{opacity:0;transition:transform 1.4s ease,opacity .5s ease 1.4s}
+#scene[data-stage="2"][data-out="c"] #shoreTraveler,#scene[data-stage="2"][data-out="c"] #shoreShadow{opacity:0;transition-delay:1.6s}
+#scene[data-stage="2"][data-out="c"] #boatTraveler{opacity:1;transition-delay:1.6s}
+#scene[data-stage="2"][data-out="c"] #dim{opacity:.4;transition-delay:1.6s}
+#scene[data-stage="2"][data-out="c"] #boatMove{transform:translate(280px,-90px) scale(.88);transition:transform 3.2s ease-in-out 2.2s}
+/* STAGE 3 */
+#heron{opacity:.95;transform:translate(0,0)}#washer{opacity:0}
+#scene[data-stage="3"][data-out="a"] #heron{opacity:0;transform:translate(120px,-40px);transition-delay:.4s}
+#scene[data-stage="3"][data-out="b"] #heron{opacity:0;transition-delay:1s}
+#scene[data-stage="3"][data-out="b"] #washer{opacity:.95;transition-delay:1s}
+#scene[data-stage="3"][data-out="c"] #near{transform:translate(-160px,60px);transition:transform 3s ease-in-out}
+#scene[data-stage="3"][data-out="c"] #heron{opacity:.3;transition-delay:1.5s}
+#scene[data-stage="3"][data-out="c"] #boatMove{transform:translate(120px,-40px) scale(.94);transition:transform 3s ease-in-out}
+/* STAGE 4 */
+#rings circle{opacity:0;transform:scale(.3);transform-box:fill-box;transform-origin:center}
+#listener{opacity:1;transform:translate(0,0)}#leftThing{opacity:0;transform:translate(0,0)}
+#scene[data-stage="4"] #rings circle{opacity:.35;transform:scale(1)}
+#scene[data-stage="4"][data-out="a"] #listener{transform:translate(-210px,110px) scale(.5);transition:transform 2.6s ease-in-out .4s}
+#scene[data-stage="4"][data-out="a"] #rings circle{opacity:.6}
+#scene[data-stage="4"][data-out="b"] #lampGlow,#scene[data-stage="4"][data-out="b"] #lampFlame,#scene[data-stage="4"][data-out="b"] #lampReflect{opacity:0;transition-delay:1.6s}
+#scene[data-stage="4"][data-out="b"] #rings circle{opacity:.7;transform:scale(1.35)}
+#scene[data-stage="4"][data-out="b"] #dim{opacity:.25;transition-delay:1.6s}
+#scene[data-stage="4"][data-out="c"] #leftThing{opacity:1;transform:translate(200px,-150px);transition:opacity .3s ease,transform 2.2s ease-in-out .3s}
+#scene[data-stage="4"][data-out="c"] #rings circle{opacity:.15;transition-delay:2s}
+/* STAGE 5 */
+#cupBasin{opacity:1}#cupBoat{opacity:0}#cupGlowBoat{opacity:0}#basinGlow{opacity:.85}
+#scene[data-water="carry"] #cupBoat,#scene[data-water="carry"] #cupGlowBoat{opacity:1}
+#scene[data-stage="5"][data-out="a"] #cupBasin{opacity:0;transition-delay:.6s}
+#scene[data-stage="5"][data-out="a"] #cupBoat,#scene[data-stage="5"][data-out="a"] #cupGlowBoat{opacity:1;transition-delay:1.2s}
+#scene[data-stage="5"][data-out="a"] #basinGlow{opacity:.15;transition-delay:.6s}
+#scene[data-stage="5"][data-out="b"] #cupBasin{opacity:0;transition-delay:.4s}
+#scene[data-stage="5"][data-out="b"] #basinGlow{opacity:0;transition-delay:.4s}
+#scene[data-stage="5"][data-out="c"] #cupBasin{opacity:.4;transition-delay:.6s}
+#scene[data-stage="5"][data-out="c"] #basinGlow{opacity:1;transform:scale(1.5);transform-box:fill-box;transform-origin:center}
+/* STAGE 6 */
+#winGlow{opacity:.5}#winReflect{opacity:.5}
+#scene[data-stage="6"][data-out="own"] #winGlow{opacity:1;transform:scale(2.6);transform-box:fill-box;transform-origin:center}
+#scene[data-stage="6"][data-out="own"] #winReflect{opacity:1;transform:scaleX(2.2);transform-box:fill-box;transform-origin:center}
+#scene[data-stage="6"][data-out="own"] #cupBoat{opacity:0;transition-delay:1s}
+#scene[data-stage="6"][data-out="frame"] #winGlow{opacity:.85;transform:scale(1.4);transform-box:fill-box;transform-origin:center}
+#scene[data-stage="6"][data-out="frame"] #waiter{transform:translate(-14px,10px)}
+#scene[data-stage="6"][data-out="proof"] #lampGlow{opacity:1;transform:scale(1.8);transform-box:fill-box;transform-origin:center}
+#scene[data-stage="6"][data-out="proof"] #fog{opacity:.85;transition-delay:1.2s}
+#scene[data-stage="6"][data-out="lie"] #winGlow{opacity:.95}
+#scene[data-stage="6"][data-out="lie"] #lampGlow,#scene[data-stage="6"][data-out="lie"] #lampFlame,#scene[data-stage="6"][data-out="lie"] #lampReflect{opacity:0;transition-delay:1s}
+#scene[data-stage="6"][data-out="lie"] #dim{opacity:.3;transition-delay:1.4s}
+#scene[data-stage="6"][data-out="silence"] #waiter{opacity:0;transition-delay:1.4s}
+#scene[data-stage="6"][data-out="silence"] #winGlow,#scene[data-stage="6"][data-out="silence"] #window,#scene[data-stage="6"][data-out="silence"] #winReflect{opacity:.12;transition-delay:2s}
+#scene[data-stage="6"][data-out="silence"] #boatMove{transform:translate(-40px,10px) scaleX(-1);transition:transform 1.6s ease}
+
+@media (prefers-reduced-motion:reduce){#scene *{transition:none!important;animation:none!important}.panel{animation:none}}
+</style>
+
+<div class="backdrop" aria-hidden="true"></div>
+<div class="shell">
+  <header class="bar">
+    <button class="btn" id="backBtn" type="button">Back</button>
+    <button class="btn" id="homeBtn" type="button">Home</button>
+    <span class="spacer"></span>
+    <span class="brand">The Ferry Crossing</span>
+    <button class="btn" id="comfortBtn" type="button" aria-expanded="false" aria-controls="comfort">Comfort</button>
+    <div class="comfort" id="comfort" hidden>
+      <h3 id="brightLabel">Brightness</h3>
+      <div class="seg" role="group" aria-labelledby="brightLabel">
+        <button class="btn" type="button" data-stop="1">Soft</button>
+        <button class="btn" type="button" data-stop="2">Bright</button>
+        <button class="btn" type="button" data-stop="3">Brightest</button>
+      </div>
+      <h3 id="sizeLabel">Text size</h3>
+      <div class="seg" role="group" aria-labelledby="sizeLabel">
+        <button class="btn" type="button" data-size="1">Large</button>
+        <button class="btn" type="button" data-size="2">Larger</button>
+        <button class="btn" type="button" data-size="3">Largest</button>
+      </div>
+      <button class="btn" type="button" id="comfortClose">Done</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="art" id="artBox">
+      <svg id="scene" data-stage="0" data-fog="0" data-lamp="1" data-name="1" data-coin="1" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid slice" role="img" aria-label="A ferry waits in fog at the mouth of a river.">
+        <defs>
+          <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="s0"/><stop offset=".3" class="s0"/><stop offset=".75" class="s1"/><stop offset="1" class="s1"/></linearGradient>
+          <linearGradient id="waterGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="w0"/><stop offset="1" class="w1"/></linearGradient>
+          <radialGradient id="glow"><stop offset="0" class="g0"/><stop offset="1" class="g1"/></radialGradient>
+          <radialGradient id="fogGrad"><stop offset="0" class="f0"/><stop offset=".3" class="fm1"/><stop offset=".65" class="fm2"/><stop offset="1" class="f1"/></radialGradient>
+          <linearGradient id="duskGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="g1"/><stop offset="1" class="g0"/></linearGradient>
+          <filter id="wash" x="-10%" y="-20%" width="120%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".012" numOctaves="4" seed="11"/><feDisplacementMap in="SourceGraphic" scale="30"/><feGaussianBlur stdDeviation="1.1"/></filter>
+          <filter id="wash2" x="-10%" y="-20%" width="120%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="3" seed="5"/><feDisplacementMap in="SourceGraphic" scale="18"/><feGaussianBlur stdDeviation="2"/></filter>
+          <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+          <filter id="blur6" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="6"/></filter>
+          <pattern id="grainTile" width="240" height="240" patternUnits="userSpaceOnUse"><rect width="240" height="240" filter="url(#grainF)"/></pattern>
+          <filter id="grainF"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="1" seed="2"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .08 0"/></filter>
+        </defs>
+
+        <!-- sky -->
+        <rect x="-300" y="-400" width="1600" height="1600" fill="url(#skyGrad)"/>
+        <rect id="dusk" x="-300" y="60" width="1600" height="330" fill="url(#duskGrad)"/>
+        <g id="far">
+          <g id="moon"><circle class="moonf" cx="810" cy="96" r="34"/><circle cx="798" cy="86" r="30" fill="url(#skyGrad)" opacity=".55"/></g>
+          <g class="fig" opacity=".45"><circle cx="120" cy="80" r="1.8"/><circle cx="260" cy="140" r="1.4"/><circle cx="420" cy="60" r="2"/><circle cx="610" cy="120" r="1.4"/><circle cx="950" cy="160" r="1.3"/><circle cx="700" cy="40" r="1.6"/></g>
+          <!-- birds -->
+          <g class="sfig" stroke-width="2" opacity=".55"><path d="M330 150 q8 -8 16 0 q8 -8 16 0"/><path d="M362 138 q6 -6 12 0 q6 -6 12 0"/><path d="M300 166 q6 -6 12 0 q6 -6 12 0"/></g>
+          <g filter="url(#wash2)"><path class="m1" d="M-20 290 C60 236 140 206 230 240 C300 266 340 214 420 204 C520 192 560 254 660 230 C760 204 820 154 900 194 C950 218 990 234 1020 230 L1020 380 L-20 380Z"/></g>
+        </g>
+        <g id="mid">
+          <g filter="url(#wash)">
+            <path class="m2" d="M-20 308 C120 238 220 288 330 258 C450 223 560 278 680 248 C800 218 900 258 1020 243 L1020 390 L-20 390Z"/>
+            <path class="m3" d="M-20 346 C150 306 300 338 450 316 C600 296 760 328 1020 306 L1020 400 L-20 400Z"/>
+          </g>
+        </g>
+
+        <!-- STAGE 4: the Listener at the source -->
+        <g class="prop p4" transform="translate(-60 0)">
+          <g id="listener" filter="url(#rough)">
+            <path class="m3" d="M660 356 C660 236 700 168 760 150 C820 168 860 236 860 356Z"/>
+            <path class="fig" d="M690 356 C690 270 715 220 760 206 C805 220 830 270 830 356Z" opacity=".9"/>
+            <path class="fig" d="M760 122 c-16 0 -28 12 -28 28 0 12 8 22 18 26 l20 0 c10 -4 18 -14 18 -26 0 -16 -12 -28 -28 -28z"/>
+          </g>
+          <g id="rings" class="sfig" stroke-width="3"><circle cx="760" cy="180" r="70"/><circle cx="760" cy="180" r="125"/><circle cx="760" cy="180" r="185"/></g>
+        </g>
+
+        <!-- river -->
+        <rect x="-300" y="362" width="1600" height="600" fill="url(#waterGrad)"/>
+        <g id="moonPath" class="smoon" stroke-width="3" opacity=".35" stroke-linecap="round"><path d="M810 380 l6 0 M804 400 l14 0 M812 424 l8 0 M800 452 l18 0 M808 486 l10 0 M798 520 l22 0 M806 560 l12 0"/></g>
+        <g id="ripples" class="smoon" stroke-width="1.5" opacity=".28">
+          <path d="M380 420 q40 -8 80 0 t80 0 t80 0"/><path d="M620 470 q40 -8 80 0 t80 0"/><path d="M430 560 q50 -10 100 0 t100 0 t100 0"/><path d="M700 620 q40 -8 80 0 t80 0"/><path d="M360 650 q40 -8 80 0 t80 0"/><path d="M900 520 q40 -8 80 0 t80 0"/><path d="M1000 430 q40 -8 80 0"/><path d="M1020 600 q40 -8 80 0 t80 0"/>
+        </g>
+
+        <!-- far shore, jetty, house -->
+        <path class="land" filter="url(#wash)" d="M1020 900 L1020 340 C920 345 830 356 790 390 C760 428 765 570 810 720 L810 900Z"/>
+        <g class="prop p6" transform="translate(-70 0)">
+          <rect class="land" x="786" y="414" width="74" height="9"/><path class="sfig" stroke-width="4" d="M796 423v34M848 423v40"/>
+          <path class="land" d="M862 332 L920 286 L978 332Z"/><rect class="land" x="872" y="332" width="96" height="64"/>
+                    <circle id="winGlow" cx="905" cy="356" r="38" fill="url(#glow)"/>
+          <rect id="window" class="lampf" x="893" y="344" width="24" height="24"/>
+          <path class="land" d="M904 344v24M893 356h24" stroke="var(--land)" stroke-width="2"/>
+          <g id="waiter" class="fig"><path d="M846 356 c-6 0 -10 5 -10 11 0 4 2 7 5 9 -9 5 -14 20 -15 40 h40 c-1 -20 -6 -35 -15 -40 3 -2 5 -5 5 -9 0 -6 -4 -11 -10 -11z"/></g>
+        </g>
+
+        <!-- STAGE 5: the stone basin and the cup -->
+        <g class="prop p5" transform="translate(-56 0)">
+          <circle id="basinGlow" cx="880" cy="386" r="64" fill="url(#glow)"/>
+          <path class="stone" d="M842 392 C848 414 864 424 880 424 C896 424 912 414 918 392Z"/><path class="fig" d="M838 388 L922 388 L918 396 L842 396Z"/>
+          <rect class="stone" x="870" y="424" width="20" height="18"/><path class="land" d="M856 442 L904 442 L908 450 L852 450Z"/>
+          <g id="cupBasin"><path class="lampf" d="M872 388 L875 368 L885 368 L888 388Z"/></g>
+        </g>
+
+        <!-- STAGE 3: the bank in fog -->
+        <g class="prop p3">
+          <g id="heron" class="fig"><path d="M688 456 C686 428 696 410 712 402 C712 394 716 388 724 386 L732 384 L720 396 C734 402 740 428 732 456Z"/><path class="sfig" stroke-width="3" d="M702 456v42M718 456v42"/></g>
+          <g id="washer" class="fig"><path d="M708 384 c-7 0 -12 6 -12 13 0 5 3 9 7 11 -12 6 -18 26 -18 48 h46 c0 -22 -6 -42 -18 -48 4 -2 7 -6 7 -11 0 -7 -5 -13 -12 -13z"/><path class="stone" d="M730 442 L762 448 L758 462 L726 456Z"/></g>
+        </g>
+
+        <!-- near shore and reeds -->
+        <g id="near">
+          <path class="land" filter="url(#wash)" d="M-20 900 L-20 455 C90 440 190 470 270 505 C320 528 350 600 362 720 L362 900Z"/>
+          <g id="reeds" class="sfig" stroke-width="3" stroke-linecap="round" opacity=".95">
+            <path d="M40 470 C46 430 40 400 52 380"/><path d="M62 476 C60 440 70 410 66 386"/><path d="M84 486 C90 450 84 420 96 400"/><path d="M300 560 C304 520 298 496 310 476"/><path d="M322 576 C320 540 330 510 326 490"/><path d="M340 600 C348 560 340 536 352 516"/><path d="M118 492 C124 460 118 436 128 418"/>
+            <path class="fig" d="M50 384 l4 -14 l4 14z M64 390 l4 -14 l4 14z M94 404 l4 -14 l4 14z M308 480 l4 -14 l4 14z M324 494 l4 -14 l4 14z M350 520 l4 -14 l4 14z M126 422 l4 -14 l4 14z" stroke="none"/>
+          </g>
+        </g>
+
+        <!-- STAGE 1: the stranger and the map -->
+        <g class="prop p1" transform="translate(50 0)">
+          <g id="stranger" class="fig"><path d="M108 366 c-8 0 -13 6 -13 14 0 5 3 10 7 12 -13 6 -21 28 -23 60 h58 c-2 -32 -10 -54 -23 -60 4 -2 7 -7 7 -12 0 -8 -5 -14 -13 -14z"/><path class="stone" d="M122 404 L164 397 L166 425 L124 432Z"/><rect fill="var(--sky1)" x="141" y="405" width="14" height="12"/></g>
+          <circle id="mapGlow" cx="150" cy="412" r="60" fill="url(#glow)"/>
+          <g id="mapHeld"><path class="stone" d="M214 414 L246 410 L248 432 L216 436Z"/><rect fill="var(--sky1)" x="230" y="416" width="10" height="10"/></g>
+          <g id="sentFigure" class="fig"><path d="M140 380 c-7 0 -12 6 -12 13 0 5 3 9 7 11 -12 6 -18 26 -18 48 h46 c0 -22 -6 -42 -18 -48 4 -2 7 -6 7 -11 0 -7 -5 -13 -12 -13z"/></g>
+        </g>
+
+        <!-- traveler on the near shore -->
+        <path id="shoreShadow" class="moonf" d="M200 370 c-8 0 -14 6 -14 14 0 5 3 10 8 13 -14 7 -22 30 -24 55 h60 c-2 -25 -10 -48 -24 -55 5 -3 8 -8 8 -13 0 -8 -6 -14 -14 -14z"/>
+        <g id="shoreTraveler" class="fig">
+          <path d="M200 370 c-8 0 -14 6 -14 14 0 5 3 10 8 13 -14 7 -22 30 -24 55 h60 c-2 -25 -10 -48 -24 -55 5 -3 8 -8 8 -13 0 -8 -6 -14 -14 -14z"/>
+          <path class="stone" d="M222 402 c8 2 12 10 12 20 l-8 26 c-2 -14 -4 -30 -4 -46z"/>
+          <path class="sfig" stroke-width="4" stroke-linecap="round" d="M174 372 L178 452"/>
+          <rect class="token" fill="var(--sky1)" x="194" y="408" width="12" height="14" rx="2"/><path class="token sfig" stroke-width="1.5" d="M197 412h6M197 416h4"/>
+          <circle class="purse lampf" cx="216" cy="440" r="6"/>
+        </g>
+        <circle id="coinFly" class="lampf" cx="216" cy="440" r="8"/>
+        <g id="tokenFly"><rect fill="var(--sky1)" x="194" y="408" width="12" height="14" rx="2"/><path class="sfig" stroke-width="1.5" d="M197 412h6M197 416h4"/></g>
+        <g id="lampFly"><rect class="fig" x="312" y="481" width="14" height="18" rx="3"/><circle cx="319" cy="490" r="26" fill="url(#glow)"/></g>
+        <path id="namePath" class="smoon" stroke-width="3.5" stroke-linecap="round" d="M370 612 c24 -22 44 18 70 -2 s40 -24 66 2 s36 22 62 -4 s46 -12 70 6"/>
+
+        <!-- the ferry -->
+        <g id="boatpos"><g transform="translate(300 525)"><g id="boatMove"><g id="boatBob">
+          <ellipse id="lampReflect" cx="26" cy="46" rx="22" ry="34" class="lampf" opacity=".45" filter="url(#blur6)"/>
+          <path class="land" d="M-24 -6 Q-10 8 12 4 L200 4 Q226 -2 234 -18 L206 34 Q100 44 8 34 Z"/>
+          <path class="smoon" stroke-width="1.5" opacity=".3" d="M4 14 H196 M8 24 H190"/>
+          <!-- ferryman -->
+          <path class="fig" d="M150 -104 c-10 0 -16 8 -16 17 0 6 3 11 7 14 -16 12 -24 46 -24 78 h66 c0 -32 -8 -66 -24 -78 4 -3 7 -8 7 -14 0 -9 -6 -17 -16 -17z"/>
+          <path class="sfig" stroke-width="5" stroke-linecap="round" d="M144 -54 L106 -46"/>
+          <path class="sfig" stroke-width="4" d="M186 -128 L128 48"/>
+          <!-- lantern on the prow -->
+          <path class="sfig" stroke-width="3" d="M10 4 L10 -46 L24 -46"/>
+          <g id="lampFlick"><circle id="lampGlow" cx="24" cy="-32" r="60" fill="url(#glow)"/>
+          <rect id="lampBody" class="fig" x="17" y="-42" width="14" height="18" rx="3"/>
+          <rect id="lampFlame" class="lampf" x="20" y="-38" width="8" height="10" rx="2"/></g>
+          <!-- traveler aboard -->
+          <g id="boatTraveler" class="fig"><path d="M72 -74 c-8 0 -14 6 -14 14 0 5 3 10 8 13 -14 7 -22 30 -24 51 h60 c-2 -21 -10 -44 -24 -51 5 -3 8 -8 8 -13 0 -8 -6 -14 -14 -14z"/>
+            <rect class="token" fill="var(--sky1)" x="66" y="-38" width="12" height="14" rx="2"/><path class="token sfig" stroke-width="1.5" d="M69 -34h6M69 -30h4"/>
+            <circle class="purse lampf" cx="88" cy="-8" r="6"/></g>
+          <g id="leftThing"><circle class="lampf" cx="100" cy="-12" r="8"/></g>
+          <circle id="cupGlowBoat" cx="108" cy="-14" r="36" fill="url(#glow)"/>
+          <g id="cupBoat"><path class="lampf" d="M100 0 L104 -20 L112 -20 L116 0Z"/></g>
+        </g></g></g></g>
+
+        <!-- fog: the player's sight -->
+        <g id="fog">
+          <ellipse class="fogf f1" cx="520" cy="470" rx="320" ry="60"/>
+          <ellipse class="fogf f2" cx="740" cy="520" rx="360" ry="64"/>
+          <ellipse class="fogf f3" cx="460" cy="600" rx="340" ry="56"/>
+          <ellipse class="fogf f4" cx="820" cy="420" rx="300" ry="50"/>
+          <ellipse class="fogf f5" cx="300" cy="520" rx="260" ry="48"/>
+          <ellipse class="fogf f6" cx="640" cy="660" rx="400" ry="56"/>
+          <ellipse class="fogf f1" cx="600" cy="520" rx="520" ry="110" opacity=".7"/><ellipse class="fogf f2" cx="350" cy="600" rx="480" ry="90" opacity=".6"/>
+        </g>
+        <rect id="dim" class="dimf" x="-300" y="-400" width="1600" height="1600"/>
+        <rect x="-300" y="-400" width="1600" height="1600" fill="url(#grainTile)" opacity=".7"/>
+      </svg>
+      <svg id="map" viewBox="0 0 1000 440" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of your crossing" hidden></svg>
+    </div>
+    <section class="panel" id="panel"></section>
+  </main>
+</div>
+
+<script>
+(function(){
+/* ---------- state ---------- */
+function fresh(){return{lamp:1,name:1,coin:1,fog:0,oath:0,sent:0,water:"",picks:[],ending:""}}
+var S=fresh(),snaps=[],i=-1,phase="choose",theoryOpen=false,endPhase="ask",guess=-1;
+
+/* ---------- content ---------- */
+var STAGES=[
+{name:"The Call",campbell:"the Call to Adventure",
+ scene:function(){return "A stranger on the near shore holds out a map with a blank space."},
+ prompt:function(){return "A stranger comes down to the water. She has been walking for some time; you can tell by her shoes, which are the wrong shoes. She unrolls a map on the wet stones. Most of it is rivers and small careful writing. One space is blank, as if the pen had been afraid of it. “This,” she says, tapping the blank. “Somebody has to.”"},
+ options:function(){return[
+  {id:"a",label:"Swear an oath to find the source.",go:function(){S.oath=1},result:"You swear. She makes you say it twice, the second time slower. Then she rolls the map and puts it in your hands, and the blank space is a thing you own now, like a debt."},
+  {id:"b",label:"Go because the space is blank.",go:function(){S.fog=Math.min(5,S.fog+1)},result:"You do not swear anything. You look at the blank space for so long that she gets uncomfortable and leaves. When you look up, the fog on the river has thinned, a little, as if it had been waiting for someone to look."},
+  {id:"c",label:"Send someone else in your place.",go:function(){S.sent=1},result:"There is a young man who is always around. You give him the map. He takes the boat that night, whistling. By spring he has not come back, and the whole town has started saying his name in the past tense, and you cannot stand the sound of it. You go."}]},
+ theory:{hero:"The pattern opens with a summons, and a refusal usually only delays it.",
+  conrad:"Conrad’s travelers don’t answer a noble summons. They go because a place is unknown. Curiosity, not destiny.",
+  myth:"Old stories start the journey many ways: a message, a dream, a stranger at the door, a debt. What they share is that the world changes shape before the traveler moves.",
+  quote:"At that time there were many blank spaces on the earth, and when I saw one that looked particularly inviting on a map (but they all look that way) I would put my finger on it and say, When I grow up I will go there.",
+  cite:"Joseph Conrad, Heart of Darkness (1899). Public domain."}},
+{name:"Crossing Over",campbell:"the Crossing of the First Threshold",
+ scene:function(){return "The ferryman waits at the river mouth, hand out. Fog lies on the water."},
+ prompt:function(){return "The ferryman is smaller than you expected and older than anyone you have met. He does not say hello. He holds out his hand, palm up, the way you would to check for rain. “Everyone pays,” he says. “Choose what with.” He looks at your lamp, then your coin, then, for a long moment, at your face."},
+ options:function(){return[
+  {id:"a",label:"Give him the coin.",go:function(){S.coin=0},result:"The coin leaves your hand and goes somewhere inside his coat, where it makes no sound at all. He pushes off. The fog does not move. You get the feeling it has seen this transaction before."},
+  {id:"b",label:"Give him your name.",go:function(){S.name=0;S.fog=Math.min(5,S.fog+1)},result:"He asks you to say it. You say it. He sets the carved token on the water, and instead of floating it goes straight down, like it knows the way. On the shore behind you, your shadow has stayed where you were standing. It does not seem to have noticed you are gone. The fog thins."},
+  {id:"c",label:"Give him the lamp.",go:function(){S.lamp=0;S.fog=Math.min(5,S.fog+1)},result:"He hangs your lamp on his own post, turned toward the far bank, so the light goes ahead of you and never comes back. You cross in the dark. Things will arrive as shapes now, and names later, if at all."}]},
+ theory:{hero:"The threshold has a guardian and a price. In the pattern the hero pays it and passes into the unknown world.",
+  conrad:"For Conrad, crossing costs you an earlier self. His 1917 novel The Shadow-Line is named for this: the line you notice only as you step over it.",
+  myth:"Ferrymen ask a fee in many traditions: a coin, a story, a promise, a name. What the traveler hands over is the first clue to what kind of story this will be.",
+  quote:"One goes on. And the time, too, goes on—till one perceives ahead a shadow-line warning one that the region of early youth, too, must be left behind.",
+  cite:"Joseph Conrad, The Shadow-Line (1917). Public domain."}},
+{name:"The River",campbell:"the Road of Trials",
+ scene:function(){return S.lamp?"Something moves on the far bank, half seen in the lamplight.":"The boat in darkness. Something moves on the far bank, unseen."},
+ prompt:function(){return S.lamp?"Something on the bank is moving in a way that is either a bird or a person or a bush that has decided to become one of those. The lamp makes it a shape. That is all the lamp is willing to do.":"You have no lamp. Something on the bank is making a sound, a careful, repeated sound, like someone trying to be quiet with a jar. It is only a sound. It has all the time in the world."},
+ options:function(){return S.lamp?[
+  {id:"a",label:"Raise the lamp and drive it off.",go:function(){},result:"You raise the lamp and shout the sort of thing one shouts. The shape backs into the reeds, offended. You will never know what it was, and it will never know what you were. The fog stays."},
+  {id:"b",label:"Cover the lamp and watch.",go:function(){S.fog=Math.min(5,S.fog+1)},result:"You cover the lamp. In the dark the shape becomes a heron, then a woman washing something she does not want washed, then a heron again, and you understand it was never going to hold still for you. The fog thins."},
+  {id:"c",label:"Steer for the middle and keep going.",go:function(){},result:"You steer for the middle, where there is nothing to look at and nothing to lose. The bank falls away. The river gets wide the way a silence gets wide. Nothing learned. Nothing lost. Not nothing, though."}]:[
+  {id:"a",label:"Call out.",go:function(){},result:"You call out. Your own voice comes back off the water, slightly wrong, like a voice that has been somewhere. The sound on the bank stops. The fog stays."},
+  {id:"b",label:"Wait until the sounds explain themselves.",go:function(){S.fog=Math.min(5,S.fog+1)},result:"You wait. Wings. Then water poured from a jar. Then wings again. Then someone humming a tune you know from somewhere you cannot place. You know the bank now, without ever seeing it, better than you know some rooms."},
+  {id:"c",label:"Steer blind for the middle.",go:function(){},result:"You steer for the middle, where there is nothing to look at and nothing to lose. The bank falls away. The river gets wide the way a silence gets wide. Nothing learned. Nothing lost. Not nothing, though."}]},
+ theory:{hero:"Trials test the hero and prove them. Each one won makes them stronger.",
+  conrad:"Conrad’s trials don’t make you stronger. They take away what you thought you knew. He gives you the sensation first and the cause later; the critic Ian Watt called this delayed decoding.",
+  myth:"Journeys down through gates are old: Inanna loses something at each of seven; the Egyptian night-boat passes twelve. The traveler arrives with less and knows more.",
+  quote:"Sticks, little sticks, were flying about—",
+  cite:"Joseph Conrad, Heart of Darkness (1899). You feel the sticks before you learn they are arrows. Public domain."}},
+{name:"The Listener",campbell:"the Ordeal",
+ scene:function(){return "At the river’s source sits a huge figure, and the air around it moves in rings, like a voice."},
+ prompt:function(){return S.sent?"At the source, on a stone the size of a house, sits the young man you sent. He is older than you now. He has given away everything he carried, one thing at a time, and is now, having nothing, talking. He talks the way rain talks. It does not stop for you.":"At the source, on a stone the size of a house, sits someone who has given away everything they ever carried, one thing at a time, and is now, having nothing, talking. They talk the way rain talks. It does not stop for you. It does not stop for anything."},
+ options:function(){var has=S.lamp||S.coin;return[
+  {id:"a",label:"Bring them back by force.",go:function(){},result:has?"You get an arm around them and drag. They come, talking. They talk in the boat. They talk while you tie up. You have kept everything you carried and learned nothing at all, and the fog, for its part, stays exactly where it was.":"You have nothing to hold them with, and nothing to offer, and your arms have gotten very tired. They slide back onto the stone like water finding its level. The fog stays."},
+  {id:"b",label:S.lamp?"Sit and listen until your lamp burns out.":"Sit and listen in the dark.",go:function(){S.lamp=0;S.fog=Math.min(5,S.fog+2)},result:S.lamp?"You sit. The lamp burns lower. You do not refill it. At some point it goes out, and you notice that you did not notice, because you were listening. When you stand, your knees have opinions, and the fog is almost gone.":"You sit in the dark and listen. It takes a night and a day. When you stand, the fog is almost gone, and you cannot remember a single sentence, only that they were all true."},
+  {id:"c",label:"Leave them the last thing you carry.",go:function(){if(S.coin)S.coin=0;else if(S.name)S.name=0;else if(S.lamp)S.lamp=0;S.fog=Math.min(5,S.fog+1)},result:S.coin?"You set the coin on the stone beside them. They do not look at it. Nobody up here has looked at a coin in years. The fog thins anyway.":S.name?"You set the carved token on the stone. They say your name once, quietly, and it is theirs now, and it sounds better on them. The fog thins.":S.lamp?"You leave the lamp burning on the stone and walk back to the boat in the dark, by memory, which turns out to be enough. The fog thins.":"You have nothing left to leave. You leave your place in the boat, which was the last thing, and sit with them a while. The fog thins."}]},
+ theory:{hero:"At the center of the journey, the hero faces the greatest power and comes through, often by defeating it.",
+  conrad:"Conrad’s travelers find no monster to beat. They find a man who crossed every line, and they are changed just by listening to him.",
+  myth:"The far figure who knows too much is everywhere in old stories: the flood-survivor, the seer in the cave, the giant at the gate. In most versions the traveler comes away with words, not a trophy.",
+  quote:"The man presented himself as a voice.",
+  cite:"Joseph Conrad, Heart of Darkness (1899). Public domain."}},
+{name:"What You Carry",campbell:"the Ultimate Boon",
+ scene:function(){return "A stone basin at the source. A cup of clear water glows in it."},
+ prompt:function(){return "The source is smaller than the stories. A spring in a stone basin, and a cup left on the rim by someone who meant to come back. The water is so clear it is hard to believe there is any. Whoever drinks it sees. That is the whole rule. Nobody says what."},
+ options:function(){return[
+  {id:"a",label:"Carry it home to share.",go:function(){S.water="carry"},result:"The cup rides in the boat between your feet. It does not spill. It has not spilled yet. You are going to think about that word, yet, all the way home."},
+  {id:"b",label:"Drink it yourself.",go:function(){S.water="drunk";S.fog=5},result:"You drink. The fog is gone, all of it, and every bank is plain, and every bank is worse and better than you thought. There is nothing left in the cup to give anyone, and you are going to have to be the only one who knows."},
+  {id:"c",label:"Pour it back.",go:function(){S.water="poured"},result:"You pour it back. It makes a sound like agreement. You leave with what you came with, which is either wisdom or the other thing."}]},
+ theory:{hero:"The hero wins the prize (the boon) and means to bring it back for others.",
+  conrad:"In Conrad the prize rarely makes it home. What survives the trip is knowledge, and usually it can’t be shared.",
+  myth:"The thing brought back takes many forms: fire, a cup, a plant, a word. And in many of the oldest tellings it is lost or spent on the way home. Gilgamesh loses his to a serpent while he bathes.",
+  quote:"The horror! The horror!",
+  cite:"Joseph Conrad, Heart of Darkness (1899). All the traveler brings back. Public domain."}},
+{name:"The Telling",campbell:"the Return",
+ scene:function(){return "Dusk. A lit window on the far shore, and someone waiting on the jetty."},
+ prompt:function(){return "Dusk. The water has gone the color of a coin. On the jetty is the one who waited, who has waited so long that waiting has become a kind of job. They do not ask where you were. They ask what you found."},
+ options:function(){
+  var pool=[];
+  if(S.name)pool.push({id:"own",label:"Tell them everything, in your own name.",go:function(){S.ending="own"},result:S.water==="carry"?"You tell it straight, all of it, in order, and they drink from the cup, and the window behind them fills with light. This is the version everyone will tell. It is a good version. It is not quite what happened.":"You tell it straight. They listen politely. They are waiting for you to hold something up, and there is nothing in your hands, and after a while you both look at your hands."});
+  else pool.push({id:"frame",label:"Tell it as if it happened to someone else.",go:function(){S.ending="frame"},result:"You say: a man I knew once went up a river. They lean in. You tell the whole thing about him. It is the only way you can say it, and it is the truest thing you have ever said, and it is not about you, and it is only about you."});
+  if(S.fog>=3)pool.push({id:"lie",label:"Tell them a kind lie.",go:function(){S.ending="lie"},result:"You say the source was beautiful and the river was easy and you were never once afraid. The window behind them stays warm. You take the dark home with you, where it will fit, more or less, under the bed."});
+  if(S.lamp)pool.push({id:"proof",label:"Hold up the lamp and show them.",go:function(){S.ending="proof"},result:"You hold up the lamp. It shows them your face, which is older, and the boat, which is a boat. It shows them nothing of the river, because that is not what lamps are for. They nod. They are being kind."});
+  pool.push({id:"silence",label:"Say nothing. Look back up the river.",go:function(){S.ending="silence"},result:"You say nothing. You look back up the river. When you turn around again they are gone, the way they were always going to be, and the river is still there, the way it was always going to be, and you have, at least, that."});
+  return pool.slice(0,3)},
+ theory:{hero:"The hero comes home master of two worlds and shares what they learned. The community is renewed.",
+  conrad:"Marlow comes home and lies to the woman who waited, because the truth would destroy her. Then he tells the whole story at dusk to men on a boat, and that telling is the book.",
+  myth:"Orpheus looks back too soon and loses her. Penelope waits twenty years and tests her husband before she believes him. Coming home is its own trial, and it is failed more often than the crossing.",
+  quote:"The last word he pronounced was—your name.",
+  cite:"Joseph Conrad, Heart of Darkness (1899). Marlow’s lie. Public domain."}}
+];
+var ENDINGS={
+ own:{name:"The Textbook Return",why:function(){return "You kept your name, so you could tell it as yourself"+(S.water==="carry"?", and you carried the cup home to share.":", though you carried nothing home to show.")}},
+ frame:{name:"The Frame Tale",why:function(){return "You gave away your name at "+lostAt("name")+", so you could only tell it as someone else’s story. That is how Marlow tells his."}},
+ lie:{name:"The Kind Lie",why:function(){return "You cleared enough fog to see what the truth would cost them, so a kind lie was open to you."}},
+ proof:{name:"The Proof",why:function(){return "You kept the lamp all the way, so you could show them something. A lamp shows faces, not rivers."}},
+ silence:{name:"The Silence",why:function(){return "You chose not to tell it at all. Every other door was open or closed by what you carried; this one is always open."}}
+};
+function lostAt(thing){for(var k=0;k<S.picks.length;k++){var before=snaps[k],after=snaps[k+1]||S;if(before&&before[thing]&&!after[thing])return STAGES[k].name}return "a crossing"}
+
+/* ---------- dom ---------- */
+var scene=document.getElementById("scene"),map=document.getElementById("map"),panel=document.getElementById("panel");
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var timer=null;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function marks(n){var s='<svg class="river" viewBox="0 0 420 34" aria-hidden="true"><path d="M10 20 C70 8 110 30 170 18 S270 8 330 20 S390 26 410 16" fill="none" stroke="var(--line)" stroke-width="3" stroke-linecap="round"/>';
+  var xs=[10,90,170,250,330,410],ys=[20,14,18,14,20,16];for(var k=0;k<6;k++){var f=k<n?'var(--ink)':k===n?'var(--amber)':'var(--card)';s+='<circle cx="'+xs[k]+'" cy="'+ys[k]+'" r="'+(k===n?9:7)+'" fill="'+f+'" stroke="var(--line)" stroke-width="2.5"/>'}return s+'</svg>'}
+function carryLine(){var c=[];if(S.lamp)c.push("lamp");if(S.name)c.push("name");if(S.coin)c.push("coin");if(S.water==="carry")c.push("the cup");return c.length?"You carry: "+c.join(" · "):"You carry nothing."}
+var GL={lamp:'<svg viewBox="0 0 26 26" aria-hidden="true"><rect x="8" y="6" width="10" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="11" y="10" width="4" height="6" rx="1" fill="var(--amber)"/><path d="M13 2v4M9 24h8" stroke="currentColor" stroke-width="2"/></svg>',
+ name:'<svg viewBox="0 0 26 26" aria-hidden="true"><rect x="6" y="4" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 10h6M10 14h4" stroke="currentColor" stroke-width="2"/></svg>',
+ coin:'<svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="8" fill="var(--amber)" stroke="currentColor" stroke-width="2"/></svg>',
+ cup:'<svg viewBox="0 0 26 26" aria-hidden="true"><path d="M8 5h10l-2 14h-6z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 21h8" stroke="currentColor" stroke-width="2"/><path d="M10 9h6" stroke="var(--amber)" stroke-width="2"/></svg>'};
+function carryHTML(st){var keep=S;S=st||S;var g='<span class="glyphs" aria-hidden="true">'+(S.lamp?GL.lamp:'')+(S.name?GL.name:'')+(S.coin?GL.coin:'')+(S.water==="carry"?GL.cup:'')+'</span>';var t=carryLine();S=keep;return g+'<span>'+esc(t)+'</span>'}
+function paint(stage,out,instant){
+  if(instant)scene.classList.add("instant");
+  scene.setAttribute("data-stage",String(stage));
+  if(out)scene.setAttribute("data-out",out);else scene.removeAttribute("data-out");
+  scene.setAttribute("data-fog",String(S.fog));scene.setAttribute("data-lamp",String(S.lamp));scene.setAttribute("data-name",String(S.name));scene.setAttribute("data-coin",String(S.coin));scene.setAttribute("data-water",S.water||"none");
+  if(instant){void scene.getBoundingClientRect();requestAnimationFrame(function(){scene.classList.remove("instant")})}
+}
+function fitScene(){var a=scene.parentElement,r=a.clientWidth/Math.max(1,a.clientHeight);scene.setAttribute("viewBox",r<1.2?"150 -60 700 840":"0 0 1000 700");scene.setAttribute("preserveAspectRatio",r<1.2?"xMidYMid meet":"xMidYMid slice")}
+window.addEventListener("resize",fitScene);fitScene();
+(function(){if(reduce)return;var box=document.getElementById("artBox"),raf=null,px=0,py=0;
+  function set(){raf=null;scene.style.setProperty("--px",px.toFixed(3));scene.style.setProperty("--py",py.toFixed(3))}
+  box.addEventListener("pointermove",function(e){var r=box.getBoundingClientRect();px=(e.clientX-r.left)/r.width*2-1;py=(e.clientY-r.top)/r.height*2-1;if(!raf)raf=requestAnimationFrame(set)});
+  box.addEventListener("pointerleave",function(){px=0;py=0;if(!raf)raf=requestAnimationFrame(set)});
+  if(window.DeviceOrientationEvent)window.addEventListener("deviceorientation",function(e){if(e.gamma==null)return;px=Math.max(-1,Math.min(1,e.gamma/30));py=Math.max(-1,Math.min(1,(e.beta-45)/30));if(!raf)raf=requestAnimationFrame(set)});
+})();
+function focusHead(){var h=document.getElementById("h");if(h)h.focus({preventScroll:true});window.scrollTo(0,0)}
+
+function render(instant){
+  clearTimeout(timer);
+  document.body.setAttribute("data-screen",i===-1?"title":i===6?"end":"stage");
+  var atHome=i===-1;
+  document.getElementById("backBtn").setAttribute("aria-disabled",atHome?"true":"false");
+  document.getElementById("homeBtn").setAttribute("aria-disabled",atHome?"true":"false");
+  if(i===-1)return renderTitle(instant);
+  if(i===6)return renderEnd();
+  map.setAttribute("hidden","");scene.style.display="";
+  var St=STAGES[i],shown=phase==="shown"&&S.picks[i];
+  var opts=shown?snapOptions(i):St.options();
+  var C=shown?opts.filter(function(o){return o.id===S.picks[i]})[0]:null;
+  paint(i+1,C?C.id:null,instant);
+  scene.setAttribute("aria-label",C?C.result:St.scene());
+  var h='<p class="eyebrow">Stage '+(i+1)+' of 6</p>'+marks(i)+
+    '<h2 id="h" tabindex="-1">'+esc(St.name)+'</h2>'+
+    '<p class="carry">'+carryHTML(S)+'</p>'+
+    '<p class="prompt">'+esc(shown?snapPrompt(i):St.prompt())+'</p>';
+  if(!shown){
+    h+='<div class="choices">';
+    opts.forEach(function(o){h+='<button class="choice" type="button" data-pick="'+o.id+'">'+esc(o.label)+'</button>'});
+    h+='</div>';
+  }else{
+    h+='<p class="chosen">You chose: '+esc(C.label)+'</p>'+
+      '<div id="after" '+(instant||reduce?'':'hidden')+'>'+
+      '<p class="result" role="status">'+esc(C.result)+'</p>'+
+      '<div class="actions" style="margin-top:16px">'+
+        '<button class="btn" type="button" id="theoryBtn" aria-expanded="'+(theoryOpen?"true":"false")+'" aria-controls="theory">Why it matters</button>'+
+        '<button class="btn" type="button" id="againBtn">Choose again</button>'+
+        '<button class="btn primary" type="button" id="nextBtn">'+(i===5?"See your crossing":"Continue")+'</button>'+
+      '</div></div>'+
+      '<section class="theory" id="theory" '+(theoryOpen?'':'hidden')+' aria-labelledby="th">'+
+        '<h3 id="th" tabindex="-1">This moment</h3>'+
+        '<dl><div><dt>In the hero’s journey</dt><dd>'+esc(St.theory.hero)+' Campbell’s name for it: '+esc(St.campbell)+'.</dd></div>'+
+        '<div><dt>Conrad’s move</dt><dd>'+esc(St.theory.conrad)+'</dd></div>'+
+        '<div><dt>Older than both</dt><dd>'+esc(St.theory.myth)+'</dd></div></dl>'+
+        '<blockquote>'+esc(St.theory.quote)+'<cite>'+esc(St.theory.cite)+'</cite></blockquote>'+
+        '<button class="btn" type="button" id="theoryClose">Back to the river</button>'+
+      '</section>';
+    if(!(instant||reduce)){timer=setTimeout(function(){var a=document.getElementById("after");if(a)a.hidden=false},i===1?4400:3000)}
+  }
+  panel.innerHTML=h;focusHead();
+}
+/* options/prompt as they were when the stage was entered (state may have moved since) */
+function withSnap(k,fn){var keep=S;S=copy(snaps[k]||S);var r=fn();S=keep;return r}
+function snapOptions(k){return withSnap(k,function(){return STAGES[k].options()})}
+function snapPrompt(k){return withSnap(k,function(){return STAGES[k].prompt()})}
+function snapCarry(k){return withSnap(k,carryLine)}
+function copy(o){return JSON.parse(JSON.stringify(o))}
+
+function renderTitle(instant){
+  map.setAttribute("hidden","");scene.style.display="";
+  paint(0,null,instant);scene.setAttribute("data-fog","2");
+  scene.setAttribute("aria-label","A ferry with a lit lamp waits in fog at the mouth of a river. A traveler stands on the shore with a lamp, a carved name-token and a coin purse.");
+  panel.innerHTML='<p class="eyebrow">Six crossings. Three things. One river that is not on the map.</p>'+
+    '<h1 id="h" tabindex="-1">The Ferry Crossing<span class="rule" aria-hidden="true"></span></h1>'+
+    '<p class="prompt">You are standing at the edge of a river that is not on any map, holding three things: a lamp that works, a name that is yours, and one coin, which is more than most people bring. Everyone who goes up this river pays something. Nobody has ever agreed on what.</p>'+
+    '<div class="actions"><button class="btn primary" type="button" id="beginBtn">Begin the crossing</button></div>'+
+    '<p class="foot">Tight Spiral Studios · Play. Notice. Design.</p>';
+  focusHead();
+}
+
+function renderEnd(){
+  scene.style.display="none";map.removeAttribute("hidden");
+  var E=ENDINGS[S.ending]||ENDINGS.silence;
+  var h='<p class="eyebrow">The crossing is over</p>'+marks(6);
+  if(endPhase==="ask"){
+    map.innerHTML='<rect width="1000" height="440" style="fill:var(--sky1)"/>';
+    map.setAttribute("aria-label","The map is blank until you answer.");
+    h+='<h2 id="h" tabindex="-1">'+esc(E.name)+'</h2>'+
+      '<p class="prompt">Before the map draws itself: which crossing changed your ending most?</p>'+
+      '<div class="choices">';
+    STAGES.forEach(function(St,k){h+='<button class="choice" type="button" data-guess="'+k+'">'+(k+1)+'. '+esc(St.name)+'</button>'});
+    h+='</div>';
+    panel.innerHTML=h;focusHead();return;
+  }
+  /* reveal */
+  var fogs=[];for(var k=0;k<6;k++)fogs.push((snaps[k+1]||S).fog);
+  var X=function(k){return 90+k*164},Y=function(f){return 340-f*46};
+  var s='<rect width="1000" height="440" style="fill:var(--sky1)"/>';
+  for(var f=0;f<=5;f++)s+='<line x1="60" x2="940" y1="'+Y(f)+'" y2="'+Y(f)+'" class="sfig" stroke-width="1" opacity=".18"/>';
+  s+='<polyline points="'+[0,1,2,3,4,5].map(function(k){return X(k)+","+Y(fogs[k])}).join(" ")+'" style="stroke:var(--amber);fill:none" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>';
+  for(k=0;k<6;k++){s+='<circle cx="'+X(k)+'" cy="'+Y(fogs[k])+'" r="12" style="fill:var(--amber)" stroke="var(--line)" stroke-width="2"/>';
+    var b=snaps[k],a=snaps[k+1]||S;if(b){var lost=[];if(b.lamp&&!a.lamp)lost.push("lamp");if(b.name&&!a.name)lost.push("name");if(b.coin&&!a.coin)lost.push("coin");
+      lost.forEach(function(t,j){s+='<rect x="'+(X(k)-9)+'" y="'+(Y(fogs[k])+22+j*26)+'" width="18" height="18" rx="3" style="fill:var(--ink)"/>'})}}
+  var gk=guess;s+='<circle cx="'+X(gk)+'" cy="'+Y(fogs[gk])+'" r="24" class="sfig" stroke-width="4" stroke-dasharray="6 6"/>';
+  map.innerHTML=s;
+  map.setAttribute("aria-label","Your sight rising or staying flat across the six crossings, with a mark at each place you gave something up. The table lists every stage.");
+  var rows=STAGES.map(function(St,k){var b=snaps[k],a=snaps[k+1]||S,lost=[];if(b){if(b.lamp&&!a.lamp)lost.push("lamp");if(b.name&&!a.name)lost.push("name");if(b.coin&&!a.coin)lost.push("coin")}
+    var pk=S.picks[k],lab=withSnap(k,function(){var o=STAGES[k].options().filter(function(o){return o.id===pk})[0];return o?o.label:""});
+    return '<tr><th scope="row">'+esc(St.name)+'</th><td>'+esc(lab)+'</td><td>'+(lost.length?esc(lost.join(", ")):"—")+'</td><td>'+fogs[k]+' of 5</td></tr>'}).join("");
+  h+='<h2 id="h" tabindex="-1">'+esc(E.name)+'</h2>'+
+    '<p class="prompt">'+esc(E.why())+'</p>'+
+    '<p class="prompt">You named '+esc(STAGES[guess].name)+'. '+esc(guessNote())+'</p>'+
+    '<p class="principle">In the hero’s journey you win things and keep them. In Conrad you trade them for sight, and then you can’t tell the story straight.</p>'+
+    '<ul class="legend"><li><svg width="46" height="14" aria-hidden="true"><line x1="2" x2="44" y1="7" y2="7" style="stroke:var(--amber)" stroke-width="7" stroke-linecap="round"/></svg>What you could see</li>'+
+    '<li><svg width="20" height="20" aria-hidden="true"><rect x="1" y="1" width="18" height="18" rx="3" style="fill:var(--ink)"/></svg>Something given up</li></ul>'+
+    '<div class="table-wrap"><table><thead><tr><th scope="col">Stage</th><th scope="col">You chose</th><th scope="col">Gave up</th><th scope="col">Sight</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div class="actions"><button class="btn primary" type="button" id="restartBtn">Cross again</button><button class="btn" type="button" id="homeBtn2">Home</button></div>'+
+    '<p class="foot">Tight Spiral Studios · Play. Notice. Design.</p>';
+  panel.innerHTML=h;focusHead();
+}
+function guessNote(){
+  var key=S.ending==="frame"?lostAt("name"):S.ending==="proof"?"every stage you kept the lamp":S.ending==="lie"?"the stages where the fog thinned":S.ending==="own"?"every stage you kept your name":"";
+  if(!key)return "The silence is always open, so no single crossing made it.";
+  var kname=STAGES[guess].name;
+  if(key===kname)return "That is where the chain starts.";
+  return "The chain runs through "+key+".";
+}
+
+/* ---------- flow ---------- */
+function enter(k,ph,instant){i=k;phase=ph;theoryOpen=false;if(k>=0&&k<6&&!snaps[k])snaps[k]=copy(S);render(instant)}
+function pick(id){
+  var opts=STAGES[i].options(),o=opts.filter(function(x){return x.id===id})[0];if(!o)return;
+  snaps[i]=copy(S);o.go();S.picks[i]=id;snaps.length=i+1;snaps[i+1]=copy(S);
+  phase="shown";theoryOpen=false;render(false);
+}
+function rewind(k){S=copy(snaps[k]);S.picks=S.picks.slice(0,k);snaps.length=k+1;enter(k,"choose",true)}
+
+panel.addEventListener("click",function(e){
+  var t=e.target.closest("button");if(!t)return;
+  if(t.id==="beginBtn"){S=fresh();snaps=[];endPhase="ask";return enter(0,"choose",true)}
+  if(t.hasAttribute("data-pick"))return pick(t.getAttribute("data-pick"));
+  if(t.hasAttribute("data-guess")){guess=+t.getAttribute("data-guess");endPhase="reveal";return render(true)}
+  if(t.id==="againBtn")return rewind(i);
+  if(t.id==="nextBtn"){if(i===5){endPhase="ask";return enter(6,"end",true)}return enter(i+1,"choose",true)}
+  if(t.id==="theoryBtn"){theoryOpen=!theoryOpen;document.getElementById("theory").hidden=!theoryOpen;t.setAttribute("aria-expanded",String(theoryOpen));if(theoryOpen)document.getElementById("th").focus();return}
+  if(t.id==="theoryClose"){theoryOpen=false;document.getElementById("theory").hidden=true;var b=document.getElementById("theoryBtn");b.setAttribute("aria-expanded","false");b.focus();return}
+  if(t.id==="restartBtn"){S=fresh();snaps=[];endPhase="ask";return enter(0,"choose",true)}
+  if(t.id==="homeBtn2")return enter(-1,"choose",true);
+});
+document.getElementById("homeBtn").addEventListener("click",function(){if(i!==-1)enter(-1,"choose",true)});
+document.getElementById("backBtn").addEventListener("click",function(){
+  if(i===-1)return;
+  if(i===6){if(endPhase==="reveal"){endPhase="ask";return render(true)}return enter(5,"shown",true)}
+  if(phase==="shown")return rewind(i);
+  if(i===0)return enter(-1,"choose",true);
+  enter(i-1,S.picks[i-1]?"shown":"choose",true);
+});
+
+/* comfort: a live corner control, never a wall */
+var root=document.documentElement,cBtn=document.getElementById("comfortBtn"),cPanel=document.getElementById("comfort");
+function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function load(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function applyComfort(){var s=root.getAttribute("data-stop")||"1",z=root.getAttribute("data-size")||"1";
+  cPanel.querySelectorAll("[data-stop]").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-stop")===s))});
+  cPanel.querySelectorAll("[data-size]").forEach(function(b){b.setAttribute("aria-pressed",String(b.getAttribute("data-size")===z))})}
+root.setAttribute("data-stop",load("tfc-stop")||"1");root.setAttribute("data-size",load("tfc-size")||"1");applyComfort();
+cBtn.addEventListener("click",function(){var open=cPanel.hidden;cPanel.hidden=!open;cBtn.setAttribute("aria-expanded",String(open));if(open)cPanel.querySelector("button").focus()});
+document.getElementById("comfortClose").addEventListener("click",function(){cPanel.hidden=true;cBtn.setAttribute("aria-expanded","false");cBtn.focus()});
+cPanel.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+  if(b.hasAttribute("data-stop")){root.setAttribute("data-stop",b.getAttribute("data-stop"));store("tfc-stop",b.getAttribute("data-stop"))}
+  if(b.hasAttribute("data-size")){root.setAttribute("data-size",b.getAttribute("data-size"));store("tfc-size",b.getAttribute("data-size"))}
+  applyComfort()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!cPanel.hidden){cPanel.hidden=true;cBtn.setAttribute("aria-expanded","false");cBtn.focus()}});
+
+function start(d){if(d&&d.S){S=d.S;snaps=d.snaps||[];i=d.i;phase=d.phase;endPhase=d.endPhase||"ask";guess=d.guess||0}render(true)}
+if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(function(){return{S:S,snaps:snaps,i:i,phase:phase,endPhase:endPhase,guess:guess}});
+if(window.claude&&window.claude.hot&&window.claude.hot.ready)window.claude.hot.ready(start);else start(window.claude&&window.claude.hot&&window.claude.hot.data||{});
+})();
+</script>
