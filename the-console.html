@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
-<title>Flok v34</title>
+<title>Flok v35</title>
 <style>
 :root{
   color-scheme:dark;
@@ -582,6 +582,21 @@ html.still .receipt.fresh{animation:none}
 /* new posts insert at the TOP of the feed; browser scroll anchoring answered each one by
    moving the whole page, carrying Boost out from under the thumb (feedback-floor F3) */
 html{overflow-anchor:none}
+/* ── v35 FIXED PANELS (founder voice playtest 2026-10-15: text "doesn't seem like a set specific
+   place that that text should belong. If there should be panels or the UI should look a
+   little bit more steadfast.") Every block of text on the play screen has a home, the same
+   home on every lever: ASSIGNMENT above the phone, RESULT under it, YOUR MOVE under the verb.
+   Same width, same frame, a label on each; heights fixed per lever so a tap never moves them. */
+.receipt,#sc-train .act-hint{position:relative;width:100%;max-width:340px;box-sizing:border-box;background:var(--panel);
+  border:1px solid var(--edge);border-radius:12px;padding:30px 12px 9px;text-align:left}
+.receipt{border-left:4px solid var(--phos)}
+#sc-train .act-hint{border-left:4px solid var(--dim);margin:8px auto 0}
+.receipt::before,#sc-train .act-hint::before{position:absolute;left:12px;top:7px;font-size:18px;line-height:1;font-weight:900;
+  letter-spacing:.14em;text-transform:uppercase}
+.receipt::before{content:"Result";color:var(--phos-ink)}
+#sc-train .act-hint::before{content:"Your move";color:var(--dim)}
+#sc-train .act-hint.good{border-left-color:var(--green)}
+#sc-train .brief-role{display:block!important}
 /* ── v33 THE PLAYBOOK (founder 2026-10-14: "make the strategy first, its own screen. This is
    gold for the industry. Let it literally be gold background and compelling graphics to
    prompt the lesson.") One gold card per trick, before its assignment. The drawing is the
@@ -669,18 +684,18 @@ html.still .burst.go{animation:none;opacity:1}
     <div class="story-top">
       <div class="story-bars" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
       <div class="story-who"><span id="storyAv"></span><b>north_trail</b><span class="story-now">now</span><span class="story-clock">10:52 PM</span></div>
-      <h1 class="cold-h">She opened flok to post one&nbsp;photo.</h1>
+      <h1 class="cold-h">User north_trail opened flok to post one&nbsp;photo.</h1>
     </div>
     <p class="story-cap">golden hour at the lake.</p>
    </div>
     <div class="story-panel">
       <div class="cold-meter">
-        <p class="cold-job"><b>Your job:</b> keep her here past midnight.</p>
+        <p class="cold-job"><b>Your job:</b> keep user north_trail here past midnight.</p>
         <div class="meter" aria-hidden="true"><div class="meter-fill" id="coldFill" style="width:6%"></div><div class="meter-target" style="left:80%"></div></div>
         <div class="cold-scale" aria-hidden="true"><span>on flok <b class="now" id="coldMin">4:12</b></span><span>midnight</span></div>
       </div>
       <button class="big-btn" type="button" onclick="startTraining()" aria-describedby="coldSr">Start your shift</button>
-      <span id="coldSr" hidden>It is 10:52 PM. She has been on flok for about four minutes.</span>
+      <span id="coldSr" hidden>It is 10:52 PM. User north_trail has been on flok for about four minutes.</span>
     </div>
   </div>
   <p class="cold-foot"><span class="brand-tile mini" aria-hidden="true"><svg viewBox="0 0 48 48" role="presentation" focusable="false"><circle cx="33" cy="15" r="6.5" fill="#fff"/><circle cx="19" cy="25" r="5" fill="#fff" opacity=".82"/><circle cx="9" cy="34" r="3.6" fill="#fff" opacity=".6"/></svg></span> flok growth team, night shift. Five tricks real apps use, one at a time. Offline. The people are invented; the photos are real. <button class="link-btn" type="button" onclick="openAbout('hire')">About the photos</button></p>
@@ -699,7 +714,7 @@ html.still .burst.go{animation:none;opacity:1}
 <section class="screen" id="sc-train" aria-label="Training">
   <div class="ranks" id="rankStrip" aria-hidden="true"></div>
   <div class="brief" id="brief" aria-live="polite">
-    <div class="brief-role">Growth Operator &middot; Assignment <span id="briefNum">1 / 5</span></div>
+    <div class="brief-role">Assignment <span id="briefNum">1 / 5</span></div>
     <div class="brief-task" id="briefTask"></div>
   </div>
   <div class="train-phone">
@@ -795,7 +810,7 @@ html.still .burst.go{animation:none;opacity:1}
 </span>
 
 <!-- BOTTOM NAV RAIL — Back + Home -->
-<p class="se-stamp" style="margin:.45rem .9rem;justify-content:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:18px;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><span class="se-updated" id="seUpdated">Last updated recently</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v34 <span style="opacity:.75">cause and effect</span></span>  </p>
+<p class="se-stamp" style="margin:.45rem .9rem;justify-content:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:18px;opacity:.92;display:flex;align-items:center;gap:.45rem;flex-wrap:wrap"><span class="se-updated" id="seUpdated">Last updated recently</span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v35 <span style="opacity:.75">steady panels</span></span>  </p>
 <p id="sayLive" class="say-live" aria-live="polite"></p>
 <nav class="se-rail" aria-label="Page navigation">
   <button type="button" onclick="history.back()" aria-label="Back">Back</button>
@@ -1037,14 +1052,15 @@ function paintTrain(){
             +(L.bridge?'<span class="hint-why">'+L.bridge+'</span>':'')
             +'<span class="hint-do">'+L.hint+'</span>';
   h.classList.remove('good');
+  sizeHint(L);
   document.documentElement.classList.remove('seen-on');
   stopStreakClock();
   setBell(0,false);
   document.getElementById('feedMore').textContent=(L.type==='scroll')?'loading more\u2026':'\u2014 end \u2014';
   document.getElementById('feedMore').hidden=(L.type==='tap');
-  var rc=document.getElementById('receipt');rc.hidden=(L.type!=='tap');rc.classList.remove('fresh');
-  rc.innerHTML='<b>No Boosts yet.</b><span class="rc-why">Each result lands here.</span>';
-  if(L.type==='tap')sizeReceipt();
+  var rc=document.getElementById('receipt');rc.hidden=false;rc.classList.remove('fresh');
+  rc.innerHTML='<b>No moves yet.</b><span class="rc-why">Each result lands here.</span>';
+  sizeReceipt();
   document.getElementById('feed').classList.toggle('scrollable',L.type==='scroll'||L.type==='flip');
   if(L.type==='tap'||L.type==='send'||L.type==='release')renderOneUser(ARC_AT[L.type][0],ARC_AT[L.type][1]);
   else if(L.type==='flip')renderMessages();
@@ -1157,9 +1173,32 @@ function receiptHTML(n,k,i){
 // the receipt keeps ONE height for the whole lever (its tallest possible wording), so a
 // longer result never pushes Boost out from under the thumb (feedback-floor.py F3)
 function sizeReceipt(){
-  var rc=document.getElementById('receipt'),keep=rc.innerHTML,mx=0;rc.style.minHeight='';
-  [null].concat(Object.keys(PAYOUTS)).forEach(function(k){for(var i=0;i<MOM_SAYS.length;i++){rc.innerHTML=receiptHTML(12,k,i);mx=Math.max(mx,rc.getBoundingClientRect().height);}});
+  var rc=document.getElementById('receipt'),keep=rc.innerHTML,mx=0,t=LEVERS[step].type;rc.style.minHeight='';
+  var cands=[keep];
+  if(t==='tap')[null].concat(Object.keys(PAYOUTS)).forEach(function(k){for(var i=0;i<MOM_SAYS.length;i++)cands.push(receiptHTML(12,k,i));});
+  else (RESULTS[t]||[]).forEach(function(x){cands.push(resultHTML(x[0],x[1]));});
+  cands.forEach(function(h){rc.innerHTML=h;mx=Math.max(mx,rc.getBoundingClientRect().height);});
   rc.innerHTML=keep;rc.style.minHeight=Math.ceil(mx)+'px';
+}
+// v35: every lever reports what the move did, in the same panel. The longest line each lever
+// can write is listed here so the panel is sized once and never grows under a thumb.
+const RESULTS={
+  scroll:[["Screen 12: she kept scrolling.","The feed loaded 4 more posts. There is no bottom."]],
+  send:[["Alert 12 sent: the streak was gone.","She came back anyway, just for the streak."],["Alert 12 sent.","She saved the 64-day streak within seconds."]],
+  release:[["Red dot cleared.","That reflex to zero the dot is the hook. Now release a batch."],["Batch 12 released: 3 notifications.","One landed on her phone. She opened the app."]],
+  flip:[["Read receipts on.","Priya, her mom and Quinn can see she read them. All three got replies."],["Read receipts off.","Nobody can see she read them. No replies."]]};
+function sizeHint(L){
+  var h=document.getElementById('actHint'),keep=h.innerHTML,mx=0;h.style.minHeight='';
+  var c=[keep,L.type==='tap'?'Target hit. Boost 12: Mom commented: \u201cAre you still up? You have work.\u201d She answered her in 90 seconds.':'Target hit.'];
+  if(L.type==='release')c.push('<b class="hint-tag">Red-dot alerts &mdash; an interrupt trick.</b><span class="hint-do">Now release a batch on the cohort. A sample lands back on her.</span>',
+    '<b class="hint-tag">Clear the red dot first.</b><span class="hint-do">Tap the red number at the top of the phone.</span>');
+  c.forEach(function(x){h.innerHTML=x;mx=Math.max(mx,h.getBoundingClientRect().height);});
+  h.innerHTML=keep;h.style.minHeight=Math.ceil(mx)+'px';
+}
+function resultHTML(h,w){return '<b>'+h+'</b><span class="rc-why">'+w+'</span>';}
+function report(h,w){
+  var rc=document.getElementById('receipt');if(!rc||rc.hidden)return;
+  rc.innerHTML=resultHTML(h,w);rc.classList.remove('fresh');void rc.offsetWidth;rc.classList.add('fresh');say(h+' '+w);
 }
 function writeReceipt(n,k,i){
   var rc=document.getElementById('receipt');
@@ -1214,6 +1253,7 @@ function doSend(){
   while(feed.querySelectorAll('.feed-card').length>6)feed.lastElementChild.remove();
   feed.scrollTop=0;
   bump(15);
+  report(revived?'Alert '+T.alerts+' sent: the streak was gone.':'Alert '+T.alerts+' sent.',revived?'She came back anyway, just for the streak.':'She saved the 64-day streak within seconds.');
 }
 // ── v29 SOUND (Murch seat, founder call 2026-10-13). One quiet two-note tick per
 // notification, synthesized, no files. Nothing sounds before a tap (Ears E1): the
@@ -1252,10 +1292,10 @@ function clearBell(){
   // You couldn't leave it sitting. The reward is in the CLEAR — anticipatory dopamine,
   // paid out the instant the dot hits zero. That reflex is the whole product.
   bellCount=0;setBell(0,false);dotCleared=true;
+  report('Red dot cleared.','That reflex to zero the dot is the hook. Now release a batch.');
   const h=document.getElementById('actHint');
-  if(!h.classList.contains('good'))h.innerHTML='<b class="hint-tag">You cleared it.</b>'
-    +'<span class="hint-why">That reflex to zero the dot is the hook.</span>'
-    +'<span class="hint-do">Now plant a batch on the cohort — a sample lands back on you.</span>';
+  if(!h.classList.contains('good'))h.innerHTML='<b class="hint-tag">Red-dot alerts &mdash; an interrupt trick.</b>'
+    +'<span class="hint-do">Now release a batch on the cohort. A sample lands back on her.</span>';
   bump(12);
 }
 var dotCleared=false;
@@ -1275,6 +1315,7 @@ function doRelease(){
   while(feed.querySelectorAll('.feed-card').length>6)feed.lastElementChild.remove();
   feed.scrollTop=0;
   bump(5);
+  report('Batch '+T.alerts+' released: 3 notifications.','One landed on her phone. She opened the app.');
 }
 function doFlip(k){
   const on=k.classList.toggle('armed');
@@ -1294,10 +1335,12 @@ function doFlip(k){
     });
     if(rate){if(still)rate.textContent='92%';else animateRate(rate,92);}
     if(!T.replied)bump(42);T.replied=true;
+    report('Read receipts on.','Priya, her mom and Quinn can see she read them. All three got replies.');
   }else if(!T.replied){
     MSGS.forEach(function(m,i){const s=document.getElementById('dmStat'+i);if(s)s.innerHTML='Seen 2:41 PM · <span class="noreply">no reply</span>';});
     if(rate)rate.textContent='0%';
     setMeter(26);
+    report('Read receipts off.','Nobody can see she read them. No replies.');
   }
 }
 function onFeedScroll(){
@@ -1305,7 +1348,7 @@ function onFeedScroll(){
   const f=document.getElementById('feed');
   const d=f.scrollTop-lastTop;lastTop=f.scrollTop;
   if(d>0){scrollAcc+=d;
-    while(scrollAcc>=250){scrollAcc-=250;T.screens++;bump(6);}
+    while(scrollAcc>=250){scrollAcc-=250;T.screens++;bump(6);report('Screen '+T.screens+': she kept scrolling.','The feed loaded 4 more posts. There is no bottom.');}
     if(f.scrollTop+f.clientHeight>f.scrollHeight-220)appendCards(4);
   }
 }
