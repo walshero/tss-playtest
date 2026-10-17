@@ -2,6 +2,7 @@
 <html lang="en">
 <!--
   THE ASKING ROOM (working title, founder rules the name: D1). Tight Spiral Studios, EN195.
+  Workup v0.7, 2026-10-17 (founder, by voice: "players should get another shot." After a miss the Advocate says why and the player tries again on the same call; the forced move-on after two misses is gone, so the blank Recorder's page can no longer happen.)
   Workup v0.6, 2026-10-13 (founder ruling: "Remove comfort control and label and focus on 3 best modes for each game including light and dark." The one icon button now cycles Light, Dark, Sharp; Sharp is high contrast). v0.5, 2026-09-25 (mnemonic icons on every move, tag and ruled comment). v0.4 (three drafts: Presto, Daiko, Dead Ants). v0.3 (struck cards keep a Claim line and the Advocate's note for the whole draft). v0.2, 2026-09-24 (round table in daylight, founder note: the lamp read as interrogation). One playable turn plus the animation language for the whole game.
   Spec: claude/SPEC-ASKING-ROOM-2026-09-24.md. Findings: convening/ASKING-ROOM-CONVENING.md.
 
@@ -12,7 +13,7 @@
 
   SOURCES, founder corpus and founder-assigned texts:
    - Roles and rules: Jesse Ball, "The Asking," from Notes on My Dunce Cap (EN195 course
-     materials, post Drive). Asker, Advocate, Asked, Recorder. Reframe once, then the
+     materials, post Drive). Asker, Advocate, Asked, Recorder. [v0.7: no longer moves on; see 2026-10-17 below] Reframe once, then the
      Advocate moves on (rule 7). The Advocate defends the silence (rule 8). The Recorder
      writes the questions and none of the answers (rule 12). Opinions are not expressed (14).
    - Feedback registers: Pat Schneider / Amherst Writers & Artists (what is strong, what
@@ -36,7 +37,7 @@
 <meta name="description" content="An EN195 workshop practice game. Notice what a draft is doing, then say it so it helps the writer. The Advocate rules on every card.">
 <style>
 :root{
-  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --ink2:#4a3d22; --line:#b8a57a;
+  --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --ink2:#4a3d22; --rule:#1f1b12; --rule2:#4a3d22; --hl:#fbe7a1; --line:#b8a57a;
   --rust:#7a3218; --chip:#efe0c4; --focus:#8a3a1c; --tap:48px;
   --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
   --label:Verdana,'Segoe UI',Arial,sans-serif;
@@ -49,7 +50,7 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){ color-scheme:dark;
-    --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --line:#6b604a;
+    --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --rule:#f3e6c6; --rule2:#d8c59a; --hl:#4a3a12; --line:#6b604a;
     --rust:#eaa183; --chip:#33302a; --focus:#f0c357;
     --s-wall:#4f4232; --s-trim:#2f2419; --s-floor:#50392a; --s-board:#3e2c1f;
     --s-table:#6e4a2e; --s-tableE:#4a301d; --s-sky1:#e79a64; --s-sky2:#4b5a8c; --s-cloud:#f3c9a6; --s-sun:#ffb66b;
@@ -58,7 +59,7 @@
     --is-dark:1; }
 }
 :root[data-theme="dark"]{ color-scheme:dark;
-  --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --line:#6b604a;
+  --bg:#1a1712; --card:#262019; --ink:#f3e6c6; --ink2:#d8c59a; --rule:#f3e6c6; --rule2:#d8c59a; --hl:#4a3a12; --line:#6b604a;
   --rust:#eaa183; --chip:#33302a; --focus:#f0c357;
   --s-wall:#4f4232; --s-trim:#2f2419; --s-floor:#50392a; --s-board:#3e2c1f;
     --s-table:#6e4a2e; --s-tableE:#4a301d; --s-sky1:#e79a64; --s-sky2:#4b5a8c; --s-cloud:#f3c9a6; --s-sun:#ffb66b;
@@ -68,7 +69,7 @@
 :root[data-theme="light"]{ color-scheme:light; }
 /* sharp: high contrast. Near-black surfaces, near-white text, scene from the dark set, grain off */
 :root[data-theme="sharp"]{ color-scheme:dark;
-  --bg:#050505; --card:#0f0f0f; --ink:#fbfaf5; --ink2:#ece6d6; --line:#c8bea8;
+  --bg:#050505; --card:#0f0f0f; --ink:#fbfaf5; --ink2:#ece6d6; --rule:#fbfaf5; --rule2:#ece6d6; --hl:#3d3300; --line:#c8bea8;
   --rust:#ffb48c; --chip:#1c1c1c; --focus:#ffd84a;
   --s-wall:#4f4232; --s-trim:#2f2419; --s-floor:#50392a; --s-board:#3e2c1f;
   --s-table:#6e4a2e; --s-tableE:#4a301d; --s-sky1:#e79a64; --s-sky2:#4b5a8c; --s-cloud:#f3c9a6; --s-sun:#ffb66b;
@@ -86,7 +87,7 @@ body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--serif)
 
 /* reserved chrome */
 .se-chrome{ position:relative; z-index:2; display:flex; flex-wrap:wrap; justify-content:center; align-items:center;
-  gap:10px; padding:9px 14px; background:var(--card); border-bottom:2px solid var(--ink); }
+  gap:10px; padding:9px 14px; background:var(--card); border-bottom:2px solid var(--rule); }
 .se-home{ display:inline-flex; align-items:center; min-height:var(--tap); padding:8px 14px;
   border:1.5px solid var(--line); border-radius:8px; background:var(--chip); color:var(--ink);
   font-family:var(--label); font-weight:bold; font-size:18px; text-decoration:none; }
@@ -95,7 +96,7 @@ body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--serif)
 .se-brand .wm{ font-family:var(--label); font-weight:bold; font-size:18px; letter-spacing:2px; white-space:nowrap; }
 @media (max-width:560px){ .se-brand .wm{ display:none; } }
 .iconbtn{ width:var(--tap); height:var(--tap); padding:0; border-radius:50%; display:inline-grid; place-items:center;
-  background:var(--chip); color:var(--ink); border:2px solid var(--ink); cursor:pointer; }
+  background:var(--chip); color:var(--ink); border:2px solid var(--rule); cursor:pointer; }
 .iconbtn svg{ width:26px; height:26px; display:block; }
 a:focus-visible, button:focus-visible, .phase:focus-visible{ outline:3px solid var(--focus); outline-offset:3px; }
 
@@ -113,6 +114,11 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 .ms{ grid-area:ms; }
 .slip{ grid-area:slip; }
 .hand{ grid-area:hand; }
+@media (max-width:979px){
+  .production{ font-size:13px; letter-spacing:.05em; }
+  .plate{ margin:0 -16px; border-radius:0; border-left:0; border-right:0; }
+  .plate svg#scene{ height:min(52vh,440px); }
+}
 @media (min-width:980px){
   .room{ grid-template-columns: minmax(0,1.08fr) minmax(0,1fr); grid-template-areas:"stage ms" "stage hand"; align-items:start; }
   .stage{ display:flex; flex-direction:column; gap:14px; grid-area:stage; position:sticky; top:12px; }
@@ -163,7 +169,7 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 @keyframes drop{ from{ transform:translateY(-14px); opacity:0; } to{ transform:none; opacity:1; } }
 
 /* the Advocate's slip */
-.slip{ position:relative; background:var(--card); border:2px solid var(--ink); border-radius:6px 14px 6px 14px;
+.slip{ position:relative; background:var(--card); border:2px solid var(--rule); border-radius:6px 14px 6px 14px;
   padding:14px 18px 16px; min-height:112px; box-shadow:3px 4px 0 rgba(40,30,15,.18); }
 .slip .who{ display:block; font-family:var(--label); font-weight:bold; font-size:18px; letter-spacing:.08em;
   text-transform:uppercase; color:var(--rust); }
@@ -171,7 +177,7 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 .slip.unroll{ animation:unroll .5s ease-out; }
 @keyframes unroll{ from{ clip-path:inset(0 100% 0 0); } to{ clip-path:inset(0 0 0 0); } }
 .hushbar{ height:8px; border-radius:4px; background:var(--chip); margin-top:12px; overflow:hidden; display:none; }
-.hushbar i{ display:block; height:100%; width:0; background:var(--ink2); }
+.hushbar i{ display:block; height:100%; width:0; background:var(--rule2); }
 .hushing .hushbar{ display:block; }
 .hushing .hushbar i{ animation:hush var(--hush,3.6s) linear forwards; }
 @keyframes hush{ to{ width:100%; } }
@@ -183,13 +189,16 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
   display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
 .ms p{ margin:0 0 14px; }
 .ms .brk{ text-align:center; letter-spacing:.6em; color:var(--ink2); margin:4px 0 14px; }
-.ev{ background-image:linear-gradient(var(--ink2),var(--ink2)); background-repeat:no-repeat;
-  background-size:0% 2px; background-position:0 100%; transition:background-size 1.4s ease; padding-bottom:2px; }
-.ev.marked{ background-size:100% 2px; }
+.ev{ text-decoration-line:underline; text-decoration-color:transparent; text-decoration-thickness:2px;
+  text-underline-offset:4px; transition:text-decoration-color 1.4s ease; }
+.ev.marked{ text-decoration-color:var(--rule2); }
+/* v0.7 hint: after a second miss, the Advocate points at the lines that matter */
+.ev.hint{ background:var(--hl); color:var(--ink); border-radius:3px; box-shadow:0 0 0 3px var(--hl); }
+.ev.hint::before{ content:"[look here] "; font-family:var(--label); font-size:18px; font-weight:bold; color:var(--rust); }
 .ev.marked::after{ content:" [noticed]"; font-family:var(--label); font-size:18px; font-weight:bold; color:var(--rust); }
 
 .drafts{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }
-.dtab{ min-height:var(--tap); padding:8px 14px; border:2px solid var(--ink); border-radius:10px; background:var(--card);
+.dtab{ min-height:var(--tap); padding:8px 14px; border:2px solid var(--rule); border-radius:10px; background:var(--card);
   color:var(--ink); font-family:var(--label); font-weight:bold; font-size:18px; cursor:pointer; }
 .dtab[aria-pressed="true"]{ background:var(--chip); text-decoration:underline; text-decoration-thickness:3px; text-underline-offset:5px; }
 .endbtns{ margin-top:16px; display:flex; flex-wrap:wrap; gap:10px; }
@@ -204,7 +213,7 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 .phase .n{ display:block; color:var(--rust); letter-spacing:.06em; text-transform:uppercase; }
 .phase .q{ display:block; font-family:var(--serif); font-weight:normal; font-size:21px; margin-top:2px; }
 .cards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
-.card{ position:relative; text-align:left; background:var(--card); color:var(--ink); border:2px solid var(--ink);
+.card{ position:relative; text-align:left; background:var(--card); color:var(--ink); border:2px solid var(--rule);
   border-radius:10px; padding:12px 14px 14px; min-height:96px; cursor:pointer; font:inherit;
   box-shadow:2px 3px 0 rgba(40,30,15,.20); transition:transform .15s ease, box-shadow .15s ease;
   display:flex; flex-direction:column; justify-content:flex-start; }
@@ -223,7 +232,7 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 .card.struck .why, .card.done .why{ display:block; }
 .card .ts b{ font-family:var(--label); font-size:18px; color:var(--ink); }
 .card.lift{ visibility:hidden; }
-.flyer{ position:fixed; z-index:50; pointer-events:none; background:var(--card); border:2px solid var(--ink);
+.flyer{ position:fixed; z-index:50; pointer-events:none; background:var(--card); border:2px solid var(--rule);
   border-radius:10px; box-shadow:4px 8px 0 rgba(40,30,15,.25); transition:transform .55s cubic-bezier(.4,.1,.3,1), opacity .55s ease; }
 
 .page{ background:var(--card); border:1.5px solid var(--line); border-radius:4px; padding:20px 24px;
@@ -233,7 +242,7 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 .page ol{ margin:10px 0 0; padding-left:28px; }
 .page li{ margin:0 0 10px; font-style:italic; }
 .btn{ display:inline-flex; align-items:center; justify-content:center; min-height:var(--tap); padding:10px 18px;
-  border:2px solid var(--ink); border-radius:10px; background:var(--chip); color:var(--ink);
+  border:2px solid var(--rule); border-radius:10px; background:var(--chip); color:var(--ink);
   font-family:var(--label); font-weight:bold; font-size:18px; cursor:pointer; text-decoration:none; }
 
 details.about{ margin-top:26px; background:var(--card); border:1.5px solid var(--line); border-radius:10px; padding:4px 18px; }
@@ -272,10 +281,10 @@ details.about p{ margin:8px 0 12px; }
   <p class="production">A Tight Spiral Studios production for EN195</p>
   <h1>The Asking Room<span class="sub">a fiction workshop game, workup with three drafts</span></h1>
 
-  <div class="room" id="room">
+  <div class="room" id="room" data-screen="workshop">
     <div class="stage">
       <div class="plate" id="plate">
-        <svg id="scene" class="enter" viewBox="0 0 400 230" role="img" aria-labelledby="sceneT" focusable="false">
+        <svg id="scene" class="enter" viewBox="0 0 400 230" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="sceneT" focusable="false">
           <title id="sceneT">A sunny workshop room. Five people sit around a round wooden table with mugs and pages. The Asked holds her draft, the Advocate sits beside her, and the Recorder writes in a notebook. Two more classmates sit at the near side with their backs to us.</title>
           <defs>
             <filter id="cut" x="-12%" y="-12%" width="124%" height="134%" color-interpolation-filters="sRGB">
@@ -500,7 +509,7 @@ details.about p{ margin:8px 0 12px; }
   <a href="arcade.html" aria-label="Back to the arcade">Back</a>
   <a href="index.html" aria-label="Home">Home</a>
 </nav>
-<p class="foot">Tight Spiral Studios. Play. Notice. Design. Workup v0.6, 2026-10-13.</p>
+<p class="foot">Tight Spiral Studios. Play. Notice. Design. Workup v0.7, 2026-10-17.</p>
 
 <script>
 (function(){
@@ -758,7 +767,7 @@ details.about p{ margin:8px 0 12px; }
   function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
   function dealNotice(){
-    S.phase='notice'; S.tries=0; cardsEl.innerHTML='';
+    S.phase='notice'; S.tries=0; cardsEl.innerHTML=''; [].forEach.call(document.querySelectorAll('.ev.hint'),function(e){ e.classList.remove('hint'); });
     setPhase('Call '+S.call+' of '+MAXCALLS+': notice', S.call===1?'Read the draft. Then play what you notice.':'What else is this draft doing?');
     shuffle(NOTICE).forEach(function(n){
       var b=makeCard('<span class="chead">'+icon(n.id)+'<span><span class="deck">'+n.deck+'</span><span class="nm">'+esc(n.name)+'</span></span></span><span class="ts">'+esc(n.test)+'</span><span class="stamp"></span><span class="why"></span>',
@@ -798,8 +807,11 @@ details.about p{ margin:8px 0 12px; }
       dealFeedback(n); S.busy=false;
     } else {
       S.tries++; S.struck[n.id]=clean(n.rule);
-      if(S.tries>=2){ say('The Advocate', clean(n.rule)); strike(btn,'Struck',S.struck[n.id]); await wait(2400); await moveOn(); return; }
-      say('The Advocate', n.rule); strike(btn,'Struck. Reframe once.',S.struck[n.id]);
+      /* v0.7 (founder 2026-10-17): no forced move-on. Every miss gets another shot at this call. */
+      if(S.tries>=2){ var hh=NOTICE.filter(function(x){ return x.kind==='hit' && !S.asked[x.id]; })[0]; var he=hh&&$(hh.ev); if(he) he.classList.add('hint');
+        say('The Advocate', n.rule+' Hint: read the highlighted lines in the draft, then choose.'); }
+      else say('The Advocate', n.rule);
+      strike(btn,'Struck. Try another.',S.struck[n.id]);
       await wait(900); ruling(false); S.busy=false;
     }
   }
@@ -817,8 +829,9 @@ details.about p{ margin:8px 0 12px; }
       await nextCall();
     } else {
       ruling(true); S.tries++; S.struck[f.t]=clean(f.why);
-      if(S.tries>=2){ say('The Advocate', clean(f.why)); strike(btn,'Struck',S.struck[f.t]); await wait(2300); await moveOn(); return; }
-      say('The Advocate', f.why); strike(btn,'Struck. Reframe once.',S.struck[f.t]);
+      /* v0.7 (founder 2026-10-17): no forced move-on. Every miss gets another shot at this card. */
+      say('The Advocate', S.tries>=2 ? f.why+' Hint: ask about the lines marked in the draft, as a question she can answer.' : f.why);
+      strike(btn,'Struck. Try another.',S.struck[f.t]);
       await wait(900); ruling(false); S.busy=false;
     }
   }
