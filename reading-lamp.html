@@ -29,6 +29,9 @@
 <!-- v0.9 2026-10-25 CARD LENGTH (Saunders seat, founder "Y"): the concrete card was the
      longest in most slots, so a player could win by picking the longest. All fifteen
      cards redrafted so length tells nothing. Machine draft; founder edits (HITL). -->
+<!-- v0.10 2026-10-25 MODE BUTTON (founder: "The LIGHT button on home is not studio
+     standard."): the "Light" word button and its three-row menu replaced by the studio
+     mode button, one icon, no label: Paper (sun), Dim (half circle), Night (moon). -->
 <style>
 /* ============ STOPS (comfort ladder, DARK HOST LAW) ============
    D6 ruling: paper cut-out, Lumino City bar. Every object is a piece of
@@ -164,10 +167,17 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
   border:2px solid var(--edge);border-radius:6px;min-height:48px;
   padding:10px 16px;cursor:pointer}
 #readB:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-#lightB{position:fixed;z-index:6;bottom:16px;left:16px}
-#lightMenu{position:fixed;z-index:7;bottom:76px;left:16px;display:none}
-#lightMenu.open{display:block}
-#lightMenu button{display:block;width:120px;margin-top:10px}
+/* v0.10 studio mode button (founder ruling 2026-10-13): three modes on one
+   icon-only button, no label; aria-label names the current mode and the next */
+.iconbtn{position:fixed;z-index:6;bottom:16px;left:16px;width:52px;height:52px;
+  padding:0;border-radius:50%;display:inline-grid;place-items:center;
+  background:var(--panel);color:var(--ink);border:2px solid var(--edge);cursor:pointer;
+  touch-action:manipulation}
+.iconbtn svg{width:26px;height:26px;display:block}
+.iconbtn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.iconbtn .ico{display:none}
+.iconbtn[data-mode="paper"] .ico-paper,.iconbtn[data-mode="dim"] .ico-dim,
+.iconbtn[data-mode="night"] .ico-night{display:block}
 /* ============ AFTER THE READING: the finale card ============ */
 #after{display:none;margin-bottom:14px;border-bottom:2px solid var(--edge);
   padding-bottom:12px}
@@ -348,12 +358,11 @@ html[data-stop="night"] #room svg{filter:brightness(.62) saturate(.95)}
 <button id="homeB" class="navbtn" type="button">Home</button>
 <a id="arcB" class="navbtn" href="arcade.html">Arcade</a>
 <button id="readB" type="button">Read it to the room</button>
-<button id="lightB" class="navbtn" type="button" aria-expanded="false">Light</button>
-<div id="lightMenu">
-  <button class="navbtn" type="button" data-set="paper">Paper</button>
-  <button class="navbtn" type="button" data-set="dim">Dim</button>
-  <button class="navbtn" type="button" data-set="night">Night</button>
-</div>
+<button class="iconbtn" id="darkBtn" type="button" aria-label="Mode: Paper. Tap for Dim." data-mode="paper">
+  <svg class="ico ico-paper" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+  <svg class="ico ico-dim" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/></svg>
+  <svg class="ico ico-night" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" fill="currentColor"/></svg>
+</button>
 
 <div id="splash">
   <div class="col">
@@ -866,20 +875,23 @@ function readAloud(){
   step();
 }
 /* ---------- comfort ladder ---------- */
+/* three modes on one button: Paper -> Dim -> Night -> Paper */
+var STOPS=["paper","dim","night"], STOPNAME={paper:"Paper",dim:"Dim",night:"Night"};
+function curStop(){var t=document.documentElement.getAttribute("data-stop");
+  return STOPS.indexOf(t)>=0?t:"paper";}
+function syncStop(){
+  var m=curStop(), n=STOPS[(STOPS.indexOf(m)+1)%STOPS.length], b=document.getElementById("darkBtn");
+  b.setAttribute("data-mode",m);
+  b.setAttribute("aria-label","Mode: "+STOPNAME[m]+". Tap for "+STOPNAME[n]+".");
+}
 function setStop(s){
   document.documentElement.setAttribute("data-stop",s);
   try{localStorage.setItem("rl.stop",s);}catch(e){}
-  document.getElementById("lightMenu").classList.remove("open");
-  document.getElementById("lightB").setAttribute("aria-expanded","false");
+  syncStop();
 }
-document.getElementById("lightB").addEventListener("click",function(){
-  var m=document.getElementById("lightMenu");
-  var open=!m.classList.contains("open");
-  m.classList.toggle("open",open);
-  this.setAttribute("aria-expanded",open?"true":"false");
-});
-[].slice.call(document.querySelectorAll("#lightMenu button")).forEach(function(b){
-  b.addEventListener("click",function(){setStop(this.dataset.set);});
+document.getElementById("darkBtn").addEventListener("click",function(e){
+  e.stopPropagation();
+  setStop(STOPS[(STOPS.indexOf(curStop())+1)%STOPS.length]);
 });
 document.getElementById("backB").addEventListener("click",closeChoice);
 function freshPassage(){
@@ -932,6 +944,7 @@ document.addEventListener("keydown",function(e){
 var saved=null; try{saved=localStorage.getItem("rl.stop");}catch(e){}
 if(saved){setStop(saved);}
 else if(window.matchMedia("(prefers-color-scheme: dark)").matches){setStop("night");}
+syncStop();
 render(); startSplash(); relayoutRoom(); paintLamp();
 </script>
 </body>
