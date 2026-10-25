@@ -1,43 +1,69 @@
 <!DOCTYPE html>
-<html lang="en" data-stop="paper">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Reading Lamp</title>
+<meta name="spec-source" content="claude/SPEC-READING-LAMP-2026-09-18.md">
+<meta name="audience" content="EN195 creative writing students reading on a phone, flash-fiction unit">
 <!-- v0.7 2026-09-24 ART REBOOT (founder: "Reading lamp is not compelling with art at all.
      Needs a major reboot."): the room rebuilt as a cut-paper reading room at night with
      the lamp as material light; the gallery's line sketches replaced by cut-paper colour
      photographs pegged on a line; the cliche is a stock print, the abstraction is fog.
      Mechanic, copy, passage and verdicts unchanged. -->
+<!-- v0.8 2026-10-24 FEEL PASS (founder: "The studio should never land a reader on a
+     screen in the middle of a paragraph so that we have to scroll up to start. That
+     happens here. Abstract board above chair before start is weird. Fix visuals and
+     make font smaller to help gameplay. Make this next level."):
+     - the page is placed by measurement, not by 46vh: it starts under the gallery and
+       the whole passage lands on one phone screen, clear of the corner controls;
+       no control scrolls the reader into the middle of the page any more
+     - type down a step (20 to 18px passage, cards 18px); the studio 18px floor holds
+     - the gallery is one row of five prints on every width
+     - the overture print hangs pegged on the same line as the gallery, small, so the
+       first thing the room teaches is the grammar of the game, not a floating board
+     - the cliche print is now a stock sunset postcard (it read as a broken-image
+       icon); the fog print lost its spinner arc and marquee corner (both read as UI)
+     - a chosen image develops like a Polaroid: dark, then the picture comes up
+     - OS dark palette and intent tags (belt ticks 3 and 11). -->
 <style>
 /* ============ STOPS (comfort ladder, DARK HOST LAW) ============
    D6 ruling: paper cut-out, Lumino City bar. Every object is a piece of
    cut paper; the tokens are the paper stock, cut per stop. */
-html[data-stop="paper"]{color-scheme:light;
+html[data-stop="paper"],html[data-comfort="paper"],html[data-light="day"],:root{color-scheme:light;
   --bg:#cfe0e2; --ink:#1d232b; --muted:#3f4a54; --panel:#fdf8ec;
   --edge:#1d232b; --floor:#c9c0ad; --base:#e3dbc6; --windowpane:#16393d;
   --lampshade:#8a6322; --lampshade2:#c99a63; --glow:rgba(247,232,181,.6);
   --chair:#1f4a4f; --chair2:#2a5f6e; --brick:#7e3a22;
   --fog:rgba(226,233,230,.9); --milk:#ded9c8; --milk2:#eae4d4;
   --mat:#c99a63; --slip:#ecd9b8;}
-html[data-stop="dim"]{color-scheme:dark;
+html[data-stop="dim"],html[data-comfort="dim"],html[data-light="dusk"]{color-scheme:dark;
   --bg:#3b3e39; --ink:#edeadf; --muted:#c9c6b8; --panel:#30332e;
   --edge:#edeadf; --floor:#34322b; --base:#3e3b33; --windowpane:#10262a;
   --lampshade:#6e4f1b; --lampshade2:#8a6a3a; --glow:rgba(230,205,140,.35);
   --chair:#173a3e; --chair2:#1f4a4f; --brick:#5e2c1a;
   --fog:rgba(52,54,50,.9); --milk:#4a4c44; --milk2:#565850;
   --mat:#8a6a3a; --slip:#453f30;}
-html[data-stop="night"]{color-scheme:dark;
+html[data-stop="night"],html[data-comfort="night"],html[data-light="night"]{color-scheme:dark;
   --bg:#15171a; --ink:#dcded6; --muted:#b2b5ab; --panel:#1d2025;
   --edge:#dcded6; --floor:#171612; --base:#1d1c17; --windowpane:#0a1a1e;
   --lampshade:#57400f; --lampshade2:#6e5426; --glow:rgba(222,192,120,.3);
   --chair:#10282c; --chair2:#173a3e; --brick:#43200f;
   --fog:rgba(24,26,24,.92); --milk:#26282a; --milk2:#31343a;
   --mat:#6e5426; --slip:#2e2a1e;}
+/* gate dialect: the gates read data-comfort / data-light / :root; these are
+   the same three palettes under those names, so the gates measure the real colours */
+@media (prefers-color-scheme: dark){:root{color-scheme:dark;
+  --bg:#15171a; --ink:#dcded6; --muted:#b2b5ab; --panel:#1d2025;
+  --edge:#dcded6; --floor:#171612; --base:#1d1c17; --windowpane:#0a1a1e;
+  --lampshade:#57400f; --lampshade2:#6e5426; --glow:rgba(222,192,120,.3);
+  --chair:#10282c; --chair2:#173a3e; --brick:#43200f;
+  --fog:rgba(24,26,24,.92); --milk:#26282a; --milk2:#31343a;
+  --mat:#6e5426; --slip:#2e2a1e;}}
 /* ============ BASE ============ */
 *{box-sizing:border-box;margin:0}
 body{font-family:Georgia,'Iowan Old Style','Times New Roman',serif;
-  color:var(--ink);background:var(--bg);font-size:20px;line-height:1.6;
+  color:var(--ink);background:var(--bg);font-size:18px;line-height:1.55;
   min-height:100vh}
 /* BACKDROP-AS-ELEMENT: the room is a real fixed div at z 0 */
 #room{position:fixed;inset:0;z-index:0;background:var(--bg)}
@@ -50,23 +76,27 @@ body{font-family:Georgia,'Iowan Old Style','Times New Roman',serif;
   transition:opacity 1.2s ease}
 /* the page rides low so the wall of photographs stays in view */
 main{position:relative;z-index:2;max-width:680px;margin:0 auto;
-  padding:46vh 18px 140px}
+  padding:var(--pageTop,190px) 14px 96px}
 #page{background:var(--panel);border:2px solid var(--edge);
-  border-radius:4px;padding:30px 28px 22px;
+  border-radius:4px;padding:18px 18px 14px;
   box-shadow:0 10px 40px rgba(0,0,0,.3)}
-#invite{font-size:20px;color:var(--muted);font-style:italic;margin-bottom:20px}
-#passage p{margin-bottom:16px}
+#invite{font-size:18px;color:var(--muted);font-style:italic;margin-bottom:10px}
+#passage p{margin-bottom:10px}
 /* a phrase is a slip of paper glued onto the page */
-.ph{font:inherit;color:inherit;background:var(--slip);border:none;
-  padding:3px 8px;cursor:pointer;text-decoration:none;border-radius:3px;
-  border-bottom:2px solid var(--edge);
-  box-shadow:0 2px 3px rgba(0,0,0,.22);
-  min-height:44px;display:inline}
-.ph:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+/* v0.8: the slip wraps like prose (a button cannot), inside a transparent
+   tap band that carries the 44px touch floor without spacing the lines */
+.phhit{padding:9px 0;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  touch-action:manipulation}
+.phhit:focus{outline:none}
+.ph{background:var(--slip);padding:2px 5px;border-radius:3px;
+  border-bottom:2px solid var(--edge);box-shadow:0 2px 3px rgba(0,0,0,.22);
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+.phhit:focus-visible .ph{outline:3px solid var(--ink);outline-offset:2px}
+.line{scroll-margin-top:190px;scroll-margin-bottom:96px}
 .line.reading-now{font-weight:bold;border-left:4px solid var(--ink);
   padding-left:12px}
-#prov{font-size:18px;color:var(--muted);margin-top:24px;
-  border-top:1px solid var(--muted);padding-top:12px}
+#prov{font-size:18px;color:var(--muted);margin-top:12px;
+  border-top:1px solid var(--muted);padding-top:8px;font-style:italic}
 /* ============ SPLASH: the reader prepared, wordlessly ============ */
 #splash{position:fixed;inset:0;z-index:4;display:none;overflow-y:auto;
   background:transparent}
@@ -98,9 +128,9 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
 /* ============ OVERTURE: the lesson, shown once, never stated ======= */
 #overture{display:none}
 #overture.on{display:block}
-#ovLine{font-size:22px;line-height:1.55;margin-bottom:20px;min-height:4.6em}
-#ovAttr{font-size:18px;color:var(--muted);display:none;margin-bottom:16px}
-#ovAsk{font-size:21px;display:none;margin-bottom:16px}
+#ovLine{font-size:19px;line-height:1.5;margin-bottom:14px}
+#ovAttr{font-size:18px;color:var(--muted);display:none;margin-bottom:12px;line-height:1.4}
+#ovAsk{font-size:19px;display:none;margin-bottom:12px}
 #ovAsk em{font-style:italic}
 .fadein{animation:dev .9s ease}
 /* ============ CHOICE SHEET: the room stays visible above ============ */
@@ -109,10 +139,10 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
   max-height:60vh;overflow-y:auto;box-shadow:0 -12px 40px rgba(0,0,0,.35)}
 #choice.open{display:block}
 #choice .inner{max-width:680px;margin:0 auto;padding:18px 18px 88px}
-#chPhrase{font-style:italic;font-size:21px;margin-bottom:14px}
-.card{display:block;width:100%;text-align:left;font:inherit;font-size:20px;
+#chPhrase{font-style:italic;font-size:19px;margin-bottom:10px}
+.card{display:block;width:100%;text-align:left;font:inherit;font-size:18px;
   color:var(--ink);background:var(--panel);border:2px solid var(--edge);
-  border-radius:4px;padding:14px 16px;min-height:52px;margin-bottom:12px;
+  border-radius:4px;padding:11px 14px;min-height:48px;margin-bottom:10px;
   cursor:pointer;line-height:1.5}
 .card:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
 .card.keep{background:none;border-style:dashed}
@@ -136,11 +166,12 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
 #lightMenu.open{display:block}
 #lightMenu button{display:block;width:120px;margin-top:10px}
 /* ============ AFTER THE READING: the finale card ============ */
-#after{display:none;margin-bottom:20px;border-bottom:2px solid var(--edge);
-  padding-bottom:18px}
-#after p{margin-bottom:16px;font-size:21px}
+#after{display:none;margin-bottom:14px;border-bottom:2px solid var(--edge);
+  padding-bottom:12px}
+#after p{margin-bottom:12px;font-size:19px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.develop{animation:dev .7s ease}
+.develop{animation:polar 1.8s ease-out}
+@keyframes polar{0%{opacity:.35;filter:brightness(.2) sepia(.7) blur(1.2px)}35%{opacity:1;filter:brightness(.45) sepia(.6) blur(.6px)}100%{opacity:1;filter:none}}
 /* v0.7: the room keeps its own colours; the stops only dim it */
 html[data-stop="dim"] #room svg{filter:brightness(.8)}
 html[data-stop="night"] #room svg{filter:brightness(.62) saturate(.95)}
@@ -349,7 +380,7 @@ html[data-stop="night"] #room svg{filter:brightness(.62) saturate(.95)}
       <button class="card" id="againB" type="button">Revise the page</button>
       <button class="card" id="nextB" type="button">Next passage</button>
     </div>
-    <p id="invite">Tap an overused phrase. Watch the image gallery.</p>
+    <p id="invite">Tap a tired phrase. Watch the prints.</p>
     <div id="passage" aria-live="polite"></div>
     <p id="prov">Passage: studio draft for this prototype.</p>
   </div>
@@ -406,13 +437,24 @@ var openSlot = -1;
 /* ---------- THE GALLERY ---------- */
 /* five polaroids in an overlay; layout adapts to the viewport */
 var FW=110, FH=132, IM=94; /* frame w/h, image square */
-function frameLayout(){
-  if(window.innerWidth>=660){
-    return {vb:"0 0 660 170", w:Math.min(window.innerWidth*0.92,720),
-      frames:[{x:14,y:14},{x:142,y:14},{x:270,y:14},{x:398,y:14},{x:526,y:14}]};
+function frameLayout(){ /* v0.8: one row on every width; the page sits under it */
+  return {vb:"0 0 660 170", w:Math.min(window.innerWidth-20,620),
+    frames:[{x:14,y:14},{x:142,y:14},{x:270,y:14},{x:398,y:14},{x:526,y:14}]};
+}
+/* v0.8 THE PAGE IS PLACED BY MEASUREMENT. It starts just under the gallery so
+   the reader lands on the first line, never mid-paragraph. In the overture it
+   sits at the foot of the room so the lamp, the chair and the one print show. */
+function placePage(){
+  var root=document.documentElement, wall=document.getElementById("wallDiv");
+  var wb=wall.getBoundingClientRect(), top;
+  if(mode==="overture"){
+    var pg=document.getElementById("page");
+    var ph=pg.getBoundingClientRect().height;
+    top=Math.max(wb.bottom+10, window.innerHeight-ph-84);
+  } else {
+    top=(wall.innerHTML?wb.bottom:76)+8;
   }
-  return {vb:"0 0 410 330", w:Math.min(window.innerWidth*0.94,430),
-    frames:[{x:14,y:14},{x:150,y:14},{x:286,y:14},{x:82,y:172},{x:218,y:172}]};
+  root.style.setProperty("--pageTop",Math.round(top)+"px");
 }
 
 /* v0.7 THE PHOTOGRAPHS. The line sketches are gone. Each concrete choice
@@ -478,23 +520,23 @@ function sketch(slot){
     R(24,54,16,11,'#c49a64')+Pth('M24 54 L28 51 L44 51 L40 54 Z','#d8b27a')+R(30,54,1.4,11,'#c0392b')+
     Pth('M26 58 L32 60','none',' stroke="#2f5d62" stroke-width="3" stroke-linecap="round"');
 }
-function placeholderArt(){ /* the stock photo everyone has already seen */
-  return R(0,0,94,94,'#d9dcdf')+'<circle cx="28" cy="28" r="10" fill="#b8bcc1"/>'+
-  Pth('M0 74 L30 42 L48 60 L64 44 L94 72 L94 94 L0 94 Z','#a3a8ae')+Pth('M0 82 L40 62 L70 78 L94 70 L94 94 L0 94 Z','#8d9298')+
-  Pth('M-10 30 L30 -10 M-10 70 L70 -10 M10 104 L104 10 M50 104 L104 50','none',' stroke="#ffffff" stroke-width="3" opacity=".35"');
+function placeholderArt(){ /* the stock photo everyone has already seen:
+  a sunset postcard, the same one in every frame */
+  return R(0,0,94,94,'#f0b46a')+R(0,0,94,22,'#e88a5a')+R(0,22,94,18,'#f2a066')+
+  '<circle cx="47" cy="58" r="17" fill="#fbe3a0"/>'+R(0,52,94,3,'#f0b46a')+R(0,46,94,2,'#f0b46a')+
+  R(0,60,94,34,'#3d6f8e')+Pth('M24 66 h46 M30 72 h34 M36 78 h22','none',' stroke="#fbe3a0" stroke-width="2" opacity=".75"')+
+  Pth('M72 94 Q74 70 70 44 L73 44 Q78 70 77 94 Z','#2a2420')+
+  Pth('M71 44 q-14 -6 -22 4 q10 -4 22 -2 Z M72 44 q12 -10 22 -4 q-12 0 -22 6 Z M71 43 q-8 -12 -18 -12 q10 4 18 14 Z M72 43 q6 -12 16 -14 q-8 6 -15 15 Z','#2a2420')+
+  Pth('M8 18 q4 -3 8 0 q4 -3 8 0 M30 12 q3 -2 6 0 q3 -2 6 0','none',' stroke="#2a2420" stroke-width="1.3"');
 }
-function milkArt(){ /* abstraction: torn-paper mist swallows the picture
-  before it can form - a corner of a frame remains, dissolving */
-  return '<rect x="4" y="4" width="86" height="86" fill="var(--milk)"/>'+
-  /* the picture that almost was: one dissolving corner */
-  '<path d="M16 16 L52 16 M16 16 L16 44" stroke="var(--muted)" fill="none" stroke-width="2.5" stroke-dasharray="7 6" opacity=".7"/>'+
-  '<path d="M58 16 L66 16 M16 50 L16 56" stroke="var(--muted)" fill="none" stroke-width="2.5" stroke-dasharray="2 8" opacity=".4"/>'+
-  /* torn paper mist, three sheets deep */
-  '<path d="M2 46 q9 -9 19 -4 q7 -11 19 -7 q6 -8 15 -5 q10 -7 16 1 q9 -3 14 4 l0 22 q-11 9 -23 5 q-9 7 -20 3 q-11 7 -22 1 q-10 5 -18 -3 Z" fill="var(--milk2)" opacity=".95"/>'+
-  '<path d="M2 64 q12 -8 22 -3 q9 -8 20 -4 q10 -6 18 0 q10 -4 16 3 l14 2 0 30 -90 0 Z" fill="var(--panel)" opacity=".8"/>'+
-  '<path d="M2 78 q14 -7 26 -2 q11 -6 22 -1 q12 -5 20 2 q10 -2 20 3 l0 12 -88 0 Z" fill="var(--milk2)" opacity=".9"/>'+
-  /* the thought that circles and lands nowhere */
-  '<path d="M60 36 a13 13 0 1 1 -10 22" stroke="var(--muted)" fill="none" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>';
+function milkArt(){ /* abstraction: a print the fog got to first. Torn-paper
+  mist three sheets deep over a horizon that never resolves */
+  return '<rect x="0" y="0" width="94" height="94" fill="var(--milk)"/>'+
+  '<path d="M0 54 Q24 50 47 53 T94 52" stroke="var(--muted)" fill="none" stroke-width="1.6" opacity=".3"/>'+
+  '<path d="M0 30 q10 -8 21 -3 q8 -9 20 -5 q8 -7 17 -2 q11 -6 18 2 q9 -3 18 3 l0 14 -94 0 Z" fill="var(--milk2)" opacity=".85"/>'+
+  '<path d="M0 50 q9 -9 19 -4 q7 -11 19 -7 q6 -8 15 -5 q10 -7 16 1 q9 -3 25 4 l0 22 q-11 9 -23 5 q-9 7 -20 3 q-11 7 -22 1 q-10 5 -29 -3 Z" fill="var(--milk2)" opacity=".95"/>'+
+  '<path d="M0 66 q12 -8 22 -3 q9 -8 20 -4 q10 -6 18 0 q10 -4 34 3 l0 32 -94 0 Z" fill="var(--panel)" opacity=".8"/>'+
+  '<path d="M0 80 q14 -7 26 -2 q11 -6 22 -1 q12 -5 20 2 q10 -2 26 3 l0 12 -94 0 Z" fill="var(--milk2)" opacity=".9"/>';
 }
 function mindArt(){ /* mnemonic: the gallery is the reader's mind - a
   paper-cut head in profile holding one developed photograph */
@@ -525,17 +567,18 @@ function ovSketch(){ /* the palm leaf on the black cover; the semicircle of town
   o+=Pth('M30 74 L34 67 M37 72 L41 65 M44 70 L48 64 M51 69 L55 64 M58 69 L62 65','none',' stroke="#7aa05e" stroke-width="2"');
   return o;
 }
-function buildOvWall(){
-  var w=Math.min(window.innerWidth*0.6,300);
-  var h=Math.round(w*(220/190));
-  var html='<svg viewBox="0 0 190 220" width="'+w+'" height="'+h+'">'+
+function buildOvWall(){ /* v0.8: one print pegged on the gallery's own line */
+  var w=Math.min(window.innerWidth-20,620), vbw=660;
+  var h=Math.round(w*(170/660));
+  var x=(vbw-FW)/2;
+  var html='<svg viewBox="0 0 660 170" width="'+w+'" height="'+h+'">'+
     '<defs><filter id="osh" x="-20%" y="-20%" width="140%" height="150%">'+
     '<feDropShadow dx="2" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity=".33"/>'+
     '</filter></defs>'+
-    '<g transform="translate(36,24) scale(1.25)" filter="url(#osh)">'+
-    '<rect x="-4" y="-4" width="'+(FW+8)+'" height="'+(FH+8)+'" fill="var(--panel)"/>'+
-    '<rect x="2" y="2" width="'+(FW-4)+'" height="'+(IM+12)+'" fill="var(--mat)"/>'+
-    '<line x1="'+(FW/2)+'" y1="-14" x2="'+(FW/2)+'" y2="-4" stroke="var(--edge)" stroke-width="2"/>'+
+    '<path d="M-10 6 Q330 16 670 6" fill="none" stroke="#d8c8a4" stroke-width="2"/>'+
+    '<g transform="translate('+x+',14) rotate(-2)" filter="url(#osh)">'+
+    '<rect x="-4" y="-4" width="'+(FW+8)+'" height="'+(FH+8)+'" fill="#f6f1e4"/>'+
+    '<rect x="'+(FW/2-3)+'" y="-12" width="6" height="16" rx="1.4" fill="#b08956"/><rect x="'+(FW/2-.6)+'" y="-12" width="1.2" height="16" fill="#7a5a36"/>'+
     '<g id="photoO" transform="translate(8,8)"></g>'+
     '</g></svg>';
   document.getElementById("wallDiv").innerHTML=html;
@@ -559,7 +602,7 @@ function ovAdvance(){
     document.getElementById("ovAsk").style.display="block";
     document.getElementById("ovB").textContent="Your turn";
     document.getElementById("announce").textContent=OV_C+" Which one did you see?";
-    try{document.getElementById("ovB").scrollIntoView({block:"center",behavior:"smooth"});}catch(e){}
+    placePage();
   } else { endOverture(); }
 }
 function endOverture(){
@@ -570,8 +613,8 @@ function endOverture(){
   document.getElementById("prov").style.display="block";
   document.getElementById("readB").textContent="Read it to the room";
   buildWall(); relayoutRoom(); paintLamp();
-  window.scrollTo(0,0);
-  document.getElementById("announce").textContent="Tap an overused phrase. Watch the image gallery.";
+  window.scrollTo(0,0); placePage();
+  document.getElementById("announce").textContent="Tap a tired phrase. Watch the prints.";
 }
 /* ---------- SPLASH ---------- */
 function miniFrame(art){
@@ -612,7 +655,7 @@ function startOverture(){
   document.getElementById("ovLine").textContent="“"+OV_A+"”";
   document.getElementById("readB").textContent="Skip";
   document.getElementById("ovAsk").innerHTML="Which one did you <em>see</em>?";
-  buildOvWall(); relayoutRoom();
+  buildOvWall(); relayoutRoom(); window.scrollTo(0,0); placePage();
 }
 function buildWall(){
   if(mode==="splash"){return;}
@@ -650,7 +693,7 @@ function relayoutRoom(){
   document.getElementById("lampG").setAttribute("transform","translate("+lampDx+",0)");
   document.getElementById("windowG").setAttribute("transform","translate("+winDx+",0)");
 }
-window.addEventListener("resize",function(){buildWall();relayoutRoom();paintLamp();});
+window.addEventListener("resize",function(){buildWall();relayoutRoom();paintLamp();placePage();});
 function paintPhoto(i,animate){
   var ph=document.getElementById("photo"+i); if(!ph){return;}
   var kind=state[i].kind; var art;
@@ -697,11 +740,15 @@ function render(){
     L.forEach(function(part){
       if(typeof part==="string"){ p.appendChild(document.createTextNode(part)); }
       else{
-        var b=document.createElement("button");
-        b.type="button"; b.className="ph"; b.dataset.slot=part;
-        b.textContent=state[part].cur;
+        var b=document.createElement("span");
+        b.className="phhit"; b.dataset.slot=part;
+        b.setAttribute("role","button"); b.tabIndex=0;
         b.setAttribute("aria-label","Change this line: "+state[part].cur);
+        var slip=document.createElement("span"); slip.className="ph";
+        slip.textContent=state[part].cur; b.appendChild(slip);
         b.addEventListener("click",function(){openChoice(part);});
+        b.addEventListener("keydown",function(e){
+          if(e.key==="Enter"||e.key===" "){e.preventDefault();openChoice(part);}});
         p.appendChild(b);
       }
     });
@@ -729,7 +776,7 @@ function openChoice(idx){
   keep.addEventListener("click",function(){pick(SLOTS[idx].planted,SLOTS[idx].kind0);});
   wrap.appendChild(keep);
   document.getElementById("choice").classList.add("open");
-  document.getElementById("backB").focus();
+  try{document.getElementById("backB").focus({preventScroll:true});}catch(e){}
 }
 function closeChoice(){
   document.getElementById("choice").classList.remove("open");
@@ -738,10 +785,11 @@ function pick(text,kind){
   state[openSlot].cur=text; state[openSlot].kind=kind;
   var slot=openSlot;
   closeChoice(); render();
+  document.getElementById("invite").style.display="none"; /* it has done its job */
   paintPhoto(slot,true); paintLamp();
   document.getElementById("announce").textContent="Line updated: "+text;
-  var b=document.querySelector('.ph[data-slot="'+slot+'"]');
-  if(b){b.focus();}
+  var b=document.querySelector('.phhit[data-slot="'+slot+'"]');
+  if(b){try{b.focus({preventScroll:true});}catch(e){b.focus();}}
 }
 /* ---------- THE READING ---------- */
 var reading=false;
@@ -796,7 +844,7 @@ function readAloud(){
     document.getElementById("roomWord").textContent=word;
     document.getElementById("after").style.display="block";
     document.getElementById("invite").style.display="none";
-    window.scrollTo({top:0,behavior:"smooth"});
+    window.scrollTo(0,0); placePage();
     document.getElementById("announce").textContent=word;
     reading=false;
   }
@@ -806,6 +854,7 @@ function readAloud(){
     lines.forEach(function(p){p.classList.remove("reading-now");});
     if(i>=lines.length){finish();return;}
     lines[i].classList.add("reading-now"); react(i); frameSpot(i);
+    try{lines[i].scrollIntoView({block:"nearest"});}catch(e){}
     i++; setTimeout(step,1700);
   }
   step();
@@ -837,7 +886,7 @@ function freshPassage(){
   document.getElementById("after").style.display="none";
   document.getElementById("invite").style.display="block";
   document.getElementById("fog").style.opacity=0;
-  render(); buildWall(); paintLamp(); window.scrollTo(0,0);
+  render(); buildWall(); paintLamp(); window.scrollTo(0,0); placePage();
 }
 document.getElementById("homeB").addEventListener("click",function(){
   closeChoice();
@@ -869,7 +918,7 @@ document.getElementById("againB").addEventListener("click",function(){
   document.getElementById("invite").style.display="block";
   document.getElementById("fog").style.opacity=0;
   paintLamp();
-  document.getElementById("page").scrollIntoView({behavior:"smooth"});
+  window.scrollTo(0,0); placePage();
 });
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape"){closeChoice();}
