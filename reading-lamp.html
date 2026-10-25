@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reading Lamp</title>
+<title>Reading Lamp v0.11</title>
 <meta name="spec-source" content="claude/SPEC-READING-LAMP-2026-09-18.md">
 <meta name="audience" content="EN195 creative writing students reading on a phone, flash-fiction unit">
 <!-- v0.7 2026-09-24 ART REBOOT (founder: "Reading lamp is not compelling with art at all.
@@ -32,6 +32,12 @@
 <!-- v0.10 2026-10-25 MODE BUTTON (founder: "The LIGHT button on home is not studio
      standard."): the "Light" word button and its three-row menu replaced by the studio
      mode button, one icon, no label: Paper (sun), Dim (half circle), Night (moon). -->
+<!-- v0.11 2026-10-25 STUDIO CHROME (founder "Yes" to: bring Reading Lamp in line with the
+     navigation rule): Studio / Cabinet / mark bar on top with the mode button in it; Back /
+     Home rail at the foot of the page; version chip beside the title; the corner Home and
+     Arcade buttons and the splash's arcade link retired (the bar and rail carry them);
+     "Read it to the room" / "Skip" now a primary button in a bottom bar, thumb reach,
+     safe-area aware. -->
 <style>
 /* ============ STOPS (comfort ladder, DARK HOST LAW) ============
    D6 ruling: paper cut-out, Lumino City bar. Every object is a piece of
@@ -74,7 +80,7 @@ body{font-family:Georgia,'Iowan Old Style','Times New Roman',serif;
 /* BACKDROP-AS-ELEMENT: the room is a real fixed div at z 0 */
 #room{position:fixed;inset:0;z-index:0;background:var(--bg)}
 #room svg{width:100%;height:100%;display:block}
-#wallDiv{position:fixed;top:76px;left:0;right:0;z-index:1;
+#wallDiv{position:fixed;top:var(--barH,66px);left:0;right:0;z-index:1;
   pointer-events:none;display:flex;justify-content:center}
 #wallDiv svg{display:block}
 #fog{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;
@@ -126,9 +132,9 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
 #beginB,#ovB{text-align:center;font-weight:700;background:var(--ink);
   color:var(--panel);border-color:var(--ink);touch-action:manipulation}
 #splash,#overture{cursor:pointer;touch-action:manipulation}
-#splash .col{padding:max(84px,9vh) 18px 104px}
+#splash .col{padding:calc(var(--barH,66px) + 18px) 18px 40px}
 .taphint{font-size:18px;color:var(--muted);margin-top:12px;font-style:italic}
-@media (max-height:700px){#splash .col{padding-top:76px}#splashCard{padding:20px 18px 18px}
+@media (max-height:700px){#splash .col{padding-top:calc(var(--barH,66px) + 10px)}#splashCard{padding:20px 18px 18px}
   #splashTitle{font-size:28px}#splashSub{margin-bottom:12px}#splashFrames{margin-bottom:14px}
   #splashFrames svg{width:62px;height:74px}}
 /* ============ OVERTURE: the lesson, shown once, never stated ======= */
@@ -144,7 +150,7 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
   background:var(--bg);border-top:3px solid var(--edge);
   max-height:60vh;overflow-y:auto;box-shadow:0 -12px 40px rgba(0,0,0,.35)}
 #choice.open{display:block}
-#choice .inner{max-width:680px;margin:0 auto;padding:18px 18px 88px}
+#choice .inner{max-width:680px;margin:0 auto;padding:18px 18px max(24px,env(safe-area-inset-bottom))}
 #chPhrase{font-style:italic;font-size:19px;margin-bottom:10px}
 .card{display:block;width:100%;text-align:left;font:inherit;font-size:18px;
   color:var(--ink);background:var(--panel);border:2px solid var(--edge);
@@ -160,16 +166,39 @@ main{position:relative;z-index:2;max-width:680px;margin:0 auto;
   border:2px solid var(--edge);border-radius:6px;min-height:48px;
   min-width:48px;padding:10px 16px;cursor:pointer}
 .navbtn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
-#homeB{position:fixed;z-index:6;top:16px;left:16px}
-#arcB{position:fixed;z-index:4;bottom:16px;right:16px;text-decoration:none;display:inline-flex;align-items:center}
-#readB{position:fixed;z-index:6;top:16px;right:16px;font-family:system-ui,sans-serif;
-  font-size:18px;color:var(--ink);background:var(--panel);
-  border:2px solid var(--edge);border-radius:6px;min-height:48px;
-  padding:10px 16px;cursor:pointer}
-#readB:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+/* v0.11 STUDIO CHROME: bar on top, rail at the foot, the verb in thumb reach */
+.se-chrome{position:fixed;top:0;left:0;right:0;z-index:6;display:flex;flex-wrap:nowrap;
+  justify-content:center;align-items:center;gap:10px;padding:8px 12px;
+  padding-top:max(8px,env(safe-area-inset-top));
+  background:var(--panel);border-bottom:2px solid var(--edge)}
+.se-home{display:inline-flex;align-items:center;min-height:48px;padding:8px 14px;
+  border:1.5px solid var(--edge);border-radius:8px;background:var(--panel);color:var(--ink);
+  font-family:system-ui,sans-serif;font-weight:bold;font-size:18px;text-decoration:none}
+.se-home:focus-visible,.se-rail a:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.se-brand{display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+.se-brand svg{width:34px;height:34px;flex:none}
+.se-brand .wm{font-family:system-ui,sans-serif;font-weight:bold;font-size:18px;letter-spacing:2px;white-space:nowrap}
+@media (max-width:560px){.se-brand .wm{display:none}}
+.se-rail{display:flex;gap:10px;justify-content:center;padding:18px 0 0;margin-top:14px;
+  border-top:2px solid var(--edge)}
+.se-rail a{min-height:48px;display:inline-flex;align-items:center;padding:10px 18px;
+  border:1.5px solid var(--edge);border-radius:8px;background:var(--panel);color:var(--ink);
+  font-family:system-ui,sans-serif;font-weight:bold;font-size:18px;text-decoration:none}
+.ver{font-size:20px;font-weight:700;letter-spacing:0;white-space:nowrap;color:var(--muted);
+  vertical-align:middle;margin-left:6px}
+#actbar{position:fixed;left:0;right:0;bottom:0;z-index:4;display:flex;justify-content:center;
+  padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));
+  background:var(--panel);border-top:2px solid var(--edge)}
+#actbar.off{display:none}
+@media (max-width:480px){#splashTitle{font-size:28px;letter-spacing:.04em}}
+#readB{pointer-events:auto;font-family:system-ui,sans-serif;font-size:18px;font-weight:700;
+  color:var(--panel);background:var(--ink);border:2px solid var(--ink);border-radius:8px;
+  min-height:52px;min-width:220px;padding:10px 22px;cursor:pointer;touch-action:manipulation;
+}
+#readB:focus-visible{outline:3px solid var(--panel);outline-offset:-6px}
 /* v0.10 studio mode button (founder ruling 2026-10-13): three modes on one
    icon-only button, no label; aria-label names the current mode and the next */
-.iconbtn{position:fixed;z-index:6;bottom:16px;left:16px;width:52px;height:52px;
+.iconbtn{flex:none;width:48px;height:48px;
   padding:0;border-radius:50%;display:inline-grid;place-items:center;
   background:var(--panel);color:var(--ink);border:2px solid var(--edge);cursor:pointer;
   touch-action:manipulation}
@@ -355,24 +384,27 @@ html[data-stop="night"] #room svg{filter:brightness(.62) saturate(.95)}
 <div id="wallDiv" aria-hidden="true"></div>
 <div id="fog" aria-hidden="true"></div>
 
-<button id="homeB" class="navbtn" type="button">Home</button>
-<a id="arcB" class="navbtn" href="arcade.html">Arcade</a>
-<button id="readB" type="button">Read it to the room</button>
-<button class="iconbtn" id="darkBtn" type="button" aria-label="Mode: Paper. Tap for Dim." data-mode="paper">
+<header class="se-chrome" id="bar">
+  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <span class="se-brand">
+    <svg class="mk" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><defs><path id="tss-spiral" d="M26.2 24.0 L26.3 24.5 L26.4 25.1 L26.2 25.7 L25.9 26.3 L25.5 26.8 L24.9 27.3 L24.2 27.6 L23.4 27.7 L22.5 27.7 L21.7 27.5 L20.8 27.0 L20.1 26.4 L19.5 25.6 L19.1 24.6 L18.8 23.5 L18.9 22.3 L19.2 21.2 L19.8 20.1 L20.6 19.1 L21.6 18.3 L22.9 17.7 L24.3 17.4 L25.7 17.4 L27.2 17.8 L28.5 18.5 L29.8 19.4 L30.8 20.7 L31.5 22.2 L32.0 23.8 L32.0 25.6 L31.7 27.4 L30.9 29.0 L29.8 30.5 L28.4 31.8 L26.7 32.8 L24.7 33.3 L22.7 33.5 L20.6 33.1 L18.6 32.4 L16.8 31.2 L15.3 29.6 L14.1 27.7 L13.4 25.5 L13.1 23.1 L13.3 20.8 L14.1 18.5 L15.4 16.3 L17.1 14.5 L19.2 13.1 L21.6 12.1 L24.2 11.7 L26.9 11.8 L29.6 12.5 L32.0 13.8 L34.1 15.7 L35.9 17.9 L37.1 20.6 L37.7 23.5 L37.7 26.4 L37.0 29.4 L35.7 32.2 L33.9 34.7 L31.4 36.7 L28.6 38.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></defs><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
+    <span class="wm">Tight Spiral</span>
+  <button class="iconbtn" id="darkBtn" type="button" aria-label="Mode: Paper. Tap for Dim." data-mode="paper">
   <svg class="ico ico-paper" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
   <svg class="ico ico-dim" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/></svg>
   <svg class="ico ico-night" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" fill="currentColor"/></svg>
 </button>
+</header>
+<div id="actbar"><button id="readB" type="button">Read it to the room</button></div>
 
 <div id="splash">
   <div class="col">
     <div id="splashCard">
-      <h1 id="splashTitle">READING LAMP</h1>
+      <h1 id="splashTitle">READING LAMP <span class="ver">v0.11</span></h1>
       <p id="splashSub">Trade overused phrases. Watch what develops.</p>
       <div id="splashFrames" aria-hidden="true"></div>
       <button class="card" id="beginB" type="button">Begin</button>
       <p class="taphint">or tap anywhere</p>
-      <p><a class="navbtn" href="arcade.html" onclick="event.stopPropagation()" style="text-decoration:none;display:inline-flex;align-items:center;margin-top:12px">Back to the EN195 Arcade</a></p>
     </div>
   </div>
 </div>
@@ -395,6 +427,10 @@ html[data-stop="night"] #room svg{filter:brightness(.62) saturate(.95)}
     <p id="invite">Tap a tired phrase. Watch the prints.</p>
     <div id="passage" aria-live="polite"></div>
     <p id="prov">Passage: studio draft for this prototype.</p>
+    <nav class="se-rail" aria-label="Page navigation">
+      <a href="arcade.html" aria-label="Back to the arcade">Back</a>
+      <a href="index.html" aria-label="Home">Home</a>
+    </nav>
   </div>
 </main>
 
@@ -461,13 +497,15 @@ function frameLayout(){ /* v0.8: one row on every width; the page sits under it 
    sits at the foot of the room so the lamp, the chair and the one print show. */
 function placePage(){
   var root=document.documentElement, wall=document.getElementById("wallDiv");
+  root.style.setProperty("--barH",Math.round(document.getElementById("bar").getBoundingClientRect().bottom)+8+"px");
   var wb=wall.getBoundingClientRect(), top;
   if(mode==="overture"){
     var pg=document.getElementById("page");
     var ph=pg.getBoundingClientRect().height;
     top=Math.max(wb.bottom+10, window.innerHeight-ph-84);
+    /* the rail sits under the card in the overture; land on the card, not the rail */
   } else {
-    top=(wall.innerHTML?wb.bottom:76)+8;
+    top=(wall.innerHTML?wb.bottom:66)+8;
   }
   root.style.setProperty("--pageTop",Math.round(top)+"px");
 }
@@ -653,14 +691,14 @@ function startSplash(){
   document.getElementById("passage").style.display="none";
   document.getElementById("prov").style.display="none";
   document.getElementById("after").style.display="none";
-  document.getElementById("readB").style.display="none";
+  document.getElementById("actbar").classList.add("off");
   document.getElementById("wallDiv").innerHTML="";
   buildSplash();
 }
 function startOverture(){
   document.getElementById("splash").classList.remove("on");
   document.getElementById("page").style.display="block";
-  document.getElementById("readB").style.display="block";
+  document.getElementById("actbar").classList.remove("off");
   mode="overture"; ovStage=0;
   document.getElementById("overture").classList.add("on");
   document.getElementById("invite").style.display="none";
@@ -906,12 +944,6 @@ function freshPassage(){
   document.getElementById("fog").style.opacity=0;
   render(); buildWall(); paintLamp(); window.scrollTo(0,0); placePage();
 }
-document.getElementById("homeB").addEventListener("click",function(){
-  closeChoice();
-  state=SLOTS.map(function(s){return {cur:s.planted,kind:s.kind0};});
-  document.getElementById("fog").style.opacity=0;
-  render(); startSplash(); window.scrollTo(0,0);
-});
 document.getElementById("nextB").addEventListener("click",freshPassage);
 document.getElementById("replayB").addEventListener("click",function(){
   document.getElementById("after").style.display="none";
@@ -945,7 +977,7 @@ var saved=null; try{saved=localStorage.getItem("rl.stop");}catch(e){}
 if(saved){setStop(saved);}
 else if(window.matchMedia("(prefers-color-scheme: dark)").matches){setStop("night");}
 syncStop();
-render(); startSplash(); relayoutRoom(); paintLamp();
+render(); startSplash(); relayoutRoom(); paintLamp(); placePage();
 </script>
 </body>
 </html>
