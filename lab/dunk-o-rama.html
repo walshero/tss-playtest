@@ -3,10 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dunk-O-Rama v0.5</title>
+<title>Dunk-O-Rama v0.6</title>
 <meta name="spec-source" content="convening/DUNK-O-RAMA-CONVENING.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students learning to spot rhetorical cheats. Lab build.">
-<!-- TSP build: Dunk-O-Rama v0.5 | LAB | 2026-11-06
+<!-- TSP build: Dunk-O-Rama v0.6 | LAB | 2026-11-06
+     v0.6: speech bubbles never block play. Each has a close button; any bubble vanishes the moment
+     the player touches to pull back (back again only if the pull is let go without a throw).
+     A closed heckle can be brought back from the call panel ("Show the line").
+     Header folds away during play (founder: "Space is limited so the header should disappear"):
+     a corner menu button opens it; a slim counter pill stays. Touching the scene folds it again.
+     v0.5:
      v0.5: tank 12% larger, characters 18% larger; cut-paper depth (drop-shadowed paper layers,
      torn ground strips, drifting paper clouds, paper grain over the scene).
      Also v0.5: breath meter removed (ring, label, colored aim dots); the breathing itself is unchanged:
@@ -32,6 +38,7 @@
 :root,html[data-comfort="dark"]{--chrome:#1b1328;--ink:#ffffff;--line:#ffd23f;--accent:#ffd23f;--tap:48px}
 html[data-comfort="light"]{--chrome:#ffffff;--ink:#1b1328;--line:#1b1328;--accent:#7a1a12}
 html[data-comfort="sharp"]{--chrome:#000000;--ink:#ffffff;--line:#ffff00;--accent:#ffff00}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{margin:0;height:100%;background:#120c1e;overflow:hidden;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent}
 canvas{display:block;position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;cursor:grab}
 .se-chrome{position:fixed;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:calc(6px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) 6px calc(8px + env(safe-area-inset-left));background:var(--chrome);color:var(--ink);border-bottom:2px solid var(--line)}
@@ -40,7 +47,12 @@ canvas{display:block;position:fixed;inset:0;width:100vw;height:100vh;height:100d
 .tsp-labchip{font:800 18px/1 system-ui,sans-serif;padding:4px 8px;border:2px solid var(--line);border-radius:6px;color:var(--ink)}
 .se-chrome .sp{order:1;display:flex;gap:6px;margin-left:auto}
 @media (min-width:700px){.se-chrome .sp{order:3}}
-#hud{order:2;flex:0 0 auto;font-size:18px;line-height:1.3;padding:2px 4px;color:var(--ink);white-space:nowrap}
+#hud{font-size:18px;line-height:1.2;padding:6px 12px;color:var(--ink);white-space:nowrap;background:var(--chrome);border:2px solid var(--line);border-radius:22px;min-height:44px;box-sizing:border-box;display:flex;align-items:center}
+.se-chrome{transform:translateY(-110%);transition:transform .2s ease;visibility:hidden}
+.se-chrome.open{transform:none;visibility:visible}
+#corner{position:fixed;z-index:3;top:calc(8px + env(safe-area-inset-top));left:calc(8px + env(safe-area-inset-left));display:flex;gap:8px;align-items:center}
+#menuBtn{border-radius:22px;padding:6px}
+#menuBtn svg{width:26px;height:26px;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;fill:none}
 #hud b{color:var(--accent)}
 a.nav,button{font:inherit;font-size:18px;font-weight:700;min-height:var(--tap);min-width:var(--tap);padding:8px 11px;border-radius:10px;border:2px solid var(--line);background:var(--chrome);color:var(--ink);cursor:pointer;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 button.icon{padding:6px}
@@ -57,19 +69,33 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 .sheet .row button{text-align:left;width:100%;flex-direction:column;align-items:flex-start}
 .sheet .row button small{display:block;font-size:18px;font-weight:500}
 .sheet .row button[aria-pressed="true"]{background:var(--accent);color:var(--chrome)}
-#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));padding:10px 16px;font-size:18px;font-weight:700;text-align:center;transition:opacity .6s;width:max-content;max-width:88vw;z-index:3;flex-direction:column;line-height:1.3}
+#hint{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom));padding:10px 16px;font-size:18px;font-weight:700;text-align:center;transition:opacity .6s;width:max-content;max-width:88vw;z-index:3;flex-direction:column;line-height:1.3}
 #hint small{font-size:18px;font-weight:500}
 #hint.gone{opacity:0;pointer-events:none}
 #result{left:50%;top:50%;transform:translate(-50%,-50%);padding:20px 22px;text-align:center;display:none;z-index:6;width:min(86vw,420px)}
 #result h2{margin:0 0 6px;color:var(--accent);font-size:28px}
 #result p{margin:6px 0 14px;font-size:18px}
 #result .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-#callit{left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom));width:min(94vw,560px);padding:10px 12px;display:none;z-index:3;text-align:center}
+#callit{left:8px;right:8px;margin:0 auto;max-width:560px;top:calc(62px + env(safe-area-inset-top));max-height:56vh;overflow:auto;padding:10px 12px 12px;display:none;z-index:3;text-align:left}
 #callit{transition:opacity .15s}
-#callit.aside{opacity:.12;pointer-events:none}
-#callit .q{font-size:18px;font-weight:700;margin:0 0 8px}
+#dlg{font-size:18px;line-height:1.35;margin:0 0 8px 0}
+#dlg p{margin:0 0 6px}
+#dlg .who{font-weight:800;color:var(--accent)}
+#dlg .crowd{font-style:italic}
+#dlgClose{float:right;margin:-4px -6px 4px 8px;width:44px;height:44px;min-width:44px;padding:0;border-radius:50%}
+#dlgClose svg{width:20px;height:20px;stroke:var(--ink);stroke-width:3;stroke-linecap:round;fill:none}
+#bubClose{position:fixed;z-index:3;display:none;align-items:center;justify-content:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;border-radius:50%;border:2px solid #1b1328;background:#ffffff;box-shadow:0 2px 0 rgba(27,19,40,.35)}
+#bubClose svg{width:22px;height:22px;stroke:#1b1328;stroke-width:3;stroke-linecap:round;fill:none}
+#bubClose:focus-visible{outline:3px solid #ffd23f;outline-offset:2px}
+#callit.aside{visibility:hidden}
+#callBtn{display:none;width:100%;margin-top:4px;position:sticky;bottom:-12px;box-shadow:0 -8px 0 var(--chrome)}
+#callit .chips{clear:both}
+#callit .chips:empty{display:none}
+@media (max-height:639px){#callit{max-height:44vh}}
+.se-chrome h1{white-space:normal;flex-wrap:wrap}
+#callit .q{font-size:18px;font-weight:700;margin:4px 0 8px}
 #callit .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
-#callit .chips button{flex:1 1 140px}
+#callit .chips button{flex:1 1 120px}
 #callit .teach{font-size:18px;line-height:1.4;margin:0;text-align:left}
 #callit .teach b{color:var(--accent)}
 #result{max-height:84vh;overflow:auto}
@@ -78,24 +104,26 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 #rGuide b{color:var(--accent)}
 #rTwain{font-size:18px;font-style:italic;margin:0 0 4px;text-align:left}
 #rTwainSrc{font-size:18px;margin:0 0 14px;text-align:left}
-.se-rail{position:fixed;left:calc(8px + env(safe-area-inset-left));bottom:calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;z-index:3}
+.se-rail{display:flex;gap:6px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
 </head>
 <body>
 <canvas id="c" tabindex="0" aria-label="Carnival dunk tank. Touch the glove, pull back and let go to throw. Hold still to steady your breathing. Keyboard: arrow keys aim, space throws."></canvas>
 
-<header class="se-chrome">
+<header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.5</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.6</span> <span class="tsp-labchip">LAB</span></h1>
   <div class="sp">
     <button id="seatBtn" aria-haspopup="dialog">Seat</button>
     <button id="modeBtn" class="icon" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" fill="currentColor" style="fill:var(--ink)"/></svg></button>
     <button id="soundBtn" class="icon" aria-pressed="true" aria-label="Sound on"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 11h4l6-5v16l-6-5H5z"/><path class="wave" d="M19 10a5 5 0 0 1 0 8M22 7a9 9 0 0 1 0 14"/><path class="x" d="M19 11l6 6M25 11l-6 6"/></svg></button>
   </div>
-  <div id="hud" aria-hidden="true"></div>
+  <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
+  <button id="menuClose" type="button">Close menu</button>
 </header>
+<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.6, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
 
 <div id="seatSheet" class="panel sheet" role="dialog" aria-label="Who's on the seat">
   <h2>Who's on the seat?</h2>
@@ -103,9 +131,10 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
   <p style="margin:12px 0 0"><button id="seatClose">Close</button></p>
 </div>
 
-<button id="hint">Grab the glove, pull back, let go<small>Hold still to steady your breath. Name the trick to steady it more.</small></button>
+<button id="hint">Pull the glove back, let go</button>
 
-<div id="callit" class="panel" role="group" aria-labelledby="callQ"><p class="q" id="callQ">Call the move</p><div class="chips" id="chips"></div><p class="teach" id="teach" aria-live="polite"></p></div>
+<button id="bubClose" type="button" aria-label="Close the speech bubble"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+<div id="callit" class="panel" role="group" aria-label="The crowd asks"><button id="dlgClose" class="icon" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="dlg"></div><button id="callBtn" type="button">Call the move</button><p class="q" id="callQ">Call the move</p><div class="chips" id="chips"></div><p class="teach" id="teach" aria-live="polite"></p></div>
 
 <div id="result" class="panel" role="dialog" aria-label="Round over">
   <h2 id="rTitle">Round over</h2>
@@ -116,10 +145,6 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
   <div class="btns"><button id="rAgain">Throw again</button><button id="rNext">Next on the seat</button></div>
 </div>
 
-<nav class="se-rail" aria-label="Page navigation">
-  <a class="nav" href="./index.html">Back</a>
-  <a class="nav" href="../index.html">Home</a>
-</nav>
 
 <div id="live" class="sr" aria-live="polite"></div>
 
@@ -128,7 +153,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 /* ---------- setup ---------- */
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let W,H,DPR,f,hy;const camY=1.5;
-function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);f=Math.min(H*1.25,W*2.1);hy=H*(H>W*1.3?0.535:0.47);}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);f=Math.min(H*1.25,W*2.1);hy=H*(H>W*1.3?0.49:0.45);}
 addEventListener('resize',resize);resize();
 function P(x,y,z){const s=f/z;return{x:W/2+x*s,y:hy+(camY-y)*s,s};}
 const $=id=>document.getElementById(id);
@@ -358,7 +383,9 @@ $('modeBtn').onclick=()=>{mode=MODES[(MODES.indexOf(mode)+1)%3];store.set('mode'
 function applySound(){$('soundBtn').setAttribute('aria-pressed',sound);$('soundBtn').setAttribute('aria-label',sound?'Sound on':'Sound off');}
 $('soundBtn').onclick=()=>{sound=!sound;store.set('sound',sound);applySound();if(sound)ac();};
 applyMode();applySound();
-function say(txt,dur){bubble.text=txt;bubble.parts=null;bubble.t=dur||3.2;}
+function say(txt,dur){bubble.text=txt;bubble.parts=null;bubble.t=dur||3.2;bubble.hidden=false;}
+function hideBubble(){bubble.hidden=true;$('bubClose').style.display='none';}
+function showBubble(){if(bubble.t>0){bubble.hidden=false;}}
 function announce(txt){$('live').textContent=txt;}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function buildSeatList(){
@@ -371,9 +398,15 @@ function buildSeatList(){
 function openSheet(id){closeSheets();buildSeatList();$(id).classList.add('open');const b=$(id).querySelector('button');b&&b.focus();}
 function closeSheets(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open'));}
 $('seatBtn').onclick=()=>openSheet('seatSheet');
+function menu(open){$('topbar').classList.toggle('open',open);$('menuBtn').setAttribute('aria-expanded',open);$('corner').style.visibility=open?'hidden':'visible';if(open){const f=$('topbar').querySelector('a,button');f&&f.focus();}else $('menuBtn').focus({preventScroll:true});}
+$('menuBtn').onclick=()=>menu(true);$('menuClose').onclick=()=>menu(false);
+$('bubClose').onclick=()=>{hideBubble();announce('Closed.');};
+$('dlgClose').onclick=()=>{$('callit').style.display='none';announce('Closed.');};
+function compact(){return H<640;}
+$('callBtn').onclick=()=>{$('dlg').style.display='none';$('callBtn').style.display='none';$('callQ').textContent='Which move was that?';$('callQ').style.display='block';$('chips').style.display='flex';const b=$('chips').querySelector('button');b&&b.focus();};
 $('hint').onclick=()=>{ac();if(canThrow()&&!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=0;}$('hint').classList.add('gone');cv.focus&&cv.focus();announce('Ball in hand. Arrow keys aim, space throws. On a touch screen, drag anywhere and let go.');};$('seatClose').onclick=closeSheets;
 $('rAgain').onclick=()=>setCast(ci);$('rNext').onclick=()=>setCast((ci+1)%CAST.length);
-addEventListener('keydown',e=>{if(e.key==='Escape')closeSheets();});
+addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheets();if($('topbar').classList.contains('open'))menu(false);}});
 
 function setCast(i){ci=i;c=CAST[i];balls=BALLS;dunks=0;streak=0;roundOver=false;ball=null;anim=null;trail=[];lastPath=[];
  ch={yo:0,vy:0,rot:0,state:'sit',timer:0};seatA=0;tg={phi:0,dphi:0,psi:0,dpsi:0};$('result').style.display='none';newWind();hud();
@@ -383,7 +416,10 @@ function pastMoves(){const out=[];for(const k of CAST){if(k===c)break;out.push(.
 function newHeckle(){
  const set=LEVEL_MOVES[c.id];const mv=bag('mv'+c.id,set);const ex=bag('ln'+c.id+mv,LINES[c.id][mv]);
  heck={active:true,move:mv,called:null};
- bubble.parts=[{who:'Crowd',crowd:true,text:ex[0]},{who:SHORT[c.id],text:ex[1]}];bubble.text=ex[1];bubble.t=999;
+ bubble.t=0;bubble.parts=null;
+ const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ $('dlg').innerHTML=`<p class="crowd"><span class="who">Crowd:</span> ${esc(ex[0])}</p><p><span class="who">${SHORT[c.id]}:</span> ${esc(ex[1])}</p>`;
+ $('callit').classList.remove('aside');
  const ask=thrown>=1;
  const box=$('callit');$('teach').textContent='';
  if(ask){
@@ -392,9 +428,12 @@ function newHeckle(){
   const chips=shuffle([mv,others[0],d2]);
   $('chips').innerHTML='';
   chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=MOVES[id].name;b.onclick=()=>callMove(id);$('chips').appendChild(b);});
-  $('callQ').textContent='Call the move';$('callQ').style.display='block';box.style.display='block';
+  $('dlg').style.display='block';
+  if(compact()){$('chips').style.display='none';$('callQ').style.display='none';$('callBtn').style.display='block';}
+  else{$('callBtn').style.display='none';$('chips').style.display='flex';$('callQ').textContent='Call the move';$('callQ').style.display='block';}
+  box.style.display='block';
   announce(`From the crowd: ${ex[0]} ${c.name}: ${ex[1]} Call the move: ${chips.map(i=>MOVES[i].name).join(', ')}.`);
- }else{box.style.display='none';announce(`From the crowd: ${ex[0]} ${c.name}: ${ex[1]}`);}
+ }else{$('dlg').style.display='block';$('callBtn').style.display='none';$('chips').innerHTML='';$('callQ').style.display='none';box.style.display='block';announce(`From the crowd: ${ex[0]} ${c.name}: ${ex[1]}`);}
 }
 function callMove(id){
  if(heck.called!==null)return;const M=MOVES[heck.move];stats.asked++;stats.seen[heck.move]=1;
@@ -421,16 +460,16 @@ function steadiness(){return breath.hold>5?'SHAKY':breath.calm>.8?'STEADY':'BREA
 function restPt(){return P(LAUNCH.x,LAUNCH.y,LAUNCH.z);}
 function maxPull(){return Math.min(W,H)*0.24;}
 function canThrow(){return !ball&&!anim&&balls>0&&!roundOver&&ch.state==='sit'&&!document.querySelector('.sheet.open');}
-cv.addEventListener('pointerdown',e=>{ac();if(!canThrow())return;$('callit').classList.add('aside');cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';});
+cv.addEventListener('pointerdown',e=>{ac();if($('topbar').classList.contains('open')){menu(false);return;}if(!canThrow())return;$('callit').classList.add('aside');bubble.pulled=!bubble.hidden;hideBubble();cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';});
 cv.addEventListener('pointermove',e=>{if(!drag)return;drag.dx=e.clientX-drag.x0;drag.dy=e.clientY-drag.y0;drag.moved+=Math.hypot(e.clientX-drag.lx,e.clientY-drag.ly);drag.lx=e.clientX;drag.ly=e.clientY;});
-cv.addEventListener('pointerup',()=>{if(!drag)return;const d=drag;drag=null;cv.style.cursor='grab';$('callit').classList.remove('aside');if(Math.hypot(d.dx,d.dy)>14)release(d.dx,d.dy);});
+cv.addEventListener('pointerup',()=>{if(!drag)return;const d=drag;drag=null;cv.style.cursor='grab';$('callit').classList.remove('aside');if(Math.hypot(d.dx,d.dy)>14)release(d.dx,d.dy);else if(bubble.pulled)showBubble();bubble.pulled=false;});
 cv.addEventListener('pointercancel',()=>{drag=null;$('callit').classList.remove('aside');});
 addEventListener('keydown',e=>{
  if(document.querySelector('.sheet.open')||$('result').style.display==='block')return;
  const k=e.key;if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','Enter'].includes(k))return;
  if(e.target&&e.target.tagName==='BUTTON'&&(k===' '||k==='Enter'))return;
  if(!canThrow())return;e.preventDefault();ac();
- if(!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=0;}const st=maxPull()*0.03;
+ if(!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=calmLock?1:0;hideBubble();$('callit').classList.add('aside');}const st=maxPull()*0.03;
  if(k==='ArrowLeft')kb.dx+=st;if(k==='ArrowRight')kb.dx-=st;if(k==='ArrowUp')kb.dy-=st;if(k==='ArrowDown')kb.dy+=st;
  if(k.startsWith('Arrow'))kb.moved+=6;
  if(k===' '||k==='Enter'){const d=kb;kb=null;release(d.dx,d.dy);}
@@ -799,15 +838,16 @@ function drawArm(){
 }
 function wrap(txt,maxW){const words=txt.split(' '),lines=[];let l='';for(const w of words){const tt=l?l+' '+w:w;if(ctx.measureText(tt).width>maxW&&l){lines.push(l);l=w;}else l=tt;}if(l)lines.push(l);return lines;}
 function drawBubble(){
- if(bubble.t<=0||ch.state==='under'||ch.state==='fall')return;
- const hp=P(SEAT.x,SEAT.y+ch.yo+1.15*CHS,SEAT.z);const fs=18,lh=fs*1.32,maxW=Math.min(W*.7,360);
+ const bc=$('bubClose');if(bubble.t<=0||bubble.hidden||ch.state==='under'||ch.state==='fall'){if(bc.style.display!=='none')bc.style.display='none';return;}
+ const hp=P(SEAT.x,SEAT.y+ch.yo+1.15*CHS,SEAT.z);const fs=18,lh=fs*1.32,maxW=Math.min(W*.7-30,330);
  const segs=bubble.parts||[{who:null,text:bubble.text}],rows=[];
  segs.forEach((sg,k)=>{const lab=sg.who?sg.who+': ':'';ctx.font=`${sg.crowd?'italic 600':'700'} ${fs}px system-ui,sans-serif`;
   wrap(lab+sg.text,maxW-28).forEach((l,i)=>rows.push({t:l,crowd:!!sg.crowd,lab:i===0?lab:''}));if(k<segs.length-1)rows.push({gap:1});});
  let bw=0;rows.forEach(r=>{if(r.gap)return;ctx.font=`${r.crowd?'italic 600':'700'} ${fs}px system-ui,sans-serif`;bw=Math.max(bw,ctx.measureText(r.t).width);});
  bw=Math.min(maxW,bw+28);const bh=rows.reduce((a,r)=>a+(r.gap?8:lh),0)+18;
- const topMin=document.querySelector('.se-chrome').getBoundingClientRect().bottom+8;
- let bx=hp.x-bw*.3,by=hp.y-bh-14;bx=Math.max(8,Math.min(W-bw-8,bx));by=Math.max(topMin,by);
+ const topMin=$('corner').getBoundingClientRect().bottom+8;
+ let bx=hp.x-bw*.3,by=hp.y-bh-14;bx=Math.max(8,Math.min(W-bw-34,bx));by=Math.max(topMin+14,by);
+ bc.style.left=Math.round(bx+bw-22)+'px';bc.style.top=Math.round(by-20)+'px';if(bc.style.display!=='flex')bc.style.display='flex';
  ctx.globalAlpha=Math.min(1,bubble.t*3);ctx.strokeStyle=OUT;ctx.lineWidth=3;paperOn(1.2);rr(bx,by,bw,bh,14,'#ffffff');paperOff();
  const tx=Math.max(bx+16,Math.min(bx+bw-16,hp.x));ctx.beginPath();ctx.moveTo(tx-9,by+bh-1);ctx.lineTo(tx,by+bh+12);ctx.lineTo(tx+9,by+bh-1);ctx.fillStyle='#ffffff';ctx.fill();
  ctx.beginPath();ctx.moveTo(tx-9,by+bh);ctx.lineTo(tx,by+bh+12);ctx.lineTo(tx+9,by+bh);ctx.stroke();
