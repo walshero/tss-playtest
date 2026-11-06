@@ -5,7 +5,14 @@
 <meta name="spec-source" content="claude/SPEC-KIREJI-ICEBOX-v5.3-2026-09-25.md">
 <meta name="audience" content="MassBay EN195 students writing their first haiku; the founder as first player">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kireji Pond v5.16</title>
+<title>Kireji Pond v5.17</title>
+<!-- v5.17 2026-11-06 (founder): "When I click next season summer, the screen should fix on the spring scene (now it
+     stays low at button) and then animate a transition to summer. Then same summer to winter." Next season now
+     scrolls to the top at every width with the finished season still showing, holds a beat, then starts the round.
+     The turn animates: sky, hills, field, sun and leaf colours drift over about two and a half seconds (registered
+     @property colours, transition only while .scene.seasoning is on) and the old tree cross-fades into the new one.
+     The third season in the game is autumn. First paint, Still water and reduced motion still cut straight.
+-->
 <!-- v5.16 2026-11-05 (founder, with a phone screenshot): "Order 1 failed." The v5.15 extra space was invisible
      because "across." ends a line on a phone. The two sentences are now two paragraphs on panel 2, so a blank
      line sits between "across." and "English" at every width.
@@ -139,6 +146,10 @@ button:focus-visible{outline:3px solid var(--beni);outline-offset:3px}
 }
 
 /* Scene */
+/* v5.17 season turn (founder 2026-11-06): the season colours drift instead of cutting. Registered as <color> so the
+   browser can interpolate them; the drift runs only while .seasoning is on, so first paint and Still water stay instant. */
+@property --sky1{syntax:"<color>";inherits:true;initial-value:#D98A78}@property --sky2{syntax:"<color>";inherits:true;initial-value:#EDCDB5}@property --hill{syntax:"<color>";inherits:true;initial-value:#A2ABA3}@property --field{syntax:"<color>";inherits:true;initial-value:#8E9A70}@property --sun{syntax:"<color>";inherits:true;initial-value:#C8553F}@property --leafA{syntax:"<color>";inherits:true;initial-value:#E6A3A0}@property --leafB{syntax:"<color>";inherits:true;initial-value:#B8707A}@property --leafC{syntax:"<color>";inherits:true;initial-value:#F7E2DA}
+.scene.seasoning{transition:--sky1 2.4s ease-in-out,--sky2 2.4s ease-in-out,--hill 2.6s ease-in-out,--field 2.6s ease-in-out,--sun 2.2s ease-in-out,--leafA 2.4s ease-in-out,--leafB 2.4s ease-in-out,--leafC 2.4s ease-in-out}
 .scene{position:relative;overflow:hidden;min-height:380px;
   --sky1:#D98A78;--sky2:#EDCDB5;--hill:#A2ABA3;--field:#8E9A70;--sun:#C8553F}
 .scene::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 7px #F5EEDB,inset 0 0 0 8.5px #1B1A17;z-index:7}
@@ -655,7 +666,7 @@ a.fzb{display:inline-flex;align-items:center;text-decoration:none}
 </style>
 </head>
 <body>
-<h1 class="sr">Kireji Pond <span class="ver">v5.16</span> <span class="status">In build</span></h1>
+<h1 class="sr">Kireji Pond <span class="ver">v5.17</span> <span class="status">In build</span></h1>
 <div class="app touring" id="app">
   <div class="scene" id="scene" aria-label="Woodblock scene: a stream runs down into an old pond where a frog sits on a stone.">
     <svg class="bg" id="sceneSvg" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
@@ -1359,11 +1370,23 @@ let tiles=[], sinceTurn=0, laneI=0, clicheI=0, last=performance.now();
 let plist=[]; S.still=false;
 
 /* ---------- scene ---------- */
+let seasonShown=-1, seasonT=0, streamT=0;
 function applySeason(){
   const se=SEASONS[S.round];
   Object.entries(se.vars).forEach(([k,v])=>scene.style.setProperty(k,v));
   $('#seasonLbl').textContent=`${se.name} · ${se.jp}`;
-  const sk=['spring','summer','autumn'][S.round]; $$('.stree').forEach(g=>g.setAttribute('display',g.dataset.season===sk?'inline':'none'));
+  const sk=['spring','summer','autumn'][S.round];
+  // v5.17: a season change cross-fades the trees and drifts the colours (CSS .seasoning); first paint, Still water and reduced motion cut straight
+  const turning=seasonShown>=0&&seasonShown!==S.round&&!reduce&&!document.body.classList.contains('still');
+  clearTimeout(seasonT); scene.classList.toggle('seasoning',turning);
+  if(turning){
+    // Web Animations, not CSS transitions: a tree coming back from display:none never starts a CSS transition in Chrome
+    $$('.stree').forEach(g=>{const on=g.dataset.season===sk, vis=g.getAttribute('display')!=='none'; if(!on&&!vis) return;
+      if(on) g.setAttribute('display','inline');
+      try{g.animate(on?[{opacity:0},{opacity:1}]:[{opacity:1},{opacity:0}],{duration:2200,easing:'ease-in-out',fill:'forwards'})}catch(e){}});
+    seasonT=setTimeout(()=>{$$('.stree').forEach(g=>{if(g.dataset.season!==sk) g.setAttribute('display','none'); try{g.getAnimations().forEach(x=>x.cancel())}catch(e){}}); scene.classList.remove('seasoning')},2800);
+  } else $$('.stree').forEach(g=>{g.style.opacity=''; g.setAttribute('display',g.dataset.season===sk?'inline':'none')});
+  seasonShown=S.round;
   const lf=[['#E6A3A0','#B8707A','#F7E2DA'],['#557438','#36512A','#93AC5C'],['#C2522C','#8C2B20','#E6A444']][S.round]||['#C2522C','#8C2B20','#E6A444'];
   ['--leafA','--leafB','--leafC'].forEach((k,i)=>scene.style.setProperty(k,lf[i]));
 }
@@ -1733,12 +1756,23 @@ function startRound(){
   S.phase='play'; S.busy=false; $('#slots').classList.remove('busy'); S.slots=[null,null,null];
   S.sndRound=S.round; // v5.2.1: the season's creatures change here, on Next season, not at the win
   applySeason(); renderPads(); renderSlots(); renderSeals();
-  layer.classList.remove('hush'); layer.inert=false; prefill(); setPaused(false); if(S.still) dealList();
-  show('pPlay'); if(innerWidth<780){try{scrollTo({top:0,behavior:'smooth'})}catch(e){scrollTo(0,0)}}
+  // v5.17: while the season turns, the stream waits under the hush; the phrases arrive once the new season has settled
+  const turn=scene.classList.contains('seasoning'); clearTimeout(streamT);
+  if(turn){layer.classList.add('hush'); layer.inert=true; prefill(); setPaused(true); streamT=setTimeout(()=>{layer.classList.remove('hush'); layer.inert=false; setPaused(false)},2400)}
+  else {layer.classList.remove('hush'); layer.inert=false; prefill(); setPaused(false)}
+  if(S.still) dealList();
+  show('pPlay'); try{scrollTo({top:0,behavior:reduce?'auto':'smooth'})}catch(e){scrollTo(0,0)} // v5.17: every width
   say(`${SEASONS[S.round].name}. Tap a phrase to stop it: Catch it, Smash it as a cliché, or Let it go.`);
 }
 $('#start').addEventListener('click',startRound);
-$('#next').addEventListener('click',startRound);
+// v5.17 (founder 2026-11-06): Next season first brings the camera up to the scene, still in the old season,
+// holds a beat so the player sees where they are, then starts the round, which animates the turn.
+$('#next').addEventListener('click',async()=>{
+  const b=$('#next'); if(b.disabled) return; b.disabled=true;
+  try{scrollTo({top:0,behavior:reduce?'auto':'smooth'})}catch(e){scrollTo(0,0)}
+  if(!reduce){const t0=performance.now(); while(scrollY>2&&performance.now()-t0<1200) await wait(50); await wait(450)}
+  b.disabled=false; startRound();
+});
 $('#again').addEventListener('click',()=>{
   Fz.reset();
   S.round=0; S.wins=[]; S.smashed=0; S.kept=0; deckRound=-1; GONE.main.clear(); scene.classList.remove('final');
