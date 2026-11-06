@@ -3,10 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dunk-O-Rama v0.3</title>
+<title>Dunk-O-Rama v0.4</title>
 <meta name="spec-source" content="convening/DUNK-O-RAMA-CONVENING.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students learning to spot rhetorical cheats. Lab build.">
-<!-- TSP build: Dunk-O-Rama v0.3 | LAB | 2026-11-06
+<!-- TSP build: Dunk-O-Rama v0.4 | LAB | 2026-11-06
+     v0.4: five levels, 20 cheats (4 per level; the Pundit adds scapegoating, false cause, loaded
+     question, incoherence). Each heckle is an exchange: the crowd asks, the politician cheats.
+     Shuffle bags: no line, move or reaction repeats until its whole set has played.
+     v0.3:
      v0.3: every level teaches three rhetorical moves (12 in all). Each throw opens with a heckle;
      from the second throw on, Call the move: name it right and your breath steadies and the target
      looks bigger. Round card is a field guide (spot it, fair version) with a verified Twain maxim.
@@ -75,7 +79,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 <header class="se-chrome">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.3</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.4</span> <span class="tsp-labchip">LAB</span></h1>
   <div class="sp">
     <button id="seatBtn" aria-haspopup="dialog">Seat</button>
     <button id="modeBtn" class="icon" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" fill="currentColor" style="fill:var(--ink)"/></svg></button>
@@ -156,49 +160,135 @@ const CAST=[
   dunk:['Put that on my expense report.','Glub. Billable hours. Glub.','My clients are... disappointed.']}
 ];
 
-/* ---------- the moves (v0.3): what each level teaches ---------- */
+/* ---------- the moves (v0.4): 20 cheats, 4 per level ---------- */
 const MOVES={
  red:{name:'Red herring',def:'Drags a shiny, unrelated topic across the trail so you lose the scent.',spot:'Did the answer ever touch the question?',fair:'Answer the question, then raise the other topic.'},
  trad:{name:'Appeal to tradition',def:'Offers "we have always done it" as proof that it is right.',spot:'Ask why it was done that way, not how long.',fair:'Give the reason the old way still works.'},
  gish:{name:'Gish gallop',def:'Floods you with more claims than anyone could check, so the pile passes for proof.',spot:'Pick one claim and ask for the evidence.',fair:'Make your best point and stand on it.'},
+ circ:{name:'Circular reasoning',def:'Uses the conclusion as its own proof.',spot:'Take out the repeat. Is any reason left?',fair:'Give a reason that does not assume the answer.'},
  straw:{name:'Straw man',def:'Swaps your point for a flimsier one he can knock down.',spot:'Is that what was actually said?',fair:'Restate the other side so well they would agree, then answer it.'},
  dilemma:{name:'False dilemma',def:'Offers two choices when there are more.',spot:'Look for the third option he left out.',fair:'Lay out the real range of options.'},
  loaded:{name:'Loaded language',def:'Dresses a hard fact in soft words, or a soft fact in scary ones, so the words do your thinking.',spot:'Swap in plain words. Does it still sound fine?',fair:'Say the plain thing.'},
+ goal:{name:'Moving the goalposts',def:'Raises the bar the moment you clear it.',spot:'Was this the test before the evidence came in?',fair:'Set the test first, then accept the result.'},
  band:{name:'Bandwagon',def:'Offers a crowd as proof.',spot:'Ask what the claim rests on besides a head count.',fair:'Give the reason the people agree.'},
  what:{name:'Whataboutism',def:'Answers a charge by pointing at somebody else\'s.',spot:'Is the first question still sitting there unanswered?',fair:'Answer for yourself, then raise the other matter.'},
  slope:{name:'Slippery slope',def:'Claims one small step leads straight to disaster, with no proof of the steps between.',spot:'Ask for the evidence for each step.',fair:'Argue about the step actually on the table.'},
+ equiv:{name:'False equivalence',def:'Treats two very different things as the same.',spot:'Ask how big each one really is.',fair:'Compare things of the same size and kind.'},
  adhom:{name:'Ad hominem',def:'Attacks the person instead of the argument.',spot:'Would the claim be wrong if someone else said it?',fair:'Answer the evidence, whoever brought it.'},
  auth:{name:'False authority',def:'Borrows a famous name or a costume in place of real expertise.',spot:'Is this person an expert in this exact thing, and do other experts agree?',fair:'Cite people who actually know the field.'},
- cherry:{name:'Cherry picking',def:'Shows you the one good apple and hides the orchard.',spot:'Ask what the rest of the evidence says.',fair:'Show the whole picture, bad days included.'}
+ cherry:{name:'Cherry picking',def:'Shows you the one good apple and hides the orchard.',spot:'Ask what the rest of the evidence says.',fair:'Show the whole picture, bad days included.'},
+ anec:{name:'Anecdote as proof',def:'Lets one vivid story stand in for all the evidence.',spot:'Ask how many cases, not how memorable the one.',fair:'Use the story to show it, the numbers to prove it.'},
+ scape:{name:'Scapegoating',def:'Pins a big, tangled problem on one handy person or group.',spot:'Would the problem vanish without them? Look for the other causes.',fair:'Name the real causes, plural.'},
+ cause:{name:'False cause',def:'Claims that because one thing came after another, the first one caused it.',spot:'Ask what else changed at the same time.',fair:'Show how the cause works, not just when it happened.'},
+ lq:{name:'Loaded question',def:'Hides an accusation inside a question, so any answer admits it.',spot:'Check what the question assumes before you answer.',fair:'Ask the first question first: did it happen?'},
+ incoh:{name:'Incoherence',def:'Makes claims that cannot all be true at once, hoping nobody lines them up.',spot:'Put two of the claims side by side.',fair:'Pick one story and stick to it.'}
 };
-const LEVEL_MOVES={fil:['red','trad','gish'],spin:['straw','dilemma','loaded'],mayor:['band','what','slope'],lob:['adhom','auth','cherry']};
-/* Lines written on set by the Twain seat. Studio drafts for founder edit. Town issues only, no parties. */
+const LEVEL_MOVES={fil:['red','trad','gish','circ'],spin:['straw','dilemma','loaded','goal'],mayor:['band','what','slope','equiv'],lob:['adhom','auth','cherry','anec'],pun:['scape','cause','lq','incoh']};
+/* Exchanges written on set by the Twain seat: [the crowd asks, the politician cheats].
+   Studio drafts for founder edit. Town issues only; no parties, no real people. */
 const LINES={
  fil:{
-  red:['You ask about the pothole on Main Street. Let me ask you about the moon. Have you seen it lately? Magnificent.','Was the bridge money spent? A fair question. A fairer one: who brought the potato salad to the Fourth of July picnic? I did.','My opponent wants to talk about the school roof. I would rather talk about the flag on top of it. Look at it wave.'],
-  trad:['We have always plowed the north side first. My grandfather plowed it first. He was snowed in for most of his life, but he was consistent.','The town clock has run eleven minutes slow for ninety years. That is not a broken clock. That is heritage.','This tank has dropped a senator every summer since 1952. Why change a thing that works? Wait. Strike that.'],
-  gish:['I have nine reasons, which I will now list: one, two, three, the moon, taxes, my aunt, a sub-reason, page four, and nine.','Before you throw, consider my forty-one points. I will make them all at once so you cannot answer any of them.','The facts are on my side. All of them. Several hundred at once. Try checking them before the ball lands.']},
+  red:[['Senator, where did the bridge money go?','A fair question. A fairer one: who brought the potato salad to the Fourth of July picnic? I did. Twice.'],
+       ['Will you fix the pothole on Main Street?','Have you looked at the moon lately? Magnificent. Nobody paves the moon, and nobody complains.'],
+       ['Why is the school roof leaking?','I would rather talk about the flag on top of that roof. Look at it wave. That is the real story.']],
+  trad:[['Why plow the north side first every time?','We have always plowed the north side first. My grandfather did. He was snowed in most of his life, but he was consistent.'],
+        ['The town clock runs eleven minutes slow.','For ninety years. That is not a broken clock. That is heritage.'],
+        ['Why does the library close at four?','It closed at four in 1911, and nobody in 1911 wrote a single letter about it.']],
+  gish:[['Can you give one reason for the new tax?','I can give nine: one, two, three, the moon, my aunt, a sub-reason, page four, the weather, and nine. Next.'],
+        ['Is the water report accurate?','Consider my forty-one points. I will make them all at once, so nobody can answer any of them.'],
+        ['Did the fair lose money this year?','The facts are on my side. All of them. Several hundred at once. Check them before the ball lands.']],
+  circ:[['Why should we trust you?','Because I am trustworthy. I know I am trustworthy because I would never lie to you about being trustworthy.'],
+        ['Why is your bridge plan the best one?','It is better than every other plan, which makes it the best, which is why it is better.'],
+        ['How do you know the budget balances?','I only pass balanced budgets, and I passed this one. Therefore it is balanced. Case closed.']]},
  spin:{
-  straw:['My opponent wants a crosswalk on Elm Street. So he wants cars outlawed, horses back, and your grandmother walking to Ohio.','You want the library open on Sundays? Why do you hate weekends?','So you think I should answer questions. In other words, you want me interrogated under a hot lamp. Shameful.'],
-  dilemma:['Either we paint the bandstand gold, or we let the town slide into the sea. Choose.','You are with the parking meters, or you are with chaos. There is no third thing. I checked.','Dunk me, or love freedom. You cannot do both.'],
-  loaded:['The budget did not go over. It achieved surprise growth.','I did not miss the meeting. I gave it room to breathe.','That is not a pothole. It is a traffic-calming feature with historical depth.']},
+  straw:[['Could we add a crosswalk on Elm Street?','So you want cars outlawed, horses brought back, and your grandmother walking to Ohio. Interesting vision.'],
+         ['Can the library open on Sundays?','So you hate weekends. You want everyone shelving books on their day off. Noted.'],
+         ['Will you answer our questions tonight?','So you want me under a hot lamp with no water. That is not democracy. That is a dentist.']],
+  dilemma:[['Should we repaint the bandstand?','Either we paint it gold, or we let the town slide into the sea. Choose wisely.'],
+           ['Are the new parking meters a good idea?','You are with the parking meters, or you are with chaos. There is no third thing. I checked.'],
+           ['Is the dunk tank good for the fair?','Dunk me, or love freedom. You cannot do both.']],
+  loaded:[['Did the budget go over?','The budget did not go over. It achieved surprise growth.'],
+          ['Why did you skip the town meeting?','I did not skip it. I gave it room to breathe.'],
+          ['When will you fix the pothole?','That is not a pothole. It is a traffic-calming feature with historical depth.']],
+  goal:[['Here is the receipt. The money went missing.','A receipt? Anyone can have a receipt. Come back with a notarized one. In Latin.'],
+        ['Ten thousand people signed the petition.','I said a lot of people. A lot has always meant more than ten thousand.'],
+        ['You said you would resign if the bridge fell. It fell.','I said the whole bridge. That was most of the bridge.']]},
  mayor:{
-  band:['Everybody who is anybody supports the new parking garage. Ask them. They are all parked in it.','Ninety percent of the people at my birthday party agree with me.','The whole town is behind me. That roar you hear is them cheering. Or the Tilt-A-Whirl.'],
-  what:['You want to know where the snowplow money went? What about the time you returned a library book late?','Sure, I missed the budget vote. But you missed the target twice. Who is really missing things here?','My fence is on the neighbor\'s lawn? And what about the neighbor\'s lawn, sitting right under my fence?'],
-  slope:['Fix one pothole and they will want every pothole fixed, then sidewalks, then a moon base.','Give the dog park a water fountain, and next the dogs will want the vote.','Dunk me today, and tomorrow you dunk the fire chief. By Friday, nobody in this town is dry.']},
+  band:[['Do people really want a parking garage?','Everybody who is anybody supports it. Ask them. They are all parked in it.'],
+        ['Is the new dog park popular?','Ninety percent of the people at my birthday party agree with me.'],
+        ['Does anyone support the new fee?','The whole town is behind me. That roar is them cheering. Or the Tilt-A-Whirl.']],
+  what:[['Where did the snowplow money go?','What about the time you returned a library book late? Let us talk about that for once.'],
+        ['Why did you miss the budget vote?','Sure, I missed the vote. You missed the target. Who is really missing things here?'],
+        ['Your fence is on your neighbor\'s lawn.','And what about the neighbor\'s lawn, sitting right under my fence?']],
+  slope:[['Can you fix the pothole on Elm?','Fix one pothole and they want every pothole fixed, then sidewalks, then a moon base.'],
+         ['Can the dog park get a water fountain?','First a fountain. Then the dogs want the vote. Then a beagle is mayor. Is that what you want?'],
+         ['Is the dunk tank fair to you?','Dunk me today and tomorrow you dunk the fire chief. By Friday nobody in this town is dry.']],
+  equiv:[['The town lost forty thousand dollars.','And my nephew lost a mitten. Losses happen on all sides. Who is to say which is worse?'],
+         ['The inspector found cracks in the bridge.','My coffee mug has a crack, and I use it every day. Bridges, mugs. Both hold things.'],
+         ['You gave your cousin the parks job.','And you lent your cousin your car. We both help family. Same thing exactly.']]},
  lob:{
-  adhom:['Why trust the crossing guard on traffic? Have you seen her hat?','The engineer says the bridge is unsafe. The engineer also drives a hatchback. Draw your own conclusions.','You cannot believe that kid about the lake. He is twelve, and he smells like the lake.'],
-  auth:['Four out of five dentists agree my client\'s candy is good policy. The fifth is not on the payroll yet.','A famous actor who played a doctor on television says the water is fine. Who are you to argue with television?','My cousin read a website about bridges. Engineering is settled.'],
-  cherry:['The factory smoked on 364 days last year. But the 365th? Clean as a whistle. Let\'s talk about the good day.','Of all the studies, I picked the one my client paid for. It is the shiniest.','Look at this one perfect tomato from the field by the factory. I rest my case.']}
+  adhom:[['The crossing guard says Elm needs a light.','The crossing guard? Have you seen her hat? I would not trust that hat with a goldfish.'],
+         ['The engineer says the bridge is unsafe.','The engineer also drives a hatchback. Draw your own conclusions. I have drawn mine.'],
+         ['A student found pollution in the lake.','That kid is twelve, and he smells like the lake. Consider the source.']],
+  auth:[['Is the candy factory\'s new candy safe?','Four out of five dentists agree it is good policy. The fifth is not on the payroll yet.'],
+        ['Is the tap water safe to drink?','An actor who played a doctor on television says it is fine. Who are you to argue with television?'],
+        ['Will the new bridge design hold?','My cousin read a website about bridges. Engineering is settled.']],
+  cherry:[['Is the factory polluting the air?','It smoked 364 days last year. But the 365th? Clean as a whistle. Let us talk about the good day.'],
+          ['What do the studies say about the dam?','Of all the studies, I picked the one my client paid for. It is the shiniest.'],
+          ['Are the crops by the factory okay?','Look at this one perfect tomato. I rest my case. Ignore the other forty acres.']],
+  anec:[['Is the new highway ramp safe?','My uncle drove it twice and he is fine. Mostly. He is fine.'],
+        ['Should kids wear bike helmets?','I never wore one, and look at me. I became a lobbyist.'],
+        ['Does the factory make neighbors sick?','I met a man who lives right next door. Ninety-four years old. Sharp as a tack. Says hello.']]},
+ pun:{
+  scape:[['Why is traffic so bad downtown?','Three words: the marching band. Since they started practicing, nothing in this town has moved.'],
+         ['Why did the library budget run short?','Ask the book club. They read too fast. Nobody will say it, so I will.'],
+         ['Why did the fair lose money?','I will not name names. I will name one name: pigeons.']],
+  cause:[['Why did the river flood?','The new mayor took office in May. In June, the river flooded. You do the math. I already did.'],
+         ['Why did test scores go up?','I bought a new tie in March, and scores went up in April. You are welcome, children.'],
+         ['Why did the bakery close?','It closed a week after the bike lane opened. Bicycles hate bread. Look it up.']],
+  lq:[['Will you take a question from us?','Sure. Here is mine for you: have you stopped wasting the town\'s money, yes or no?'],
+      ['What will you ask the mayor tonight?','Just one thing: why does the mayor hate puppies? I am only asking.'],
+      ['What is tonight\'s show about?','A simple question, folks: how long has the library been hiding the truth?']],
+  incoh:[['Is the new bridge good or bad?','It is a disaster nobody will use, and it is so crowded it is dangerous. Both. At once.'],
+         ['Is the new tax too high?','It is so tiny it is an insult, and it will bankrupt every family on Elm Street.'],
+         ['Is the carnival safe?','It is perfectly safe, which is why I warn you never to go. I am here every night.']]}
 };
-/* Verified in Following the Equator (1897), Pudd'nhead Wilson's New Calendar and chapter text. */
+/* Verified against the University of Virginia list of Pudd'nhead Wilson's New Calendar epigraphs
+   in Following the Equator (1897). */
 const TWAIN={
  fil:{q:'It could probably be shown by facts and figures that there is no distinctly native American criminal class except Congress.',src:'Mark Twain, Following the Equator (1897)'},
  spin:{q:'Truth is the most valuable thing we have. Let us economize it.',src:'Mark Twain, Following the Equator (1897)'},
  mayor:{q:'It is by the goodness of God that in our country we have those three unspeakably precious things: freedom of speech, freedom of conscience, and the prudence never to practice either of them.',src:'Mark Twain, Following the Equator (1897)'},
- lob:{q:'Often, the surest way to convey misinformation is to tell the strict truth.',src:'Mark Twain, Following the Equator (1897)'}
+ lob:{q:'Often, the surest way to convey misinformation is to tell the strict truth.',src:'Mark Twain, Following the Equator (1897)'},
+ pun:{q:'Truth is stranger than fiction, but it is because Fiction is obliged to stick to possibilities; Truth isn\'t.',src:'Mark Twain, Following the Equator (1897)'}
 };
+/* v0.4 cast: the Pundit joins; reactions rewritten so nothing repeats inside a round */
+CAST.push({id:'pun',name:'Dale Bluster',title:'The Pundit',level:'',
+  suit:'#a8323e',pants:'#3a2a30',tie:'#1b1328',skin:'#efc19c',bw:0.56,r:0.27,sway:0.95,tw:1.6,wind:1,idle:[],miss:[],bonk:[],dunk:[]});
+const LEVELTXT={fil:'Level 1, easy. Dodging the question. Light breeze.',spin:'Level 2. Rewriting what you said. The target twists.',mayor:'Level 3. The crowd and the other guy. Gusts push the ball.',lob:'Level 4, hard. Who says so, and what they leave out. Small target.',pun:'Level 5, hardest. Blame and fog. Small target, gusts, the lot.'};
+const REACT={
+ fil:{miss:['Noted. Tabled. Forgotten.','Motion to dismiss that throw. Seconded by me.','The chair recognizes your miss.','Let the record show the ball agreed with me.','That throw has been referred to committee, where it will live forever.'],
+      bonk:['That net was in the budget for a reason.','Out of order! You hit the procedure.','Nets have protected senators since 1789. Tradition.'],
+      dunk:["I'll be entering this splash into the record.",'Glub. The senator from the deep end yields.','Moist. Very moist. Moving on to page ten.','I yield the floor. The floor is wet.','Glub. Point of order. Glub.']},
+ spin:{miss:['That miss was a strategic success.','Sources close to the ball say it was tired.','Historic restraint on your part.','Missing is the new hitting. You heard it here first.','We will call that a soft launch.'],
+      bonk:['The net and I are on message.','Hit the net? Bold choice. Wrong, but bold.','The net and I have a working relationship.'],
+      dunk:['This water polls very well with me.','I meant to do that. Write it down.','Wet is the new dry. Trust me.','I am not wet. I am hydrated by circumstance.','Off the record: cold. On the record: refreshing.']},
+ mayor:{miss:["Ha! That's going in the newsletter.",'A miss! Free parking for everyone.','The wind is on my committee.','Even the ball loves this town too much to hit me.','Free throw. On the house. Paid for by the house.'],
+      bonk:['That net cost the town nine thousand dollars. Worth it.','Dent that net and I raise the fee.','That net is a gift from the people. To me.'],
+      dunk:['I hereby name this puddle after myself.','Cancel the parade. And the hat.','Glub. Vote... glub... for me.','This splash is brought to you by the Chamber of Commerce.','Everybody is doing it. Swimming. Very popular.']},
+ lob:{miss:['Pleasure doing business.',"I'll send a fruit basket.",'Your miss has been noted by my clients.','My clients thank you for your service.','That one is going in the brochure.'],
+      bonk:['The net is a valued partner.','I own the net. Indirectly.','That net has excellent lawyers.'],
+      dunk:['Put that on my expense report.','Glub. Billable hours. Glub.','My clients are... disappointed.','I would like to speak to the water\'s manager.','This is a gift. I will have to report it.']},
+ pun:{miss:['And there it is, folks. A miss. Who sent you?','That throw was brought to you by the pigeons.','Sources say you missed. I am the sources.','Breaking news: nothing happened.','Stay with us. After the break, you miss again.'],
+      bonk:['You hit the net. Is the net on your side? Asking for a friend.','The net: friend or foe? Tonight at eleven.','Even the net agrees with me.'],
+      dunk:['This is fine. Breaking news: this is fine.','Glub. We will be right back.','Sabotage. Pigeons. Glub.','I have never been drier. Report that.','Coming up: who is to blame for this water? I have a list.']}
+};
+CAST.forEach(k=>{k.level=LEVELTXT[k.id];Object.assign(k,REACT[k.id]);});
+/* shuffle bags: nothing repeats until every line in the set has played */
+const BAGS={};
+function bag(key,arr){if(!BAGS[key]||!BAGS[key].length){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}BAGS[key]=a;}return BAGS[key].pop();}
 
+const SHORT={fil:'Senator',spin:'Skip',mayor:'Mayor',lob:'Chet',pun:'Dale'};
 /* ---------- state ---------- */
 const MODES=['dark','light','sharp'],MODE_NAME={dark:'Dark',light:'Light',sharp:'Sharp'};
 let mode=store.get('mode','dark');if(!MODES.includes(mode))mode='dark';
@@ -240,7 +330,7 @@ $('modeBtn').onclick=()=>{mode=MODES[(MODES.indexOf(mode)+1)%3];store.set('mode'
 function applySound(){$('soundBtn').setAttribute('aria-pressed',sound);$('soundBtn').setAttribute('aria-label',sound?'Sound on':'Sound off');}
 $('soundBtn').onclick=()=>{sound=!sound;store.set('sound',sound);applySound();if(sound)ac();};
 applyMode();applySound();
-function say(txt,dur){bubble.text=txt;bubble.t=dur||3.2;}
+function say(txt,dur){bubble.text=txt;bubble.parts=null;bubble.t=dur||3.2;}
 function announce(txt){$('live').textContent=txt;}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function buildSeatList(){
@@ -259,26 +349,24 @@ addEventListener('keydown',e=>{if(e.key==='Escape')closeSheets();});
 
 function setCast(i){ci=i;c=CAST[i];balls=BALLS;dunks=0;streak=0;roundOver=false;ball=null;anim=null;trail=[];lastPath=[];
  ch={yo:0,vy:0,rot:0,state:'sit',timer:0};seatA=0;tg={phi:0,dphi:0,psi:0,dpsi:0};$('result').style.display='none';newWind();hud();
- heck={active:false,move:null,called:null};heckN=0;thrown=0;rBoost=1;calmLock=false;stats={asked:0,right:0,seen:{}};$('callit').style.display='none';bubble.t=0;announce(`${c.title}, ${c.name}, is on the seat. ${c.level}`);}
+ Object.keys(BAGS).forEach(k=>delete BAGS[k]);heck={active:false,move:null,called:null};heckN=0;thrown=0;rBoost=1;calmLock=false;stats={asked:0,right:0,seen:{}};$('callit').style.display='none';bubble.t=0;announce(`${c.title}, ${c.name}, is on the seat. ${c.level}`);}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function pastMoves(){const out=[];for(const k of CAST){if(k===c)break;out.push(...LEVEL_MOVES[k.id]);}return out;}
-let lastLine='';
 function newHeckle(){
- const set=LEVEL_MOVES[c.id];if(heckN%set.length===0)heckOrder=shuffle(set);
- const mv=heckOrder[heckN%set.length];heckN++;
- const pool=LINES[c.id][mv].filter(l=>l!==lastLine);const line=pick(pool.length?pool:LINES[c.id][mv]);lastLine=line;
- heck={active:true,move:mv,called:null};say(line,999);
+ const set=LEVEL_MOVES[c.id];const mv=bag('mv'+c.id,set);const ex=bag('ln'+c.id+mv,LINES[c.id][mv]);
+ heck={active:true,move:mv,called:null};
+ bubble.parts=[{who:'Crowd',crowd:true,text:ex[0]},{who:SHORT[c.id],text:ex[1]}];bubble.text=ex[1];bubble.t=999;
  const ask=thrown>=1;
  const box=$('callit');$('teach').textContent='';
  if(ask){
-  const others=set.filter(m=>m!==mv),earlier=shuffle(pastMoves());
-  const d2=earlier.length&&Math.random()<.5?earlier[0]:pick(others.filter(m=>m!==others[0]))||others[1];
-  const chips=shuffle([mv,others[0],d2===mv?others[1]:d2]);
+  const others=shuffle(set.filter(m=>m!==mv)),earlier=shuffle(pastMoves());
+  const d2=earlier.length&&Math.random()<.5?earlier[0]:others[1];
+  const chips=shuffle([mv,others[0],d2]);
   $('chips').innerHTML='';
   chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=MOVES[id].name;b.onclick=()=>callMove(id);$('chips').appendChild(b);});
   $('callQ').textContent='Call the move';$('callQ').style.display='block';box.style.display='block';
-  announce(`${c.name} says: ${line} Call the move: ${chips.map(i=>MOVES[i].name).join(', ')}.`);
- }else{box.style.display='none';announce(`${c.name} says: ${line}`);}
+  announce(`From the crowd: ${ex[0]} ${c.name}: ${ex[1]} Call the move: ${chips.map(i=>MOVES[i].name).join(', ')}.`);
+ }else{box.style.display='none';announce(`From the crowd: ${ex[0]} ${c.name}: ${ex[1]}`);}
 }
 function callMove(id){
  if(heck.called!==null)return;const M=MOVES[heck.move];stats.asked++;stats.seen[heck.move]=1;
@@ -353,7 +441,7 @@ function step(b,dt,live){
  if(!b.front&&cross(TANK.zf)){const[cx,cy]=at(TANK.zf);
   if(cx>TANK.x0-R&&cx<TANK.x1+R&&cy<TANK.cage+R){b.front=true;b.z=TANK.zf-.01;
    const glass=cy<TANK.glass;b.vz=-Math.abs(b.vz)*(glass?.32:.18);b.vx*=.7;b.vy*=glass?.8:.5;
-   if(glass){SFX.glass();glassWob=1;slosh=Math.max(slosh,.4);}else{SFX.mesh();b.bonked=true;say(pick(c.bonk),2.6);announce('Hit the net.');}
+   if(glass){SFX.glass();glassWob=1;slosh=Math.max(slosh,.4);}else{SFX.mesh();b.bonked=true;say(bag('b'+c.id,c.bonk),2.6);announce('Hit the net.');}
    shakeIt(.25);}}
  if(b.z>14.2&&b.vz>0){b.z=14.2;b.vz=-b.vz*.3;SFX.bounce(2);}
  if(b.y<R){b.y=R;if(b.vy<0){const v=-b.vy;b.vy=v*.45;b.vx*=.78;b.vz*=.78;if(v>1.2)SFX.bounce(v);}}
@@ -373,7 +461,7 @@ function splashAt(){
  setTimeout(()=>SFX.cheer(),350);
 }
 function endBall(){
- if(!ball.hitT||ch.state==='sit'){streak=0;if(!ball.bonked&&!ball.hitT)say(pick(c.miss),2.6);}
+ if(!ball.hitT||ch.state==='sit'){streak=0;if(!ball.bonked&&!ball.hitT)say(bag('m'+c.id,c.miss),2.6);}
  lastPath=trail.slice();ball=null;
  if(balls<=0)setTimeout(checkEnd,ch.state==='sit'?700:2600);else newWind();hud();
 }
@@ -412,7 +500,7 @@ function frame(now){
   if(SEAT.y+ch.yo<TANK.water+.05&&!ch.splashed){ch.splashed=true;splashAt();}
   if(SEAT.y+ch.yo<0.75){ch.yo=0.75-SEAT.y;ch.vy=0;ch.state='under';ch.timer=1.5;}}
  else if(ch.state==='under'){ch.timer-=dt;ch.yo=0.75-SEAT.y+Math.sin(t*3)*.04;if(Math.random()<dt*14)parts.push({k:'bub',x:SEAT.x+(Math.random()-.5)*.3,y:1.0,z:SEAT.z,vy:.8+Math.random(),life:1});
-  if(ch.timer<=0){ch.state='climb';ch.timer=0;ch.splashed=false;say(pick(c.dunk),3.4);}}
+  if(ch.timer<=0){ch.state='climb';ch.timer=0;ch.splashed=false;say(bag('d'+c.id,c.dunk),3.4);}}
  else if(ch.state==='climb'){ch.timer+=dt;const k=Math.min(1,ch.timer/1.1);const e=1-Math.pow(1-k,3);ch.yo=(0.75-SEAT.y)*(1-e);ch.rot=-0.9*(1-e);seatA=1.25*(1-Math.min(1,k*1.6));
   if(k>=1){ch.state='sit';ch.yo=0;ch.rot=0;seatA=0;}}
  for(const p of parts){p.life-=dt;if(p.k==='drop'){p.vy-=G*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;
@@ -568,6 +656,7 @@ function drawChar(c,X,Y,s,rot,mood,tm){
   if(sd>0&&c.id==='fil'&&!fall&&mood!=='under'){ctx.save();ctx.translate(.48,0);rr(-.03,-.1,.06,.2,.02,'#f8f5ea');ctx.restore();}
   if(sd<0&&c.id==='lob'&&!fall&&mood!=='under'){ctx.save();ctx.translate(.46,0);ctx.rotate(Math.PI/2);rr(-.13,.02,.26,.18,.03,'#7a4a24');rr(-.04,-.01,.08,.04,.01,'#3a2410');ctx.restore();}
   if(sd<0&&c.id==='lob')circ(.36,0,.035,'#ffd23f');
+  if(sd>0&&c.id==='pun'&&!fall&&mood!=='under'){rr(.44,-.025,.17,.05,.02,'#8c8799');circ(.64,0,.065,'#2a2a2a');}
   ctx.restore();}
  const hY=-.8,hr=c.id==='mayor'?.19:.17;
  circ(0,hY,hr,c.skin);ctx.fillStyle='rgba(0,0,0,.08)';ctx.beginPath();ctx.arc(0,hY+.02,hr*.95,.2,Math.PI-.2);ctx.fill();
@@ -575,6 +664,7 @@ function drawChar(c,X,Y,s,rot,mood,tm){
  if(c.id==='fil'){ell(-hr*.9,hY-.07,.06,.08,'#e6e6ea');ell(hr*.9,hY-.07,.06,.08,'#e6e6ea');ell(-.05,hY-.11,.04,.02,'rgba(255,255,255,.55)',false);}
  if(c.id==='spin'){ctx.fillStyle='#22182e';ctx.beginPath();ctx.moveTo(-hr,hY-.05);for(let i=0;i<=6;i++){const x=-hr+i*(2*hr/6);ctx.lineTo(x+hr/6,hY-hr-.12+(i%2)*.06);ctx.lineTo(x+hr/3,hY-.1);}ctx.lineTo(hr,hY-.05);ctx.closePath();ctx.fill();ctx.stroke();}
  if(c.id==='lob'){ctx.fillStyle='#2a1a12';ctx.beginPath();ctx.moveTo(-hr,hY-.02);ctx.quadraticCurveTo(-hr,hY-hr-.06,hr*.3,hY-hr-.05);ctx.quadraticCurveTo(hr+.05,hY-hr,hr,hY-.04);ctx.quadraticCurveTo(0,hY-hr*.55,-hr,hY-.02);ctx.fill();ctx.stroke();ctx.strokeStyle='rgba(255,255,255,.4)';ctx.beginPath();ctx.moveTo(-.08,hY-hr+.01);ctx.quadraticCurveTo(.02,hY-hr-.03,.1,hY-hr+.01);ctx.stroke();ctx.strokeStyle=OUT;}
+ if(c.id==='pun'){ctx.beginPath();ctx.ellipse(0,hY-.035,hr*1.18,hr*1.0,0,Math.PI*1.02,Math.PI*1.98);ctx.quadraticCurveTo(hr*.6,hY-hr*.55,-hr*1.1,hY-.05);ctx.closePath();ctx.fillStyle='#d9b45c';ctx.fill();ctx.stroke();ctx.strokeStyle='rgba(255,255,255,.5)';ctx.beginPath();ctx.moveTo(-hr*.6,hY-hr*.85);ctx.quadraticCurveTo(0,hY-hr*1.05,hr*.6,hY-hr*.8);ctx.stroke();ctx.strokeStyle=OUT;}
  if(c.id==='mayor'&&mood!=='under'&&!fall){rr(-.15,hY-hr-.26,.3,.24,.02,'#15121a');rr(-.15,hY-hr-.08,.3,.05,0,'#c8342b');rr(-.24,hY-hr-.04,.48,.05,.025,'#15121a');}
  if(c.id==='mayor'&&(mood==='under'||fall)){ctx.save();ctx.translate(.35,hY-.45);ctx.rotate(tm*6);rr(-.12,-.2,.24,.2,.02,'#15121a');rr(-.2,-.02,.4,.04,.02,'#15121a');ctx.restore();}
  const ex=.065,ey=hY-.02;
@@ -591,6 +681,7 @@ function drawChar(c,X,Y,s,rot,mood,tm){
  else if(fall){ell(0,my+.01,.04,.05,'#5a1220');}
  else if(mood==='talk'){const o=.015+Math.abs(Math.sin(tm*14))*.035;ell(0,my,.05,o,'#5a1220');}
  else if(mood==='wet'){ctx.beginPath();ctx.moveTo(-.05,my+.01);ctx.quadraticCurveTo(0,my-.02,.05,my+.01);ctx.stroke();}
+ else if(c.id==='pun'){rr(-.075,my-.025,.15,.055,.02,'#ffffff');ctx.beginPath();ctx.moveTo(-.025,my-.025);ctx.lineTo(-.025,my+.03);ctx.moveTo(.025,my-.025);ctx.lineTo(.025,my+.03);ctx.stroke();}
  else{ctx.beginPath();if(c.id==='lob'){ctx.moveTo(-.04,my);ctx.quadraticCurveTo(.02,my+.03,.06,my-.015);}else if(c.id==='mayor'){ctx.moveTo(-.07,my-.01);ctx.quadraticCurveTo(0,my+.06,.07,my-.01);ctx.closePath();ctx.fillStyle='#ffffff';ctx.fill();}else{ctx.moveTo(-.05,my);ctx.quadraticCurveTo(0,my+.035,.05,my);}ctx.stroke();}
  if(c.id==='fil'&&mood!=='under'){ctx.fillStyle='#e6e6ea';ctx.beginPath();ctx.moveTo(0,hY+.05);ctx.quadraticCurveTo(-.08,hY+.04,-.12,hY+.09);ctx.quadraticCurveTo(-.06,hY+.08,0,hY+.075);ctx.quadraticCurveTo(.06,hY+.08,.12,hY+.09);ctx.quadraticCurveTo(.08,hY+.04,0,hY+.05);ctx.fill();ctx.stroke();}
  if(mood==='wet'){for(let i=0;i<4;i++){const ph=(tm*1.5+i*.25)%1;circ(-.15+i*.1,hY+hr*.5+ph*.6,.018,'#9fd8ff',false);}}
@@ -667,14 +758,23 @@ function drawArm(){
 function wrap(txt,maxW){const words=txt.split(' '),lines=[];let l='';for(const w of words){const tt=l?l+' '+w:w;if(ctx.measureText(tt).width>maxW&&l){lines.push(l);l=w;}else l=tt;}if(l)lines.push(l);return lines;}
 function drawBubble(){
  if(bubble.t<=0||ch.state==='under'||ch.state==='fall')return;
- const hp=P(SEAT.x,SEAT.y+ch.yo+1.15,SEAT.z);const fs=18;ctx.font=`700 ${fs}px system-ui,sans-serif`;
- const maxW=Math.min(W*.62,320),lines=wrap(bubble.text,maxW-24),lh=fs*1.3,bw=Math.min(maxW,Math.max(...lines.map(l=>ctx.measureText(l).width))+28),bh=lines.length*lh+18;
+ const hp=P(SEAT.x,SEAT.y+ch.yo+1.15,SEAT.z);const fs=18,lh=fs*1.32,maxW=Math.min(W*.7,360);
+ const segs=bubble.parts||[{who:null,text:bubble.text}],rows=[];
+ segs.forEach((sg,k)=>{const lab=sg.who?sg.who+': ':'';ctx.font=`${sg.crowd?'italic 600':'700'} ${fs}px system-ui,sans-serif`;
+  wrap(lab+sg.text,maxW-28).forEach((l,i)=>rows.push({t:l,crowd:!!sg.crowd,lab:i===0?lab:''}));if(k<segs.length-1)rows.push({gap:1});});
+ let bw=0;rows.forEach(r=>{if(r.gap)return;ctx.font=`${r.crowd?'italic 600':'700'} ${fs}px system-ui,sans-serif`;bw=Math.max(bw,ctx.measureText(r.t).width);});
+ bw=Math.min(maxW,bw+28);const bh=rows.reduce((a,r)=>a+(r.gap?8:lh),0)+18;
  const topMin=document.querySelector('.se-chrome').getBoundingClientRect().bottom+8;
  let bx=hp.x-bw*.3,by=hp.y-bh-14;bx=Math.max(8,Math.min(W-bw-8,bx));by=Math.max(topMin,by);
  ctx.globalAlpha=Math.min(1,bubble.t*3);ctx.strokeStyle=OUT;ctx.lineWidth=3;rr(bx,by,bw,bh,14,'#ffffff');
  const tx=Math.max(bx+16,Math.min(bx+bw-16,hp.x));ctx.beginPath();ctx.moveTo(tx-9,by+bh-1);ctx.lineTo(tx,by+bh+12);ctx.lineTo(tx+9,by+bh-1);ctx.fillStyle='#ffffff';ctx.fill();
  ctx.beginPath();ctx.moveTo(tx-9,by+bh);ctx.lineTo(tx,by+bh+12);ctx.lineTo(tx+9,by+bh);ctx.stroke();
- ctx.fillStyle='#1b1328';ctx.textAlign='left';ctx.textBaseline='top';lines.forEach((l,i)=>ctx.fillText(l,bx+14,by+10+i*lh));ctx.globalAlpha=1;
+ ctx.textAlign='left';ctx.textBaseline='top';let y=by+10;
+ rows.forEach(r=>{if(r.gap){ctx.strokeStyle='rgba(27,19,40,.25)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(bx+14,y+3);ctx.lineTo(bx+bw-14,y+3);ctx.stroke();y+=8;return;}
+  const f=`${r.crowd?'italic 600':'700'} ${fs}px system-ui,sans-serif`;ctx.font=f;let x=bx+14,t=r.t;
+  if(r.lab){ctx.fillStyle=r.crowd?'#7a1a12':'#4a2a7a';ctx.font=`800 ${fs}px system-ui,sans-serif`;const lw=ctx.measureText(r.lab).width;ctx.fillText(r.lab,x,y);x+=lw;t=r.t.slice(r.lab.length);ctx.font=f;}
+  ctx.fillStyle='#1b1328';ctx.fillText(t,x,y);y+=lh;});
+ ctx.globalAlpha=1;
 }
 function drawPop(){if(!pop)return;const k=1-pop.t/1.4;const sc=k<.15?k/.15*1.25:1.25-Math.min(.25,(k-.15)*.6);const fs=Math.min(W*.14,96)*sc;
  ctx.save();ctx.translate(W/2,H*.36);ctx.rotate(-.06);ctx.font=`900 ${fs}px system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=Math.min(1,pop.t*2);
