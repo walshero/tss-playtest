@@ -3,10 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dunk-O-Rama v0.2</title>
-<meta name="spec-source" content="claude/SPEC-DUNK-O-RAMA-2026-11-06.md">
-<meta name="audience" content="Founder playtest first; phone-first casual players at the carnival booth. Lab build.">
-<!-- TSP build: Dunk-O-Rama v0.2 | LAB | 2026-11-06 | single-file, offline, no external hosts
+<title>Dunk-O-Rama v0.3</title>
+<meta name="spec-source" content="convening/DUNK-O-RAMA-CONVENING.md">
+<meta name="audience" content="Founder playtest first; phone-first players, teens and college students learning to spot rhetorical cheats. Lab build.">
+<!-- TSP build: Dunk-O-Rama v0.3 | LAB | 2026-11-06
+     v0.3: every level teaches three rhetorical moves (12 in all). Each throw opens with a heckle;
+     from the second throw on, Call the move: name it right and your breath steadies and the target
+     looks bigger. Round card is a field guide (spot it, fair version) with a verified Twain maxim.
+     Lines written by the Twain seat; town issues only, no parties (inoculation research: Roozenbeek
+     et al., Science Advances 2022).
+     Earlier: 2026-11-06 | single-file, offline, no external hosts
      v0.2: cartoon glove on an elbow pivot replaces the slingshot; target hangs on two wires and
      sways/twists in the breeze; breathing sway on the aim (calm builds while you hold still,
      tremor after holding too long). Three modes on one button (Dark, Light, Sharp). Studio nav.
@@ -47,6 +53,18 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 #result h2{margin:0 0 6px;color:var(--accent);font-size:28px}
 #result p{margin:6px 0 14px;font-size:18px}
 #result .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+#callit{left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom));width:min(94vw,560px);padding:10px 12px;display:none;z-index:3;text-align:center}
+#callit .q{font-size:18px;font-weight:700;margin:0 0 8px}
+#callit .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#callit .chips button{flex:1 1 140px}
+#callit .teach{font-size:18px;line-height:1.4;margin:0;text-align:left}
+#callit .teach b{color:var(--accent)}
+#result{max-height:84vh;overflow:auto}
+#rGuide{text-align:left;margin:0 0 14px;padding-left:20px;font-size:18px;line-height:1.4}
+#rGuide li{margin:0 0 10px}
+#rGuide b{color:var(--accent)}
+#rTwain{font-size:18px;font-style:italic;margin:0 0 4px;text-align:left}
+#rTwainSrc{font-size:18px;margin:0 0 14px;text-align:left}
 .se-rail{position:fixed;left:calc(8px + env(safe-area-inset-left));bottom:calc(8px + env(safe-area-inset-bottom));display:flex;gap:8px;z-index:3}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 </style>
@@ -57,7 +75,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 <header class="se-chrome">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.2</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.3</span> <span class="tsp-labchip">LAB</span></h1>
   <div class="sp">
     <button id="seatBtn" aria-haspopup="dialog">Seat</button>
     <button id="modeBtn" class="icon" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" fill="currentColor" style="fill:var(--ink)"/></svg></button>
@@ -72,11 +90,16 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
   <p style="margin:12px 0 0"><button id="seatClose">Close</button></p>
 </div>
 
-<button id="hint">Grab the glove, pull back, let go<small>Hold still to steady your breath</small></button>
+<button id="hint">Grab the glove, pull back, let go<small>Hold still to steady your breath. Name the trick to steady it more.</small></button>
+
+<div id="callit" class="panel" role="group" aria-labelledby="callQ"><p class="q" id="callQ">Call the move</p><div class="chips" id="chips"></div><p class="teach" id="teach" aria-live="polite"></p></div>
 
 <div id="result" class="panel" role="dialog" aria-label="Round over">
   <h2 id="rTitle">Round over</h2>
   <p id="rText"></p>
+  <h3 style="margin:0 0 6px;font-size:20px;text-align:left">Field guide</h3>
+  <ul id="rGuide"></ul>
+  <p id="rTwain"></p><p id="rTwainSrc"></p>
   <div class="btns"><button id="rAgain">Throw again</button><button id="rNext">Next on the seat</button></div>
 </div>
 
@@ -107,31 +130,74 @@ const TGT={px:-1.6,top:3.65,len:1.95,z:11.4};
 const LAUNCH={x:0.18,y:1.25,z:1.5};
 
 const CAST=[
- {id:'fil',name:'Sen. Lyle Droneon',title:'The Filibusterer',level:'Easy. A light breeze, and he never stops talking.',
+ {id:'fil',name:'Sen. Lyle Droneon',title:'The Filibusterer',level:'Easy. Moves: red herring, appeal to tradition, Gish gallop. Light breeze.',
   suit:'#59647e',pants:'#454e63',tie:'#c8342b',skin:'#f0c4a0',bw:0.52,r:0.34,sway:0.5,tw:1,wind:0,
   idle:['And another thing. Section four, paragraph nine...','I yield my time to... myself.','Point of order! That was a practice throw.','I have forty more pages. Single-spaced.','Let the record show I am perfectly dry.'],
   miss:['Noted. Tabled. Forgotten.','Motion to dismiss that throw. Seconded by me.','The chair recognizes your miss.'],
   bonk:['That net was in the budget for a reason.','Out of order! You hit the procedure.'],
   dunk:["I'll be entering this splash into the record.",'Glub. The senator from the deep end yields.','Moist. Very moist. Moving on to page ten.']},
- {id:'spin',name:'Skip Twirl',title:'The Spin Doctor',level:'Medium. The target twists like his answers.',
+ {id:'spin',name:'Skip Twirl',title:'The Spin Doctor',level:'Medium. Moves: straw man, false dilemma, loaded language. The target twists.',
   suit:'#6a3fa0',pants:'#4b2c74',tie:'#ffd23f',skin:'#e7b48c',bw:0.46,r:0.31,sway:0.7,tw:2.1,wind:0,
   idle:['Let me reframe that throw for you.','Every miss is a win, if you squint.',"The target isn't twisting. It's evolving.",'Off the record? You throw like a committee.'],
   miss:['That miss was a strategic success.','Sources close to the ball say it was tired.','Historic restraint on your part.'],
   bonk:['The net and I are on message.','Hit the net? Bold choice. Wrong, but bold.'],
   dunk:['This water polls very well with me.','I meant to do that. Write it down.','Wet is the new dry. Trust me.']},
- {id:'mayor',name:'Mayor Bunting',title:'The Pork-Barrel Mayor',level:'Medium. Gusty. The breeze pushes the ball too.',
+ {id:'mayor',name:'Mayor Bunting',title:'The Pork-Barrel Mayor',level:'Medium. Moves: bandwagon, whataboutism, slippery slope. Gusts push the ball.',
   suit:'#2f6b4f',pants:'#244f3b',tie:'#c8342b',skin:'#f3c2a2',bw:0.7,r:0.33,sway:0.8,tw:1,wind:1,
   idle:['This ball was paid for with your taxes!','Ribbon-cutting at noon, so watch the suit.','I hereby declare this seat a historic landmark.','Feel that breeze? I ordered it.'],
   miss:["Ha! That's going in the newsletter.",'A miss! Free parking for everyone.','The wind is on my committee.'],
   bonk:['That net cost the town nine thousand dollars. Worth it.','Dent that net and I raise the fee.'],
   dunk:['I hereby name this puddle after myself.','Cancel the parade. And the hat.','Glub. Vote... glub... for me.']},
- {id:'lob',name:'Chet Ledger',title:'The Lobbyist',level:'Hard. Small target, big wind, never still.',
+ {id:'lob',name:'Chet Ledger',title:'The Lobbyist',level:'Hard. Moves: ad hominem, false authority, cherry picking. Small target, big wind.',
   suit:'#23345a',pants:'#1b2846',tie:'#2e9e5b',skin:'#eec3a0',bw:0.5,r:0.25,sway:1.15,tw:1.4,wind:0,
   idle:['What if missing paid really well?','My clients would prefer you aim left.',"Let's call this throw a donation.",'Nice breeze today. I paid for that too.'],
   miss:['Pleasure doing business.',"I'll send a fruit basket.",'Your miss has been noted by my clients.'],
   bonk:['The net is a valued partner.','I own the net. Indirectly.'],
   dunk:['Put that on my expense report.','Glub. Billable hours. Glub.','My clients are... disappointed.']}
 ];
+
+/* ---------- the moves (v0.3): what each level teaches ---------- */
+const MOVES={
+ red:{name:'Red herring',def:'Drags a shiny, unrelated topic across the trail so you lose the scent.',spot:'Did the answer ever touch the question?',fair:'Answer the question, then raise the other topic.'},
+ trad:{name:'Appeal to tradition',def:'Offers "we have always done it" as proof that it is right.',spot:'Ask why it was done that way, not how long.',fair:'Give the reason the old way still works.'},
+ gish:{name:'Gish gallop',def:'Floods you with more claims than anyone could check, so the pile passes for proof.',spot:'Pick one claim and ask for the evidence.',fair:'Make your best point and stand on it.'},
+ straw:{name:'Straw man',def:'Swaps your point for a flimsier one he can knock down.',spot:'Is that what was actually said?',fair:'Restate the other side so well they would agree, then answer it.'},
+ dilemma:{name:'False dilemma',def:'Offers two choices when there are more.',spot:'Look for the third option he left out.',fair:'Lay out the real range of options.'},
+ loaded:{name:'Loaded language',def:'Dresses a hard fact in soft words, or a soft fact in scary ones, so the words do your thinking.',spot:'Swap in plain words. Does it still sound fine?',fair:'Say the plain thing.'},
+ band:{name:'Bandwagon',def:'Offers a crowd as proof.',spot:'Ask what the claim rests on besides a head count.',fair:'Give the reason the people agree.'},
+ what:{name:'Whataboutism',def:'Answers a charge by pointing at somebody else\'s.',spot:'Is the first question still sitting there unanswered?',fair:'Answer for yourself, then raise the other matter.'},
+ slope:{name:'Slippery slope',def:'Claims one small step leads straight to disaster, with no proof of the steps between.',spot:'Ask for the evidence for each step.',fair:'Argue about the step actually on the table.'},
+ adhom:{name:'Ad hominem',def:'Attacks the person instead of the argument.',spot:'Would the claim be wrong if someone else said it?',fair:'Answer the evidence, whoever brought it.'},
+ auth:{name:'False authority',def:'Borrows a famous name or a costume in place of real expertise.',spot:'Is this person an expert in this exact thing, and do other experts agree?',fair:'Cite people who actually know the field.'},
+ cherry:{name:'Cherry picking',def:'Shows you the one good apple and hides the orchard.',spot:'Ask what the rest of the evidence says.',fair:'Show the whole picture, bad days included.'}
+};
+const LEVEL_MOVES={fil:['red','trad','gish'],spin:['straw','dilemma','loaded'],mayor:['band','what','slope'],lob:['adhom','auth','cherry']};
+/* Lines written on set by the Twain seat. Studio drafts for founder edit. Town issues only, no parties. */
+const LINES={
+ fil:{
+  red:['You ask about the pothole on Main Street. Let me ask you about the moon. Have you seen it lately? Magnificent.','Was the bridge money spent? A fair question. A fairer one: who brought the potato salad to the Fourth of July picnic? I did.','My opponent wants to talk about the school roof. I would rather talk about the flag on top of it. Look at it wave.'],
+  trad:['We have always plowed the north side first. My grandfather plowed it first. He was snowed in for most of his life, but he was consistent.','The town clock has run eleven minutes slow for ninety years. That is not a broken clock. That is heritage.','This tank has dropped a senator every summer since 1952. Why change a thing that works? Wait. Strike that.'],
+  gish:['I have nine reasons, which I will now list: one, two, three, the moon, taxes, my aunt, a sub-reason, page four, and nine.','Before you throw, consider my forty-one points. I will make them all at once so you cannot answer any of them.','The facts are on my side. All of them. Several hundred at once. Try checking them before the ball lands.']},
+ spin:{
+  straw:['My opponent wants a crosswalk on Elm Street. So he wants cars outlawed, horses back, and your grandmother walking to Ohio.','You want the library open on Sundays? Why do you hate weekends?','So you think I should answer questions. In other words, you want me interrogated under a hot lamp. Shameful.'],
+  dilemma:['Either we paint the bandstand gold, or we let the town slide into the sea. Choose.','You are with the parking meters, or you are with chaos. There is no third thing. I checked.','Dunk me, or love freedom. You cannot do both.'],
+  loaded:['The budget did not go over. It achieved surprise growth.','I did not miss the meeting. I gave it room to breathe.','That is not a pothole. It is a traffic-calming feature with historical depth.']},
+ mayor:{
+  band:['Everybody who is anybody supports the new parking garage. Ask them. They are all parked in it.','Ninety percent of the people at my birthday party agree with me.','The whole town is behind me. That roar you hear is them cheering. Or the Tilt-A-Whirl.'],
+  what:['You want to know where the snowplow money went? What about the time you returned a library book late?','Sure, I missed the budget vote. But you missed the target twice. Who is really missing things here?','My fence is on the neighbor\'s lawn? And what about the neighbor\'s lawn, sitting right under my fence?'],
+  slope:['Fix one pothole and they will want every pothole fixed, then sidewalks, then a moon base.','Give the dog park a water fountain, and next the dogs will want the vote.','Dunk me today, and tomorrow you dunk the fire chief. By Friday, nobody in this town is dry.']},
+ lob:{
+  adhom:['Why trust the crossing guard on traffic? Have you seen her hat?','The engineer says the bridge is unsafe. The engineer also drives a hatchback. Draw your own conclusions.','You cannot believe that kid about the lake. He is twelve, and he smells like the lake.'],
+  auth:['Four out of five dentists agree my client\'s candy is good policy. The fifth is not on the payroll yet.','A famous actor who played a doctor on television says the water is fine. Who are you to argue with television?','My cousin read a website about bridges. Engineering is settled.'],
+  cherry:['The factory smoked on 364 days last year. But the 365th? Clean as a whistle. Let\'s talk about the good day.','Of all the studies, I picked the one my client paid for. It is the shiniest.','Look at this one perfect tomato from the field by the factory. I rest my case.']}
+};
+/* Verified in Following the Equator (1897), Pudd'nhead Wilson's New Calendar and chapter text. */
+const TWAIN={
+ fil:{q:'It could probably be shown by facts and figures that there is no distinctly native American criminal class except Congress.',src:'Mark Twain, Following the Equator (1897)'},
+ spin:{q:'Truth is the most valuable thing we have. Let us economize it.',src:'Mark Twain, Following the Equator (1897)'},
+ mayor:{q:'It is by the goodness of God that in our country we have those three unspeakably precious things: freedom of speech, freedom of conscience, and the prudence never to practice either of them.',src:'Mark Twain, Following the Equator (1897)'},
+ lob:{q:'Often, the surest way to convey misinformation is to tell the strict truth.',src:'Mark Twain, Following the Equator (1897)'}
+};
 
 /* ---------- state ---------- */
 const MODES=['dark','light','sharp'],MODE_NAME={dark:'Dark',light:'Light',sharp:'Sharp'};
@@ -143,6 +209,7 @@ let t=0,rt=0,slow=1,slowT=0,shake=0,hitPause=0;
 let seatA=0,ch={yo:0,vy:0,rot:0,state:'sit',timer:0},glassWob=0,tgtFlash=0,wind=0,windShown=0;
 let tg={phi:0,dphi:0,psi:0,dpsi:0},gust=0,gustT=3;
 let breath={ph:0,calm:0,hold:0};
+let heck={active:false,move:null,called:null},heckN=0,heckOrder=[],thrown=0,rBoost=1,calmLock=false,stats={asked:0,right:0,seen:{}};
 let parts=[],rings=[],slosh=0,pop=null,bubble={text:'',t:0},idleT=3;
 
 /* ---------- audio ---------- */
@@ -192,7 +259,37 @@ addEventListener('keydown',e=>{if(e.key==='Escape')closeSheets();});
 
 function setCast(i){ci=i;c=CAST[i];balls=BALLS;dunks=0;streak=0;roundOver=false;ball=null;anim=null;trail=[];lastPath=[];
  ch={yo:0,vy:0,rot:0,state:'sit',timer:0};seatA=0;tg={phi:0,dphi:0,psi:0,dpsi:0};$('result').style.display='none';newWind();hud();
- say(pick(c.idle),3.5);announce(`${c.title}, ${c.name}, is on the seat. ${c.level}`);}
+ heck={active:false,move:null,called:null};heckN=0;thrown=0;rBoost=1;calmLock=false;stats={asked:0,right:0,seen:{}};$('callit').style.display='none';bubble.t=0;announce(`${c.title}, ${c.name}, is on the seat. ${c.level}`);}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pastMoves(){const out=[];for(const k of CAST){if(k===c)break;out.push(...LEVEL_MOVES[k.id]);}return out;}
+let lastLine='';
+function newHeckle(){
+ const set=LEVEL_MOVES[c.id];if(heckN%set.length===0)heckOrder=shuffle(set);
+ const mv=heckOrder[heckN%set.length];heckN++;
+ const pool=LINES[c.id][mv].filter(l=>l!==lastLine);const line=pick(pool.length?pool:LINES[c.id][mv]);lastLine=line;
+ heck={active:true,move:mv,called:null};say(line,999);
+ const ask=thrown>=1;
+ const box=$('callit');$('teach').textContent='';
+ if(ask){
+  const others=set.filter(m=>m!==mv),earlier=shuffle(pastMoves());
+  const d2=earlier.length&&Math.random()<.5?earlier[0]:pick(others.filter(m=>m!==others[0]))||others[1];
+  const chips=shuffle([mv,others[0],d2===mv?others[1]:d2]);
+  $('chips').innerHTML='';
+  chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=MOVES[id].name;b.onclick=()=>callMove(id);$('chips').appendChild(b);});
+  $('callQ').textContent='Call the move';$('callQ').style.display='block';box.style.display='block';
+  announce(`${c.name} says: ${line} Call the move: ${chips.map(i=>MOVES[i].name).join(', ')}.`);
+ }else{box.style.display='none';announce(`${c.name} says: ${line}`);}
+}
+function callMove(id){
+ if(heck.called!==null)return;const M=MOVES[heck.move];stats.asked++;stats.seen[heck.move]=1;
+ if(id===heck.move){heck.called=true;stats.right++;rBoost=1.22;calmLock=true;breath.calm=1;SFX.steady();setTimeout(()=>SFX.steady(),110);
+  $('teach').innerHTML=`<b>Called it: ${M.name}.</b> ${M.def} Your breath steadies and the target looks bigger.`;
+  announce(`Called it. ${M.name}. ${M.def}`);}
+ else{heck.called=false;tone(220,.18,'square',.05);
+  $('teach').innerHTML=`<b>Not quite. That was ${M.name}.</b> ${M.def} Spot it: ${M.spot}`;
+  announce(`Not quite. That was ${M.name}. ${M.def} Spot it: ${M.spot}`);}
+ $('chips').innerHTML='';$('callQ').style.display='none';
+}
 function newWind(){wind=c.wind?Math.round((Math.random()*6-3)*10)/10:0;}
 
 /* ---------- breathing ---------- */
@@ -208,7 +305,7 @@ function steadiness(){return breath.hold>5?'SHAKY':breath.calm>.8?'STEADY':'BREA
 function restPt(){return P(LAUNCH.x,LAUNCH.y,LAUNCH.z);}
 function maxPull(){return Math.min(W,H)*0.24;}
 function canThrow(){return !ball&&!anim&&balls>0&&!roundOver&&ch.state==='sit'&&!document.querySelector('.sheet.open');}
-cv.addEventListener('pointerdown',e=>{ac();if(!canThrow())return;cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=0;cv.style.cursor='grabbing';});
+cv.addEventListener('pointerdown',e=>{ac();if(!canThrow())return;cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';});
 cv.addEventListener('pointermove',e=>{if(!drag)return;drag.dx=e.clientX-drag.x0;drag.dy=e.clientY-drag.y0;drag.moved+=Math.hypot(e.clientX-drag.lx,e.clientY-drag.ly);drag.lx=e.clientX;drag.ly=e.clientY;});
 cv.addEventListener('pointerup',()=>{if(!drag)return;const d=drag;drag=null;cv.style.cursor='grab';if(Math.hypot(d.dx,d.dy)>14)release(d.dx,d.dy);});
 cv.addEventListener('pointercancel',()=>{drag=null;});
@@ -229,7 +326,7 @@ function launchState(dx,dy){
  return{x:LAUNCH.x,y:LAUNCH.y,z:LAUNCH.z,vx:-4.6*nx,vy:1+9*ny,vz:8+14*p,p,age:0,hitT:false,front:false,bonked:false};
 }
 function release(dx,dy){const v=aimPull(dx,dy);anim={v,t:0,launched:false};breath.hold=0;}
-function launch(v){ball=launchState(v[0],v[1]);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
+function launch(v){ball=launchState(v[0],v[1]);ball.rBoost=rBoost;rBoost=1;calmLock=false;thrown++;if(heck.move)stats.seen[heck.move]=1;heck.active=false;$('callit').style.display='none';bubble.t=Math.min(bubble.t,1.2);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
 
 /* ---------- physics ---------- */
 function tgtPos(){return{x:TGT.px+TGT.len*Math.sin(tg.phi),y:TGT.top-TGT.len*Math.cos(tg.phi)};}
@@ -249,8 +346,8 @@ function step(b,dt,live){
  if(!live)return;
  const cross=(zp)=>pz<zp&&b.z>=zp,at=(zp)=>{const k=(zp-pz)/(b.z-pz);return[px+(b.x-px)*k,py+(b.y-py)*k];};
  if(!b.hitT&&cross(TGT.z)){const[cx,cy]=at(TGT.z),T=tgtPos(),cw=Math.max(.12,Math.abs(Math.cos(tg.psi)));
-  const ex=(cx-T.x)/(c.r*cw+R*.6),ey=(cy-T.y)/(c.r+R*.6),e2=ex*ex+ey*ey;
-  const rx=(cx-T.x)/(c.r*cw+.07+R),ry=(cy-T.y)/(c.r+.07+R),r2=rx*rx+ry*ry;
+  const tr=c.r*(b.rBoost||1);const ex=(cx-T.x)/(tr*cw+R*.6),ey=(cy-T.y)/(tr+R*.6),e2=ex*ex+ey*ey;
+  const rx=(cx-T.x)/(tr*cw+.07+R),ry=(cy-T.y)/(tr+.07+R),r2=rx*rx+ry*ry;
   if(e2<1){b.hitT=true;b.z=TGT.z-.01;b.vz=-Math.abs(b.vz)*.35;b.vy=b.vy*.5+1.5;b.vx+=(cx-T.x)*4;tg.dphi+=b.vx*.25+(cx-T.x)*1.5;tg.dpsi+=(cx-T.x)*12;dunk(T);}
   else if(r2<1){b.hitT=true;b.z=TGT.z-.01;b.vz=-Math.abs(b.vz)*.3;b.vx+=(cx-T.x)*6;b.vy+=(cy-T.y)*6;tg.dpsi+=(cx-T.x)*16;tg.dphi+=(cx-T.x)*2;SFX.rim();rings.push({x:cx,y:cy,z:TGT.z,r:.05,a:1});say(pick(['So close it hurts.','Rim! Ha!','Ooh, the edge. Try again.']),2.2);announce('Off the rim.');}}
  if(!b.front&&cross(TANK.zf)){const[cx,cy]=at(TANK.zf);
@@ -284,6 +381,9 @@ function checkEnd(){if(ball||balls>0||roundOver)return;if(ch.state!=='sit'){setT
  roundOver=true;const key='best_'+c.id,best=store.get(key,0),nb=dunks>best;if(nb)store.set(key,dunks);
  $('rTitle').textContent=dunks===0?'Bone dry':dunks>=7?'Soaked':'Round over';
  $('rText').textContent=`${dunks} dunk${dunks===1?'':'s'} out of ${BALLS} on ${c.name}. ${nb?'New best!':'Best: '+Math.max(best,dunks)+'.'}`;
+ const g=$('rGuide');g.innerHTML='';LEVEL_MOVES[c.id].forEach(id=>{const M=MOVES[id];const li=document.createElement('li');li.innerHTML=`<b>${M.name}.</b> ${M.def} <br>Spot it: ${M.spot} <br>Fair version: ${M.fair}`;g.appendChild(li);});
+ $('rTwain').textContent='\u201c'+TWAIN[c.id].q+'\u201d';$('rTwainSrc').textContent=TWAIN[c.id].src;
+ if(stats.asked)$('rText').textContent+=` You called ${stats.right} of ${stats.asked} moves.`;
  $('result').style.display='block';$('rAgain').focus();announce($('rText').textContent);}
 
 /* ---------- update ---------- */
@@ -295,6 +395,7 @@ function frame(now){
  if(aiming){breath.hold+=rdt;const mv=aiming.moved;aiming.moved=0;
   if(mv>rdt*120)breath.calm=Math.max(0,breath.calm-.1);else breath.calm=Math.min(1,breath.calm+rdt/1.6);
   if(breath.hold>5)breath.calm=Math.max(0,breath.calm-rdt*.5);
+  if(calmLock){breath.calm=1;breath.hold=Math.min(breath.hold,3);}
   const st=steadiness()==='STEADY';if(st&&!wasSteady)SFX.steady();wasSteady=st;}
  else{breath.calm=0;wasSteady=false;}
  if(hitPause>0){hitPause-=rdt;draw();requestAnimationFrame(frame);return;}
@@ -322,7 +423,7 @@ function frame(now){
  slosh*=Math.pow(.35,dt);glassWob*=Math.pow(.02,dt);tgtFlash*=Math.pow(.05,dt);shake*=Math.pow(.004,rdt);
  if(pop){pop.t-=rdt;if(pop.t<=0)pop=null;}
  if(bubble.t>0)bubble.t-=rdt;
- if(!ball&&ch.state==='sit'&&!roundOver){idleT-=rdt;if(idleT<=0){idleT=5+Math.random()*3;if(bubble.t<=0&&!aiming)say(pick(c.idle));}}
+ if(canThrow()&&!heck.active&&bubble.t<=0.3&&!aiming)newHeckle();
  windShown+=(wind-windShown)*Math.min(1,rdt*3);
  draw();requestAnimationFrame(frame);
 }
@@ -373,6 +474,7 @@ function drawBackdrop(){
 }
 
 function drawTarget(){
+ const cr=c.r*(ball?(ball.rBoost||1):rBoost);
  const T=tgtPos(),p=P(T.x,T.y,TGT.z),z=TGT.z;
  const lp=P(TGT.px-.95,0,z),rp2=P(TGT.px+.95,0,z),lt=P(TGT.px-.95,TGT.top+.15,z),rt2=P(TGT.px+.95,TGT.top+.15,z);
  // frame: two posts and a crossbar
@@ -384,13 +486,13 @@ function drawTarget(){
  const cw=Math.cos(tg.psi),up={x:-Math.sin(tg.phi),y:Math.cos(tg.phi)},rt={x:Math.cos(tg.phi),y:Math.sin(tg.phi)};
  // two wires
  ctx.strokeStyle=mode==='light'?'#3a3340':'#e9e3f5';ctx.lineWidth=Math.max(1.5,p.s*.018);
- for(const sd of [-1,1]){const top=P(TGT.px+sd*.28,TGT.top+.15,z);const ax=T.x+up.x*c.r*.82+rt.x*sd*c.r*.5*cw,ay=T.y+up.y*c.r*.82+rt.y*sd*c.r*.5*cw;const a=P(ax,ay,z);
+ for(const sd of [-1,1]){const top=P(TGT.px+sd*.28,TGT.top+.15,z);const ax=T.x+up.x*cr*.82+rt.x*sd*cr*.5*cw,ay=T.y+up.y*cr*.82+rt.y*sd*cr*.5*cw;const a=P(ax,ay,z);
   ctx.beginPath();ctx.moveTo(top.x,top.y);ctx.lineTo(a.x,a.y);ctx.stroke();}
  // slack trip cord to the tank latch
- const bot=P(T.x-up.x*c.r,T.y-up.y*c.r,z),latch=P(TANK.x0,2.0,TANK.zf);
+ const bot=P(T.x-up.x*cr,T.y-up.y*cr,z),latch=P(TANK.x0,2.0,TANK.zf);
  ctx.strokeStyle='rgba(30,20,40,.85)';ctx.lineWidth=Math.max(1.5,p.s*.02);ctx.beginPath();ctx.moveTo(bot.x,bot.y);ctx.quadraticCurveTo((bot.x+latch.x)/2,Math.max(bot.y,latch.y)+p.s*.35,latch.x,latch.y);ctx.stroke();
  // disc: thickness then face
- const rpx=c.r*p.s,ang=-tg.phi,ew=Math.abs(cw);
+ const rpx=cr*p.s,ang=-tg.phi,ew=Math.abs(cw);
  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(ang);
  const th=Math.sin(tg.psi)*p.s*.07;
  ctx.lineWidth=1;ctx.strokeStyle=OUT;
@@ -400,7 +502,7 @@ function drawTarget(){
  [['#ffffff',1],['#c8342b',.8],['#ffffff',.58],['#c8342b',.36],['#ffd23f',.15]].forEach(([col,k],i)=>{ell(0,0,rpx*k*ew,rpx*k,face||i===0?col:'#b9b3c4',false);});
  if(tgtFlash>.05){ctx.globalAlpha=tgtFlash*.8;ell(0,0,(rpx+p.s*.06)*ew,rpx+p.s*.06,'#fff6c2',false);ctx.globalAlpha=1;}
  ctx.restore();
- for(const r of rings){const q=P(r.x,r.y,r.z);ctx.strokeStyle=`rgba(255,240,180,${Math.max(0,r.a)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(q.x,q.y,r.r*q.s+c.r*q.s,0,7);ctx.stroke();}
+ for(const r of rings){const q=P(r.x,r.y,r.z);ctx.strokeStyle=`rgba(255,240,180,${Math.max(0,r.a)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(q.x,q.y,r.r*q.s+cr*q.s,0,7);ctx.stroke();}
 }
 
 function waterEdge(z,amp){const pts=[];for(let i=0;i<=24;i++){const x=TANK.x0+(TANK.x1-TANK.x0)*i/24;const y=TANK.water+Math.sin(i*.9+t*6)*.03*amp+Math.sin(i*.37-t*3.4)*.05*amp;pts.push(P(x,y,z));}return pts;}
