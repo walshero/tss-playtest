@@ -2,6 +2,7 @@
 <html lang="en">
 <!--
   EN195 ARCADE (arcade.html, the TSP home arcade). Tight Spiral Studios.
+  v4 2026-09-25: The Asking Room added (founder: "Add the asking workshop game to the en195 arcade"), Weeks 9 and 10, before Workshop 4.
   v3 2026-09-24: promoted from en195-fall-arcade.html to arcade.html (founder: "I want this
   to be the new arcade"). Games link relative, so the arcade and the games travel together.
   MAINTENANCE: every date lives in the TERM and DUE block at the top of the script.
@@ -13,7 +14,7 @@
 
   Founder ask: "Create an updated en195 wraparound arcade that includes
   sandbags, dress rehearsal (new name), Kireji Pond, and Reading Lamp."
-  The arcade wraps around the semester: four games pinned to the weeks their
+  The arcade wraps around the semester: five games pinned to the weeks their
   workshops run, read from the FALL 2026 EN195-700 Course Schedule
   (Drive 1FKp4AAcM9WJMQczMUFinUX_QnbPQyhW6h3WYKbTzqjs, read 2026-09-23):
     Kireji Pond     Workshop 2 Poetry        Weeks 4-5   (#5.2 free verse due Oct 6)
@@ -38,7 +39,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>EN195 Wraparound Arcade</title>
-<meta name="description" content="Four practice games for EN195 Creative Writing, each pinned to the week its workshop runs.">
+<meta name="description" content="Five practice games for EN195 Creative Writing, each pinned to the week its workshop runs.">
 <style>
 :root{
   --bg:#f3ead8; --card:#fffaf0; --ink:#1f1b12; --ink2:#4a3d22; --line:#b8a57a;
@@ -152,12 +153,12 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
 
   <section class="hero" aria-labelledby="t">
     <p class="eyebrow" id="termLine">EN195 Creative Writing · Fall 2026</p>
-    <h1 id="t">Four games, one per workshop.</h1>
+    <h1 id="t">Five games for four workshops.</h1>
     <p class="lede">Each game practices one move the week before you need it on the page. They are practice: nothing is graded, and nothing you do here leaves your screen.</p>
 
     <!-- the semester as a paper ribbon: fifteen week tabs, the four workshops,
          a game pinned where each one opens, and a pin for this week -->
-    <div class="ribbonbox"><svg class="ribbon" id="ribbon" viewBox="0 0 1000 300" aria-hidden="true" focusable="false">
+    <div class="ribbonbox" data-hscroll><svg class="ribbon" id="ribbon" viewBox="0 0 1000 300" aria-hidden="true" focusable="false">
       <rect width="1000" height="300" fill="#e9dcc0"/>
       <g filter="url(#soft)">
         <path d="M-10 150 C120 118 220 176 360 146 C500 116 610 178 760 148 C860 128 930 150 1010 138 L1010 186 C930 198 860 176 760 196 C610 226 500 164 360 194 C220 224 120 166 -10 198 Z" fill="#c9b48a"/>
@@ -173,7 +174,7 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
     <p class="now" id="now" aria-live="polite">Loading this week.</p>
   </section>
 
-  <section class="cabs" aria-label="The four games" id="cabs"></section>
+  <section class="cabs" aria-label="The five games" id="cabs"></section>
 
   <p class="note">Every game runs in your browser on a phone or a laptop, with a dark mode button and no sign-in. Questions go to the Ask the Professor board on Blackboard.</p>
 
@@ -200,7 +201,7 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
 
   var BASE='';   /* the games sit beside this page */
   /* flip a flag to false to show a game's opening week instead of a Play link */
-  var READY={ kireji:true, lamp:true, rehearsal:true, sandbags:true };
+  var READY={ kireji:true, lamp:true, rehearsal:true, asking:true, sandbags:true, moves:true };
 
   function day(iso,endOfDay){ var p=iso.split('-'); return new Date(+p[0],+p[1]-1,+p[2],endOfDay?23:0,endOfDay?59:0); }
   var W1=day(TERM.week1), W2=day(TERM.week2), END=day(TERM.end,true);
@@ -255,6 +256,45 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
     frame(176,50,-3,'<rect x="10" y="30" width="22" height="34" rx="2" fill="none" stroke="#1d232b" stroke-width="2.4"/><line x1="10" y1="44" x2="32" y2="44" stroke="#1d232b" stroke-width="2.4"/><path d="M38 38 q5 6 0 12" stroke="#1d232b" stroke-width="2.4" fill="none"/>')+
     frame(250,58,2,'<circle cx="24" cy="26" r="7" fill="none" stroke="#1d232b" stroke-width="2.4"/><path d="M24 33 L24 50 M24 38 L14 46 M24 38 L36 46" stroke="#1d232b" stroke-width="2.4" fill="none"/><path d="M4 56 q10 -5 18 0" stroke="#1d232b" stroke-width="2.4" fill="none"/>')+
     frame(324,48,-2,'<rect x="4" y="4" width="40" height="52" fill="#ded9c8"/><path d="M2 36 q9 -8 18 -3 q8 -8 16 -2 q6 -3 10 2 l0 24 -44 0 Z" fill="#eae4d4"/><path d="M28 18 a8 8 0 1 1 -6 13" stroke="#3f4a54" stroke-width="2.2" fill="none" opacity=".6"/>');
+  }
+  function deck(){
+    var C=[['#23305a','<circle cx="52" cy="22" r="9" fill="#f4ecdc"/><path d="M14 52 q24 -10 50 0" stroke="#8fa2d6" stroke-width="3" fill="none"/>','M8 8 h8 v8 h-8z',0],
+           ['#1f4a3e','<rect x="37" y="12" width="4" height="34" fill="#f4ecdc"/><path d="M27 40 q12 12 24 0" stroke="#f4ecdc" stroke-width="4" fill="none"/><rect x="31" y="18" width="16" height="4" fill="#f4ecdc"/>','M8 8 h8 v8 h-8z',1],
+           ['#7a2e14','<rect x="24" y="22" width="32" height="20" rx="2" fill="#f4ecdc" transform="rotate(-14 40 32)"/><circle cx="40" cy="32" r="6" fill="#7a2e14"/>','M12 8 l5 9 h-10z',2],
+           ['#4a2346','<path d="M33 10 v18 M38 10 v18 M43 10 v18 M48 10 v18 M32 26 q8 10 16 0 M40 32 v20" stroke="#f4ecdc" stroke-width="3" fill="none"/>','M12 7 l5 5 -5 5 -5 -5z',3]];
+    var cards='';
+    [-26,-9,8,25].forEach(function(a,i){ var c=C[i];
+      cards+='<g transform="translate(200,236) rotate('+a+') translate(-39,-150)"><g filter="url(#cut)"><rect width="78" height="116" rx="6" fill="#f4ecdc"/>'+
+        '<rect x="4" y="4" width="70" height="66" rx="3" fill="'+c[0]+'"/></g>'+c[1]+
+        '<rect x="10" y="80" width="46" height="6" rx="2" fill="#1b1712"/><rect x="10" y="92" width="58" height="4" rx="2" fill="#6e5a3e"/><rect x="10" y="101" width="40" height="4" rx="2" fill="#6e5a3e"/></g>'; });
+    return ''+
+    '<rect width="400" height="260" fill="#e3d6b8"/>'+
+    '<ellipse cx="200" cy="120" rx="150" ry="110" fill="#f3e9d2" opacity=".7"/>'+
+    '<g filter="url(#soft)"><rect x="-10" y="200" width="420" height="70" fill="#8a6d4a"/><rect x="-10" y="196" width="420" height="8" fill="#a5835a"/></g>'+
+    cards+
+    '<g filter="url(#cut)" transform="rotate(-12 330 222)"><rect x="276" y="216" width="96" height="12" rx="2" fill="#e0a94b"/><path d="M372 216 l18 6 l-18 6z" fill="#e9d2a6"/><path d="M384 220 l6 2 l-6 2z" fill="#1b1712"/><rect x="266" y="216" width="12" height="12" rx="2" fill="#c96a5a"/></g>';
+  }
+  function asking(){ var ppl=[[92,'#5f7d4e','#a86f48','#241810'],[146,'#0F5F5A','#8a5a3c','#1d1712'],[200,'#B4511A','#d9a67c','#3b2415'],[254,'#6a4466','#c48a5e','#6b4a2a'],[308,'#c9a13b','#6e4630','#2b1d14']].map(function(q){
+      return '<path d="M'+(q[0]-18)+' 170 q2 -38 18 -38 q16 0 18 38 Z" fill="'+q[1]+'"/><circle cx="'+q[0]+'" cy="112" r="12" fill="'+q[2]+'"/>'+
+        '<path d="M'+(q[0]-12)+' 112 q0 -15 12 -15 q13 0 12 14 q-5 -7 -12 -7 q-7 0 -12 8 Z" fill="'+q[3]+'"/>'+
+        '<circle cx="'+(q[0]-4)+'" cy="115" r="1.5" fill="#140d07"/><circle cx="'+(q[0]+4)+'" cy="115" r="1.5" fill="#140d07"/><path d="M'+(q[0]-4)+' 120 q4 3 8 0" stroke="#140d07" stroke-width="1.2" fill="none"/>'; }).join('');
+    return ''+
+    '<rect width="400" height="260" fill="#f1e4c8"/><rect y="176" width="400" height="84" fill="#c89c6c"/>'+
+    '<g filter="url(#cut)"><rect x="20" y="16" width="86" height="92" rx="3" fill="#9a7a52"/><rect x="26" y="22" width="74" height="80" fill="#a9d4ee"/><circle cx="80" cy="42" r="10" fill="#ffe08a"/>'+
+    '<path d="M26 102 V84 q9 -12 18 -5 q9 -10 18 0 q10 -5 14 6 q10 0 24 7 V102 Z" fill="#6f9a5a"/><rect x="61" y="22" width="4" height="80" fill="#9a7a52"/><rect x="26" y="60" width="74" height="4" fill="#9a7a52"/></g>'+
+    '<path d="M130 14 q120 30 250 0" stroke="#9a7a52" stroke-width="1.6" fill="none"/>'+
+    '<g filter="url(#cut)"><path d="M146 18 l7 13 l7 -11 Z M190 26 l7 13 l7 -12 Z M236 29 l7 13 l7 -13 Z M282 25 l7 12 l7 -12 Z M328 17 l7 12 l7 -12 Z" fill="#B4511A"/>'+
+    '<path d="M168 23 l7 13 l7 -12 Z M213 28 l7 13 l7 -13 Z M259 28 l7 12 l7 -12 Z M305 22 l7 12 l7 -12 Z" fill="#0F5F5A"/></g>'+
+    '<path d="M26 30 L100 46 L230 200 L100 200 Z" fill="#fff1c4" opacity=".35"/>'+
+    '<g filter="url(#cut)">'+ppl+'</g>'+
+    '<g filter="url(#cut)"><ellipse cx="200" cy="184" rx="176" ry="34" fill="#8a5634"/><ellipse cx="200" cy="174" rx="176" ry="32" fill="#b87a47"/>'+
+    '<rect x="110" y="160" width="14" height="14" rx="2" fill="#fbf5e6"/><rect x="286" y="164" width="14" height="14" rx="2" fill="#0F5F5A"/>'+
+    '<rect x="186" y="152" width="28" height="22" fill="#fffaf0" stroke="#8a6a45" stroke-width=".8" transform="rotate(-6 200 163)"/>'+
+    '<path d="M191 159 h18 M191 164 h16 M191 169 h12" stroke="#8a6a45" stroke-width="1.2" transform="rotate(-6 200 163)"/>'+
+    '<rect x="150" y="176" width="26" height="18" rx="2" fill="#fffaf0" stroke="#1f1b12" stroke-width="1.2" transform="rotate(-10 163 185)"/>'+
+    '<rect x="232" y="178" width="22" height="15" fill="#fffaf0" stroke="#8a6a45" stroke-width=".8" transform="rotate(8 243 185)"/></g>'+
+    '<g filter="url(#cut)"><path d="M20 260 v-18 q4 -26 44 -26 q40 0 44 26 v18 Z" fill="#7d8fa8"/><circle cx="64" cy="208" r="19" fill="#3b2a1e"/>'+
+    '<path d="M292 260 v-18 q4 -26 44 -26 q40 0 44 26 v18 Z" fill="#a45c3c"/><path d="M316 212 q0 -24 20 -24 q20 0 20 24 q0 6 -20 6 q-20 0 -20 -6 Z" fill="#8a6440"/></g>';
   }
   function frame(x,y,r,inner){ return '<g transform="translate('+x+','+y+') rotate('+r+')" filter="url(#cut)">'+
     '<line x1="30" y1="-8" x2="30" y2="0" stroke="#1d232b" stroke-width="2"/>'+
@@ -315,10 +355,18 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
      when:'Workshop 3: 10-Minute Play · Weeks 7 to 9',
      what:'Each scene hides a secret. Pick the move, the line, or the silence that stages it, and the house tells you whether it saw the secret or was told it.',
      hook:'Pairs with on-the-nose dialogue (#8.3). Play before you submit your play (#9.1'+due('9.1')+').'},
+    {id:'asking', title:'The Asking Room', from:9, to:10, again:0, pinDx:-10, file:'the-asking-room.html', art:asking,
+     when:'Before Workshop 4: Flash Fiction \u00b7 Weeks 9 and 10',
+     what:'Sit at the workshop table with three drafts. Notice what a draft is really doing, then say it so it helps the writer. The Advocate strikes praise, verdicts, fix-its and guesses about the writer.',
+     hook:'Practice being an Asker before you workshop your classmates\u2019 flash stories in Workshop 4.'},
     {id:'sandbags', title:'Sandbags', from:10, to:11, again:13, file:'sandbags.html', art:balloon,
      when:'Workshop 4: Flash Fiction · Weeks 10 and 11, again Week 13',
      what:'Every word is a sandbag. Cut the ones a flash piece can fly without. Cut a word the story leans on, twice, and it crashes.',
-     hook:'Play before your flash story (#11.4'+due('11.4')+'), then again while you revise for the portfolio (#14.2'+due('14.2')+').'}
+     hook:'Play before your flash story (#11.4'+due('11.4')+'), then again while you revise for the portfolio (#14.2'+due('14.2')+').'},
+    {id:'moves', title:'Writerly Moves', from:0, to:-1, again:0, file:'writerly-moves-deck.html', art:deck,
+     when:'All semester \u00b7 keep it open while you write',
+     what:'Thirty craft moves on cut-paper cards. Turn a card over for what the move does and something to try. A pencil on every line lets you rewrite a card in your own words.',
+     hook:'Reach for it while you draft and before you give feedback. The Workshop Diagnostic cards are the questions a workshop asks of a draft.'}
   ];
 
   var today=new Date(), wk=weekOf(today);
@@ -329,7 +377,7 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
   GAMES.forEach(function(g){
     var a=document.createElement('article'); a.className='cab'; a.setAttribute('aria-labelledby','h-'+g.id);
     var act = READY[g.id]
-      ? '<a class="play" href="'+BASE+g.file+'">Play '+g.title+'</a>'
+      ? '<a class="play" href="'+(g.href||BASE+g.file)+'">Play '+g.title+'</a>'
       : '<span class="soon">Opens Week '+g.from+', '+range(g.from).split(' to ')[0]+'</span>';
     a.innerHTML='<svg class="art" viewBox="0 0 400 260" aria-hidden="true" focusable="false">'+g.art()+'</svg>'+
       '<span class="stampx"'+(live(g)?'':' hidden')+'>THIS WEEK</span>'+
@@ -365,11 +413,13 @@ h1{ margin:0; font-size:clamp(34px,6vw,58px); line-height:1.05; font-weight:bold
     kireji:'<circle r="30" fill="#1F3A5F"/><path d="M-16 8 C-14 -6 0 -12 14 -6 C22 -2 22 8 14 10 C2 14 -10 14 -16 8 Z" fill="#7C8C3A"/><circle cx="-6" cy="-6" r="4" fill="#B98A2E"/>',
     lamp:'<circle r="30" fill="#cfe0e2"/><circle r="22" fill="url(#lampglow)"/><path d="M-14 4 L14 4 L8 -14 L-8 -14 Z" fill="#8a6322"/><rect x="-2" y="4" width="4" height="16" fill="#7e3a22"/>',
     rehearsal:'<circle r="30" fill="#2c2b30"/><path d="M-26 -18 L-6 -18 C-9 0 -10 12 -12 22 L-26 22 Z M26 -18 L6 -18 C9 0 10 12 12 22 L26 22 Z" fill="#b8452e"/><circle cy="10" r="6" fill="#F4C542"/>',
+    asking:'<circle r="30" fill="#f1e4c8"/><ellipse cy="10" rx="24" ry="8" fill="#b87a47"/><circle cx="-12" cy="-6" r="6" fill="#B4511A"/><circle cx="0" cy="-10" r="6" fill="#0F5F5A"/><circle cx="12" cy="-6" r="6" fill="#c9a13b"/><rect x="-5" y="4" width="10" height="7" fill="#fffaf0"/>',
     sandbags:'<circle r="30" fill="#cf9c5c"/><path d="M0 -22 C-12 -22 -16 -10 -16 -2 c0 10 8 14 12 20 h8 c4 -6 12 -10 12 -20 0 -8 -4 -20 -16 -20 z" fill="#9a4321"/><path d="M0 -22 c-5 0 -7 10 -7 20 0 10 4 14 5 20 h4 c1 -6 5 -10 5 -20 0 -10 -2 -20 -7 -20 z" fill="#efe3c6"/><rect x="-6" y="20" width="12" height="7" fill="#b98f5c"/>'
   };
   var pins='';
   GAMES.forEach(function(g){
-    var x=30+(g.from-1)*67, y=yAt(x)-78;
+    if(g.from<1) return;   /* an all-semester tool has no week to pin */
+    var x=30+(g.from-1)*67+(g.pinDx||0), y=yAt(x)-78;
     pins+='<line x1="'+x+'" y1="'+(y+30)+'" x2="'+x+'" y2="'+(yAt(x)-20)+'" stroke="#1f1b12" stroke-width="2.4"/>'+
       '<g transform="translate('+x+','+y+')" filter="url(#cut)"><circle r="34" fill="#fffaf0"/>'+ICON[g.id]+'</g>';
   });
