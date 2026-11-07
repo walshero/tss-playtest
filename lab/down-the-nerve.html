@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Down the Nerve v0.8</title>
+<title>Down the Nerve v0.11</title>
 <meta name="spec-source" content="claude/SPEC-DOWN-THE-NERVE-v0.8-AUDIO-2026-11-06.md">
 <meta name="audience" content="Founder playtest first. Audience ruling D4 still open (12 and up, mapped to OpenStax, recommended). Lab build.">
 <!-- tsp:source claude/SPEC-DOWN-THE-NERVE-2026-11-05.md; convening/DOWN-THE-NERVE-CONVENING.md (D12 Brainbow, S.T.U.N. Runner feel); Tight Spiral Studios -->
@@ -61,7 +61,7 @@ a{color:#9cc8f2}
 @media (prefers-color-scheme: dark){:root{--bg:#04050a;--panel:#0d1220;--panel2:#141b2e;--ink:#eef2f6;--rule:#8f9bb0}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:560px){#bar .title .name{display:none}#bar{gap:6px;padding-left:6px;padding-right:6px}#bal{width:96px}#speed .unit{max-width:96px}}
-</style>
+#msgs{position:fixed;z-index:4;left:0;right:0;top:calc(58px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 8px}#msgs.low{top:auto;bottom:calc(112px + env(safe-area-inset-bottom))}#msgs.sl,#msgs.sr{width:min(46vw,340px);align-items:stretch}#msgs.sl>*,#msgs.sr>*{width:auto!important;max-width:100%!important;white-space:normal!important}#msgs.sl{right:auto;left:8px}#msgs.sr{left:auto;right:8px}#msgs>*{position:static!important;transform:none!important;left:auto!important;top:auto!important;bottom:auto!important;max-width:min(560px,94vw)}#msgs #steerHint{pointer-events:auto}#replay{top:calc(52px + env(safe-area-inset-top));bottom:auto!important;background:linear-gradient(rgba(4,5,10,.96) 70%,rgba(4,5,10,0))!important;padding:10px 16px 18px!important}#cards .cath{grid-column:1/-1;margin:6px 0 0}#cards .cath h3{margin:4px 0;font-size:20px}#cards .cath p{margin:2px 0 4px;font-size:18px;line-height:1.4}.src{color:#c7cfdb;font-size:16px}.wk small{display:block;font-size:16px;font-weight:600;color:#c7cfdb}.wk span{display:block}#cards .back{grid-column:1/-1;justify-self:start;min-height:44px}#cards .info{grid-column:1/-1;background:#141b2e;border:2px solid #4a5568;border-radius:12px;padding:8px 12px}#cards .info h3{margin:2px 0 4px;font-size:20px}#cards .info .wt{font-size:16px;color:#c7cfdb;font-weight:600}#cards .info p{margin:4px 0;font-size:18px;line-height:1.45}#fxp{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 12px;font-size:18px;margin:6px 0}#fxp svg{vertical-align:middle}.howto{margin-top:10px}.howto summary{min-height:44px;display:flex;align-items:center;font-size:18px;font-weight:700;cursor:pointer}</style>
 </head>
 <body>
 <div id="backdrop" aria-hidden="true"></div>
@@ -69,35 +69,37 @@ a{color:#9cc8f2}
 
 <header id="bar" class="ui">
   <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/lab/" aria-label="Studio home">Studio</a>
-  <span class="title"><span class="name">Down the Nerve</span><span class="chip">v0.8</span><span class="chip tsp-labchip">LAB</span></span>
+  <span class="title"><span class="name">Down the Nerve</span><span class="chip">v0.11</span><span class="chip tsp-labchip">LAB</span></span>
   <button class="btn" id="bRestart" type="button" aria-label="Restart the ride">Back</button>
   <button class="btn" id="bLib" type="button">Library</button>
   <button class="btn" id="bComfort" type="button">Comfort</button>
 </header>
 
 <div id="inset" class="ui" aria-live="polite"><div class="disc" id="insetPic"></div><div class="cap" id="insetCap"></div></div>
-<div id="toast" class="ui" role="status" aria-live="polite"></div>
+<div id="msgs"><div id="toast" class="ui" role="status" aria-live="polite"></div>
 <div id="effect" class="ui" role="status" aria-live="assertive"></div>
-<button id="steerHint" class="btn primary ui" type="button">Hold the left or right side to steer</button>
+<button id="steerHint" class="btn primary ui" type="button">Hold the left or right side to steer</button></div>
 <div id="replay" class="ui" role="region" aria-label="Checkpoint replay"><div class="rtag">REPLAY</div><p id="replayCap" aria-live="polite"></p><button class="btn" id="bSkipReplay" type="button">Skip replay</button></div>
 
 <div id="tray" class="ui" role="region" aria-labelledby="hT">
   <div class="top">
     <div style="flex:1;min-width:220px"><h2 id="hT">Load a week</h2>
-    <p class="sub">Use a week like yours, or any week. Nothing is saved. Each cube you load pops up during the ride: bads widen the frayed bands, greens narrow them. The week also sets how many landing spines wait at the thinking cortex.</p></div>
+    <p class="sub">Use a week like yours, or any week. Nothing is saved. Open a category, read what the research says, and add blocks. On the ride, steer into greens and around reds and frayed bands. The panel below shows what this week will change.</p></div>
     <svg id="trayBal" viewBox="0 0 150 96" role="img" aria-label="Balance"><path d="M75 52 l-14 34 h28 z" fill="#4a5568"/><g id="tBeam"><line x1="12" y1="52" x2="138" y2="52" stroke="#eef2f6" stroke-width="5" stroke-linecap="round"/><g id="tL"></g><g id="tR"></g></g></svg>
     <svg id="preview" viewBox="0 0 150 96" role="img" aria-label="Thinking cortex landing spines"></svg>
   </div>
+  <div id="fxp" aria-live="polite"></div><p class="sub" id="trayReadout" aria-live="polite"></p>
+  <div id="cards"></div>
+  <div class="row" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" id="bRide" type="button">Ride this week</button><button class="btn" id="bCalm" type="button">Calm road (no week)</button></div>
+  <details class="howto"><summary>How the ride works</summary>
   <div class="legend" aria-label="How the ride works">
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><g stroke="#ff4fa3" stroke-width="2" stroke-linecap="round"><path d="M15 15 L15 3 M15 15 L25 8 M15 15 L27 18 M15 15 L20 27 M15 15 L9 27 M15 15 L3 19 M15 15 L5 7"/></g><circle cx="15" cy="15" r="4" fill="#ff4fa3"/></svg>You ride one fiber in a circuit. After a bad, the thorny alarm fibers fire harder. After a green, the thinking fibers light up and grow new tips.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><defs><clipPath id="lgc"><path d="M2 9 h26 v12 h-26z"/></clipPath></defs><path d="M2 9 h26 v12 h-26z" fill="#ff8020"/><g clip-path="url(#lgc)" stroke="#260a00" stroke-width="3"><path d="M-2 24 l12 -18 M6 24 l12 -18 M14 24 l12 -18 M22 24 l12 -18"/></g><path d="M4 9 l-1 -5 M9 9 l1 -6 M15 9 l-1 -4 M21 9 l1 -6 M26 9 l0 -4 M5 21 l1 5 M12 21 l-1 6 M19 21 l1 4 M25 21 l-1 5" stroke="#ffc285" stroke-width="2"/></svg>Frayed bands (striped, loose fibers) slow you down.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M3 5 l23 -2 l2 23 l-24 2 z" fill="#ff4fa3" stroke="#eef2f6" stroke-width="2"/></svg>Bads: frayed bands get wider and you slow. Hit three and the signal fades.</div>
-    <div><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="2" width="26" height="26" rx="9" fill="#6dff8a" stroke="#eef2f6" stroke-width="2"/></svg>Greens: frayed bands get narrower. They do not change your speed.</div>
+    <div><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="2" width="26" height="26" rx="9" fill="#6dff8a" stroke="#eef2f6" stroke-width="2"/></svg>Greens: steer into them. Frayed bands get narrower. They do not change your speed.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="11" fill="none" stroke="#ffd23f" stroke-width="3"/><circle cx="15" cy="15" r="6" fill="none" stroke="#ffd23f" stroke-width="3"/></svg>Yellow double rings are checkpoints.</div>
   </div>
-  <div id="cards"></div>
-  <p class="sub" id="trayReadout" aria-live="polite"></p>
-  <div class="row" style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" id="bRide" type="button">Ride this week</button><button class="btn" id="bCalm" type="button">Calm road (no week)</button></div>
+  </details>
 </div>
 <div id="hud" class="ui">
   <svg id="bal" viewBox="0 0 120 70" role="img" aria-label="Balance: level">
@@ -126,7 +128,7 @@ a{color:#9cc8f2}
   <ul><li>Bright rings: gaps in the insulation (nodes). The signal leaps from node to node, which is why it is fast.</li>
   <li>Frayed bands: damaged insulation, drawn as amber stripes with loose fibers at the edges. They slow you, and hitting one counts as a hit.</li>
   <li>Red cubes (rough edges) are bads: a short night, a test, a phone at 2 a.m. Every bad that pops up or that you hit makes the frayed bands wider and slows you. Three hits and the signal fades; you go back to the last checkpoint.</li>
-  <li>Green cubes (rounded) are goods: sleep, a walk, a friend, a meal, practice. Every green makes the frayed bands narrower. Nothing in the ride speeds you up; the bright rings show the signal leaping, at a steady speed.</li>
+  <li>Green cubes (rounded) are goods: sleep, a walk, a friend, a meal, practice. Steer into a green and the frayed bands get narrower. Nothing in the ride speeds you up; the bright rings show the signal leaping, at a steady speed.</li>
   <li>Yellow double rings: checkpoints, halfway through each leg and at each relay.</li>
   <li>The end of each fiber: a gap, then the next neuron's landing spines. Line up with a lit spine to land.</li>
   <li>Before each ride you load a week onto the balance. Every card in the deck: short night, test tomorrow, phone at 2 a.m., missed bus, loud room (stress); real sleep, a walk, a friend, a good meal, practice (support). Each card you load shows up as a picture during the ride. Choose the calm road to ride with no week.</li>
@@ -139,6 +141,7 @@ a{color:#9cc8f2}
   <li>Radley et al., 2005 and 2006: spine loss after repeated stress, and recovery.</li>
   <li>The Resilience Balance, as taught in MassBay's Toolkit of Trauma-Informed Pedagogies &amp; Practices, after the Alberta Family Wellness Initiative's Resilience Scale.</li>
   <li>Tube and objects: studio drawings in the style of Brainbow imaging (Livet et al., 2007).</li></ul>
+  <h3>The week: research behind each block</h3><ul><li><b>Short nights</b> (stress, weight 2): After a night without sleep, the brain's alarm center reacted over 60% more strongly to upsetting pictures. (Yoo et al., 2007, Current Biology)</li><li><b>Phone in bed</b> (stress, weight 1): Reading on a lit screen before bed delayed sleep and the sleep hormone melatonin, compared with a printed book. (Chang et al., 2015, PNAS)</li><li><b>Test tomorrow</b> (stress, weight 1): Short stress can take the brain's planning center offline within minutes. It comes back when the stress passes. (Arnsten, 2009, Nature Reviews Neuroscience)</li><li><b>Deadlines piling up</b> (stress, weight 2): Stress that feels out of your control hits harder. A sense of control lets the planning center calm the alarm. (Maier and Seligman, 2016, Psychological Review)</li><li><b>Skipped meals</b> (stress, weight 2): In a national survey of about 86,000 students, 48% at two-year colleges had faced food insecurity in the past 30 days. (Hope Center #RealCollege report, 2019)</li><li><b>Rent due</b> (stress, weight 2): In the Hope Center's national survey, 60% of two-year college students had faced housing insecurity in the past year. (Hope Center #RealCollege report, 2019)</li><li><b>Shift before class</b> (stress, weight 1): In 2020, 40% of full-time and 74% of part-time undergraduates were working while enrolled. (National Center for Education Statistics, 2022)</li><li><b>Missed the bus</b> (stress, weight 1): A surprise you cannot control is the kind of stress that lands hardest; predictable stress is easier to absorb. (Maier and Seligman, 2016, Psychological Review)</li><li><b>Loud, crowded room</b> (stress, weight 1): Children at schools under flight paths read worse the louder the aircraft noise. (Stansfeld et al., 2005, The Lancet (RANCH study))</li><li><b>Feeling alone</b> (stress, weight 2): Across 148 studies, people with stronger social ties had 50% better odds of survival over the study periods. (Holt-Lunstad et al., 2010, PLOS Medicine)</li><li><b>A full night of sleep</b> (builder, weight 2): Adults need 7 or more hours a night. About a third of U.S. adults get less. (Centers for Disease Control and Prevention)</li><li><b>A walk or workout</b> (builder, weight 1): Exercise raises BDNF, a protein that helps new connections between neurons grow. (van Praag; reviewed in Liu and Nusslock, 2018, Frontiers in Neuroscience)</li><li><b>A friend who listens</b> (builder, weight 2): In a lab stress test, men who had their best friend with them beforehand had lower stress-hormone (cortisol) responses. (Heinrichs et al., 2003, Biological Psychiatry)</li><li><b>A professor who cares</b> (builder, weight 1): Graduates who had a professor who cared, one who made them excited to learn, and a mentor had more than double the odds of being engaged at work. (Gallup-Purdue Index, 2014)</li><li><b>Practice</b> (builder, weight 1): Skills and abilities set the balance point: with more skill, the same weight tips the scale less. (Alberta Family Wellness Initiative, Resilience Scale)</li><li><b>Slow breathing</b> (builder, weight 1): Breathing slowly, about six breaths a minute, raises heart-rate variability, a sign the body's calming system is working. (Zaccaro et al., 2018, Frontiers in Human Neuroscience)</li><li><b>An if-then plan</b> (builder, weight 1): Across 94 studies, if-then plans ("If it's 7 p.m., then I start the essay") helped people reach goals, a medium-to-large effect. (Gollwitzer and Sheeran, 2006, Advances in Experimental Social Psychology)</li><li><b>Time outside</b> (builder, weight 1): People who spent at least 120 minutes a week in nature were more likely to report good health and well-being. (White et al., 2019, Scientific Reports)</li><li><b>A group where you belong</b> (builder, weight 1): A one-hour activity showing new students that worries about belonging are common and fade raised Black students' grades over three years. (Walton and Cohen, 2011, Science)</li><li><b>Campus food pantry</b> (builder, weight 1): Basic-needs gaps are common (48% food insecurity at two-year colleges), so campuses run pantries and emergency aid. Using them is support, not failure. (Hope Center #RealCollege report, 2019)</li><li>Weights are a studio simplification: long-running loads, basic needs, isolation, full sleep and close friends weigh 2; single events weigh 1. After the Harvard Center on the Developing Child: duration and support decide how hard stress lands.</li></ul>
   <h3>Outside the tube</h3>
   <p>You are riding one fiber in a circuit. The fibers beside you belong to neighboring neurons, joined at cell bodies and cross-links. The racing lights are signals moving through that circuit; when a signal reaches a cell body it can jump across a link to the next fiber. Behind the circuit, dimmed, are Santiago Ramón y Cajal's ink drawings of the region you are in; flashes of lightning light up parts of them.</p>
   <h3>What the lights mean</h3>
@@ -152,7 +155,7 @@ a{color:#9cc8f2}
 
 <div class="sheet" id="sFade" role="dialog" aria-modal="true" aria-labelledby="hF"><div class="card">
   <h2 id="hF">The signal faded</h2>
-  <p>Three hits. What's happening here: each hard thing widened the bad bands until there was almost no clear path left. Greens narrow them again.</p>
+  <p>Three hits. What's happening here: damaged insulation can stop a signal. Each hard thing widened the frayed bands until there was almost no clear path left. Greens narrow them again.</p>
   <div class="row"><button class="btn primary" id="bCp">Back to the checkpoint</button><button class="btn" id="bFadeWeek">Change the week</button></div>
 </div></div>
 <div class="sheet" id="sEnd" role="dialog" aria-modal="true" aria-labelledby="hE"><div class="card">
@@ -191,38 +194,56 @@ function dcurve(f,u){return (f(u+0.5)-f(u-0.5));}
 var STEERED=false,hintShown=null,steerHint=document.getElementById('steerHint');
 steerHint.onclick=function(){firstTouch();steerHint.style.display='none';hintShown=false;};
 function buildRun(w){
-  var m=w?weekModel(w):{tilt:0,pads:5,drift:0,red:0,green:0,prac:0};
+  var m=w?weekModel(w):{tilt:0,pads:5,drift:0,red:0,green:0,prac:0,R:0,G:0,band0:0.7,clAdj:0};
   var stressed=m.tilt>0.15;
   legs=[{name:'Fingertip to brainstem',len:230,realM:1.0},
         {name:'Brainstem to thalamus',len:120,realM:0.12},
         {name:'Thalamus to sensory cortex',len:110,realM:0.10},
         {name:'Sensory cortex to thinking cortex',len:120,realM:0.08}];
   nodes=[];feats=[];syns=[];pickups=[];checkpoints=[];var s=0;
+  var chosen=w?DECK.filter(function(c){return w[c.id];}):[];
+  var poolR=chosen.filter(function(c){return c.t==='r';}),poolG=chosen.filter(function(c){return c.t==='g';});
+  if(!poolR.length)poolR=DECK.filter(function(c){return c.t==='r';});if(!poolG.length)poolG=DECK.filter(function(c){return c.t==='g';});
+  var pR=w?Math.max(0.25,Math.min(0.75,0.5+0.05*(m.R-m.G))):0.5;
   var alarm=rnd(0,TAU);
   legs.forEach(function(L,i){
     L.start=s;L.end=s+L.len;
     for(var n=s+6;n<L.end-10;n+=7)nodes.push({s:n,hit:false});
     for(var fs=s+(i===0?34:22);fs<L.end-16;fs+=rnd(26,34)-i*1.5)feats.push({s:fs,len:2.6,a:rnd(0,TAU),wm:rnd(0.85,1.15),hit:false,warned:false});
-    for(var pk=0;pk<4;pk++){var ps=s+26+(L.len-48)*(pk+0.5)/4;var gd=pk%2===1;var pool=DECK.filter(function(c){return gd?c.t==='g':c.t==='r';});pickups.push({s:ps,a:rnd(0,TAU),good:gd,hit:false,card:pool[Math.floor(Math.random()*pool.length)]});}
+    var lf=feats.filter(function(f){return f.s>=L.start&&f.s<L.end;});
+    // blocks never share a stretch with a frayed band: 8 units clear on both sides of a cluster
+    function clearSpan(ps,span){var prev=L.start,next=L.end;lf.forEach(function(f){if(f.s<=ps&&f.s>prev)prev=f.s;if(f.s>ps&&f.s<next)next=f.s;});
+      if(ps-prev>=8&&next-(ps+span)>=8)return ps;if(next-prev>=16+span)return (prev+next-span)/2;
+      lf.forEach(function(f){if(f.s>ps-8&&f.s<ps+span+8){var k=feats.indexOf(f);if(k>=0)feats.splice(k,1);}});return ps;}
+    // clusters: reds arrive as a wall of 1-4 side by side, greens as a line of 1-4 to ride along.
+    // size grows with each leg and with how much of that kind the week carries.
+    for(var gi=0;gi<4;gi++){
+      var bad=gi===0?pR>=0.5:gi===1?pR<0.5:Math.random()<pR;
+      var n=bad?Math.max(1,Math.min(4,1+Math.floor(i*0.6+m.R*0.2+Math.random()*0.9)+m.clAdj)):Math.min(4,1+Math.floor(i*0.4+m.G*0.25+Math.random()*0.9));
+      var span=bad?0.6:(n-1)*1.6,ps=clearSpan(s+26+(L.len-48)*(gi+0.5)/4,span),a0=rnd(0,TAU),pool=bad?poolR:poolG;
+      for(var k=0;k<n;k++){var card=pool[Math.floor(Math.random()*pool.length)];
+        pickups.push(bad?{s:ps+(k%2)*0.6,a:a0+(k-(n-1)/2)*0.5,good:false,hit:false,card:card,grp:i*10+gi,n:n}
+                        :{s:ps+k*1.6,a:a0,good:true,hit:false,card:card,grp:i*10+gi,n:n});}
+    }
     checkpoints.push({s:s+L.len/2,leg:i,passed:false});
     var last=i===3,pads=[],np=last?m.pads:5;
     if(last&&stressed){var base=alarm+Math.PI;var spread=np===2?[-0.7,0.95]:null;
       if(spread)pads=[base+spread[0],base+spread[1]];else for(var p=0;p<np;p++)pads.push(base-1.2+p*2.4/(np-1||1));}
     else{var off=rnd(0,TAU);for(var q=0;q<np;q++)pads.push(off+q*TAU/np);}
-    syns.push({s:L.end,pads:pads,tol:last&&stressed?0.34:0.42,done:false});
+    var apads=[];if(last&&stressed){for(var ap=0;ap<7;ap++)apads.push(alarm-1.0+ap*2.0/6);}
+    syns.push({s:L.end,pads:pads,tol:last&&stressed?0.34:0.42,done:false,gap:last&&stressed?5.5:4,last:last,stressed:last&&stressed,apads:apads,w:last&&stressed?Math.max(0.35,np/5):1,need:3,fill:0,afill:0,tries:0});
     s=L.end+4;
   });
   // outside pictures: one per loaded card, spread across the ride
-  var chosen=w?DECK.filter(function(c){return w[c.id];}):[];
-  var total=legs[3].end, pics=chosen.map(function(c,i){return {s:20+(total-80)*(i+0.5)/Math.max(1,chosen.length),card:c,shown:false};});
-  var band0=Math.max(0.45,Math.min(1.6,0.7+0.15*m.red-0.12*m.green));
+  var total=legs[3].end, pics=[]; // founder 2026-11-06: no pop-up cards during the ride
+  var band0=m.band0!==undefined?m.band0:0.7;
   run={s:0,v:4,theta:Math.PI/2,leg:0,realM:0,realMs:0,stressed:stressed,model:m,week:w,alarm:alarm,
        drift:0,driftRate:m.drift,slowT:0,boostT:0,goodT:0,flash:0,flashCol:'#ff4fa3',over:false,faded:false,pics:pics,firstInput:false,
        toldNode:false,toldFray:false,missCount:0,band:band0,bandT:band0,bandPulse:0,hits:0,floatTxt:null,floatT:0};
   saveCp();drawHits();
-  setBalance(m.tilt,m.green>0);
+  setBalance(m.tilt,m.green,m.red);
   document.getElementById('legname').textContent=legs[0].name;
-  insetEl.style.display='none';bgFrom=bgTo=0;bgMix=1;FIB=null;PUL=[];LINKS=[];BOLTS=[];SPROUTS=[];FX={type:0,t:9,dim:0,glow:0};
+  insetEl.style.display='none';bgFrom=bgTo=0;bgMix=1;FIB=null;PUL=[];LINKS=[];BOLTS=[];SPROUTS=[];FX={type:0,t:9,dim:0,glow:0};run.lm=null;BURST=[];RING=null;
 }
 
 
@@ -231,27 +252,16 @@ var BANDMAX=2.0,BANDMIN=0.35;
 function effect(good,title,icon){
   var e=document.getElementById('effect');var ic=icon?'<svg viewBox="0 0 34 34" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px">'+icon+'</svg>':'';
   if(good){run.bandT=Math.max(BANDMIN,run.bandT-0.3);run.flash=0.6;run.flashCol='#6dff8a';
-    e.className='ui good';e.innerHTML=ic+title+'<small>Bad bands narrower. Thinking fibers light up and grow.</small>';forestReact(true);run.floatTxt='+ clear path';sfxGood();}
+    e.className='ui good';e.innerHTML=ic+title;forestReact(true);run.floatTxt='+ clear path';sfxGood();}
   else{run.bandT=Math.min(BANDMAX,run.bandT+0.32);run.v=Math.max(1.5*S.speed,run.v*0.45);run.slowT=0.9;run.flash=0.6;run.flashCol='#ff4fa3';
-    e.className='ui bad';e.innerHTML=ic+title+'<small>Bad bands wider. Slower. Alarm fibers fire.</small>';forestReact(false);run.floatTxt='- speed';sfxBad();}
+    e.className='ui bad';e.innerHTML=ic+title;forestReact(false);run.floatTxt='- speed';sfxBad();}
   run.bandPulse=1;run.floatT=1.2;e.style.display='block';effectT=2.2;
   callout(spoken(title));logEvent(good,title);
 }
 var effectT=0;
 var SAY={'Hit a frayed band':'Frayed band'};
 function spoken(title){if(SAY[title])return SAY[title];for(var i=0;i<DECK.length;i++){if(DECK[i].cap===title)return DECK[i].label;}return title;}
-var WHY={
- night:'A short night. The bands widened and you slowed. In the brain, short nights thin the landing places in the thinking cortex. They come back.',
- test:'A test tomorrow. One hard moment dims the thinking road for a while. It relights when the moment passes.',
- phone:'A phone at 2 a.m. means broken sleep. Short nights thin the landing places. They come back.',
- bus:'A missed bus. Stress stacks, and the alarm road gets louder. That is the body protecting you.',
- loud:'A loud room. The alarm road fires. It is built to protect you, and it quiets when things calm down.',
- sleep:'Real sleep. Landing places relight overnight, so the bands narrowed.',
- walk:'A walk. Moving helps new landing places grow, so the bands narrowed.',
- friend:'A friend. The alarm road calms and the thinking road relights, so the bands narrowed.',
- meal:'A good meal. Support the world gives you, so the bands narrowed.',
- practice:'Practice. A road you ride again grows more landing places.',
- fray:'A frayed band. That is damaged insulation, and the signal crawls through it.'};
+var WHY={"night": "Short nights. The alarm system runs hot after lost sleep.", "phone": "A phone in bed means later, lighter sleep.", "test": "A test tomorrow. One hard moment dims the thinking road for a while.", "pile": "Deadlines piling up. Stress that feels out of control weighs more.", "food": "Skipped meals. When basics are missing, everything costs more.", "rent": "Rent due. A shaky floor makes every task heavier.", "work": "A shift before class. Time squeezed from both ends.", "bus": "A missed bus. Surprises stack when the day has no slack.", "loud": "A loud room. Noise taxes attention.", "alone": "Feeling alone. The alarm road gets louder without people around.", "sleep": "A full night of sleep. Landing places relight overnight.", "walk": "A walk. Moving helps new connections grow.", "friend": "A friend. Support buffers the stress response.", "prof": "A professor who cares. Support at school counts.", "practice": "Practice. The balance point moves.", "breath": "Slow breathing. The calming system switches on.", "plan": "An if-then plan. A plan turns a pile into steps.", "outside": "Time outside. A place that settles you.", "club": "A group where you belong. Belonging lowers the load.", "pantry": "The campus pantry. Help lightens the load.", "fray": "A frayed band. That is damaged insulation, and the signal crawls through it."};
 function whyFor(title){if(title==='Hit a frayed band')return WHY.fray;for(var i=0;i<DECK.length;i++){if(DECK[i].cap===title)return WHY[DECK[i].id]||title;}return title;}
 // ---------- v0.8 replay recorder ----------
 var REC=[],EVT=[],RP=null;
@@ -269,7 +279,7 @@ function nextClip(){RP.hidden.forEach(function(p){p.hit=true;});RP.hidden=[];RP.
   var c=RP.clips[RP.ci];RP.fi=c.a;
   var lo=REC[c.a].s,hi=REC[c.b].s+1;pickups.forEach(function(p){if(p.hit&&p.s>=lo&&p.s<=hi){p.hit=false;RP.hidden.push(p);}});
   var line=whyFor(c.e.title);document.getElementById('replayCap').textContent=line;speak(line,true);}
-function endReplay(){if(!RP)return;RP.hidden.forEach(function(p){p.hit=true;});var L=RP.live;for(var k in L)run[k]=L[k];RP=null;resetRec();
+function endReplay(){if(!RP)return;if(run.endAfter){run.endAfter=false;setTimeout(function(){run.over=true;openSheet('sEnd');},50);}RP.hidden.forEach(function(p){p.hit=true;});var L=RP.live;for(var k in L)run[k]=L[k];RP=null;resetRec();
   document.getElementById('replay').style.display='none';document.getElementById('hud').style.display='flex';last=performance.now();try{speechSynthesis.cancel();}catch(e){}}
 function stepReplay(dt){var c=RP.clips[RP.ci];RP.fi+=dt*60*0.35;var i=Math.min(c.b,Math.floor(RP.fi)),fr=REC[i];for(var k in fr)run[k]=fr[k];
   if(fr.flash>0.3){}if(RP.fi>=c.b+20){nextClip();}}
@@ -278,11 +288,12 @@ document.getElementById('bSkipReplay').onclick=function(){endReplay();};
 var warmDone=false;
 function buildWarmup(){buildRun(null);run.warm=true;feats=[];checkpoints=[];run.pics=[];
   var gc=DECK.filter(function(c){return c.id==='friend';})[0],rc=DECK.filter(function(c){return c.id==='night';})[0];
-  pickups=[{s:30,a:Math.PI/2,good:true,hit:false,card:gc,warm:'Supports clear the path.'},{s:52,a:Math.PI/2,good:false,hit:false,card:rc,warm:'Stress takes away places to land.'}];
+  pickups=[{s:30,a:Math.PI/2,good:true,hit:false,card:gc,warm:'Supports narrow the frayed bands.'},{s:52,a:Math.PI/2,good:false,hit:false,card:rc,warm:'Stress widens the frayed bands.'}];
   run.warmEnd=70;}
 function endWarmup(){warmDone=true;var fi=run.firstInput;run.warm=false;speak('Now load a week.',false);buildRun(null);run.firstInput=fi;openTray();}
 function hit(title,icon){
   run.hits++;run.assist=Math.max(0.72,(run.assist||1)-0.1);drawHits();effect(false,title,icon);
+  if(run.hits===2){setTimeout(function(){if(AC&&S.sound){tone(880,0.12,'square',0.06);setTimeout(function(){tone(660,0.16,'square',0.06);},150);}speak('One hit left',false);},950);}
   if(run.hits>=3){run.faded=true;setTimeout(function(){speak('The signal faded.',false);openSheet('sFade');},500);}
 }
 function drawHits(){var h=document.getElementById('hits');var out='';for(var i=0;i<3;i++){out+= i<run.hits
@@ -297,49 +308,71 @@ function restoreCp(){var c=run.cp;run.s=c.s;run.leg=c.leg;run.band=run.bandT=c.b
   document.getElementById('legname').textContent=legs[run.leg].name;drawHits();bgFrom=bgTo=run.leg;bgMix=1;toast('Back at the checkpoint. Hits reset.',3);resetRec();}
 
 // ---------- week deck ----------
-var DECK=[
- {id:'night',label:'Short night',t:'r',cap:'Short night, 4 hours',ic:'<circle cx="24" cy="12" r="7" fill="#ffd23f"/><circle cx="27" cy="10" r="6" fill="#141b2e"/><rect x="4" y="22" width="26" height="8" rx="3" fill="#8f9bb0"/>'},
- {id:'test',label:'Test tomorrow',t:'r',cap:'Test tomorrow, 8 a.m.',ic:'<rect x="7" y="4" width="20" height="26" rx="2" fill="#d9e2ee"/><path d="M11 11h12M11 16h12M11 21h8" stroke="#141b2e" stroke-width="2"/>'},
- {id:'phone',label:'Phone at 2 a.m.',t:'r',cap:'Phone buzzing, 2:14 a.m.',ic:'<rect x="10" y="3" width="14" height="28" rx="3" fill="#d9e2ee"/><rect x="12" y="7" width="10" height="18" fill="#3fd6ff"/>'},
- {id:'bus',label:'Missed bus',t:'r',cap:'Missed the bus, in the rain',ic:'<rect x="3" y="8" width="28" height="16" rx="3" fill="#ffd23f"/><circle cx="10" cy="26" r="3" fill="#d9e2ee"/><circle cx="24" cy="26" r="3" fill="#d9e2ee"/><rect x="6" y="11" width="22" height="6" fill="#141b2e"/>'},
- {id:'loud',label:'Loud room',t:'r',cap:'A loud, crowded room',ic:'<path d="M5 13h6l7-6v20l-7-6H5z" fill="#d9e2ee"/><path d="M22 10q5 7 0 14M26 7q8 10 0 20" stroke="#d9e2ee" stroke-width="2" fill="none"/>'},
- {id:'sleep',label:'Real sleep',t:'g',cap:'A full night of sleep',ic:'<circle cx="24" cy="10" r="6" fill="#ffd23f"/><rect x="4" y="20" width="26" height="9" rx="3" fill="#6dff8a"/><path d="M6 20q5-6 11 0" fill="#d9e2ee"/>'},
- {id:'walk',label:'A walk',t:'g',cap:'A walk outside',ic:'<circle cx="17" cy="6" r="4" fill="#d9e2ee"/><path d="M17 11l-3 9 4 4-2 7M15 15l-5 4M17 15l6 3M14 20l-4 10" stroke="#d9e2ee" stroke-width="3" fill="none" stroke-linecap="round"/>'},
- {id:'friend',label:'A friend',t:'g',cap:'A friend on the steps',ic:'<circle cx="11" cy="9" r="4" fill="#d9e2ee"/><circle cx="23" cy="9" r="4" fill="#6dff8a"/><path d="M5 30q6-14 12 0M17 30q6-14 12 0" fill="#d9e2ee"/>'},
- {id:'meal',label:'A good meal',t:'g',cap:'A good meal',ic:'<ellipse cx="17" cy="20" rx="13" ry="7" fill="#d9e2ee"/><ellipse cx="17" cy="18" rx="8" ry="4" fill="#6dff8a"/>'},
- {id:'practice',label:'Practice',t:'g',cap:'Practice, the same road again',ic:'<path d="M5 26q12-24 24 0" stroke="#6dff8a" stroke-width="4" fill="none"/><path d="M5 20q12-18 24 0" stroke="#d9e2ee" stroke-width="2" fill="none"/>'}
-];
-var week={night:true,phone:true,test:true,walk:true,friend:false,sleep:false,meal:false,practice:false,bus:false,loud:false};
+var DECK=[{"id": "night", "label": "Short nights", "t": "r", "cat": "sleep", "w": 2, "cap": "Short nights, all week", "fact": "After a night without sleep, the brain's alarm center reacted over 60% more strongly to upsetting pictures.", "src": "Yoo et al., 2007, Current Biology", "ic": "<circle cx=\"24\" cy=\"12\" r=\"7\" fill=\"#ffd23f\"/><circle cx=\"27\" cy=\"10\" r=\"6\" fill=\"#141b2e\"/><rect x=\"4\" y=\"22\" width=\"26\" height=\"8\" rx=\"3\" fill=\"#8f9bb0\"/>"}, {"id": "phone", "label": "Phone in bed", "t": "r", "cat": "sleep", "w": 1, "cap": "Phone buzzing, 2:14 a.m.", "fact": "Reading on a lit screen before bed delayed sleep and the sleep hormone melatonin, compared with a printed book.", "src": "Chang et al., 2015, PNAS", "ic": "<rect x=\"10\" y=\"3\" width=\"14\" height=\"28\" rx=\"3\" fill=\"#d9e2ee\"/><rect x=\"12\" y=\"7\" width=\"10\" height=\"18\" fill=\"#3fd6ff\"/>"}, {"id": "test", "label": "Test tomorrow", "t": "r", "cat": "school", "w": 1, "cap": "Test tomorrow, 8 a.m.", "fact": "Short stress can take the brain's planning center offline within minutes. It comes back when the stress passes.", "src": "Arnsten, 2009, Nature Reviews Neuroscience", "ic": "<rect x=\"7\" y=\"4\" width=\"20\" height=\"26\" rx=\"2\" fill=\"#d9e2ee\"/><path d=\"M11 11h12M11 16h12M11 21h8\" stroke=\"#141b2e\" stroke-width=\"2\"/>"}, {"id": "pile", "label": "Deadlines piling up", "t": "r", "cat": "school", "w": 2, "cap": "Three deadlines, one week", "fact": "Stress that feels out of your control hits harder. A sense of control lets the planning center calm the alarm.", "src": "Maier and Seligman, 2016, Psychological Review", "ic": "<rect x=\"6\" y=\"18\" width=\"22\" height=\"5\" fill=\"#d9e2ee\"/><rect x=\"8\" y=\"12\" width=\"20\" height=\"5\" fill=\"#8f9bb0\"/><rect x=\"5\" y=\"6\" width=\"22\" height=\"5\" fill=\"#d9e2ee\"/><rect x=\"7\" y=\"24\" width=\"20\" height=\"5\" fill=\"#8f9bb0\"/>"}, {"id": "food", "label": "Skipped meals", "t": "r", "cat": "basics", "w": 2, "cap": "Skipped lunch again", "fact": "In a national survey of about 86,000 students, 48% at two-year colleges had faced food insecurity in the past 30 days.", "src": "Hope Center #RealCollege report, 2019", "ic": "<ellipse cx=\"17\" cy=\"21\" rx=\"13\" ry=\"7\" fill=\"#d9e2ee\"/><ellipse cx=\"17\" cy=\"19\" rx=\"8\" ry=\"4\" fill=\"#141b2e\"/><path d=\"M8 6l18 22\" stroke=\"#ff4fa3\" stroke-width=\"3\"/>"}, {"id": "rent", "label": "Rent due", "t": "r", "cat": "basics", "w": 2, "cap": "Rent due Friday", "fact": "In the Hope Center's national survey, 60% of two-year college students had faced housing insecurity in the past year.", "src": "Hope Center #RealCollege report, 2019", "ic": "<path d=\"M4 16 L17 5 L30 16 V30 H4z\" fill=\"#d9e2ee\"/><rect x=\"13\" y=\"20\" width=\"8\" height=\"10\" fill=\"#141b2e\"/><circle cx=\"26\" cy=\"9\" r=\"5\" fill=\"#ffd23f\"/>"}, {"id": "work", "label": "Shift before class", "t": "r", "cat": "time", "w": 1, "cap": "Closing shift, then class", "fact": "In 2020, 40% of full-time and 74% of part-time undergraduates were working while enrolled.", "src": "National Center for Education Statistics, 2022", "ic": "<rect x=\"5\" y=\"11\" width=\"24\" height=\"17\" rx=\"2\" fill=\"#d9e2ee\"/><rect x=\"12\" y=\"6\" width=\"10\" height=\"6\" rx=\"2\" fill=\"none\" stroke=\"#d9e2ee\" stroke-width=\"2\"/><rect x=\"5\" y=\"17\" width=\"24\" height=\"3\" fill=\"#8f9bb0\"/>"}, {"id": "bus", "label": "Missed the bus", "t": "r", "cat": "time", "w": 1, "cap": "Missed the bus, in the rain", "fact": "A surprise you cannot control is the kind of stress that lands hardest; predictable stress is easier to absorb.", "src": "Maier and Seligman, 2016, Psychological Review", "ic": "<rect x=\"3\" y=\"8\" width=\"28\" height=\"16\" rx=\"3\" fill=\"#ffd23f\"/><circle cx=\"10\" cy=\"26\" r=\"3\" fill=\"#d9e2ee\"/><circle cx=\"24\" cy=\"26\" r=\"3\" fill=\"#d9e2ee\"/><rect x=\"6\" y=\"11\" width=\"22\" height=\"6\" fill=\"#141b2e\"/>"}, {"id": "loud", "label": "Loud, crowded room", "t": "r", "cat": "place", "w": 1, "cap": "A loud, crowded room", "fact": "Children at schools under flight paths read worse the louder the aircraft noise.", "src": "Stansfeld et al., 2005, The Lancet (RANCH study)", "ic": "<path d=\"M5 13h6l7-6v20l-7-6H5z\" fill=\"#d9e2ee\"/><path d=\"M22 10q5 7 0 14M26 7q8 10 0 20\" stroke=\"#d9e2ee\" stroke-width=\"2\" fill=\"none\"/>"}, {"id": "alone", "label": "Feeling alone", "t": "r", "cat": "people", "w": 2, "cap": "Nobody to text back", "fact": "Across 148 studies, people with stronger social ties had 50% better odds of survival over the study periods.", "src": "Holt-Lunstad et al., 2010, PLOS Medicine", "ic": "<circle cx=\"17\" cy=\"10\" r=\"5\" fill=\"#d9e2ee\"/><path d=\"M8 30q9-18 18 0\" fill=\"#d9e2ee\"/><circle cx=\"5\" cy=\"27\" r=\"2\" fill=\"#8f9bb0\"/><circle cx=\"29\" cy=\"27\" r=\"2\" fill=\"#8f9bb0\"/>"}, {"id": "sleep", "label": "A full night of sleep", "t": "g", "cat": "body", "w": 2, "cap": "A full night of sleep", "fact": "Adults need 7 or more hours a night. About a third of U.S. adults get less.", "src": "Centers for Disease Control and Prevention", "ic": "<circle cx=\"24\" cy=\"10\" r=\"6\" fill=\"#ffd23f\"/><rect x=\"4\" y=\"20\" width=\"26\" height=\"9\" rx=\"3\" fill=\"#6dff8a\"/><path d=\"M6 20q5-6 11 0\" fill=\"#d9e2ee\"/>"}, {"id": "walk", "label": "A walk or workout", "t": "g", "cat": "body", "w": 1, "cap": "A walk outside", "fact": "Exercise raises BDNF, a protein that helps new connections between neurons grow.", "src": "van Praag; reviewed in Liu and Nusslock, 2018, Frontiers in Neuroscience", "ic": "<circle cx=\"17\" cy=\"6\" r=\"4\" fill=\"#d9e2ee\"/><path d=\"M17 11l-3 9 4 4-2 7M15 15l-5 4M17 15l6 3M14 20l-4 10\" stroke=\"#d9e2ee\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/>"}, {"id": "friend", "label": "A friend who listens", "t": "g", "cat": "kin", "w": 2, "cap": "A friend on the steps", "fact": "In a lab stress test, men who had their best friend with them beforehand had lower stress-hormone (cortisol) responses.", "src": "Heinrichs et al., 2003, Biological Psychiatry", "ic": "<circle cx=\"11\" cy=\"9\" r=\"4\" fill=\"#d9e2ee\"/><circle cx=\"23\" cy=\"9\" r=\"4\" fill=\"#6dff8a\"/><path d=\"M5 30q6-14 12 0M17 30q6-14 12 0\" fill=\"#d9e2ee\"/>"}, {"id": "prof", "label": "A professor who cares", "t": "g", "cat": "kin", "w": 1, "cap": "A professor who answers", "fact": "Graduates who had a professor who cared, one who made them excited to learn, and a mentor had more than double the odds of being engaged at work.", "src": "Gallup-Purdue Index, 2014", "ic": "<circle cx=\"12\" cy=\"9\" r=\"4\" fill=\"#6dff8a\"/><path d=\"M5 30q7-15 14 0\" fill=\"#6dff8a\"/><rect x=\"18\" y=\"8\" width=\"13\" height=\"10\" rx=\"2\" fill=\"#d9e2ee\"/><path d=\"M20 12h9M20 15h6\" stroke=\"#141b2e\" stroke-width=\"1.5\"/>"}, {"id": "practice", "label": "Practice", "t": "g", "cat": "skills", "w": 1, "cap": "Practice, the same road again", "fact": "Skills and abilities set the balance point: with more skill, the same weight tips the scale less.", "src": "Alberta Family Wellness Initiative, Resilience Scale", "ic": "<path d=\"M5 26q12-24 24 0\" stroke=\"#6dff8a\" stroke-width=\"4\" fill=\"none\"/><path d=\"M5 20q12-18 24 0\" stroke=\"#d9e2ee\" stroke-width=\"2\" fill=\"none\"/>"}, {"id": "breath", "label": "Slow breathing", "t": "g", "cat": "skills", "w": 1, "cap": "Six slow breaths", "fact": "Breathing slowly, about six breaths a minute, raises heart-rate variability, a sign the body's calming system is working.", "src": "Zaccaro et al., 2018, Frontiers in Human Neuroscience", "ic": "<path d=\"M6 17q5-9 11 0t11 0\" stroke=\"#6dff8a\" stroke-width=\"3\" fill=\"none\"/><path d=\"M6 24q5-6 11 0t11 0\" stroke=\"#d9e2ee\" stroke-width=\"2\" fill=\"none\"/>"}, {"id": "plan", "label": "An if-then plan", "t": "g", "cat": "skills", "w": 1, "cap": "If 7 p.m., then essay", "fact": "Across 94 studies, if-then plans (\"If it's 7 p.m., then I start the essay\") helped people reach goals, a medium-to-large effect.", "src": "Gollwitzer and Sheeran, 2006, Advances in Experimental Social Psychology", "ic": "<rect x=\"6\" y=\"6\" width=\"22\" height=\"24\" rx=\"2\" fill=\"#d9e2ee\"/><path d=\"M10 13l3 3 5-6M10 22l3 3 5-6\" stroke=\"#14301f\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M20 14h5M20 23h5\" stroke=\"#141b2e\" stroke-width=\"2\"/>"}, {"id": "outside", "label": "Time outside", "t": "g", "cat": "belong", "w": 1, "cap": "Time outside", "fact": "People who spent at least 120 minutes a week in nature were more likely to report good health and well-being.", "src": "White et al., 2019, Scientific Reports", "ic": "<path d=\"M17 4 L27 20 H7z\" fill=\"#6dff8a\"/><path d=\"M17 12 L29 28 H5z\" fill=\"#3fbf6a\"/><rect x=\"15\" y=\"27\" width=\"4\" height=\"5\" fill=\"#8f6a4a\"/>"}, {"id": "club", "label": "A group where you belong", "t": "g", "cat": "belong", "w": 1, "cap": "Your club meets tonight", "fact": "A one-hour activity showing new students that worries about belonging are common and fade raised Black students' grades over three years.", "src": "Walton and Cohen, 2011, Science", "ic": "<circle cx=\"9\" cy=\"11\" r=\"3.5\" fill=\"#d9e2ee\"/><circle cx=\"17\" cy=\"9\" r=\"3.5\" fill=\"#6dff8a\"/><circle cx=\"25\" cy=\"11\" r=\"3.5\" fill=\"#d9e2ee\"/><path d=\"M3 28q6-12 12 0M11 26q6-13 12 0M19 28q6-12 12 0\" fill=\"#d9e2ee\"/>"}, {"id": "pantry", "label": "Campus food pantry", "t": "g", "cat": "help", "w": 1, "cap": "The campus pantry", "fact": "Basic-needs gaps are common (48% food insecurity at two-year colleges), so campuses run pantries and emergency aid. Using them is support, not failure.", "src": "Hope Center #RealCollege report, 2019", "ic": "<rect x=\"7\" y=\"10\" width=\"20\" height=\"20\" rx=\"2\" fill=\"#d9e2ee\"/><rect x=\"11\" y=\"5\" width=\"12\" height=\"7\" rx=\"2\" fill=\"#6dff8a\"/><path d=\"M11 18h12M11 23h12\" stroke=\"#141b2e\" stroke-width=\"2\"/>"}];
+var CATS=[{"id": "sleep", "t": "r", "name": "Sleep", "intro": "Sleep is when the brain resets its emotional circuits. Lose it and the alarm system runs hot the next day.", "fx": "Each sleep block also takes one landing spine from the thinking cortex."}, {"id": "school", "t": "r", "name": "School pressure", "intro": "Short bursts, like a test, are positive stress: you rise to them and recover. A pile that never clears is heavier.", "fx": "Weighs on the balance. A pile of deadlines weighs double."}, {"id": "basics", "t": "r", "name": "Money and basics", "intro": "Food and a place to live are the floor everything else stands on. When the floor shakes, every other task costs more.", "fx": "Heavy blocks: each weighs double on the balance."}, {"id": "time", "t": "r", "name": "Time squeeze", "intro": "When every hour is spoken for, small surprises stack up with nowhere to go.", "fx": "Red block groups on the ride get one block bigger."}, {"id": "place", "t": "r", "name": "Surroundings", "intro": "Where you are shapes how hard everything else is.", "fx": "Frayed bands start wider."}, {"id": "people", "t": "r", "name": "Feeling alone", "intro": "Feeling cut off is a real load on the body, not just a mood.", "fx": "The alarm road pulls harder at the thinking cortex."}, {"id": "body", "t": "g", "name": "Body", "intro": "Sleep and movement change the brain's chemistry, and over time its structure.", "fx": "Adds one landing spine at the thinking cortex."}, {"id": "kin", "t": "g", "name": "People", "intro": "Support from other people buffers the body's stress response.", "fx": "The alarm road pulls less."}, {"id": "skills", "t": "g", "name": "Skills", "intro": "Skills move the balance point, so the same weight tips you less. This is the fulcrum on the balance.", "fx": "Slides the balance point toward the reds."}, {"id": "belong", "t": "g", "name": "Places and belonging", "intro": "Places that settle you and groups that include you lower the load you carry.", "fx": "Frayed bands start narrower."}, {"id": "help", "t": "g", "name": "Help and resources", "intro": "Using help is a skill, not a weakness. Colleges run pantries and emergency aid because basic needs are common.", "fx": "Red block groups on the ride get one block smaller."}];
+var week={night:true,test:true,walk:true,friend:true};
 function weekModel(w){
-  var red=0,green=0,prac=w.practice?1:0;
-  DECK.forEach(function(c){if(!w[c.id])return;if(c.t==='r')red++;else if(c.id!=='practice')green++;});
-  var lever=1-0.3*prac; // practice moves the balance point
-  var tilt=Math.max(-1,Math.min(1,(red*lever-green)/3.5));
+  var R=0,G=0,red=0,green=0,cat={};
+  DECK.forEach(function(c){if(!w[c.id])return;cat[c.cat]=(cat[c.cat]||0)+1;if(c.t==='r'){R+=c.w;red++;}else{G+=c.w;green++;}});
+  var skills=cat.skills||0,lever=Math.max(0.55,1-0.15*skills); // skills move the balance point (AFWI)
+  var tilt=Math.max(-1,Math.min(1,(R*lever-G)/5));
   var pads=tilt>0?Math.max(2,Math.round(5-3*tilt)):Math.min(6,Math.round(5-1.2*tilt));
-  return {tilt:tilt,pads:pads,drift:Math.max(0,tilt)*0.75,red:red,green:green,prac:prac};
+  pads=Math.max(2,Math.min(6,pads-(cat.sleep||0)+(cat.body?1:0)));
+  var drift=Math.max(0,Math.max(0,tilt)*0.75+(cat.people?0.3:0)-0.2*(cat.kin||0));
+  var band0=Math.max(0.45,Math.min(1.6,0.7+0.1*R-0.08*G+(cat.place?0.3:0)-0.15*(cat.belong||0)));
+  var clAdj=(cat.time?1:0)-(cat.help?1:0);
+  return {tilt:tilt,pads:pads,drift:drift,red:red,green:green,prac:skills,R:R,G:G,band0:band0,clAdj:clAdj,cat:cat};
 }
 function cubeR(x,y){return '<path d="M'+x+' '+y+' l16 -2 l2 -14 l-17 2 z" fill="#ff4fa3" stroke="#04050a" stroke-width="2"/>';}
 function cubeG(x,y){return '<rect x="'+x+'" y="'+(y-15)+'" width="17" height="15" rx="6" fill="#6dff8a" stroke="#04050a" stroke-width="2"/>';}
+function drawFx(m){var el=document.getElementById('fxp');if(!el)return;
+  var pull=m.drift<0.05?'none':m.drift<0.45?'light':m.drift<0.8?'strong':'very strong';
+  var band=m.band0<0.65?'narrow':m.band0<0.95?'medium':m.band0<1.25?'wide':'very wide';
+  var grp=m.clAdj>0?'one bigger':m.clAdj<0?'one smaller':'normal';
+  var bw=Math.round(30+60*(m.band0-0.45)/(1.6-0.45));
+  el.innerHTML='<div><b>'+m.pads+'</b> landing spines at the thinking cortex</div>'+
+   '<div>Alarm road pull: <b>'+pull+'</b></div>'+
+   '<div>Frayed bands: <b>'+band+'</b> <svg width="96" height="14" viewBox="0 0 96 14" aria-hidden="true"><rect x="0" y="3" width="96" height="8" rx="4" fill="#26304a"/><rect x="0" y="3" width="'+bw+'" height="8" rx="4" fill="#ff8020"/></svg></div>'+
+   '<div>Red block groups: <b>'+grp+'</b></div>';}
 function drawTrayBal(m){
   document.getElementById('tBeam').setAttribute('transform','rotate('+(-m.tilt*22)+' 75 52)');
   var L='',Rr='';for(var i=0;i<m.red;i++)L+=cubeR(16+(i%3)*18,50-Math.floor(i/3)*15);
   for(var j=0;j<m.green;j++)Rr+=cubeG(100+(j%2)*18,50-Math.floor(j/2)*15);
   document.getElementById('tL').innerHTML=L;document.getElementById('tR').innerHTML=Rr;
-  var tri=document.querySelector('#trayBal path');tri.setAttribute('transform','translate('+(m.prac?12:0)+' 0)');
-  document.getElementById('trayBal').setAttribute('aria-label','Balance with '+m.red+' stress cubes and '+m.green+' support cubes'+(m.prac?', balance point moved by practice':''));
+  var tri=document.querySelector('#trayBal path');tri.setAttribute('transform','translate('+(Math.min(3,m.prac)*6)+' 0)');
+  document.getElementById('trayBal').setAttribute('aria-label','Balance with '+m.red+' stress blocks weighing '+m.R+' and '+m.green+' builder blocks weighing '+m.G+(m.prac?', balance point moved by skills':''));
   // preview dendrite face with spines
   var svg='<circle cx="75" cy="48" r="38" fill="none" stroke="#ff4fa3" stroke-width="4"/>';
   for(var k=0;k<6;k++){var a=-Math.PI/2+k*Math.PI*2/6,x=75+Math.cos(a)*38,y=48+Math.sin(a)*38;
     svg+= k<m.pads?'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="8" fill="#ff4fa3" stroke="#eef2f6" stroke-width="2"/>':'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="none" stroke="#8f6a86" stroke-width="2" stroke-dasharray="3 3"/>';}
   document.getElementById('preview').innerHTML=svg;document.getElementById('preview').setAttribute('aria-label','Thinking cortex: '+m.pads+' landing spines');
-  document.getElementById('trayReadout').textContent=(m.pads<5?'Fewer landing spines at the thinking cortex. The alarm road will pull.':m.pads>5?'Extra landing spines at the thinking cortex. The alarm road stays quiet.':'The balance is close to level.');
+  drawFx(m);document.getElementById('trayReadout').textContent=(m.pads<5?'Fewer landing spines at the thinking cortex. The alarm road will pull.':m.pads>5?'Extra landing spines at the thinking cortex. The alarm road stays quiet.':'The balance is close to level.');
 }
+var trayCat=null,infoId=null;
+function catOf(id){for(var i=0;i<CATS.length;i++)if(CATS[i].id===id)return CATS[i];}
+function cubeSvg(c){return '<svg viewBox="0 0 34 34" width="34" height="34" aria-hidden="true">'+(c.t==='r'?'<path d="M1 3 l31 -2 l1 31 l-32 2 z" fill="#3a1830" stroke="#ff4fa3" stroke-width="2"/>':'<rect x="1" y="1" width="32" height="32" rx="10" fill="#14301f" stroke="#6dff8a" stroke-width="2"/>')+c.ic+'</svg>';}
+function infoHTML(c){var k=catOf(c.cat);return '<h3>'+c.label+' <span class="wt">'+(c.t==='r'?'stress':'builder')+', weight '+c.w+'</span></h3>'+
+  '<p><b>Research:</b> '+c.fact+' <span class="src">('+c.src+')</span></p><p><b>In the game:</b> '+(c.t==='r'?'Adds '+c.w+' to the stress side of the balance. ':'Adds '+c.w+' to the support side of the balance. ')+k.fx+'</p>';}
 function buildCards(){var box=document.getElementById('cards');box.innerHTML='';
-  DECK.forEach(function(c){var b=document.createElement('button');b.type='button';b.className='wk '+(c.t==='r'?'red':'grn');b.setAttribute('aria-pressed',String(!!week[c.id]));
-    b.innerHTML='<svg viewBox="0 0 34 34" width="34" height="34" aria-hidden="true">'+(c.t==='r'?'<path d="M1 3 l31 -2 l1 31 l-32 2 z" fill="#3a1830" stroke="#ff4fa3" stroke-width="2"/>':'<rect x="1" y="1" width="32" height="32" rx="10" fill="#14301f" stroke="#6dff8a" stroke-width="2"/>')+c.ic+'</svg><span>'+c.label+'</span>';
-    b.setAttribute('aria-label',c.label+(c.t==='r'?', stress cube':', support cube'));
-    b.onclick=function(){week[c.id]=!week[c.id];b.setAttribute('aria-pressed',String(week[c.id]));drawTrayBal(weekModel(week));tone(week[c.id]?520:340,0.08,'triangle',0.07);};
-    box.appendChild(b);});
+  if(!trayCat){
+    [['r','Stress','Researchers sort stress three ways: positive (brief, like a test), tolerable (serious, but buffered by support) and toxic (long-lasting, with no support). Pick what this week holds.','Harvard Center on the Developing Child'],
+     ['g','Resilience builders','Resilience is not something you have or lack. It is built from people, skills and places, and it can grow.','Harvard Center on the Developing Child; Alberta Family Wellness Initiative']].forEach(function(g){
+      var h=document.createElement('div');h.className='cath';h.innerHTML='<h3>'+g[1]+'</h3><p>'+g[2]+' <span class="src">('+g[3]+')</span></p>';box.appendChild(h);
+      CATS.filter(function(c){return c.t===g[0];}).forEach(function(c){var items=DECK.filter(function(d){return d.cat===c.id;}),n=items.filter(function(d){return week[d.id];}).length;
+        var b=document.createElement('button');b.type='button';b.className='wk cat '+(c.t==='r'?'red':'grn');b.setAttribute('aria-pressed',String(n>0));
+        b.innerHTML=cubeSvg(items[0])+'<span>'+c.name+'<small>'+n+' of '+items.length+' in your week</small></span>';
+        b.setAttribute('aria-label',c.name+', '+(c.t==='r'?'stress':'resilience builder')+' category, '+n+' of '+items.length+' chosen. Open');
+        b.onclick=function(){trayCat=c.id;infoId=null;buildCards();var f=document.querySelector('#cards .back');if(f)f.focus();};box.appendChild(b);});});
+  } else {
+    var c=catOf(trayCat);
+    var bk=document.createElement('button');bk.type='button';bk.className='btn back';bk.textContent='All categories';bk.onclick=function(){trayCat=null;buildCards();};box.appendChild(bk);
+    var h=document.createElement('div');h.className='cath';h.innerHTML='<h3>'+c.name+'</h3><p>'+c.intro+'</p><p><b>In the game:</b> '+c.fx+'</p>';box.appendChild(h);
+    DECK.filter(function(d){return d.cat===c.id;}).forEach(function(d){var b=document.createElement('button');b.type='button';b.className='wk '+(d.t==='r'?'red':'grn');b.setAttribute('aria-pressed',String(!!week[d.id]));
+      b.innerHTML=cubeSvg(d)+'<span>'+d.label+'<small>weight '+d.w+'</small></span>';b.setAttribute('aria-label',d.label+', weight '+d.w+(week[d.id]?', in your week':', not in your week'));
+      b.onclick=function(){week[d.id]=!week[d.id];infoId=d.id;tone(week[d.id]?520:340,0.08,'triangle',0.07);buildCards();};box.appendChild(b);});
+    var inf=document.createElement('div');inf.id='info';inf.className='info';inf.setAttribute('aria-live','polite');
+    var shown=infoId?DECK.filter(function(d){return d.id===infoId;})[0]:DECK.filter(function(d){return d.cat===c.id;})[0];inf.innerHTML=infoHTML(shown);box.appendChild(inf);
+  }
   drawTrayBal(weekModel(week));}
 var trayOpen=false;
 function openTray(){trayOpen=true;buildCards();document.getElementById('tray').style.display='block';document.getElementById('hud').style.display='none';insetEl.style.display='none';}
@@ -570,6 +603,8 @@ function bell(){if(!AC||!S.sound)return;[1,2.76,5.4,8.93].forEach(function(m,i){
 
 // ---------- UI helpers ----------
 var toastEl=document.getElementById('toast'),toastT=0;
+var LQ=[];function lesson(m){if(LQ.indexOf(m)<0)LQ.push(m);}
+function flushLesson(){if(!LQ.length)return;var m=LQ.shift();setTimeout(function(){toast(m,6);speak(m,true);},1300);}
 function toast(msg,secs){toastEl.textContent=msg;toastEl.style.display='block';toastT=secs||4;}
 var insetEl=document.getElementById('inset'),insetPic=document.getElementById('insetPic'),insetCap=document.getElementById('insetCap'),insetT=0;
 var PICS={
@@ -579,7 +614,9 @@ var PICS={
 function showInset(which){if(!which){insetEl.style.display='none';return;}var p=PICS[which];insetPic.innerHTML=p.svg;insetCap.textContent=p.cap;insetEl.style.display='block';insetT=7;}
 function showCard(c){effect(c.t!=='r',c.cap,c.ic);}
 var balL=document.getElementById('balL'),balR=document.getElementById('balR'),beam=document.getElementById('beam'),balSvg=document.getElementById('bal');
-function setBalance(t,green){
+function setBalance(t,green,red){if(typeof green==='number'){var L2='',R2='';for(var i=0;i<(red||0);i++)L2+='<path d="M'+(10+(i%3)*14)+' '+(36-Math.floor(i/3)*12)+' l12 -1.5 l1.5 -10.5 l-12.5 1.5 z" fill="#ff4fa3" stroke="#04050a" stroke-width="1.5"/>';
+  for(var j=0;j<green;j++)R2+='<rect x="'+(76+(j%2)*14)+'" y="'+(25-Math.floor(j/2)*12)+'" width="13" height="11" rx="4" fill="#6dff8a" stroke="#04050a" stroke-width="1.5"/>';
+  beam.setAttribute('transform','rotate('+(-t*24)+' 60 40)');balL.innerHTML=L2;balR.innerHTML=R2;balSvg.setAttribute('aria-label','Balance with '+(red||0)+' stress cubes and '+green+' support cubes, '+(t>0.15?'tipped toward stress':t<-0.15?'tipped toward support':'close to level'));return;}
   beam.setAttribute('transform','rotate('+(-t*24)+' 60 40)');
   balL.innerHTML=t>0.05?'<path d="M14 36 l18 -3 l2 -16 l-19 3 z" fill="#ff4fa3" stroke="#04050a" stroke-width="2"/><path d="M32 34 l16 -2 l2 -15 l-17 2 z" fill="#ff4fa3" stroke="#04050a" stroke-width="2"/>':'';
   balR.innerHTML=green?'<rect x="80" y="18" width="22" height="20" rx="7" fill="#6dff8a" stroke="#04050a" stroke-width="2"/>':'';
@@ -587,6 +624,7 @@ function setBalance(t,green){
 }
 
 // ---------- sheets ----------
+function quietBeacon(){try{beacon(false);}catch(e){}}
 function openSheet(id){var s=document.getElementById(id);s.style.display='flex';s.classList.add('open');paused=true;var b=s.querySelector('button');if(b)b.focus();}
 function closeSheets(){document.querySelectorAll('.sheet').forEach(function(s){s.style.display='none';s.classList.remove('open');});paused=false;last=performance.now();}
 document.querySelectorAll('[data-close]').forEach(function(b){b.addEventListener('click',closeSheets);});
@@ -602,7 +640,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheets(
 
 // ---------- end ----------
 function finish(){
-  run.over=true;bell();
+  run.over=true;bell();document.getElementById('hE').textContent='You reached the thinking cortex';setTimeout(addReplayBtn,0);
   document.getElementById('endStats').textContent='Your touch traveled about '+run.realM.toFixed(2)+' meters through four neurons in about '+run.realMs.toFixed(1)+' milliseconds, with '+run.hits+' of 3 hits.';
   var why=document.getElementById('endWhy'),myth=document.getElementById('endMyth'),btns=document.getElementById('endBtns');btns.innerHTML='';
   var m=run.model;
@@ -619,11 +657,124 @@ function finish(){
 }
 function addBtn(label,primary,fn){var b=document.createElement('button');b.className='btn'+(primary?' primary':'');b.textContent=label;b.onclick=fn;document.getElementById('endBtns').appendChild(b);}
 
+
+// ---------- v0.10 the Leap, in slow motion ----------
+// The tube ends; time slows. On each beat the spark releases messengers where you are. A white spine
+// with a closing ring is the target for that beat, and it moves to a new spine each beat, so landing
+// takes several moves. Relays 1-3 fire on the first beat that lands. The thinking cortex needs its ring
+// filled: under a hard week it has fewer spines and each landing counts for less, while the alarm road
+// pulls; two beats on the thorny alarm face and the alarm road fires first (an arrival, not a failure).
+// What lands carries over between beats (summation, OpenStax A&P 12.5; Arnsten 2009).
+var BURST=[],RING=null,BEAT=1.0;
+function startLanding(sy){
+  var beats=sy.last?(sy.stressed?6:4):3;
+  run.lm={t:0,k:0,beats:beats,max:sy.last?9:6,tgt:sy.pads[Math.floor(Math.random()*sy.pads.length)],a0:run.s,hits:0};
+  RING={fill:sy.last?Math.min(1,sy.fill/sy.need):0,t:0,col:'#ff4fa3',hold:true};sfxSlowIn();
+}
+function nextTarget(sy){var pads=sy.pads;if(pads.length<2)return pads[0];var cur=run.lm.tgt,best=null,bd=9;
+  pads.forEach(function(p){var d=Math.abs(angDiff(p,cur));if(d>0.05&&d<bd){bd=d;best=p;}});
+  var others=pads.filter(function(p){return Math.abs(angDiff(p,cur))>0.05;});return Math.random()<0.6?best:others[Math.floor(Math.random()*others.length)];}
+function landingBeat(sy){
+  var lm=run.lm;lm.k++;var d=Math.abs(angDiff(run.theta,lm.tgt));var full=d<0.3,half=!full&&d<0.6;
+  var onAlarm=sy.apads.some(function(p){return Math.abs(angDiff(run.theta,p))<0.3;});
+  var parts=[];for(var k=0;k<8;k++){var a=run.theta+0.5*(k/7-0.5);var kind=onAlarm?2:(full||half)&&Math.abs(angDiff(a,lm.tgt))<0.5?1:0;
+    parts.push({a0:a,a1:kind===1?lm.tgt:kind===2?a:a+(Math.random()-0.5)*0.6,kind:kind,t:0,d:k*0.02});}
+  BURST=BURST.concat(parts);
+  if(onAlarm&&sy.stressed){sy.afill++;sfxBeat(-1);if(sy.afill>=2){endLanding();RING={fill:1,t:0,col:'#ff4f7a'};sy.done=true;alarmFinish();return;}}
+  else if(full||half){var add=(full?1:0.5)*(sy.last?sy.w:1);sy.fill+=add;lm.hits++;sfxBeat(sy.last?Math.min(1,sy.fill/sy.need):1);}
+  else sfxBeat(0);
+  var done=sy.last?sy.fill>=sy.need:lm.hits>=2;
+  if(RING)RING.fill=sy.last?Math.min(1,sy.fill/sy.need):(done?1:0);
+  if(done||lm.k>=lm.max){fireRelay(sy,done);return;}
+  lm.tgt=nextTarget(sy);
+}
+function endLanding(){run.lm=null;sfxSlowOut();if(RING)RING.hold=false;}
+function fireRelay(sy,clean){
+  endLanding();sy.done=true;run.flash=1;sfxFire();callout(clean?'Fired':'Fired, late');
+  if(!sy.last){if(run.leg===0)lesson('Messengers crossed the gap and the next neuron fired. That gap is a synapse.');
+    run.leg++;run.s=sy.s+4.01;document.getElementById('legname').textContent=legs[run.leg].name;saveCp();setBgLeg(run.leg);flushLesson();return;}
+  run.s=sy.s+sy.gap-1.5;finish();
+}
+function updateLanding(dt,sy){ // returns true while the slow-motion landing owns the frame
+  var faceS=sy.s+sy.gap-1.5;
+  if(!run.lm){if(run.s>=sy.s){startLanding(sy);}else return false;}
+  var lm=run.lm;var tick0=(lm.t%BEAT);lm.t+=dt;if(tick0<0.5&&lm.t%BEAT>=0.5&&AC&&S.sound)tone(1200,0.04,'sine',0.04,null,panOf(lm.tgt,1.5));
+  // the world creeps forward so the face arrives on the last planned beat
+  var span=Math.max(0.6,faceS-0.9-lm.a0);run.s=Math.min(faceS-0.9,lm.a0+span*Math.min(1,lm.t/(lm.beats*BEAT)));
+  if(lm.t>=(lm.k+1)*BEAT){landingBeat(sy);}
+  return true;
+}
+function sparkRad(){if(!run.lm)return 0.86;var p=Math.min(1,run.lm.t/(run.lm.beats*BEAT));return 0.86-0.3*Math.sin(Math.PI*Math.min(1,p*1.2));}
+function drawLeap(sy,zf){
+  if(sy&&sy.apads.length&&zf>0.4&&zf<ZMAX){
+    sy.apads.forEach(function(pa){var p=proj(pa,zf,1.0);var R2=Math.max(5,0.22*f/zf);cx.fillStyle='#ff4f7a';cx.shadowColor='#ff4f7a';cx.shadowBlur=blur()*2;cx.globalAlpha=0.9;
+      cx.beginPath();for(var k=0;k<10;k++){var aa=k*TAU/10,rr=k%2?R2:R2*0.45;cx.lineTo(p[0]+Math.cos(aa)*rr,p[1]+Math.sin(aa)*rr);}cx.closePath();cx.fill();});cx.globalAlpha=1;}
+  if(run.lm&&sy&&zf>0.3){ // target spine: white, with a ring closing on the beat
+    var lm=run.lm,p=proj(lm.tgt,zf,1.0),rr0=Math.max(8,0.26*f/zf),ph=1-((lm.t%BEAT)/BEAT);
+    cx.fillStyle='#ffffff';cx.shadowColor='#ffffff';cx.shadowBlur=blur()*3;cx.beginPath();cx.arc(p[0],p[1],rr0,0,TAU);cx.fill();
+    cx.strokeStyle='#ffffff';cx.lineWidth=4;cx.globalAlpha=0.9;cx.beginPath();cx.arc(p[0],p[1],rr0*(1.3+2.2*ph),0,TAU);cx.stroke();cx.globalAlpha=1;cx.shadowBlur=0;}
+  if(BURST.length){var alive=false;BURST.forEach(function(m){m.t+=1/60*(run.lm?0.6:1);var q=Math.max(0,Math.min(1,(m.t-m.d)/0.45));if(q<1)alive=true;
+      var a=m.a0+(angDiff(m.a1,m.a0))*q,zz=Math.max(0.6,1.0+Math.max(0.2,(zf||2)-1)*q),rr=0.86+0.14*q;var pp2=proj(a,zz,rr);
+      cx.globalAlpha=m.kind?1:Math.max(0,1-q);cx.fillStyle=m.kind===2?'#ff4f7a':m.kind?'#ffffff':'#8f9bb0';cx.shadowColor=cx.fillStyle;cx.shadowBlur=blur()*1.5;
+      cx.beginPath();cx.arc(pp2[0],pp2[1],Math.max(3,5*(1-q*0.4)),0,TAU);cx.fill();});
+    cx.globalAlpha=1;cx.shadowBlur=0;if(!alive)BURST=BURST.filter(function(m){return m.t<m.d+0.6;});}
+  if(run.lm){ // slow-motion frame
+    var bh=Math.round(H*0.07);cx.fillStyle='rgba(0,0,0,0.85)';cx.fillRect(0,0,W,bh);cx.fillRect(0,H-bh,W,bh);}
+  if(RING){if(!RING.hold)RING.t+=1/60;var al=RING.hold?1:Math.max(0,1-Math.max(0,RING.t-0.8)/0.7);if(al<=0){RING=null;return;}
+    var cxr=cxv,cyr=cyv,rr2=Math.min(40,f*0.24);cx.globalAlpha=al;cx.lineWidth=8;cx.strokeStyle='#2a3348';cx.beginPath();cx.arc(cxr,cyr,rr2,0,TAU);cx.stroke();
+    cx.strokeStyle=RING.col;cx.shadowColor=RING.col;cx.shadowBlur=blur()*2;cx.beginPath();cx.arc(cxr,cyr,rr2,-Math.PI/2,-Math.PI/2+TAU*RING.fill);cx.stroke();cx.shadowBlur=0;cx.globalAlpha=1;}
+}
+function alarmFinish(){
+  run.over=true;run.flash=1;run.flashCol='#ff4f7a';sfxAlarmFire();
+  document.getElementById('hE').textContent='The alarm road fired first';
+  document.getElementById('endStats').textContent='Your touch reached the brain in about '+run.realMs.toFixed(1)+' milliseconds, with '+run.hits+' of 3 hits.';
+  document.getElementById('endWhy').textContent="What's happening here: your week tipped the balance toward stress. The thinking cortex had fewer landing spines, and the alarm neuron beside it, with plenty of spines, fired first. That is the body protecting you, not a failure.";
+  document.getElementById('endMyth').textContent='"Stress makes your whole brain weaker." The alarm road gets stronger. Try the same week with sleep or a walk added, or steer against the pull and leap at the thinking spines.';
+  var btns=document.getElementById('endBtns');btns.innerHTML='';
+  [['Ride the same week',function(){closeSheets();buildRun(run.week);}],['Change the week',function(){closeSheets();openTray();}]].forEach(function(b,i){var e=document.createElement('button');e.className='btn'+(i?'':' primary');e.type='button';e.textContent=b[0];e.onclick=b[1];btns.appendChild(e);});
+  addReplayBtn();speak('The alarm road fired first.',false);setTimeout(function(){openSheet('sEnd');},700);
+}
+function addReplayBtn(){if(!EVT.length)return;var btns=document.getElementById('endBtns'),e=document.createElement('button');e.className='btn';e.type='button';e.textContent='Replay the last red and green';
+  e.onclick=function(){closeSheets();var o=run.over;run.over=false;if(!startReplay()){run.over=o;openSheet('sEnd');return;}run.endAfter=true;};btns.appendChild(e);}
+
+
+// ---------- v0.9 audio cues: what is coming, where, and what just happened ----------
+function panOf(a,z){var p=proj(a,Math.max(0.8,z),1);return Math.max(-1,Math.min(1,(p[0]-cxv)/(f||1)));}
+function sfxSlowIn(){if(!AC||!S.sound)return;tone(660,0.7,'sine',0.1,110);tone(90,0.9,'sine',0.12,55);}
+function sfxSlowOut(){if(!AC||!S.sound)return;tone(110,0.4,'sine',0.08,660);}
+function sfxBeat(q){if(!AC||!S.sound)return;if(q<0){tone(150,0.3,'sawtooth',0.1,95);return;}if(q===0){tone(140,0.18,'square',0.07,100);return;}
+  [0,4,7].forEach(function(st,i){setTimeout(function(){tone(440*Math.pow(2,(st+12*q)/12),0.18,'triangle',0.06);},i*40);});}
+function sfxFire(){if(!AC||!S.sound)return;[523.25,659.25,783.99,1046.5,1318.5].forEach(function(fq,i){setTimeout(function(){tone(fq,0.6,'triangle',0.06);},i*55);});}
+function sfxLeap(){if(!AC||!S.sound)return;tone(220,0.45,'sine',0.12,880);tone(330,0.45,'triangle',0.05,1320);}
+function sfxBurst(hT,hA){if(!AC||!S.sound)return;for(var k=0;k<Math.min(10,hT+hA);k++){var fq=k<hA?180+k*20:660+k*90;setTimeout(function(q){return function(){tone(q,0.09,'triangle',0.06);};}(fq),k*30);}}
+function sfxFizzle(){if(!AC||!S.sound)return;tone(520,0.5,'sine',0.09,170);}
+function sfxAlarmFire(){if(!AC||!S.sound)return;tone(140,0.6,'sawtooth',0.12,90);setTimeout(function(){tone(150,0.5,'sawtooth',0.1,95);},180);}
+function cueBand(inPath,pan){if(!AC||!S.sound)return;if(inPath){tone(330,0.09,'square',0.07,null,pan);setTimeout(function(){tone(330,0.09,'square',0.07,null,pan);},120);}else tone(520,0.07,'sine',0.035,null,pan);}
+function cueRed(inPath,n,pan){if(!AC||!S.sound)return;for(var k=0;k<n;k++)setTimeout(function(){tone(inPath?150:200,0.14,'sawtooth',inPath?0.08:0.04,null,pan);},k*110);}
+function cueGreen(n,pan){if(!AC||!S.sound)return;for(var k=0;k<n;k++)setTimeout(function(q){return function(){tone(q,0.12,'triangle',0.05,null,pan);};}(660*Math.pow(1.26,k)),k*100);}
+var BEACON=null,beatT=0;
+function beacon(on,align,pan,stress){ // synapse approach: steady and high when lined up with a lit spine
+  if(!AC||!S.sound){if(BEACON)BEACON.g.gain.setTargetAtTime(0,AC?AC.currentTime:0,0.05);return;}
+  if(!BEACON){var o=AC.createOscillator(),g=AC.createGain(),p=AC.createStereoPanner?AC.createStereoPanner():null;o.type='sine';g.gain.value=0;o.connect(g);if(p){g.connect(p);p.connect(AC.destination);}else g.connect(AC.destination);o.start();BEACON={o:o,g:g,p:p};}
+  var t=AC.currentTime;BEACON.g.gain.setTargetAtTime(on?0.05:0,t,0.08);if(!on)return;
+  BEACON.o.frequency.setTargetAtTime(align?880:300+300*Math.max(0,1-Math.abs(pan)),t,0.06);if(BEACON.p)BEACON.p.pan.setTargetAtTime(align?0:pan,t,0.06);}
+function audioCues(dt){
+  var look=run.v*1.4;
+  feats.forEach(function(fe){var z=fe.s-run.s;if(!fe.cued&&z>0&&z<look){fe.cued=true;cueBand(Math.abs(angDiff(fe.a,run.theta))<run.band*fe.wm/2+0.25,panOf(fe.a,z));}});
+  var seen={};pickups.forEach(function(p){if(p.hit||p.cued||seen[p.grp])return;var z=p.s-run.s;if(z>0&&z<look){seen[p.grp]=1;
+    var grp=pickups.filter(function(q){return q.grp===p.grp;});grp.forEach(function(q){q.cued=true;});
+    if(p.good)cueGreen(grp.length,panOf(p.a,z));else cueRed(grp.some(function(q){return Math.abs(angDiff(q.a,run.theta))<0.5;}),grp.length,panOf(p.a,z));}});
+  var sy=syns[run.leg];if(sy&&!sy.done){var z2=sy.s+sy.gap-1.5-run.s;var on=run.lm?true:(z2>0&&z2<run.v*3);var best=null,bd=9;(run.lm?[run.lm.tgt]:sy.pads).forEach(function(pa){var d=angDiff(pa,run.theta);if(Math.abs(d)<Math.abs(bd)){bd=d;best=pa;}});
+    beacon(on,Math.abs(bd)<0.2,best===null?0:panOf(best,Math.max(1,z2)),sy.stressed);}else beacon(false);
+  if(run.drift){beatT-=dt;if(beatT<=0){beatT=0.9;if(AC&&S.sound){var pn=panOf(run.alarm,3);tone(62,0.16,'sine',0.14,48,pn);setTimeout(function(){tone(58,0.14,'sine',0.1,44,pn);},170);}}}
+}
+
+function rampF(){if(run.warm)return 0.5;if(run.leg>0)return 1;var L0=legs[0];return 0.5+0.5*Math.max(0,Math.min(1,(run.s-L0.start)/180));}
 // ---------- update ----------
 var paused=false,last=performance.now(),tAll=0;
 function update(dt){
-  if(run.over||run.faded)return;tAll+=dt;
-  if(run.assist===undefined)run.assist=1;run.assist=Math.min(1,run.assist+dt*0.004);var cruise=6.5*S.speed*run.assist,vmax=16*S.speed;
+  if(run.over||run.faded){beacon(false);return;}tAll+=dt;
+  if(run.assist===undefined)run.assist=1;run.assist=Math.min(1,run.assist+dt*0.004);var cruise=6.5*S.speed*run.assist*rampF(),vmax=16*S.speed;
   run.band+=(run.bandT-run.band)*Math.min(1,dt*3);run.bandPulse=Math.max(0,run.bandPulse-dt*1.2);run.floatT=Math.max(0,run.floatT-dt);
   if(effectT>0){effectT-=dt;if(effectT<=0)document.getElementById('effect').style.display='none';}
   // steer
@@ -631,45 +782,40 @@ function update(dt){
   run.theta+=steer*2.7*dt;
   // alarm drift on stressed last leg
   var L=legs[run.leg];
-  if(run.driftRate>0&&run.leg===3){var d=angDiff(run.alarm,run.theta);run.theta+=Math.sign(d)*Math.min(Math.abs(d),run.driftRate*dt);run.drift=1;}else run.drift=0;
+  if(run.driftRate>0&&run.leg===3){var d=angDiff(run.alarm,run.theta);run.theta+=Math.sign(d)*Math.min(Math.abs(d),run.driftRate*dt*(run.lm?0.6:1));run.drift=1;}else run.drift=0;
+  // slow-motion landing
+  var syL=syns[run.leg];if(syL&&!syL.done&&!run.warm&&updateLanding(dt,syL)){if(toastT>0){toastT-=dt;if(toastT<=0)toastEl.style.display='none';}audioCues(dt);return;}
   // speed
   if(run.slowT>0){run.slowT-=dt;run.v+= (1.2*S.speed-run.v)*Math.min(1,dt*6);}
   else{run.v+=(cruise-run.v)*Math.min(1,dt*(run.v>cruise?0.6:1.2));}
   run.boostT=Math.max(0,run.boostT-dt);run.flash=Math.max(0,run.flash-dt*2.5);
   var ds=run.v*dt;var prev=run.s;run.s+=ds;
   // real distance/time
-  var vReal=Math.min(120,run.v/(6.5*S.speed)*75); var mPer=L.realM/L.len; var dm=ds*mPer; run.realM+=dm; if(vReal>0.5)run.realMs+=dm/vReal*1000;
+  var vReal=Math.min(120,run.v/(6.5*S.speed*rampF())*75); // the speedometer reads the fiber, not the onramp var mPer=L.realM/L.len; var dm=ds*mPer; run.realM+=dm; if(vReal>0.5)run.realMs+=dm/vReal*1000;
   // nodes
   nodes.forEach(function(n){if(!n.hit&&prev<n.s&&run.s>=n.s){n.hit=true;if(run.slowT<=0){run.boostT=0.18;}click();
-    if(!run.toldNode){run.toldNode=true;toast('Bright rings are gaps in the insulation. The signal leaps from one to the next. That is why it is fast.',5);}}});
+    if(!run.toldNode){run.toldNode=true;lesson('Bright rings are gaps in the insulation. The signal leaps from one to the next. That is why it is fast.');}}});
   // frays
   feats.forEach(function(f){
     var z=f.s-run.s;
-    if(!f.warned&&z<7&&z>0){f.warned=true;var rel=angDiff(f.a,run.theta);tone(520,0.12,'triangle',0.08,null,Math.max(-1,Math.min(1,Math.sin(rel))));}
     if(!f.hit&&run.s>=f.s&&run.s<=f.s+f.len&&Math.abs(angDiff(run.theta,f.a))<run.band*f.wm/2){f.hit=true;hit('Hit a frayed band');
-      if(!run.toldFray){run.toldFray=true;toast('Frayed bands are damaged insulation. Steer around them.',4);}}
+      if(!run.toldFray){run.toldFray=true;lesson('Frayed bands are damaged insulation. The signal slows there.');}}
   });
   pickups.forEach(function(p){if(!p.hit&&prev<p.s&&run.s>=p.s&&Math.abs(angDiff(run.theta,p.a))<0.42){p.hit=true;
-    if(run.warm){effect(p.good,p.card.cap,p.card.ic);var wl=p.warm;setTimeout(function(){toast(wl,3.5);},900);}
-    else if(p.good)effect(true,p.card.cap,p.card.ic);else hit(p.card.cap,p.card.ic);}});
-  if(run.warm){pickups.forEach(function(p){if(!p.hit&&!p.told&&run.s>p.s+1){p.told=true;toast(p.good?'You passed a support. Supports clear the path.':'You dodged a stress cube. Stress takes away places to land.',3.5);}});}
+    if(run.warm){effect(p.good,p.card.cap,p.card.ic);var wl=p.warm;setTimeout(function(){speak(wl,true);},900);}
+    else if(p.good)effect(true,p.card.cap,p.card.ic);else hit(p.card.cap,p.card.ic);
+    var sy4=syns[3];if(!run.warm&&run.leg===3&&sy4&&!sy4.done&&sy4.stressed){if(p.good&&sy4.pads.length<5){sy4.pads.push(sy4.pads[sy4.pads.length-1]+0.55);sy4.w=Math.min(1,sy4.w+0.15);}
+      else if(!p.good&&sy4.pads.length>2){sy4.pads.pop();sy4.w=Math.max(0.3,sy4.w-0.1);}}}});
+  if(run.warm){pickups.forEach(function(p){if(!p.hit&&!p.told&&run.s>p.s+1){p.told=true;speak(p.good?'You passed a support. Steer into greens.':'You dodged a stress cube.',true);}});}
+  pickups.forEach(function(p){if(p.good&&!p.hit&&!p.passed&&run.s>p.s+0.6){p.passed=true;if(!run.warm&&AC&&S.sound)tone(560,0.18,'sine',0.035,400,panOf(p.a,1.2));}});
   if(run.warm&&run.s>=run.warmEnd){endWarmup();return;}
+  if(!run.warm)audioCues(dt);
   checkpoints.forEach(function(c){if(!c.passed&&prev<c.s&&run.s>=c.s){c.passed=true;saveCp();sfxCheck();
-    if(!startReplay()){toast('Checkpoint',2);callout('Checkpoint');}}});
+    toast('Checkpoint',2);callout('Checkpoint');}});
   if(run.faded)return;
   // outside beat
   run.pics.forEach(function(p){if(!p.shown&&run.s>=p.s){p.shown=true;showCard(p.card);}});
   // synapses
-  var sy=syns[run.leg];
-  if(sy&&!sy.done&&run.s>=sy.s){
-    var ok=sy.pads.some(function(p){return Math.abs(angDiff(run.theta,p))<sy.tol;});
-    if(ok){sy.done=true;run.flash=1;sfxGood();callout('Landed');
-      if(run.leg===0)toast('You crossed the gap and landed on the next neuron. That gap is a synapse.',4);
-      if(run.leg===3){run.s=sy.s;finish();return;}
-      run.leg++;run.s=sy.s+4.01;var nl=legs[run.leg];document.getElementById('legname').textContent=nl.name;saveCp();setBgLeg(run.leg);toast('Outside the tube: '+CAJCAP[run.leg]+', drawn by Santiago Ramón y Cajal.',4);
-    }else{run.missCount++;run.s=sy.s-9;run.v=cruise*0.6;tone(110,0.4,'square',0.1,70);
-      toast(run.missCount>2&&sy.pads.length<3?'Only two spines are lit. Steer early, and push against the pull.':'Missed the landing. Line up with a lit spine at the end of the tube.',4);}
-  }
   if(toastT>0){toastT-=dt;if(toastT<=0)toastEl.style.display='none';}
   if(insetT>0){insetT-=dt;if(insetT<=0)insetEl.style.display='none';}
   recFrame();
@@ -679,11 +825,25 @@ function update(dt){
   document.getElementById('tripv').textContent=run.realM.toFixed(2)+' m · '+run.realMs.toFixed(1)+' ms';
 }
 
+
+// v0.9: every message sits where the ball is not. Candidates in order: top band, bottom band,
+// left column, right column. Measured each frame; if none is clear, the toast (lowest priority,
+// also spoken) steps aside and the column away from the ball is used.
+var MS=null,msPos='';
+function placeMsgs(pp){if(!MS)MS=document.getElementById('msgs');if(!MS)return;
+  var bx0=pp[0]-36,bx1=pp[0]+36,by0=pp[1]-36,by1=pp[1]+36;
+  function fits(){var ok=true;for(var i=0;i<MS.children.length;i++){var el=MS.children[i];if(el.style.display==='none'||getComputedStyle(el).display==='none')continue;var q=el.getBoundingClientRect();if(!(q.bottom<by0||q.top>by1||q.right<bx0||q.left>bx1))ok=false;}return ok;}
+  function use(c){if(c===msPos)return;if(msPos)MS.classList.remove(msPos);if(c)MS.classList.add(c);msPos=c;}
+  if(fits())return;var C=['','low','sl','sr'];
+  for(var i=0;i<C.length;i++){use(C[i]);if(fits())return;}
+  if(toastEl.style.display!=='none'){toastEl.style.display='none';toastT=0;for(var j=0;j<C.length;j++){use(C[j]);if(fits())return;}}
+  use(pp[0]>W/2?'sl':'sr');}
+
 // ---------- render ----------
 var cxv,cyv,f,TRL=[];
 function lw(){return S.glow===0?0.8:S.glow===2?1.4:1;}
 function blur(){return S.glow===0?3:S.glow===2?14:8;}
-function inGap(u){for(var i=0;i<syns.length;i++){if(u>syns[i].s&&u<syns[i].s+4)return true;}return false;}
+function inGap(u){for(var i=0;i<syns.length;i++){if(u>syns[i].s&&u<syns[i].s+syns[i].gap)return true;}return false;}
 function proj(a,z,rad){ // angle around tube, depth, radius factor
   var u=run.s+z;
   var CG=4.5;var ox=CG*(curveX(u)-curveX(run.s)-dcurve(curveX,run.s)*z), oy=CG*(curveY(u)-curveY(run.s)-dcurve(curveY,run.s)*z);
@@ -711,7 +871,7 @@ function render(){
   cx.globalAlpha=1;
   // rings far to near
   for(var zz=z0+Math.floor((ZMAX-z0)/DZ)*DZ;zz>=z0;zz-=DZ){
-    var u2=run.s+zz;if(inGap(u2))continue;
+    var u2=run.s+zz;if(inGap(u2))continue;if(Math.round(u2/DZ)%2)continue; // one ring per unit: half the flicker
     var fog=Math.max(0,1-zz/ZMAX);
     cx.strokeStyle='#3fd6ff';cx.shadowColor='#3fd6ff';cx.shadowBlur=blur()*0.6;cx.lineWidth=Math.max(0.6,2.2*lw()/zz*1.2);cx.globalAlpha=0.18+0.45*fog;
     cx.beginPath();for(var i=0;i<=SIDES;i++){var p2=proj(i*TAU/SIDES,zz);i?cx.lineTo(p2[0],p2[1]):cx.moveTo(p2[0],p2[1]);}cx.stroke();
@@ -757,28 +917,29 @@ function render(){
   cx.globalAlpha=1;cx.shadowBlur=0;
   // synapse: next neuron face with spines
   var sy=syns[run.leg];
-  if(sy){var zf=sy.s+2.5-run.s;if(zf>0.6&&zf<ZMAX){var fog=1-zf/ZMAX;
+  if(sy){var zf=sy.s+sy.gap-1.5-run.s;if(zf>0.6&&zf<ZMAX){var fog=1-zf/ZMAX;
     cx.strokeStyle='#ff4fa3';cx.shadowColor='#ff4fa3';cx.shadowBlur=blur()*1.5;cx.lineWidth=Math.max(2,6*lw()/zf);cx.globalAlpha=0.5+0.5*fog;
     cx.beginPath();for(var i=0;i<=SIDES;i++){var p=proj(i*TAU/SIDES,zf,1.05);i?cx.lineTo(p[0],p[1]):cx.moveTo(p[0],p[1]);}cx.stroke();
     // missing spine outlines when stressed
     if(sy.pads.length<5){cx.shadowBlur=0;cx.strokeStyle='#8f6a86';cx.lineWidth=Math.max(1,2.5/zf);var off=sy.pads[0];
       for(var g=1;g<5;g++){var ga=off+g*TAU/5+0.3;var gp=proj(ga,zf,1.0);cx.beginPath();cx.arc(gp[0],gp[1],Math.max(3,0.16*f/zf),0,TAU);cx.stroke();}}
     sy.pads.forEach(function(pa){var p=proj(pa,zf,1.0);var rr=Math.max(4,0.2*f/zf);var lined=Math.abs(angDiff(run.theta,pa))<sy.tol;
-      cx.fillStyle=lined?'#ffffff':'#ff4fa3';cx.shadowColor='#ff4fa3';cx.shadowBlur=blur()*2.2;cx.globalAlpha=1;
+      cx.fillStyle=lined&&!run.lm?'#ffffff':'#ff4fa3';cx.shadowColor='#ff4fa3';cx.shadowBlur=blur()*2.2;cx.globalAlpha=1;
       cx.beginPath();cx.arc(p[0],p[1],rr*(lined?1.25:1),0,TAU);cx.fill();
       var stem=proj(pa,zf,1.22);cx.strokeStyle='#ff4fa3';cx.lineWidth=Math.max(2,rr*0.45);cx.beginPath();cx.moveTo(stem[0],stem[1]);cx.lineTo(p[0],p[1]);cx.stroke();});
   }}
+  drawLeap(sy,sy?sy.s+sy.gap-1.5-run.s:0);
   // alarm pull glow
   if(run.drift){var pa2=proj(run.alarm,3,1.0);var gr=cx.createRadialGradient(pa2[0],pa2[1],0,pa2[0],pa2[1],f*0.7);gr.addColorStop(0,'rgba(255,79,163,0.35)');gr.addColorStop(1,'rgba(255,79,163,0)');cx.shadowBlur=0;cx.fillStyle=gr;cx.fillRect(0,0,W,H);}
   // player spark
-  var pp=proj(run.theta,ZP,0.86);
+  var SR=sparkRad();var pp=proj(run.theta,ZP,SR);window.__ball=pp;placeMsgs(pp);
   cx.shadowBlur=0;
-  TRL.unshift(run.theta);if(TRL.length>16)TRL.length=16;for(var t=15;t>=1;t--){var th=run.theta+0.35*angDiff(TRL[Math.min(TRL.length-1,t)],run.theta);var tp=proj(th,ZP-t*0.03,0.86);cx.globalAlpha=0.45*(1-t/16);cx.fillStyle="#3fd6ff";cx.beginPath();cx.arc(tp[0],tp[1],12*(1-t/18),0,TAU);cx.fill();}
+  TRL.unshift(run.theta);if(TRL.length>16)TRL.length=16;for(var t=15;t>=1;t--){var th=run.theta+0.35*angDiff(TRL[Math.min(TRL.length-1,t)],run.theta);var tp=proj(th,ZP-t*0.03,SR);cx.globalAlpha=0.45*(1-t/16);cx.fillStyle="#3fd6ff";cx.beginPath();cx.arc(tp[0],tp[1],12*(1-t/18),0,TAU);cx.fill();}
   cx.globalAlpha=1;cx.shadowColor='#bff3ff';cx.shadowBlur=blur()*3;cx.fillStyle='#ffffff';cx.beginPath();cx.arc(pp[0],pp[1],13+(run.boostT>0?4:0),0,TAU);cx.fill();
   cx.shadowBlur=0;
   // flash on landing
   if(run.flash>0){cx.globalAlpha=run.flash*0.3;cx.fillStyle=run.flashCol;cx.fillRect(0,0,W,H);cx.globalAlpha=1;}
-  if(run.floatT>0&&run.floatTxt){cx.font='800 24px "Avenir Next","Segoe UI",system-ui,sans-serif';cx.textAlign='center';var fy=pp[1]-40-(1.2-run.floatT)*40;
+  if(false){cx.font='800 24px "Avenir Next","Segoe UI",system-ui,sans-serif';cx.textAlign='center';var fy=pp[1]-40-(1.2-run.floatT)*40;
     cx.globalAlpha=Math.min(1,run.floatT*1.5);cx.lineWidth=5;cx.strokeStyle='#04050a';cx.strokeText(run.floatTxt,pp[0],fy);cx.fillStyle=run.floatTxt[0]==='+'?'#6dff8a':'#ff8fc4';cx.fillText(run.floatTxt,pp[0],fy);cx.globalAlpha=1;cx.textAlign='start';}
   if(RP){var bh=H*0.07;cx.fillStyle='#04050a';cx.fillRect(0,0,W,bh);cx.fillRect(0,H-bh,W,bh);}
   // steering hint before first input
