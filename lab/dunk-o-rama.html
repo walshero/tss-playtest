@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dunk-O-Rama v0.8</title>
+<title>Dunk-O-Rama v0.9</title>
 <meta name="spec-source" content="convening/DUNK-O-RAMA-CONVENING.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students learning to spot rhetorical cheats. Lab build.">
-<!-- TSP build: Dunk-O-Rama v0.8 | LAB | 2026-11-07
+<!-- TSP build: Dunk-O-Rama v0.9 | LAB | 2026-11-07
+     v0.9 (founder, 2026-11-07 11:28): a dunked cheater climbs out and gives the straight answer, then
+     gets a towel. Not every candidate is a cheat: per-candidate cheat rates (Senator 20%, Chet 25%,
+     Mayor 45%, Skip 65%, Dale 65%).
      v0.8 (founder, 2026-11-07): the runoff. Two candidates share the tank. The left target dunks the
      left seat, the right target the right seat, the top target dunks both. The crowd asks one
      question and both answer: usually one cheats, sometimes both answer straight, sometimes both
@@ -131,7 +134,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.8</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.9</span> <span class="tsp-labchip">LAB</span></h1>
   <div class="sp">
     <button id="seatBtn" aria-haspopup="dialog">Runoffs</button>
     <button id="modeBtn" class="icon" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" fill="currentColor" style="fill:var(--ink)"/></svg></button>
@@ -140,7 +143,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="menuClose" type="button">Close menu</button>
 </header>
-<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.8, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
+<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.9, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
 
 <div id="seatSheet" class="panel sheet" role="dialog" aria-label="Pick a runoff">
   <h2>Pick a runoff</h2>
@@ -314,6 +317,10 @@ const SHORT={fil:'Senator',spin:'Skip',mayor:'Mayor',lob:'Chet',pun:'Dale'};
      Dale Bluster     - crack down; fines, cameras, guards.
    Row: [crowd asks, left straight answer, left move, left cheat, right straight answer, right move, right cheat].
    Each runoff teaches its level's four moves; 10 questions, so a 10-ball round never repeats one. */
+/* how often each candidate cheats. The Senator and Chet mostly answer straight; Skip and Dale mostly
+   do not; the Mayor is a coin flip. Runoffs: straight v cheat, cheat v coin, coin v straight,
+   straight v cheat, cheat v straight. */
+const CHEATRATE={fil:.2,spin:.65,mayor:.45,lob:.25,pun:.65};
 const LEVELS=[{k:'fil',a:0,b:1},{k:'spin',a:1,b:2},{k:'mayor',a:2,b:3},{k:'lob',a:3,b:4},{k:'pun',a:4,b:0}];
 const RUN={
  fil:[
@@ -380,7 +387,7 @@ let sound=store.get('sound',true);
 let ci=0,lv=null,cand=[CAST[0],CAST[1]],balls=BALLS,dunks=0,streak=0,roundOver=false,wet=[0,0],lies=[0,0];
 let ball=null,trail=[],lastPath=[],drag=null,kb=null,anim=null,ready=1;
 let t=0,rt=0,slow=1,slowT=0,shake=0,hitPause=0;
-const newCh=()=>({yo:0,vy:0,rot:0,state:'sit',timer:0,seatA:0,fair:false,splashed:false});
+const newCh=()=>({yo:0,vy:0,rot:0,state:'sit',timer:0,seatA:0,fair:false,splashed:false,straight:null,towel:0});
 let chs=[newCh(),newCh()],glassWob=0,tgtFlash=[0,0,0],wind=0,windShown=0;
 const newTg=()=>({phi:0,dphi:0,psi:0,dpsi:0});
 let tgs=[newTg(),newTg(),newTg()],gust=0,gustT=3;
@@ -469,9 +476,9 @@ function newHeckle(){
   $('dlg').innerHTML=`<p><span class="who">Runoff for mayor.</span> ${cand[0].name} on the left, ${cand[1].name} on the right.</p><p>Left target dunks ${n0}. Right target dunks ${n1}. Top target dunks both. Driest candidate wins.</p>`;
   $('dlg').style.display='block';$('callBtn').style.display='none';$('chips').innerHTML='';$('callQ').style.display='none';$('teach').textContent='';
   $('callit').classList.remove('aside');$('callit').style.display='block';announce($('dlg').textContent);return;}const Q=bag('q'+lv.k,RUN[lv.k]);
- /* usually one candidate cheats; now and then both answer straight, now and then both cheat */
- const roll=Math.random();let cheat=[false,false];
- if(roll<.15){}else if(roll<.28)cheat=[true,true];else cheat[Math.random()<.5?0:1]=true;
+ /* founder 2026-11-07: "Dont make all candidates cheats!" Each candidate has a cheat rate that holds
+    in every runoff they enter, so a player can learn who talks straight. */
+ const cheat=cand.map(k=>Math.random()<CHEATRATE[k.id]);
  const moves=[cheat[0]?Q[2]:null,cheat[1]?Q[5]:null];
  const ans=[cheat[0]?Q[3]:Q[1],cheat[1]?Q[6]:Q[4]];
  heck={active:true,cheat,moves,called:null,q:Q};
@@ -553,7 +560,7 @@ function launchState(dx,dy){
  return{x:LAUNCH.x,y:LAUNCH.y,z:LAUNCH.z,vx:-4.6*nx,vy:1+9*ny,vz:8+14*p,p,age:0,hit:-1,rim:false,front:false,bonked:false};
 }
 function release(dx,dy){const v=aimPull(dx,dy);anim={v,t:0,launched:false};breath.hold=0;}
-function launch(v){ball=launchState(v[0],v[1]);ball.boost=boostT;ball.cheat=heck.legend?null:heck.cheat.slice();ball.moves=heck.moves.slice();
+function launch(v){ball=launchState(v[0],v[1]);ball.boost=boostT;ball.cheat=heck.legend?null:heck.cheat.slice();ball.moves=heck.moves.slice();ball.q=heck.legend?null:heck.q;
  if(!heck.legend)heck.cheat.forEach((x,i)=>{if(x)lies[i]++;});heck.moves.forEach(m=>{if(m)stats.seen[m]=1;});
  boostT=-1;calmLock=false;thrown++;heck.active=false;$('callit').style.display='none';bubble.t=Math.min(bubble.t,1.2);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
 
@@ -593,9 +600,9 @@ function step(b,dt,live){
 function dunk(i,T){
  const hitSeats=TGTS[i].seats.filter(s=>chs[s].state==='sit');
  SFX.clang();tgtFlash[i]=1;rings.push({x:T.x,y:T.y,z:TGTS[i].z,r:.1,a:1,k:i});
- hitSeats.forEach(s=>{wet[s]++;dunks++;const h=chs[s];h.fair=!!(ball&&ball.cheat&&!ball.cheat[s]);if(h.fair)stats.fairDunks++;});
+ hitSeats.forEach(s=>{wet[s]++;dunks++;const h=chs[s];h.fair=!!(ball&&ball.cheat&&!ball.cheat[s]);h.straight=(ball&&ball.cheat&&ball.cheat[s]&&ball.q)?ball.q[s?4:1]:null;if(h.fair)stats.fairDunks++;});
  streak++;hud();shakeIt(.6);hitPause=RM?0:.07;if(!RM){slow=.25;slowT=.45;}
- setTimeout(()=>{SFX.drop();hitSeats.forEach(s=>{chs[s].state='fall';chs[s].vy=.6;});},90);
+ setTimeout(()=>{SFX.drop();hitSeats.forEach(s=>{chs[s].state='fall';chs[s].vy=.6;chs[s].towel=0;});},90);
  pop={text:hitSeats.length>1?'DOUBLE DUNK!':streak>1?`DUNK! ${streak} in a row`:'DUNK!',t:1.4};
  const who=hitSeats.map(s=>cand[s].name).join(' and ');
  announce(`Dunk! ${who} ${hitSeats.length>1?'hit':'hits'} the water. ${SHORT[cand[0].id]} ${wet[0]}, ${SHORT[cand[1].id]} ${wet[1]}. ${balls} balls left.`);
@@ -656,9 +663,12 @@ function frame(now){
   if(S.y+h.yo<0.3){h.yo=0.3-S.y;h.vy=0;h.state='under';h.timer=1.5;}}
  else if(h.state==='under'){h.timer-=dt;h.yo=0.3-S.y+Math.sin(t*3+si)*.04;if(Math.random()<dt*14)parts.push({k:'bub',x:S.x+(Math.random()-.5)*.3,y:1.0,z:S.z,vy:.8+Math.random(),life:1});
   if(h.timer<=0){h.state='climb';h.timer=0;h.splashed=false;const k=cand[si];
-   if(h.fair){h.fair=false;say(bag('fd',FAIRDUNK),3.8,si);announce(`${k.name} gave a straight answer, and you dunked it anyway.`);}else say(bag('d'+k.id,k.dunk),3.4,si);}}
+   if(h.fair){h.fair=false;say(bag('fd',FAIRDUNK),3.8,si);announce(`${k.name} gave a straight answer, and you dunked it anyway.`);}
+   else if(h.straight){const a=h.straight;h.straight=null;say(`Fine. Straight answer: ${a}`,4.2,si);announce(`${k.name}, dripping: straight answer. ${a} Someone hands over a towel.`);}
+   else say(bag('d'+k.id,k.dunk),3.4,si);}}
  else if(h.state==='climb'){h.timer+=dt;const k=Math.min(1,h.timer/1.1);const e=1-Math.pow(1-k,3);h.yo=(0.3-S.y)*(1-e);h.rot=-0.9*(1-e);h.seatA=1.25*(1-Math.min(1,k*1.6));
-  if(k>=1){h.state='sit';h.yo=0;h.rot=0;h.seatA=0;}}});
+  if(k>=1){h.state='sit';h.yo=0;h.rot=0;h.seatA=0;h.towel=4.5;}}
+ if(h.towel>0)h.towel=Math.max(0,h.towel-dt);});
  for(const p of parts){p.life-=dt;if(p.k==='drop'){p.vy-=G*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;
    const inTank=p.x>TANK.x0&&p.x<TANK.x1&&p.z>TANK.zf&&p.z<TANK.zb;if((inTank&&p.y<TANK.water&&p.vy<0)||p.y<0||p.z<1.5)p.life=0;}
   else{p.y+=p.vy*dt;if(p.y>TANK.water)p.life=0;}}
@@ -793,7 +803,7 @@ function drawTank(){
   ctx.strokeStyle='#8c8799';ctx.lineWidth=Math.max(2,sh.s*.05);const bk=P(S.x+dir*.42,S.y,zb);ctx.beginPath();ctx.moveTo(bk.x,bk.y);ctx.lineTo(sh.x,sh.y);ctx.stroke();});
  SEATS.forEach((S,si)=>{const h=chs[si];const cp=P(S.x,S.y+h.yo,S.z);
   const mood=h.state==='fall'?'fall':h.state==='under'?'under':h.state==='climb'?'wet':(bubble.t>0&&!bubble.hidden&&bubble.who===si?'talk':'idle');
-  paperOn(1);drawChar(cand[si],cp.x,cp.y,cp.s*CHS,h.rot*(si?-1:1),mood,t+si*1.3);paperOff();});
+  paperOn(1);drawChar(cand[si],cp.x,cp.y,cp.s*CHS,h.rot*(si?-1:1),mood,t+si*1.3,h.towel||0);paperOff();});
  const amp=.3+slosh;const edge=waterEdge(zf,amp),edgeB=waterEdge(zb,amp*.6);
  ctx.fillStyle='rgba(110,190,240,.55)';ctx.beginPath();edge.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));for(let i=edgeB.length-1;i>=0;i--)ctx.lineTo(edgeB[i].x,edgeB[i].y);ctx.closePath();ctx.fill();
  const bot=P(TANK.x1,0,zf),bl=P(TANK.x0,0,zf);
@@ -822,7 +832,7 @@ function drawTank(){
 }
 
 /* ---------- characters ---------- */
-function drawChar(c,X,Y,s,rot,mood,tm){
+function drawChar(c,X,Y,s,rot,mood,tm,towel){
  ctx.save();ctx.translate(X,Y);ctx.rotate(rot);ctx.scale(s,s);
  ctx.lineJoin='round';ctx.lineCap='round';ctx.lineWidth=.022;ctx.strokeStyle=OUT;
  const bw=c.bw,fall=mood==='fall',kick=fall?Math.sin(tm*22)*.5:Math.sin(tm*2.2)*.12;
@@ -874,6 +884,11 @@ function drawChar(c,X,Y,s,rot,mood,tm){
  else{ctx.beginPath();if(c.id==='lob'){ctx.moveTo(-.04,my);ctx.quadraticCurveTo(.02,my+.03,.06,my-.015);}else if(c.id==='mayor'){ctx.moveTo(-.07,my-.01);ctx.quadraticCurveTo(0,my+.06,.07,my-.01);ctx.closePath();ctx.fillStyle='#ffffff';ctx.fill();}else{ctx.moveTo(-.05,my);ctx.quadraticCurveTo(0,my+.035,.05,my);}ctx.stroke();}
  if(c.id==='fil'&&mood!=='under'){ctx.fillStyle='#e6e6ea';ctx.beginPath();ctx.moveTo(0,hY+.05);ctx.quadraticCurveTo(-.08,hY+.04,-.12,hY+.09);ctx.quadraticCurveTo(-.06,hY+.08,0,hY+.075);ctx.quadraticCurveTo(.06,hY+.08,.12,hY+.09);ctx.quadraticCurveTo(.08,hY+.04,0,hY+.05);ctx.fill();ctx.stroke();}
  if(mood==='wet'){for(let i=0;i<4;i++){const ph=(tm*1.5+i*.25)%1;circ(-.15+i*.1,hY+hr*.5+ph*.6,.018,'#9fd8ff',false);}}
+ if(towel>0){// founder 2026-11-07: after the straight answer, a towel. It drops onto the shoulders, then fades.
+  const k=Math.min(1,(4.5-towel)/.35),e=1-Math.pow(1-k,3),dy=-(1-e)*.5;ctx.save();ctx.globalAlpha=Math.min(1,towel/.6);ctx.translate(0,dy);
+  const tw=shX+.07,band=(x0,y0,w,h)=>{rr(x0,y0,w,h,.035,'#fbf6ea');ctx.save();ctx.beginPath();ctx.rect(x0,y0,w,h);ctx.clip();ctx.fillStyle='#c8342b';for(let y=y0+h*.18;y<y0+h;y+=h*.42)ctx.fillRect(x0,y,w,h*.12);ctx.restore();};
+  ctx.lineWidth=.02;band(-tw,shY-.07,tw*2,.11);band(-shX*.62-.06,shY-.02,.12,.32);band(shX*.62-.06,shY-.02,.12,.32);
+  ctx.restore();}
  ctx.restore();
 }
 
