@@ -3,10 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dunk-O-Rama v0.6</title>
+<title>Dunk-O-Rama v0.7</title>
 <meta name="spec-source" content="convening/DUNK-O-RAMA-CONVENING.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students learning to spot rhetorical cheats. Lab build.">
-<!-- TSP build: Dunk-O-Rama v0.6 | LAB | 2026-11-06
+<!-- TSP build: Dunk-O-Rama v0.7 | LAB | 2026-11-06
+     v0.7 (panel playtest, founder "Proceed with 1"): the hint no longer steals the glove grab;
+     No cheat added (about one heckle in five is a straight answer; dunking one gets noticed);
+     every exchange cut to 18 words or fewer so the card never scrolls at 263 x 480.
+     v0.6:
      v0.6: speech bubbles never block play. Each has a close button; any bubble vanishes the moment
      the player touches to pull back (back again only if the pull is let go without a throw).
      A closed heckle can be brought back from the call panel ("Show the line").
@@ -76,7 +80,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 #result h2{margin:0 0 6px;color:var(--accent);font-size:28px}
 #result p{margin:6px 0 14px;font-size:18px}
 #result .btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-#callit{left:8px;right:8px;margin:0 auto;max-width:560px;top:calc(62px + env(safe-area-inset-top));max-height:56vh;overflow:auto;padding:10px 12px 12px;display:none;z-index:3;text-align:left}
+#callit{left:8px;right:8px;margin:0 auto;max-width:560px;top:calc(62px + env(safe-area-inset-top));max-height:56vh;overflow:auto;padding:8px 10px 10px;display:none;z-index:3;text-align:left}
 #callit{transition:opacity .15s}
 #dlg{font-size:18px;line-height:1.35;margin:0 0 8px 0}
 #dlg p{margin:0 0 6px}
@@ -93,8 +97,8 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 #callit .chips:empty{display:none}
 @media (max-height:639px){#callit{max-height:44vh}}
 .se-chrome h1{white-space:normal;flex-wrap:wrap}
-#callit .q{font-size:18px;font-weight:700;margin:4px 0 8px}
-#callit .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#callit .q{font-size:18px;font-weight:700;margin:2px 0 6px}
+#callit .chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 #callit .chips button{flex:1 1 120px}
 #callit .teach{font-size:18px;line-height:1.4;margin:0;text-align:left}
 #callit .teach b{color:var(--accent)}
@@ -114,7 +118,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.6</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.7</span> <span class="tsp-labchip">LAB</span></h1>
   <div class="sp">
     <button id="seatBtn" aria-haspopup="dialog">Seat</button>
     <button id="modeBtn" class="icon" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" fill="currentColor" style="fill:var(--ink)"/></svg></button>
@@ -123,7 +127,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="menuClose" type="button">Close menu</button>
 </header>
-<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.6, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
+<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.7, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
 
 <div id="seatSheet" class="panel sheet" role="dialog" aria-label="Who's on the seat">
   <h2>Who's on the seat?</h2>
@@ -221,73 +225,44 @@ const MOVES={
 const LEVEL_MOVES={fil:['red','trad','gish','circ'],spin:['straw','dilemma','loaded','goal'],mayor:['band','what','slope','equiv'],lob:['adhom','auth','cherry','anec'],pun:['scape','cause','lq','incoh']};
 /* Exchanges written on set by the Twain seat: [the crowd asks, the politician cheats].
    Studio drafts for founder edit. Town issues only; no parties, no real people. */
+/* v0.7 exchanges: every one trimmed to 18 words or fewer (question + answer) so the card never
+   scrolls at the founder's 263 x 480. Lines by the Twain seat; drafts for founder edit. */
 const LINES={
  fil:{
-  red:[['Senator, where did the bridge money go?','A fair question. A fairer one: who brought the potato salad to the Fourth of July picnic? I did. Twice.'],
-       ['Will you fix the pothole on Main Street?','Have you looked at the moon lately? Magnificent. Nobody paves the moon, and nobody complains.'],
-       ['Why is the school roof leaking?','I would rather talk about the flag on top of that roof. Look at it wave. That is the real story.']],
-  trad:[['Why plow the north side first every time?','We have always plowed the north side first. My grandfather did. He was snowed in most of his life, but he was consistent.'],
-        ['The town clock runs eleven minutes slow.','For ninety years. That is not a broken clock. That is heritage.'],
-        ['Why does the library close at four?','It closed at four in 1911, and nobody in 1911 wrote a single letter about it.']],
-  gish:[['Can you give one reason for the new tax?','I can give nine: one, two, three, the moon, my aunt, a sub-reason, page four, the weather, and nine. Next.'],
-        ['Is the water report accurate?','Consider my forty-one points. I will make them all at once, so nobody can answer any of them.'],
-        ['Did the fair lose money this year?','The facts are on my side. All of them. Several hundred at once. Check them before the ball lands.']],
-  circ:[['Why should we trust you?','Because I am trustworthy. I know I am trustworthy because I would never lie to you about being trustworthy.'],
-        ['Why is your bridge plan the best one?','It is better than every other plan, which makes it the best, which is why it is better.'],
-        ['How do you know the budget balances?','I only pass balanced budgets, and I passed this one. Therefore it is balanced. Case closed.']]},
+  red:[['Where did the bridge money go?','Who brought the potato salad? Me. Twice. Next question.'],['Will you fix the Main Street pothole?','Have you seen the moon lately? Nobody paves the moon.'],['Why is the school roof leaking?','Look at the flag on that roof. Look at it wave.']],
+  trad:[['Why plow the north side first?','Grandpa did. He was snowed in forty years, but consistent.'],['The town clock runs slow.','For ninety years. That is not broken. That is heritage.'],['Why does the library close at four?','It closed at four in 1911. Nobody complained in 1911.']],
+  gish:[['One reason for the new tax?','Nine: one, two, the moon, my aunt, page four, nine.'],['Is the water report accurate?','Here are forty-one points, all at once. Answer any. Go.'],['Did the fair lose money?','I have several hundred facts. Check them before the ball lands.']],
+  circ:[['Why should we trust you?','I am trustworthy. I know because I would never lie about it.'],['Why is your bridge plan best?','Because it is the best plan. That is why it is best.'],['Is the budget balanced?','I only pass balanced budgets. I passed it. So it is balanced.']],
+  none:[['Where did the bridge money go?','To the bridge. The receipts are in the town report.'],['Will you fix the Main Street pothole?','Yes, in April. Call me if it is not.'],['Why should we trust you?','Do not. Check my votes. They are posted at the library.']]},
  spin:{
-  straw:[['Could we add a crosswalk on Elm Street?','So you want cars outlawed, horses brought back, and your grandmother walking to Ohio. Interesting vision.'],
-         ['Can the library open on Sundays?','So you hate weekends. You want everyone shelving books on their day off. Noted.'],
-         ['Will you answer our questions tonight?','So you want me under a hot lamp with no water. That is not democracy. That is a dentist.']],
-  dilemma:[['Should we repaint the bandstand?','Either we paint it gold, or we let the town slide into the sea. Choose wisely.'],
-           ['Are the new parking meters a good idea?','You are with the parking meters, or you are with chaos. There is no third thing. I checked.'],
-           ['Is the dunk tank good for the fair?','Dunk me, or love freedom. You cannot do both.']],
-  loaded:[['Did the budget go over?','The budget did not go over. It achieved surprise growth.'],
-          ['Why did you skip the town meeting?','I did not skip it. I gave it room to breathe.'],
-          ['When will you fix the pothole?','That is not a pothole. It is a traffic-calming feature with historical depth.']],
-  goal:[['Here is the receipt. The money went missing.','A receipt? Anyone can have a receipt. Come back with a notarized one. In Latin.'],
-        ['Ten thousand people signed the petition.','I said a lot of people. A lot has always meant more than ten thousand.'],
-        ['You said you would resign if the bridge fell. It fell.','I said the whole bridge. That was most of the bridge.']]},
+  straw:[['Could Elm Street get a crosswalk?','So you want cars banned and Grandma walking to Ohio.'],['Can the library open Sundays?','So you hate weekends. Noted.'],['Will you answer questions tonight?','So you want a hot lamp in my face. That is a dentist.']],
+  dilemma:[['Should we repaint the bandstand?','Gold paint, or the town slides into the sea. Choose.'],['Are the parking meters a good idea?','Meters or chaos. There is no third thing. I checked.'],['Is the dunk tank good for the fair?','Dunk me, or love freedom. You cannot do both.']],
+  loaded:[['Did the budget go over?','No. It achieved surprise growth.'],['Why did you skip the meeting?','I did not skip it. I gave it room to breathe.'],['When will you fix the pothole?','It is a traffic-calming feature with historical depth.']],
+  goal:[['Here is the receipt. The money is gone.','Anyone has receipts. Bring a notarized one. In Latin.'],['Ten thousand people signed.','I said a lot. A lot means more than ten thousand.'],['The bridge fell. You promised to resign.','I meant the whole bridge. That was most of it.']],
+  none:[['Did the budget go over?','Yes, four percent, for snow. Reserves will cover it.'],['Why did you skip the meeting?','I had the flu. I will answer questions Monday.'],['Should we repaint the bandstand?','Maybe. It costs nine thousand. Here are three other options.']]},
  mayor:{
-  band:[['Do people really want a parking garage?','Everybody who is anybody supports it. Ask them. They are all parked in it.'],
-        ['Is the new dog park popular?','Ninety percent of the people at my birthday party agree with me.'],
-        ['Does anyone support the new fee?','The whole town is behind me. That roar is them cheering. Or the Tilt-A-Whirl.']],
-  what:[['Where did the snowplow money go?','What about the time you returned a library book late? Let us talk about that for once.'],
-        ['Why did you miss the budget vote?','Sure, I missed the vote. You missed the target. Who is really missing things here?'],
-        ['Your fence is on your neighbor\'s lawn.','And what about the neighbor\'s lawn, sitting right under my fence?']],
-  slope:[['Can you fix the pothole on Elm?','Fix one pothole and they want every pothole fixed, then sidewalks, then a moon base.'],
-         ['Can the dog park get a water fountain?','First a fountain. Then the dogs want the vote. Then a beagle is mayor. Is that what you want?'],
-         ['Is the dunk tank fair to you?','Dunk me today and tomorrow you dunk the fire chief. By Friday nobody in this town is dry.']],
-  equiv:[['The town lost forty thousand dollars.','And my nephew lost a mitten. Losses happen on all sides. Who is to say which is worse?'],
-         ['The inspector found cracks in the bridge.','My coffee mug has a crack, and I use it every day. Bridges, mugs. Both hold things.'],
-         ['You gave your cousin the parks job.','And you lent your cousin your car. We both help family. Same thing exactly.']]},
+  band:[['Do people want a parking garage?','Everybody who is anybody does. They are all parked in it.'],['Is the dog park popular?','Ninety percent of my birthday party agrees.'],['Who supports the new fee?','The whole town. Hear that roar? Or is that the Tilt-A-Whirl?']],
+  what:[['Where did the snowplow money go?','Where did your overdue library book go? Exactly.'],['Why did you miss the budget vote?','You missed the target. Who is really missing things here?'],['Your fence is on your neighbor\'s lawn.','And what about his lawn, under my fence?']],
+  slope:[['Can you fix the Elm pothole?','Fix one pothole, next it is sidewalks, then a moon base.'],['A dog park fountain?','First a fountain. Then dogs vote. Then a beagle is mayor.'],['Is the dunk tank fair?','Dunk me today, the fire chief tomorrow. By Friday, nobody is dry.']],
+  equiv:[['The town lost forty thousand dollars.','My nephew lost a mitten. Losses happen on all sides.'],['The inspector found cracks in the bridge.','My mug has a crack. Bridges, mugs. Both hold things.'],['You gave your cousin the parks job.','You lent your cousin your car. Same thing exactly.']],
+  none:[['Do people want a parking garage?','I do not know yet. We are asking every household this month.'],['Where did the snowplow money go?','Overtime. Nine storms in February. The breakdown is online.'],['You gave your cousin the parks job.','Fair point. I will step aside and let the board decide.']]},
  lob:{
-  adhom:[['The crossing guard says Elm needs a light.','The crossing guard? Have you seen her hat? I would not trust that hat with a goldfish.'],
-         ['The engineer says the bridge is unsafe.','The engineer also drives a hatchback. Draw your own conclusions. I have drawn mine.'],
-         ['A student found pollution in the lake.','That kid is twelve, and he smells like the lake. Consider the source.']],
-  auth:[['Is the candy factory\'s new candy safe?','Four out of five dentists agree it is good policy. The fifth is not on the payroll yet.'],
-        ['Is the tap water safe to drink?','An actor who played a doctor on television says it is fine. Who are you to argue with television?'],
-        ['Will the new bridge design hold?','My cousin read a website about bridges. Engineering is settled.']],
-  cherry:[['Is the factory polluting the air?','It smoked 364 days last year. But the 365th? Clean as a whistle. Let us talk about the good day.'],
-          ['What do the studies say about the dam?','Of all the studies, I picked the one my client paid for. It is the shiniest.'],
-          ['Are the crops by the factory okay?','Look at this one perfect tomato. I rest my case. Ignore the other forty acres.']],
-  anec:[['Is the new highway ramp safe?','My uncle drove it twice and he is fine. Mostly. He is fine.'],
-        ['Should kids wear bike helmets?','I never wore one, and look at me. I became a lobbyist.'],
-        ['Does the factory make neighbors sick?','I met a man who lives right next door. Ninety-four years old. Sharp as a tack. Says hello.']]},
+  adhom:[['The crossing guard wants a light.','Seen her hat? I would not trust it with a goldfish.'],['The engineer says the bridge is unsafe.','The engineer drives a hatchback. Draw your own conclusions.'],['A student found pollution in the lake.','He is twelve and smells like the lake. Consider the source.']],
+  auth:[['Is the factory\'s candy safe?','Four of five dentists agree. The fifth is not on payroll yet.'],['Is the tap water safe?','An actor who played a doctor says so. Argue with television.'],['Will the bridge design hold?','My cousin read a website. Engineering is settled.']],
+  cherry:[['Is the factory polluting the air?','Smoke 364 days. Day 365? Spotless. Let us talk about that one.'],['What do the dam studies say?','I chose the one my client paid for. Shiniest one.'],['Are the crops by the factory okay?','Look at this one perfect tomato. Ignore the forty acres.']],
+  anec:[['Is the new highway ramp safe?','My uncle drove it twice. He is fine. Mostly.'],['Should kids wear bike helmets?','I never did, and look at me. A lobbyist.'],['Does the factory make neighbors sick?','I met a neighbor. Ninety-four, sharp as a tack.']],
+  none:[['Is the factory polluting the air?','State tests found two bad days. My client must fix both.'],['Is the tap water safe?','Ask the state lab. Their latest test is posted.'],['Will the new bridge hold?','The state engineer signed off. Her report is public.']]},
  pun:{
-  scape:[['Why is traffic so bad downtown?','Three words: the marching band. Since they started practicing, nothing in this town has moved.'],
-         ['Why did the library budget run short?','Ask the book club. They read too fast. Nobody will say it, so I will.'],
-         ['Why did the fair lose money?','I will not name names. I will name one name: pigeons.']],
-  cause:[['Why did the river flood?','The new mayor took office in May. In June, the river flooded. You do the math. I already did.'],
-         ['Why did test scores go up?','I bought a new tie in March, and scores went up in April. You are welcome, children.'],
-         ['Why did the bakery close?','It closed a week after the bike lane opened. Bicycles hate bread. Look it up.']],
-  lq:[['Will you take a question from us?','Sure. Here is mine for you: have you stopped wasting the town\'s money, yes or no?'],
-      ['What will you ask the mayor tonight?','Just one thing: why does the mayor hate puppies? I am only asking.'],
-      ['What is tonight\'s show about?','A simple question, folks: how long has the library been hiding the truth?']],
-  incoh:[['Is the new bridge good or bad?','It is a disaster nobody will use, and it is so crowded it is dangerous. Both. At once.'],
-         ['Is the new tax too high?','It is so tiny it is an insult, and it will bankrupt every family on Elm Street.'],
-         ['Is the carnival safe?','It is perfectly safe, which is why I warn you never to go. I am here every night.']]}
+  scape:[['Why is traffic so bad downtown?','The marching band. Since practice started, nothing moves.'],['Why is the library budget short?','The book club reads too fast. Somebody had to say it.'],['Why did the fair lose money?','I will not name names. One name: pigeons.']],
+  cause:[['Why did the river flood?','New mayor in May, flood in June. You do the math.'],['Why did test scores go up?','I bought a new tie in March. You are welcome, children.'],['Why did the bakery close?','A week after the bike lane opened. Bikes hate bread.']],
+  lq:[['Will you take our question?','Mine first: have you stopped wasting town money? Yes or no?'],['What will you ask the mayor?','Why does the mayor hate puppies? I am only asking.'],['What is tonight\'s show about?','How long has the library been hiding the truth?']],
+  incoh:[['Is the new bridge good or bad?','Nobody will use it, and it is dangerously crowded. Both.'],['Is the new tax too high?','It is insultingly tiny, and it will bankrupt Elm Street.'],['Is the carnival safe?','Perfectly safe. Never go. I am here every night.']],
+  none:[['Why did the river flood?','Record rain and an old culvert. Both were flagged last year.'],['Why did test scores go up?','Hard to say. Tutoring, smaller classes. Nobody knows yet.'],['Why is traffic so bad downtown?','Two lanes are closed for water mains until June. Sorry.']]}
 };
+MOVES.none={name:'No cheat',def:'A straight answer. You can disagree with it, but it plays fair.',spot:'Does it answer the question, with reasons you could check?',fair:'This is the fair version.'};
+/* dunking a straight answer gets noticed (panel: Gitlin, Turkle) */
+const FAIRDUNK=['I told you the truth, plainly. And here I am, wet.','Honest answer, cold water. Lesson noted, folks.','Next time I will lie. That seems to work better.','Did anyone hear the answer? Anyone? Glub.','Fair answer. Unfair water.'];
+
 /* Verified against the University of Virginia list of Pudd'nhead Wilson's New Calendar epigraphs
    in Following the Equator (1897). */
 const TWAIN={
@@ -375,7 +350,7 @@ const SFX={
 
 /* ---------- UI ---------- */
 function hud(){
- const w=c.wind?` &nbsp; Breeze <b>${wind===0?'calm':(wind<0?'← ':'')+Math.abs(wind).toFixed(1)+(wind>0?' →':'')}</b>`:'';
+ const w=(c.wind&&innerWidth>=360)?` &nbsp; Breeze <b>${wind===0?'calm':(wind<0?'← ':'')+Math.abs(wind).toFixed(1)+(wind>0?' →':'')}</b>`:'';
  $('hud').innerHTML=`Balls <b>${balls}</b> &nbsp; Dunks <b>${dunks}</b>${w}`;
 }
 function applyMode(){document.documentElement.setAttribute('data-comfort',mode);const nx=MODES[(MODES.indexOf(mode)+1)%3];$('modeBtn').setAttribute('aria-label',`Mode: ${MODE_NAME[mode]}. Switch to ${MODE_NAME[nx]}.`);}
@@ -404,7 +379,7 @@ $('bubClose').onclick=()=>{hideBubble();announce('Closed.');};
 $('dlgClose').onclick=()=>{$('callit').style.display='none';announce('Closed.');};
 function compact(){return H<640;}
 $('callBtn').onclick=()=>{$('dlg').style.display='none';$('callBtn').style.display='none';$('callQ').textContent='Which move was that?';$('callQ').style.display='block';$('chips').style.display='flex';const b=$('chips').querySelector('button');b&&b.focus();};
-$('hint').onclick=()=>{ac();if(canThrow()&&!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=0;}$('hint').classList.add('gone');cv.focus&&cv.focus();announce('Ball in hand. Arrow keys aim, space throws. On a touch screen, drag anywhere and let go.');};$('seatClose').onclick=closeSheets;
+$('hint').onclick=(e)=>{if(e.detail>0)return;ac();if(canThrow()&&!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=0;}$('hint').classList.add('gone');cv.focus&&cv.focus();announce('Ball in hand. Arrow keys aim, space throws. On a touch screen, drag anywhere and let go.');};$('seatClose').onclick=closeSheets;
 $('rAgain').onclick=()=>setCast(ci);$('rNext').onclick=()=>setCast((ci+1)%CAST.length);
 addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheets();if($('topbar').classList.contains('open'))menu(false);}});
 
@@ -414,7 +389,7 @@ function setCast(i){ci=i;c=CAST[i];balls=BALLS;dunks=0;streak=0;roundOver=false;
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function pastMoves(){const out=[];for(const k of CAST){if(k===c)break;out.push(...LEVEL_MOVES[k.id]);}return out;}
 function newHeckle(){
- const set=LEVEL_MOVES[c.id];const mv=bag('mv'+c.id,set);const ex=bag('ln'+c.id+mv,LINES[c.id][mv]);
+ const set=LEVEL_MOVES[c.id];const mv=bag('mv'+c.id,set.concat(['none']));const ex=bag('ln'+c.id+mv,LINES[c.id][mv]);
  heck={active:true,move:mv,called:null};
  bubble.t=0;bubble.parts=null;
  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
@@ -424,7 +399,7 @@ function newHeckle(){
  const box=$('callit');$('teach').textContent='';
  if(ask){
   const others=shuffle(set.filter(m=>m!==mv)),earlier=shuffle(pastMoves());
-  const d2=earlier.length&&Math.random()<.5?earlier[0]:others[1];
+  const d2=mv==='none'?others[1]:Math.random()<.4?'none':(earlier.length&&Math.random()<.5?earlier[0]:others[1]);
   const chips=shuffle([mv,others[0],d2]);
   $('chips').innerHTML='';
   chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=MOVES[id].name;b.onclick=()=>callMove(id);$('chips').appendChild(b);});
@@ -438,10 +413,10 @@ function newHeckle(){
 function callMove(id){
  if(heck.called!==null)return;const M=MOVES[heck.move];stats.asked++;stats.seen[heck.move]=1;
  if(id===heck.move){heck.called=true;stats.right++;rBoost=1.22;calmLock=true;breath.calm=1;SFX.steady();setTimeout(()=>SFX.steady(),110);
-  $('teach').innerHTML=`<b>Called it: ${M.name}.</b> ${M.def} Your breath steadies and the target looks bigger.`;
+  $('teach').innerHTML=heck.move==='none'?`<b>Called it: no cheat.</b> A straight answer. Aim steadied.`:`<b>Called it: ${M.name}.</b> ${M.def} Aim steadied.`;
   announce(`Called it. ${M.name}. ${M.def}`);}
  else{heck.called=false;tone(220,.18,'square',.05);
-  $('teach').innerHTML=`<b>Not quite. That was ${M.name}.</b> ${M.def} Spot it: ${M.spot}`;
+  $('teach').innerHTML=heck.move==='none'?`<b>That was a straight answer.</b> ${M.def}`:`<b>That was ${M.name}.</b> ${M.def}`;
   announce(`Not quite. That was ${M.name}. ${M.def} Spot it: ${M.spot}`);}
  $('chips').innerHTML='';$('callQ').style.display='none';
 }
@@ -460,7 +435,9 @@ function steadiness(){return breath.hold>5?'SHAKY':breath.calm>.8?'STEADY':'BREA
 function restPt(){return P(LAUNCH.x,LAUNCH.y,LAUNCH.z);}
 function maxPull(){return Math.min(W,H)*0.24;}
 function canThrow(){return !ball&&!anim&&balls>0&&!roundOver&&ch.state==='sit'&&!document.querySelector('.sheet.open');}
-cv.addEventListener('pointerdown',e=>{ac();if($('topbar').classList.contains('open')){menu(false);return;}if(!canThrow())return;$('callit').classList.add('aside');bubble.pulled=!bubble.hidden;hideBubble();cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';});
+function startPull(e){ac();if($('topbar').classList.contains('open')){menu(false);return;}if(!canThrow())return;$('callit').classList.add('aside');bubble.pulled=!bubble.hidden;hideBubble();cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';}
+cv.addEventListener('pointerdown',startPull);
+$('hint').addEventListener('pointerdown',e=>{e.preventDefault();$('hint').classList.add('gone');startPull(e);});
 cv.addEventListener('pointermove',e=>{if(!drag)return;drag.dx=e.clientX-drag.x0;drag.dy=e.clientY-drag.y0;drag.moved+=Math.hypot(e.clientX-drag.lx,e.clientY-drag.ly);drag.lx=e.clientX;drag.ly=e.clientY;});
 cv.addEventListener('pointerup',()=>{if(!drag)return;const d=drag;drag=null;cv.style.cursor='grab';$('callit').classList.remove('aside');if(Math.hypot(d.dx,d.dy)>14)release(d.dx,d.dy);else if(bubble.pulled)showBubble();bubble.pulled=false;});
 cv.addEventListener('pointercancel',()=>{drag=null;$('callit').classList.remove('aside');});
@@ -481,7 +458,7 @@ function launchState(dx,dy){
  return{x:LAUNCH.x,y:LAUNCH.y,z:LAUNCH.z,vx:-4.6*nx,vy:1+9*ny,vz:8+14*p,p,age:0,hitT:false,front:false,bonked:false};
 }
 function release(dx,dy){const v=aimPull(dx,dy);anim={v,t:0,launched:false};breath.hold=0;}
-function launch(v){ball=launchState(v[0],v[1]);ball.rBoost=rBoost;rBoost=1;calmLock=false;thrown++;if(heck.move)stats.seen[heck.move]=1;heck.active=false;$('callit').style.display='none';bubble.t=Math.min(bubble.t,1.2);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
+function launch(v){ball=launchState(v[0],v[1]);ball.rBoost=rBoost;ball.move=heck.move;rBoost=1;calmLock=false;thrown++;if(heck.move)stats.seen[heck.move]=1;heck.active=false;$('callit').style.display='none';bubble.t=Math.min(bubble.t,1.2);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
 
 /* ---------- physics ---------- */
 function tgtPos(){return{x:TGT.px+TGT.len*Math.sin(tg.phi),y:TGT.top-TGT.len*Math.cos(tg.phi)};}
@@ -514,6 +491,7 @@ function step(b,dt,live){
  if(b.y<R){b.y=R;if(b.vy<0){const v=-b.vy;b.vy=v*.45;b.vx*=.78;b.vz*=.78;if(v>1.2)SFX.bounce(v);}}
 }
 function dunk(T){
+ if(ball&&ball.move==='none'){ch.fair=true;stats.fairDunks=(stats.fairDunks||0)+1;}
  SFX.clang();tgtFlash=1;rings.push({x:T.x,y:T.y,z:TGT.z,r:.1,a:1});
  dunks++;streak++;hud();shakeIt(.6);hitPause=RM?0:.07;if(!RM){slow=.25;slowT=.45;}
  setTimeout(()=>{SFX.drop();ch.state='fall';ch.vy=.6;},90);
@@ -538,7 +516,9 @@ function checkEnd(){if(ball||balls>0||roundOver)return;if(ch.state!=='sit'){setT
  $('rText').textContent=`${dunks} dunk${dunks===1?'':'s'} out of ${BALLS} on ${c.name}. ${nb?'New best!':'Best: '+Math.max(best,dunks)+'.'}`;
  const g=$('rGuide');g.innerHTML='';LEVEL_MOVES[c.id].forEach(id=>{const M=MOVES[id];const li=document.createElement('li');li.innerHTML=`<b>${M.name}.</b> ${M.def} <br>Spot it: ${M.spot} <br>Fair version: ${M.fair}`;g.appendChild(li);});
  $('rTwain').textContent='\u201c'+TWAIN[c.id].q+'\u201d';$('rTwainSrc').textContent=TWAIN[c.id].src;
+ {const M=MOVES.none,li=document.createElement('li');li.innerHTML=`<b>No cheat.</b> ${M.def} <br>Spot it: ${M.spot}`;g.appendChild(li);}
  if(stats.asked)$('rText').textContent+=` You called ${stats.right} of ${stats.asked} moves.`;
+ if(stats.fairDunks)$('rText').textContent+=` You dunked ${stats.fairDunks} straight answer${stats.fairDunks===1?'':'s'}.`;
  $('result').style.display='block';$('rAgain').focus();announce($('rText').textContent);}
 
 /* ---------- update ---------- */
@@ -567,7 +547,7 @@ function frame(now){
   if(SEAT.y+ch.yo<TANK.water+.05&&!ch.splashed){ch.splashed=true;splashAt();}
   if(SEAT.y+ch.yo<0.3){ch.yo=0.3-SEAT.y;ch.vy=0;ch.state='under';ch.timer=1.5;}}
  else if(ch.state==='under'){ch.timer-=dt;ch.yo=0.3-SEAT.y+Math.sin(t*3)*.04;if(Math.random()<dt*14)parts.push({k:'bub',x:SEAT.x+(Math.random()-.5)*.3,y:1.0,z:SEAT.z,vy:.8+Math.random(),life:1});
-  if(ch.timer<=0){ch.state='climb';ch.timer=0;ch.splashed=false;say(bag('d'+c.id,c.dunk),3.4);}}
+  if(ch.timer<=0){ch.state='climb';ch.timer=0;ch.splashed=false;if(ch.fair){ch.fair=false;say(bag('fd',FAIRDUNK),3.8);announce('That was a straight answer, and you dunked it anyway.');}else say(bag('d'+c.id,c.dunk),3.4);}}
  else if(ch.state==='climb'){ch.timer+=dt;const k=Math.min(1,ch.timer/1.1);const e=1-Math.pow(1-k,3);ch.yo=(0.3-SEAT.y)*(1-e);ch.rot=-0.9*(1-e);seatA=1.25*(1-Math.min(1,k*1.6));
   if(k>=1){ch.state='sit';ch.yo=0;ch.rot=0;seatA=0;}}
  for(const p of parts){p.life-=dt;if(p.k==='drop'){p.vy-=G*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;
