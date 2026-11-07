@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Spool v0.1</title>
+<meta name="spec-source" content="convening/SPOOL-CONVENING.md">
+<meta name="audience" content="High school biology and up (ruling R2 pending). Founder playtest first. Lab build.">
+<!-- BUILD: Spool v0.1 (LAB) 2026-11-07. Tight Spiral Studios. -->
+<!-- tsp:source convening/SPOOL-CONVENING.md -->
+<style>
+:root{--bg:#efe6d2;--panel:#fbf6ea;--ink:#1b1712;--line:#6e5f40;--hot-ink:#7a2e14;--btn:#fbf6ea;color-scheme:light}
+@media (prefers-color-scheme: dark){:root{--bg:#10131b;--panel:#1b2030;--ink:#f1ece0;--line:#8d97b0;--hot-ink:#f2b38f;--btn:#1b2030;color-scheme:dark}}
+html[data-mode=light]{--bg:#efe6d2;--panel:#fbf6ea;--ink:#1b1712;--line:#6e5f40;--hot-ink:#7a2e14;--btn:#fbf6ea;color-scheme:light}
+html[data-mode=dark]{--bg:#10131b;--panel:#1b2030;--ink:#f1ece0;--line:#8d97b0;--hot-ink:#f2b38f;--btn:#1b2030;color-scheme:dark}
+html[data-mode=sharp]{--bg:#000000;--panel:#000000;--ink:#ffffff;--line:#ffffff;--hot-ink:#ffd84a;--btn:#000000;color-scheme:dark}
+html[data-light=day]{--bg:#efe6d2;--panel:#fbf6ea;--ink:#1b1712;--line:#6e5f40;--hot-ink:#7a2e14;--btn:#fbf6ea;color-scheme:light}
+html[data-light=dusk],html[data-light=night]{--bg:#10131b;--panel:#1b2030;--ink:#f1ece0;--line:#8d97b0;--hot-ink:#f2b38f;--btn:#1b2030;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:20px/1.4 "Avenir Next","Segoe UI",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+#backdrop{position:fixed;inset:0;z-index:0;background:var(--bg)}
+#app{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;height:100dvh;color:var(--ink)}
+.se-chrome{display:flex;align-items:center;gap:6px;padding:calc(4px + env(safe-area-inset-top)) 8px 4px;background:var(--bg)}
+.se-brand{flex:1;min-width:0;display:flex;align-items:center}
+.se-brand h1{margin:0;font-size:22px;font-weight:800;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.ver,.tsp-labchip{font-size:18px;font-weight:700;color:var(--hot-ink);border:2px solid var(--hot-ink);border-radius:10px;padding:0 6px;line-height:1.3}
+.btn{min-height:44px;min-width:44px;border-radius:22px;border:2px solid var(--ink);background:var(--btn);color:var(--ink);font:700 18px "Avenir Next","Segoe UI",system-ui,sans-serif;padding:0 12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:focus-visible{outline:3px solid var(--hot-ink);outline-offset:2px}
+.btn svg{width:24px;height:24px}
+#strip{padding:2px 12px 4px;background:var(--bg)}
+#brief{margin:0;font-size:19px;font-weight:600;line-height:1.35}
+#meta{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin-top:4px;font-size:18px;font-weight:700}
+#meta .tools{margin-left:auto;display:flex;gap:6px}#meta .tools .btn{padding:0;width:44px}
+#board{flex:1;min-height:0;width:100%;display:block;touch-action:none}
+#pad{display:grid;grid-template-columns:1fr 1fr 1.6fr 1fr;max-width:560px;width:100%;margin:0 auto;gap:8px;padding:6px 10px;background:var(--bg)}
+#pad .btn{min-height:56px;font-size:20px;border-radius:16px}
+#pad .sec{font-weight:400}#pad .sec svg{width:30px;height:30px}
+#pad .primary{background:var(--ink);color:var(--bg);font-weight:800}
+.se-rail{display:flex;justify-content:space-between;gap:8px;padding:2px 10px calc(6px + env(safe-area-inset-bottom));background:var(--bg)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.sheet{position:fixed;z-index:5;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);padding:14px}
+.sheet.on{display:flex}
+.card{background:var(--panel);color:var(--ink);border:2px solid var(--line);border-radius:18px;max-width:560px;width:100%;max-height:88vh;overflow:auto;padding:16px 18px}
+.card h2{margin:0 0 6px;font-size:26px}
+.card h3{margin:14px 0 4px;font-size:21px}
+.card p,.card li{font-size:20px;margin:6px 0}
+.card canvas{width:100%;height:180px;display:block;margin:6px 0}
+.card .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.card a{color:var(--hot-ink)}
+#lvl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#readsTxt{white-space:nowrap}
+@media (max-width:420px){.se-brand .nm{display:none}#brief{font-size:18px}#lvl .lp{display:none}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="backdrop" aria-hidden="true"></div>
+<div id="app" data-art-class="studio-cut">
+<header class="se-chrome">
+  <a class="btn" href="../index.html">Studio</a>
+  <a class="btn" href="../arcade.html">Cabinet</a>
+  <span class="se-brand"><h1><span class="nm">Spool</span> <span class="ver">v0.1</span> <span class="tsp-labchip">LAB</span></h1></span>
+  <button class="btn" id="bMode" type="button" aria-label="Mode"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
+</header>
+<section id="strip" aria-label="Level brief">
+  <p id="brief">Match three of the same letter to read the gene. Each read adds a link to the protein.</p>
+  <div id="meta"><span id="lvl"><span class="lp">Level 1: </span>Read the strand</span><span id="readsTxt">Reads 0 of 8</span>
+  <span class="tools"><button class="btn" id="bSound" type="button" aria-label="Sound is on. Turn sound off"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path id="snd" d="M16 8c2 2 2 6 0 8M18.5 5.5c3.5 3.5 3.5 9.5 0 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button><button class="btn" id="bNotes" type="button" aria-label="Notes: how to play and the science"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 10.5v6.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="7" r="1.6" fill="currentColor"/></svg></button><button class="btn" id="bPause" type="button" aria-label="Pause"><svg viewBox="0 0 24 24" aria-hidden="true"><path id="pIco" d="M8 5v14M16 5v14" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" fill="none"/></svg></button></span></div>
+</section>
+<canvas id="board" role="img" aria-label="A strand of DNA letters stacked in a paper well. Spools sit on the left, a twisting helix on the right. A three-letter piece falls from the top."></canvas>
+<div id="pad" role="group" aria-label="Piece controls">
+  <button class="btn sec" id="bL" type="button" aria-label="Move left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="btn sec" id="bRot" type="button" aria-label="Turn piece"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12a7 7 0 1 1-2.1-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M18 3v5h-5" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="btn primary" id="bDrop" type="button" aria-label="Drop piece">Drop</button>
+  <button class="btn sec" id="bR" type="button" aria-label="Move right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+<nav class="se-rail" aria-label="Navigation"><a class="btn" href="index.html">Back</a><a class="btn" href="../index.html">Home</a></nav>
+</div>
+<div id="live" class="sr" aria-live="polite"></div>
+
+<div class="sheet" id="sCard" role="dialog" aria-modal="true" aria-labelledby="cT"><div class="card">
+  <h2 id="cT">Gene read</h2>
+  <canvas id="cArt" aria-hidden="true"></canvas>
+  <p id="cP"></p>
+  <div class="row"><button class="btn" id="cGo" type="button">Next level</button><button class="btn" id="cAgain" type="button">Play again</button></div>
+</div></div>
+
+<div class="sheet" id="sNotes" role="dialog" aria-modal="true" aria-labelledby="nT"><div class="card">
+  <h2 id="nT">Notes</h2>
+  <h3>How to play</h3>
+  <ul><li>Steer the falling piece with Left, Right and Turn. Drop sends it down fast.</li>
+  <li>Swipe a settled letter toward a neighbor to swap them, or tap one and then the other. A swap only sticks when it makes a read.</li>
+  <li>Three or more of one letter in a row or column makes a read. Four counts double.</li>
+  <li>Keyboard: arrow keys steer, Up turns, Space drops, P pauses.</li></ul>
+  <h3>What is real</h3>
+  <ul><li>Epigenetic marks change which genes a cell reads without changing the DNA letters.</li>
+  <li>Methyl groups on DNA (the gray caps) stop a gene from being read. Enzymes called DNMTs write them; TET enzymes begin taking them off.</li>
+  <li>DNA wraps around histone proteins like thread on a spool. Acetyl groups on histones loosen the wrap so the gene can be read; HDAC enzymes take them off and the wrap tightens.</li>
+  <li>Nearly every cell in your body carries the same DNA. Marks help make a skin cell different from a nerve cell.</li></ul>
+  <h3>Studio inventions</h3>
+  <p>The falling pieces, swapping, the eraser and key as pieces, rows as spools, reads as runs of three, and signals on a timer are game rules, not biology.</p>
+  <h3>Sources</h3>
+  <ul><li>NHGRI Talking Glossary: Epigenetics.</li>
+  <li>American Society of Human Genetics, Discover Genetics: Genetics and Environment fact sheet (2024).</li>
+  <li>Epigenetic mechanisms table, AIMS Neuroscience 8(4), 2021 (PMC8611190).</li></ul>
+  <div class="row"><button class="btn" data-close type="button">Back to the strand</button></div>
+</div></div>
+
+<script>
+(function(){
+'use strict';
+const COLS=7, ROWS=11;
+const LETTERS=['A','T','G','C'];
+const LEVELS=[
+ {name:'Read the strand',goal:8,capP:0,tightRows:0,pre:4,preCap:0,tetEvery:0,acEvery:0,signals:0,drop:950,
+  brief:'Match three of the same letter to read the gene. Each read adds a link to the protein.',
+  win:'You read the gene. The letters made a protein because nothing was in the way.'},
+ {name:'Caps',goal:8,capP:.2,tightRows:0,pre:4,preCap:.3,tetEvery:6,acEvery:0,signals:0,drop:900,
+  brief:'Gray caps silence a letter without changing it. Drop the pink eraser on caps to lift them.',
+  win:'Under every cap the letter stayed the same. The cap only decided whether the cell could read it.'},
+ {name:'Spools',goal:10,capP:.12,tightRows:5,pre:5,preCap:.15,tetEvery:8,acEvery:5,signals:0,drop:850,
+  brief:'Dark rows are wound tight on their spools. Drop a gold key in to loosen them for reading.',
+  win:'Loose spools let the cell reach the letters. Tight spools hid them, letters and all.'},
+ {name:'Signals',goal:12,capP:.15,tightRows:3,pre:5,preCap:.15,tetEvery:6,acEvery:6,signals:14000,drop:780,
+  brief:'Signals keep writing caps and winding rows. Keep the gene open long enough to read it.',
+  win:'Every cell in your body carries nearly the same strand. Marks like these help decide which genes each cell reads.'},
+ {name:'Endless',goal:Infinity,capP:.16,tightRows:3,pre:5,preCap:.15,tetEvery:6,acEvery:6,signals:11000,drop:740,
+  brief:'Keep reading. The signals speed up as the protein grows.',win:''}
+];
+const cv=document.getElementById('board'), cx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- modes ----------
+const MODES=['light','dark','sharp'];
+const MODE_NAME={light:'Light',dark:'Dark',sharp:'Sharp'};
+let mode=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+const PAL={
+ light:{bg:'#efe6d2',far:'#e2d4b6',mid:'#d6c39c',well:'#fbf6ea',wellEdge:'#b9a57c',grid:'rgba(110,95,64,.18)',ink:'#1b1712',shadow:'rgba(60,40,10,.28)',
+   tile:['#1f7a72','#b0442a','#e0b23a','#3a4e9c'],let:['#ffffff','#ffffff','#1a1408','#ffffff'],cap:'#a39d92',capBand:'#3d3a36',capLet:'#1a1712',
+   tight:'rgba(40,28,10,.42)',cord:'#7a5a34',spool:'#c98a5e',spoolDark:'#8a5634',helixA:'#1f7a72',helixB:'#b0442a',rung:'rgba(27,23,18,.35)',gold:'#e8b83a',pink:'#e889a6',outline:null},
+ dark:{bg:'#10131b',far:'#161b28',mid:'#1d2436',well:'#1f2536',wellEdge:'#3a4560',grid:'rgba(141,151,176,.16)',ink:'#f1ece0',shadow:'rgba(0,0,0,.55)',
+   tile:['#2a958b','#c8573a','#e8bd48','#5068c2'],let:['#08110f','#ffffff','#1a1408','#ffffff'],cap:'#6d6a66',capBand:'#2a2826',capLet:'#ffffff',
+   tight:'rgba(0,0,0,.52)',cord:'#a7835a',spool:'#b77a52',spoolDark:'#6e4228',helixA:'#2a958b',helixB:'#c8573a',rung:'rgba(241,236,224,.3)',gold:'#f0c44a',pink:'#f09ab4',outline:null},
+ sharp:{bg:'#000000',far:'#000000',mid:'#0b0b0b',well:'#000000',wellEdge:'#ffffff',grid:'rgba(255,255,255,.22)',ink:'#ffffff',shadow:'rgba(0,0,0,0)',
+   tile:['#00c2b2','#ff6a3d','#ffd23f','#7d96ff'],let:['#000000','#000000','#000000','#000000'],cap:'#8a8a8a',capBand:'#ffffff',capLet:'#000000',
+   tight:'rgba(0,0,0,.6)',cord:'#ffffff',spool:'#ffffff',spoolDark:'#bbbbbb',helixA:'#00c2b2',helixB:'#ff6a3d',rung:'rgba(255,255,255,.5)',gold:'#ffd23f',pink:'#ff9ac0',outline:'#ffffff'}
+};
+function applyMode(){
+  document.documentElement.setAttribute('data-mode',mode);
+  const nx=MODES[(MODES.indexOf(mode)+1)%3];
+  $('bMode').setAttribute('aria-label','Mode: '+MODE_NAME[mode]+'. Switch to '+MODE_NAME[nx]);
+  bgCache=null;
+}
+$('bMode').onclick=()=>{mode=MODES[(MODES.indexOf(mode)+1)%3];applyMode();};
+
+// ---------- audio ----------
+let actx=null, soundOn=true;
+function audio(){ if(!soundOn) return null; if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } } if(actx.state==='suspended') actx.resume(); return actx; }
+function tone(f,dur,type,vol,when){ const a=audio(); if(!a) return; const t=a.currentTime+(when||0); const o=a.createOscillator(), g=a.createGain(); o.type=type||'sine'; o.frequency.value=f; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol||.15,t+.008); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+.05); }
+const PENTA=[392,440,523.25,587.33,659.25,783.99,880,1046.5];
+function sRead(n){ const f=PENTA[Math.min(n,PENTA.length-1)]; tone(f,.35,'triangle',.16); tone(f*2,.25,'sine',.06,.01); }
+function sLand(){ tone(140,.12,'sine',.12); }
+function sNo(){ tone(180,.1,'square',.05); tone(150,.12,'square',.05,.08); }
+function sKey(){ [523,659,784,1046].forEach((f,i)=>tone(f,.4,'sine',.08,i*.06)); }
+function sErase(){ const a=audio(); if(!a) return; const n=a.createBufferSource(), b=a.createBuffer(1,a.sampleRate*.25,a.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length)*.25; n.buffer=b; const fl=a.createBiquadFilter(); fl.type='bandpass'; fl.frequency.value=2400; n.connect(fl); fl.connect(a.destination); n.start(); }
+function sBell(){ // temple bell (founder pick W6): inharmonic partials, long decay
+  [[1,.22,4],[2.76,.1,3],[5.4,.05,2],[8.93,.03,1.2]].forEach(([m,v,d])=>tone(196*m,d,'sine',v)); }
+function sSignal(){ tone(330,.5,'sine',.07); tone(311,.5,'sine',.06,.12); }
+$('bSound').onclick=()=>{ soundOn=!soundOn; $('snd').style.display=soundOn?'':'none'; $('bSound').setAttribute('aria-label',soundOn?'Sound is on. Turn sound off':'Sound is off. Turn sound on'); };
+
+// ---------- state ----------
+let grid, tight, piece, nextP, li=0, reads=0, state='idle', acc=0, pieceCount=0, sigT=0, paused=false, sel=null, last=0;
+let fx=[], floats=[], flash=[], clearing=null, clearT=0, cascade=0, shake=0, endlessReads=0;
+let seedN=1; const rnd=()=>Math.random();
+const L=()=>LEVELS[li];
+function mkTile(b,me){ return {b:b,me:!!me,dy:0,seed:seedN++}; }
+function say(t){ $('live').textContent=t; }
+
+function newLevel(i){
+  li=i; reads=0; pieceCount=0; sigT=0; sel=null; fx=[]; floats=[]; flash=[]; clearing=null; cascade=0;
+  grid=[]; for(let r=0;r<ROWS;r++){ grid.push(new Array(COLS).fill(null)); }
+  tight=new Array(ROWS).fill(false);
+  const lv=L();
+  for(let r=ROWS-1;r>=ROWS-lv.pre;r--) for(let c=0;c<COLS;c++){
+    let b, tries=0;
+    do{ b=Math.floor(rnd()*4); tries++; } while(tries<20 && ((c>=2&&grid[r][c-1]&&grid[r][c-2]&&grid[r][c-1].b===b&&grid[r][c-2].b===b)||(r<=ROWS-3&&grid[r+1][c]&&grid[r+2][c]&&grid[r+1][c].b===b&&grid[r+2][c].b===b)));
+    grid[r][c]=mkTile(b,rnd()<lv.preCap);
+  }
+  for(let r=ROWS-lv.tightRows;r<ROWS;r++) tight[r]=true;
+  nextP=genPiece(); piece=null; spawn();
+  state='idle'; acc=0;
+  $('brief').textContent=lv.brief;
+  $('lvl').innerHTML=(li<4?'<span class="lp">Level '+(li+1)+': </span>':'')+lv.name;
+  updReads();
+  say('Level '+(li+1)+'. '+lv.brief+' Press any control to start.');
+}
+function updReads(){ $('readsTxt').textContent= L().goal===Infinity ? 'Reads '+reads : 'Reads '+reads+' of '+L().goal; }
+function genPiece(){
+  pieceCount++; const lv=L();
+  if(lv.acEvery && pieceCount%lv.acEvery===0) return {type:'ac'};
+  if(lv.tetEvery && pieceCount%lv.tetEvery===0) return {type:'tet'};
+  const a=Math.floor(rnd()*4); const t=[];
+  for(let k=0;k<3;k++){ const b=(rnd()<.35)?a:Math.floor(rnd()*4); t.push(mkTile(b,rnd()<lv.capP)); }
+  return {type:'bar',tiles:t};
+}
+function spawn(){
+  const p=nextP; nextP=genPiece();
+  p.c=3; p.vert=false; p.r=0;
+  piece=p;
+  if(collides(cells(p))){ piece=null; lose(); }
+}
+function cells(p){
+  if(p.type!=='bar') return [[p.r,p.c]];
+  return p.vert?[[p.r-1,p.c],[p.r,p.c],[p.r+1,p.c]]:[[p.r,p.c-1],[p.r,p.c],[p.r,p.c+1]];
+}
+function collides(cs){ for(const [r,c] of cs){ if(c<0||c>=COLS||r>=ROWS) return true; if(r>=0&&grid[r][c]) return true; } return false; }
+function tryMove(dc,dr){ if(!piece||state!=='fall') return false; const q=Object.assign({},piece,{c:piece.c+dc,r:piece.r+dr}); if(collides(cells(q))) return false; piece.c=q.c; piece.r=q.r; return true; }
+function rotate(){ if(!piece||state!=='fall'||piece.type!=='bar') return; const kicks=[[0,0],[0,-1],[0,1],[-1,0],[0,-2],[0,2]];
+  for(const [dr,dc] of kicks){ const q=Object.assign({},piece,{vert:!piece.vert,r:piece.r+dr,c:piece.c+dc}); if(!collides(cells(q))){ Object.assign(piece,q); if(!piece.vert){} else {} tone(600,.05,'sine',.05); return; } }
+  // turning in place cycles the letters instead, so Turn always does something
+  piece.tiles.push(piece.tiles.shift());
+}
+function hardDrop(){ if(!piece||state!=='fall') return; while(tryMove(0,1)){} lock(); }
+function lock(){
+  const p=piece; piece=null;
+  if(p.type==='bar'){
+    const cs=cells(p); let over=false;
+    cs.forEach(([r,c],i)=>{ if(r<0){ over=true; return; } grid[r][c]=p.tiles[i]; });
+    if(over){ lose(); return; }
+    sLand();
+  } else {
+    const R=Math.max(0,p.r), C=p.c;
+    if(p.type==='ac'){
+      let opened=0; for(let r=R;r<=Math.min(ROWS-1,R+2);r++){ if(tight[r]){opened++;} tight[r]=false; flash.push({r:r,t:0,kind:'ac'}); }
+      sKey(); burst(C,R+1,PAL[mode].gold,14);
+      say(opened?'The key loosened '+opened+(opened>1?' rows':' row')+'. Those letters can be read now.':'The key loosened a row that was already open.');
+    } else {
+      let lifted=0; for(let r=R;r<=Math.min(ROWS-1,R+2);r++) for(let c=C-1;c<=C+1;c++){ if(c<0||c>=COLS) continue; const t=grid[r][c]; if(t&&t.me){ t.me=false; lifted++; burst(c,r,PAL[mode].pink,6); } }
+      sErase(); flash.push({r:R,c:C,t:0,kind:'tet'});
+      say(lifted?'The eraser lifted '+lifted+(lifted>1?' caps':' cap')+'. Same letters, readable again.':'The eraser found no caps there.');
+    }
+  }
+  cascade=0; settle(); resolve();
+}
+function settle(){
+  for(let c=0;c<COLS;c++){ let w=ROWS-1; for(let r=ROWS-1;r>=0;r--){ const t=grid[r][c]; if(t){ if(w!==r){ grid[w][c]=t; grid[r][c]=null; t.dy-= (w-r); } w--; } } }
+}
+function readable(r,c){ const t=grid[r][c]; return t&&!t.me&&!tight[r]; }
+function findRuns(){
+  const runs=[];
+  for(let r=0;r<ROWS;r++){ let c=0; while(c<COLS){ if(!readable(r,c)){c++;continue;} let e=c; while(e+1<COLS&&readable(r,e+1)&&grid[r][e+1].b===grid[r][c].b) e++; if(e-c+1>=3){ const cs=[]; for(let k=c;k<=e;k++) cs.push([r,k]); runs.push(cs);} c=e+1; } }
+  for(let c=0;c<COLS;c++){ let r=0; while(r<ROWS){ if(!readable(r,c)){r++;continue;} let e=r; while(e+1<ROWS&&readable(e+1,c)&&grid[e+1][c].b===grid[r][c].b) e++; if(e-r+1>=3){ const cs=[]; for(let k=r;k<=e;k++) cs.push([k,c]); runs.push(cs);} r=e+1; } }
+  return runs;
+}
+function resolve(){
+  const runs=findRuns();
+  if(!runs.length){ cascade=0; state='fall'; if(!piece){ spawn(); } return; }
+  cascade++;
+  let gained=0; const set=new Map();
+  runs.forEach(cs=>{ gained+= cs.length>=5?3:cs.length===4?2:1; cs.forEach(([r,c])=>set.set(r*COLS+c,[r,c])); });
+  if(cascade>1) gained+=1;
+  clearing=[...set.values()]; clearT=0; state='clear';
+  const [r0,c0]=clearing[Math.floor(clearing.length/2)];
+  const letter=LETTERS[grid[r0][c0].b];
+  reads+=gained; updReads();
+  floats.push({x:c0+.5,y:r0+.5,t:0,txt:(cascade>1?'Cascade ':'')+'+'+gained});
+  sRead(cascade-1+Math.min(2,gained-1));
+  say('Read '+letter+(cascade>1?', cascade '+cascade:'')+'. '+(L().goal===Infinity?reads+' reads.':reads+' of '+L().goal+' reads.'));
+}
+function finishClear(){
+  clearing.forEach(([r,c])=>{ const t=grid[r][c]; if(t) burst(c,r,PAL[mode].tile[t.b],5); grid[r][c]=null; });
+  clearing=null; settle();
+  if(reads>=L().goal){ win(); return; }
+  resolve();
+}
+function burst(c,r,col,n){ if(reduce) n=Math.min(n,3); for(let i=0;i<n;i++){ const a=rnd()*Math.PI*2, s=.04+rnd()*.08; fx.push({x:c+.5,y:r+.5,vx:Math.cos(a)*s,vy:Math.sin(a)*s-.05,t:0,rot:rnd()*6,vr:(rnd()-.5)*.4,col:col,sz:.12+rnd()*.12}); } }
+
+// ---------- swap (the Candy Crush half) ----------
+function trySwap(a,b){
+  if(state!=='fall'&&state!=='idle') return;
+  const [r1,c1]=a,[r2,c2]=b;
+  if(r2<0||r2>=ROWS||c2<0||c2>=COLS) return;
+  const t1=grid[r1][c1], t2=grid[r2][c2];
+  if(!t1||!t2){ sNo(); return; }
+  if(t1.me||t2.me){ sNo(); shakeAt=[[r1,c1],[r2,c2]]; shake=1; say('Capped letters cannot move. Lift the cap first.'); return; }
+  if(tight[r1]||tight[r2]){ sNo(); shakeAt=[[r1,c1],[r2,c2]]; shake=1; say('That row is wound tight. Loosen it with a key first.'); return; }
+  grid[r1][c1]=t2; grid[r2][c2]=t1;
+  if(!findRuns().length){ grid[r1][c1]=t1; grid[r2][c2]=t2; sNo(); shakeAt=[[r1,c1],[r2,c2]]; shake=1; return; }
+  if(state==='idle') state='fall';
+  t1.dy=0; t2.dy=0; cascade=0; resolve();
+}
+let shakeAt=[];
+
+// ---------- win / lose ----------
+function win(){
+  state='won'; sBell();
+  const lv=L();
+  $('cT').textContent= li<3?'Gene read':'Same strand, different marks';
+  $('cP').textContent=lv.win;
+  $('cGo').textContent= li<3?'Next level':'Play endless';
+  $('cGo').style.display='';
+  openCard('win');
+}
+function lose(){
+  state='over'; sNo();
+  $('cT').textContent='The strand filled up';
+  $('cP').textContent= li===4 ? 'You read '+reads+' times before silence filled the strand.' : 'Unread letters and caps piled to the top. Every letter was still there; the cell just could not reach enough of them.';
+  $('cGo').style.display='none';
+  openCard('lose');
+}
+function openCard(kind){ $('sCard').classList.add('on'); drawCardArt(kind); setTimeout(()=>($('cGo').style.display!=='none'?$('cGo'):$('cAgain')).focus(),50); }
+$('cGo').onclick=()=>{ $('sCard').classList.remove('on'); newLevel(Math.min(4,li+1)); };
+$('cAgain').onclick=()=>{ $('sCard').classList.remove('on'); newLevel(li); };
+$('bNotes').onclick=()=>{ paused=true; $('sNotes').classList.add('on'); $('sNotes').querySelector('[data-close]').focus(); };
+$('sNotes').querySelector('[data-close]').onclick=()=>{ $('sNotes').classList.remove('on'); paused=false; updPause(); };
+function updPause(){ $('pIco').setAttribute('d',paused?'M8 5l11 7-11 7z':'M8 5v14M16 5v14'); $('pIco').setAttribute('fill',paused?'currentColor':'none'); $('bPause').setAttribute('aria-label',paused?'Play':'Pause'); }
+$('bPause').onclick=()=>{ paused=!paused; updPause(); };
+document.addEventListener('visibilitychange',()=>{ if(document.hidden){ paused=true; updPause(); } });
+
+// ---------- input ----------
+function start(){ if(state==='idle') state='fall'; audio(); }
+function ctl(fn){ return e=>{ e.preventDefault(); if(paused){ paused=false; updPause(); } start(); fn(); }; }
+$('bL').onclick=ctl(()=>tryMove(-1,0));
+$('bR').onclick=ctl(()=>tryMove(1,0));
+$('bRot').onclick=ctl(rotate);
+$('bDrop').onclick=ctl(hardDrop);
+document.addEventListener('keydown',e=>{
+  if($('sCard').classList.contains('on')||$('sNotes').classList.contains('on')) { if(e.key==='Escape'&&$('sNotes').classList.contains('on')) $('sNotes').querySelector('[data-close]').click(); return; }
+  const k=e.key; let used=true;
+  if(k==='p'||k==='P'){ paused=!paused; updPause(); return; }
+  if(paused) return;
+  if(k==='ArrowLeft'){ start(); tryMove(-1,0); }
+  else if(k==='ArrowRight'){ start(); tryMove(1,0); }
+  else if(k==='ArrowUp'){ start(); rotate(); }
+  else if(k==='ArrowDown'){ start(); if(!tryMove(0,1)&&state==='fall') lock(); }
+  else if(k===' '){ start(); hardDrop(); }
+  else used=false;
+  if(used) e.preventDefault();
+});
+let geo={cell:40,bx:0,by:0,W:0,H:0,dpr:1};
+function cellAt(x,y){ const c=Math.floor((x-geo.bx)/geo.cell), r=Math.floor((y-geo.by)/geo.cell); if(c<0||c>=COLS||r<0||r>=ROWS) return null; return [r,c]; }
+let down=null;
+cv.addEventListener('pointerdown',e=>{ const rc=cellAt(e.offsetX,e.offsetY); down={x:e.offsetX,y:e.offsetY,rc:rc,moved:false}; if(paused){ paused=false; updPause(); } start(); });
+cv.addEventListener('pointermove',e=>{ if(!down||!down.rc||down.moved) return; const dx=e.offsetX-down.x, dy=e.offsetY-down.y; const th=geo.cell*.4;
+  if(Math.abs(dx)>th||Math.abs(dy)>th){ down.moved=true; const [r,c]=down.rc; if(!grid[r][c]) return; const d=Math.abs(dx)>Math.abs(dy)?[0,Math.sign(dx)]:[Math.sign(dy),0]; sel=null; trySwap([r,c],[r+d[0],c+d[1]]); } });
+cv.addEventListener('pointerup',e=>{ if(!down) return; const d=down; down=null; if(d.moved) return; const rc=d.rc;
+  if(!rc||!grid[rc[0]][rc[1]]){ // tap on empty space steers the piece toward the tap
+    if(piece&&state==='fall'){ const c=Math.floor((e.offsetX-geo.bx)/geo.cell); if(c<piece.c) tryMove(-1,0); else if(c>piece.c) tryMove(1,0); else rotate(); } sel=null; return; }
+  if(sel&&Math.abs(sel[0]-rc[0])+Math.abs(sel[1]-rc[1])===1){ const a=sel; sel=null; trySwap(a,rc); }
+  else if(sel&&sel[0]===rc[0]&&sel[1]===rc[1]) sel=null;
+  else sel=rc;
+});
+
+// ---------- drawing ----------
+let bgCache=null;
+function resize(){
+  const dpr=Math.min(2,window.devicePixelRatio||1); const W=cv.clientWidth, H=cv.clientHeight;
+  cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); cx.setTransform(dpr,0,0,dpr,0,0);
+  const cell=Math.floor(Math.min(W/(COLS+2.6),(H-8)/(ROWS+1.15)));
+  geo={cell:cell,W:W,H:H,dpr:dpr,bx:Math.round((W-cell*COLS)/2),by:Math.round(cell*1.1)};
+  bgCache=null;
+}
+window.addEventListener('resize',resize);
+function jitterPoly(x,y,w,h,seed,amt){
+  let s=seed*9301+49297; const rr=()=>{ s=(s*9301+49297)%233280; return s/233280; };
+  const pts=[], k=amt; const rad=w*.18;
+  const corners=[[x+rad,y],[x+w-rad,y],[x+w,y+rad],[x+w,y+h-rad],[x+w-rad,y+h],[x+rad,y+h],[x,y+h-rad],[x,y+rad]];
+  corners.forEach(([px,py])=>pts.push([px+(rr()-.5)*k,py+(rr()-.5)*k]));
+  return pts;
+}
+function polyPath(pts){ cx.beginPath(); pts.forEach(([x,y],i)=>i?cx.lineTo(x,y):cx.moveTo(x,y)); cx.closePath(); }
+function buildBg(){
+  const P=PAL[mode], {W,H,cell,bx,by}=geo;
+  const off=document.createElement('canvas'); off.width=cv.width; off.height=cv.height; const o=off.getContext('2d'); o.setTransform(geo.dpr,0,0,geo.dpr,0,0);
+  o.fillStyle=P.bg; o.fillRect(0,0,W,H);
+  // layered paper: the nucleus wall, cut in two depths
+  const layer=(col,yOff,amp,sh)=>{ o.save(); o.shadowColor=P.shadow; o.shadowBlur=sh; o.shadowOffsetY=sh/3; o.fillStyle=col; o.beginPath(); o.moveTo(0,H);
+    for(let x=0;x<=W+20;x+=20){ o.lineTo(x,yOff+Math.sin(x*.013+amp)*cell*.6+Math.sin(x*.041)*cell*.2); } o.lineTo(W,H); o.closePath(); o.fill(); o.restore(); };
+  layer(P.far,H*.18,1.2,10); layer(P.mid,H*.55,2.7,14);
+  // loose chromatin loops behind the well
+  o.save(); o.strokeStyle=P.rung; o.lineWidth=Math.max(2,cell*.06); o.globalAlpha=.6;
+  for(let i=0;i<5;i++){ o.beginPath(); const y0=H*(.15+i*.18); for(let x=0;x<=W;x+=8){ const y=y0+Math.sin(x*.03+i)*cell*.5; x?o.lineTo(x,y):o.moveTo(x,y); } o.stroke(); }
+  o.restore();
+  // the well: a cut paper panel with a hand-cut edge
+  const pad=cell*.18; const pts=jitterPoly(bx-pad,by-pad,cell*COLS+pad*2,cell*ROWS+pad*2,7,cell*.12);
+  o.save(); o.shadowColor=P.shadow; o.shadowBlur=18; o.shadowOffsetY=6; o.fillStyle=P.well; o.beginPath(); pts.forEach(([x,y],i)=>i?o.lineTo(x,y):o.moveTo(x,y)); o.closePath(); o.fill(); o.restore();
+  o.strokeStyle=P.wellEdge; o.lineWidth=2; o.beginPath(); pts.forEach(([x,y],i)=>i?o.lineTo(x,y):o.moveTo(x,y)); o.closePath(); o.stroke();
+  o.strokeStyle=P.grid; o.lineWidth=1;
+  for(let c=1;c<COLS;c++){ o.beginPath(); o.moveTo(bx+c*cell,by); o.lineTo(bx+c*cell,by+ROWS*cell); o.stroke(); }
+  for(let r=1;r<ROWS;r++){ o.beginPath(); o.moveTo(bx,by+r*cell); o.lineTo(bx+COLS*cell,by+r*cell); o.stroke(); }
+  bgCache=off;
+}
+function drawTile(t,x,y,s,alpha,scale,ghost){
+  const P=PAL[mode]; scale=scale||1; alpha=alpha==null?1:alpha;
+  const inset=s*.06, w=(s-inset*2)*scale; const ox=x+(s-w)/2, oy=y+(s-w)/2;
+  const pts=jitterPoly(ox,oy,w,w,t.seed,s*.07);
+  cx.save(); cx.globalAlpha=alpha*(ghost?.35:1);
+  cx.save(); cx.translate(s*.05,s*.07); cx.fillStyle=P.shadow; polyPath(pts); cx.fill(); cx.restore();
+  cx.fillStyle=t.me?P.cap:P.tile[t.b]; polyPath(pts); cx.fill();
+  if(P.outline){ cx.strokeStyle=P.outline; cx.lineWidth=2; cx.stroke(); }
+  // paper fold highlight
+  cx.globalAlpha=alpha*(ghost?.2:.18); cx.fillStyle='#ffffff'; cx.beginPath(); cx.moveTo(pts[0][0],pts[0][1]); cx.lineTo(pts[1][0],pts[1][1]); cx.lineTo(pts[2][0],pts[2][1]); cx.lineTo(ox+w*.5,oy+w*.32); cx.closePath(); cx.fill();
+  cx.globalAlpha=alpha*(ghost?.35:1);
+  if(t.me){ // methyl cap: a slate band across the top
+    cx.fillStyle=P.capBand; cx.beginPath(); cx.moveTo(pts[7][0],pts[7][1]); cx.lineTo(pts[0][0],pts[0][1]); cx.lineTo(pts[1][0],pts[1][1]); cx.lineTo(pts[2][0],pts[2][1]); cx.lineTo(ox+w,oy+w*.34); cx.lineTo(ox,oy+w*.34); cx.closePath(); cx.fill();
+    cx.fillStyle=t.me&&mode==='sharp'?'#000':P.cap; [.3,.5,.7].forEach(f=>{ cx.beginPath(); cx.arc(ox+w*f,oy+w*.18,Math.max(1.5,w*.035),0,7); cx.fill(); });
+  }
+  cx.fillStyle=t.me?P.capLet:P.let[t.b];
+  const fs=Math.max(18,Math.round(w*.5)); cx.font='800 '+fs+'px "Avenir Next","Segoe UI",system-ui,sans-serif'; cx.textAlign='center'; cx.textBaseline='middle';
+  cx.fillText(LETTERS[t.b],ox+w/2,oy+w*(t.me?.66:.53));
+  cx.restore();
+}
+function drawSpecial(type,x,y,s,alpha){
+  const P=PAL[mode]; cx.save(); cx.globalAlpha=alpha==null?1:alpha;
+  const m=s/2;
+  if(type==='ac'){ // gold key: acetyl
+    cx.fillStyle=P.shadow; cx.beginPath(); cx.arc(x+m+2,y+m+3,s*.42,0,7); cx.fill();
+    cx.fillStyle=P.gold; cx.beginPath(); cx.arc(x+m,y+m,s*.42,0,7); cx.fill();
+    cx.strokeStyle='#2a1c04'; cx.lineWidth=Math.max(2.5,s*.08); cx.lineCap='round';
+    cx.beginPath(); cx.arc(x+s*.36,y+m,s*.12,0,7); cx.stroke();
+    cx.beginPath(); cx.moveTo(x+s*.48,y+m); cx.lineTo(x+s*.76,y+m); cx.moveTo(x+s*.68,y+m); cx.lineTo(x+s*.68,y+s*.64); cx.moveTo(x+s*.76,y+m); cx.lineTo(x+s*.76,y+s*.62); cx.stroke();
+  } else { // pink eraser: TET
+    cx.translate(x+m,y+m); cx.rotate(-.35);
+    cx.fillStyle=P.shadow; cx.fillRect(-s*.36+2,-s*.22+3,s*.72,s*.44);
+    cx.fillStyle=P.pink; cx.fillRect(-s*.36,-s*.22,s*.72,s*.44);
+    cx.fillStyle='#ffffff'; cx.globalAlpha*=.75; cx.fillRect(-s*.36,-s*.22,s*.24,s*.44);
+    cx.globalAlpha=alpha==null?1:alpha; cx.strokeStyle='#3a1220'; cx.lineWidth=2; cx.strokeRect(-s*.36,-s*.22,s*.72,s*.44);
+  }
+  cx.restore();
+}
+function drawSpools(now){
+  const P=PAL[mode], {cell,bx,by}=geo; const sx=bx-cell*.75;
+  for(let r=0;r<ROWS;r++){
+    const cy=by+r*cell+cell/2, rw=cell*.32, rh=cell*.42;
+    cx.save();
+    cx.fillStyle=P.shadow; cx.beginPath(); cx.ellipse(sx+2,cy+3,rw,rh,0,0,7); cx.fill();
+    cx.fillStyle=tight[r]?P.spoolDark:P.spool; cx.beginPath(); cx.ellipse(sx,cy,rw,rh,0,0,7); cx.fill();
+    cx.strokeStyle=P.cord; cx.lineWidth=Math.max(2,cell*.06);
+    if(tight[r]){ for(let k=-1;k<=1;k++){ cx.beginPath(); cx.moveTo(sx-rw,cy+k*rh*.45-rh*.18); cx.lineTo(sx+rw,cy+k*rh*.45+rh*.18); cx.stroke(); } }
+    else { cx.beginPath(); cx.moveTo(sx+rw*.6,cy-rh*.6); cx.bezierCurveTo(sx+rw*1.8,cy-rh*.2,sx+rw*1.8,cy+rh*.4,sx+rw*.6,cy+rh*.7); cx.stroke(); }
+    cx.restore();
+  }
+}
+function drawHelix(now){
+  const P=PAL[mode], {cell,bx,by}=geo; const hx=bx+COLS*cell+cell*.75, amp=cell*.42; const ph=reduce?0:now*.0006;
+  cx.save(); cx.lineWidth=Math.max(2,cell*.05);
+  for(let y=by;y<=by+ROWS*cell;y+=cell*.5){ const a=Math.sin(y*.045+ph)*amp; cx.strokeStyle=P.rung; cx.beginPath(); cx.moveTo(hx-a,y); cx.lineTo(hx+a,y); cx.stroke(); }
+  [[P.helixA,0],[P.helixB,Math.PI]].forEach(([col,o])=>{ cx.strokeStyle=col; cx.lineWidth=Math.max(4,cell*.14); cx.lineCap='round'; cx.beginPath();
+    for(let y=by;y<=by+ROWS*cell;y+=3){ const x=hx+Math.sin(y*.045+ph+o)*amp; y===by?cx.moveTo(x,y):cx.lineTo(x,y); } cx.stroke(); });
+  cx.restore();
+}
+function drawTop(){
+  const P=PAL[mode], {cell,bx}=geo; const y=cell*.55;
+  // protein chain: each read is a bead
+  const goal=L().goal===Infinity?Math.max(12,reads+1):L().goal; const n=Math.min(goal,24);
+  const span=cell*COLS*.68; const step=span/Math.max(1,n-1); const r=Math.min(cell*.2,step*.42);
+  cx.save(); cx.strokeStyle=P.ink; cx.lineWidth=2; cx.globalAlpha=.5; cx.beginPath(); cx.moveTo(bx,y); cx.lineTo(bx+span,y); cx.stroke(); cx.globalAlpha=1;
+  const shown=L().goal===Infinity?Math.min(reads,n):Math.min(reads,n);
+  for(let i=0;i<n;i++){ const x=bx+i*step, yy=y+Math.sin(i*.9)*cell*.12;
+    if(i<shown){ cx.fillStyle=P.shadow; cx.beginPath(); cx.arc(x+1.5,yy+2,r,0,7); cx.fill(); cx.fillStyle=P.tile[i%4]; cx.beginPath(); cx.arc(x,yy,r,0,7); cx.fill(); if(P.outline){cx.strokeStyle=P.outline;cx.stroke();} }
+    else { cx.strokeStyle=P.ink; cx.globalAlpha=.45; cx.beginPath(); cx.arc(x,yy,r*.8,0,7); cx.stroke(); cx.globalAlpha=1; } }
+  // next piece
+  const ns=cell*.5, nx=bx+COLS*cell-ns*3;
+  if(nextP){ if(nextP.type==='bar') nextP.tiles.forEach((t,i)=>drawTile(t,nx+i*ns,y-ns/2,ns,1)); else drawSpecial(nextP.type,nx+ns,y-ns/2,ns,1); }
+  cx.restore();
+}
+function frame(now){
+  const dt=Math.min(50,now-(last||now)); last=now;
+  if(!bgCache) { if(!geo.cell) resize(); buildBg(); }
+  const P=PAL[mode], {cell,bx,by}=geo;
+  if(!paused){
+    if(state==='fall'&&piece){ acc+=dt; const lv=L(); let d=lv.drop; if(li===4) d=Math.max(380,lv.drop-reads*8); if(acc>=d){ acc=0; if(!tryMove(0,1)) lock(); } }
+    if(state==='clear'){ clearT+=dt; if(clearT>=(reduce?120:260)) finishClear(); }
+    if(L().signals&&(state==='fall')){ sigT+=dt; const every=li===4?Math.max(6000,L().signals-reads*120):L().signals; if(sigT>=every){ sigT=0; signal(); } }
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const t=grid[r][c]; if(t&&t.dy<0){ t.dy=Math.min(0,t.dy+dt*.02); } }
+    fx.forEach(p=>{ p.t+=dt; p.x+=p.vx*dt*.06; p.y+=p.vy*dt*.06; p.vy+=.004*dt*.06; p.rot+=p.vr; }); fx=fx.filter(p=>p.t<700);
+    floats.forEach(f=>f.t+=dt); floats=floats.filter(f=>f.t<900);
+    flash.forEach(f=>f.t+=dt); flash=flash.filter(f=>f.t<600);
+    if(shake>0) shake=Math.max(0,shake-dt/260);
+  }
+  cx.drawImage(bgCache,0,0,geo.W,geo.H);
+  drawSpools(now); drawHelix(now); drawTop();
+  // tight rows: dim band and a wrapping cord across the board
+  for(let r=0;r<ROWS;r++) if(tight[r]){ cx.save(); cx.fillStyle=P.tight; cx.fillRect(bx,by+r*cell,cell*COLS,cell); cx.restore(); }
+  // settled tiles
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const t=grid[r][c]; if(!t) continue;
+    let x=bx+c*cell, y=by+(r+t.dy)*cell, a=1, s=1;
+    if(clearing&&clearing.some(([rr,cc])=>rr===r&&cc===c)){ const k=clearT/260; s=1+k*.25; a=1-k; }
+    if(shake>0&&shakeAt.some(([rr,cc])=>rr===r&&cc===c)) x+=Math.sin(shake*30)*cell*.08*shake;
+    drawTile(t,x,y,cell,a,s);
+    if(tight[r]){ cx.save(); cx.globalAlpha=.3; cx.fillStyle=P.tight; cx.fillRect(x,y,cell,cell); cx.restore(); }
+  }
+  for(let r=0;r<ROWS;r++) if(tight[r]){ cx.save(); cx.strokeStyle=P.cord; cx.lineWidth=Math.max(3,cell*.09); cx.lineCap='round'; cx.globalAlpha=.95;
+    const y0=by+r*cell; [cell*.1,cell*.9].forEach(off=>{ cx.beginPath(); cx.moveTo(bx-cell*.45,y0+cell*.5); cx.lineTo(bx,y0+off); cx.lineTo(bx+COLS*cell,y0+off); cx.stroke(); }); cx.restore(); }
+  // selection
+  if(sel&&grid[sel[0]][sel[1]]){ cx.save(); cx.strokeStyle=P.ink; cx.lineWidth=4; cx.strokeRect(bx+sel[1]*cell+2,by+sel[0]*cell+2,cell-4,cell-4); cx.restore(); }
+  // falling piece and its landing ghost
+  if(piece&&(state==='fall'||state==='idle')){
+    let g=Object.assign({},piece); while(!collides(cells(Object.assign({},g,{r:g.r+1})))) g.r++;
+    const gc=cells(g), pc=cells(piece);
+    if(g.r!==piece.r) gc.forEach(([r,c],i)=>{ if(r<0) return; if(piece.type==='bar') drawTile(piece.tiles[i],bx+c*cell,by+r*cell,cell,1,1,true); else drawSpecial(piece.type,bx+c*cell,by+r*cell,cell,.3); });
+    pc.forEach(([r,c],i)=>{ if(r<0) return; if(piece.type==='bar') drawTile(piece.tiles[i],bx+c*cell,by+r*cell,cell,1); else drawSpecial(piece.type,bx+c*cell,by+r*cell,cell,1); });
+  }
+  flash.forEach(f=>{ cx.save(); cx.globalAlpha=(1-f.t/600)*.6; if(f.kind==='ac'){ cx.fillStyle=P.gold; cx.fillRect(bx,by+f.r*cell,cell*COLS,cell); } else { cx.fillStyle=P.pink; cx.fillRect(bx+(f.c-1)*cell,by+f.r*cell,cell*3,cell*3); } cx.restore(); });
+  fx.forEach(p=>{ cx.save(); cx.globalAlpha=1-p.t/700; cx.translate(bx+p.x*cell,by+p.y*cell); cx.rotate(p.rot); cx.fillStyle=p.col; const z=p.sz*cell; cx.fillRect(-z/2,-z/3,z,z*.66); cx.restore(); });
+  floats.forEach(f=>{ cx.save(); cx.globalAlpha=1-f.t/900; cx.font='800 '+Math.max(22,cell*.55)+'px "Avenir Next","Segoe UI",system-ui,sans-serif'; cx.textAlign='center';
+    const x=bx+f.x*cell, y=by+(f.y-f.t/900*1.2)*cell; cx.lineWidth=5; cx.strokeStyle=P.well; cx.strokeText(f.txt,x,y); cx.fillStyle=P.ink; cx.fillText(f.txt,x,y); cx.restore(); });
+  if(state==='idle'||paused){ const msg=paused?'Paused. Tap to play.':'Tap a control to begin';
+    cx.save(); cx.font='800 '+Math.max(20,cell*.5)+'px "Avenir Next","Segoe UI",system-ui,sans-serif'; cx.textAlign='center'; const w=cx.measureText(msg).width+28, h=Math.max(44,cell*.9), x=geo.W/2, y=by+cell*3;
+    cx.fillStyle=P.well; cx.strokeStyle=P.ink; cx.lineWidth=2; cx.beginPath(); cx.roundRect?cx.roundRect(x-w/2,y-h/2,w,h,14):cx.rect(x-w/2,y-h/2,w,h); cx.fill(); cx.stroke();
+    cx.fillStyle=P.ink; cx.textBaseline='middle'; cx.fillText(msg,x,y); cx.restore(); }
+  requestAnimationFrame(frame);
+}
+function signal(){
+  sSignal();
+  const open=[]; for(let r=ROWS-1;r>=0;r--) if(!tight[r]&&grid[r].some(Boolean)) open.push(r);
+  if(rnd()<.5||!open.length){ const cand=[]; for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const t=grid[r][c]; if(t&&!t.me) cand.push(t); }
+    for(let i=0;i<3&&cand.length;i++){ const t=cand.splice(Math.floor(rnd()*cand.length),1)[0]; t.me=true; }
+    say('Signal: a DNMT enzyme wrote three new caps.'); floatMsg('DNMT wrote caps');
+  } else { const r=open[Math.floor(rnd()*Math.min(3,open.length))]; tight[r]=true; flash.push({r:r,t:0,kind:'ac'}); say('Signal: an HDAC enzyme wound a row tight.'); floatMsg('HDAC wound a row'); }
+}
+function floatMsg(t){ floats.push({x:COLS/2,y:2,t:0,txt:t}); }
+function drawCardArt(kind){
+  const c=$('cArt'), g=c.getContext('2d'), P=PAL[mode]; const dpr=Math.min(2,devicePixelRatio||1); const W=c.clientWidth||480, H=c.clientHeight||180;
+  c.width=W*dpr; c.height=H*dpr; g.setTransform(dpr,0,0,dpr,0,0);
+  g.fillStyle=P.well; g.fillRect(0,0,W,H);
+  // two cells, same strand: one open (read), one capped and wound (silent)
+  const strand=[2,0,3,1,2,2,0,3]; const s=Math.min(30,(W/2-30)/strand.length);
+  [[0,'open'],[1,'shut']].forEach(([k,st])=>{ const ox=k*W/2+14, oy=H/2-s/2;
+    g.save(); g.fillStyle=P.mid; g.beginPath(); g.ellipse(ox+W/4-14,H/2,W/4-10,H/2-14,0,0,7); g.fill(); g.restore();
+    strand.forEach((b,i)=>{ const x=ox+i*s+ (W/4-14-strand.length*s/2), y=oy+(st==='open'?Math.sin(i)*6:0);
+      g.fillStyle=(st==='shut'&&i%2===0)?P.cap:P.tile[b]; g.fillRect(x+1,y,s-2,s);
+      g.fillStyle=(st==='shut'&&i%2===0)?P.capLet:P.let[b]; g.font='800 18px system-ui,sans-serif'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(LETTERS[b],x+s/2,y+s/2+1);
+      if(st==='shut'&&i%2===0){ g.fillStyle=P.capBand; g.fillRect(x+1,y,s-2,s*.28); } });
+    if(st==='shut'){ g.strokeStyle=P.cord; g.lineWidth=4; g.beginPath(); for(let i=0;i<=strand.length;i++){ const x=ox+(W/4-14-strand.length*s/2)+i*s; g.lineTo(x,oy+(i%2?s:0)); } g.stroke(); }
+    if(st==='open'&&kind==='win'){ for(let i=0;i<6;i++){ g.fillStyle=P.tile[i%4]; g.beginPath(); g.arc(ox+W/4-14-40+i*16,oy-26+Math.sin(i)*5,6,0,7); g.fill(); } }
+  });
+}
+
+applyMode(); resize();
+const qL=parseInt(new URLSearchParams(location.search).get('level'),10); newLevel(qL>=1&&qL<=5?qL-1:0); requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
