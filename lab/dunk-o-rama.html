@@ -3,10 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dunk-O-Rama v0.7</title>
+<title>Dunk-O-Rama v0.8</title>
 <meta name="spec-source" content="convening/DUNK-O-RAMA-CONVENING.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students learning to spot rhetorical cheats. Lab build.">
-<!-- TSP build: Dunk-O-Rama v0.7 | LAB | 2026-11-06
+<!-- TSP build: Dunk-O-Rama v0.8 | LAB | 2026-11-07
+     v0.8 (founder, 2026-11-07): the runoff. Two candidates share the tank. The left target dunks the
+     left seat, the right target the right seat, the top target dunks both. The crowd asks one
+     question and both answer: usually one cheats, sometimes both answer straight, sometimes both
+     cheat. Each candidate keeps one platform in every answer, cheat or straight. Driest candidate
+     wins mayor. Five runoffs, 50 questions, 200 answers.
+     v0.7:
      v0.7 (panel playtest, founder "Proceed with 1"): the hint no longer steals the glove grab;
      No cheat added (about one heckle in five is a straight answer; dunking one gets noticed);
      every exchange cut to 18 words or fewer so the card never scrolls at 263 x 480.
@@ -58,6 +64,7 @@ canvas{display:block;position:fixed;inset:0;width:100vw;height:100vh;height:100d
 #menuBtn{border-radius:22px;padding:6px}
 #menuBtn svg{width:26px;height:26px;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;fill:none}
 #hud b{color:var(--accent)}
+#hud.two{flex-direction:column;align-items:flex-start;justify-content:center;line-height:1.05;padding:3px 12px}
 a.nav,button{font:inherit;font-size:18px;font-weight:700;min-height:var(--tap);min-width:var(--tap);padding:8px 11px;border-radius:10px;border:2px solid var(--line);background:var(--chrome);color:var(--ink);cursor:pointer;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 button.icon{padding:6px}
 button.icon svg{width:28px;height:28px;stroke:var(--ink);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
@@ -95,7 +102,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 #callBtn{display:none;width:100%;margin-top:4px;position:sticky;bottom:-12px;box-shadow:0 -8px 0 var(--chrome)}
 #callit .chips{clear:both}
 #callit .chips:empty{display:none}
-@media (max-height:639px){#callit{max-height:44vh}}
+
 .se-chrome h1{white-space:normal;flex-wrap:wrap}
 #callit .q{font-size:18px;font-weight:700;margin:2px 0 6px}
 #callit .chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
@@ -110,27 +117,33 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 #rTwainSrc{font-size:18px;margin:0 0 14px;text-align:left}
 .se-rail{display:flex;gap:6px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-height:639px){#callit{max-height:49vh;left:4px;right:4px;padding:6px 8px 8px;top:calc(58px + env(safe-area-inset-top))}
+ #dlg{line-height:1.24;margin-bottom:4px}#dlg p{margin:0 0 3px}
+ #dlgClose{position:absolute;float:none;top:-2px;right:-2px;margin:0;border-color:transparent;background:transparent}
+ #dlg p:first-child,#callQ{padding-right:36px}
+ #callit .chips{flex-direction:column}#callit .chips button{flex:none;width:100%;min-height:44px;padding:6px 10px}
+ #callit .teach{line-height:1.3}}
 </style>
 </head>
 <body>
-<canvas id="c" tabindex="0" aria-label="Carnival dunk tank. Touch the glove, pull back and let go to throw. Hold still to steady your breathing. Keyboard: arrow keys aim, space throws."></canvas>
+<canvas id="c" tabindex="0" aria-label="Carnival dunk tank with two candidates for mayor. Left target dunks the left candidate, right target the right, top target both. Touch the glove, pull back and let go to throw. Hold still to steady your breathing. Keyboard: arrow keys aim, space throws."></canvas>
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.7</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.8</span> <span class="tsp-labchip">LAB</span></h1>
   <div class="sp">
-    <button id="seatBtn" aria-haspopup="dialog">Seat</button>
+    <button id="seatBtn" aria-haspopup="dialog">Runoffs</button>
     <button id="modeBtn" class="icon" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" fill="currentColor" style="fill:var(--ink)"/></svg></button>
     <button id="soundBtn" class="icon" aria-pressed="true" aria-label="Sound on"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 11h4l6-5v16l-6-5H5z"/><path class="wave" d="M19 10a5 5 0 0 1 0 8M22 7a9 9 0 0 1 0 14"/><path class="x" d="M19 11l6 6M25 11l-6 6"/></svg></button>
   </div>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="menuClose" type="button">Close menu</button>
 </header>
-<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.7, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
+<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.8, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
 
-<div id="seatSheet" class="panel sheet" role="dialog" aria-label="Who's on the seat">
-  <h2>Who's on the seat?</h2>
+<div id="seatSheet" class="panel sheet" role="dialog" aria-label="Pick a runoff">
+  <h2>Pick a runoff</h2>
   <div class="row" id="seatList"></div>
   <p style="margin:12px 0 0"><button id="seatClose">Close</button></p>
 </div>
@@ -138,7 +151,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 <button id="hint">Pull the glove back, let go</button>
 
 <button id="bubClose" type="button" aria-label="Close the speech bubble"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-<div id="callit" class="panel" role="group" aria-label="The crowd asks"><button id="dlgClose" class="icon" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="dlg"></div><button id="callBtn" type="button">Call the move</button><p class="q" id="callQ">Call the move</p><div class="chips" id="chips"></div><p class="teach" id="teach" aria-live="polite"></p></div>
+<div id="callit" class="panel" role="group" aria-label="The crowd asks"><button id="dlgClose" class="icon" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="dlg"></div><button id="callBtn" type="button">Call it</button><p class="q" id="callQ">Who cheated, and how?</p><div class="chips" id="chips"></div><p class="teach" id="teach" aria-live="polite"></p></div>
 
 <div id="result" class="panel" role="dialog" aria-label="Round over">
   <h2 id="rTitle">Round over</h2>
@@ -146,7 +159,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
   <h3 style="margin:0 0 6px;font-size:20px;text-align:left">Field guide</h3>
   <ul id="rGuide"></ul>
   <p id="rTwain"></p><p id="rTwainSrc"></p>
-  <div class="btns"><button id="rAgain">Throw again</button><button id="rNext">Next on the seat</button></div>
+  <div class="btns"><button id="rAgain">Run it again</button><button id="rNext">Next runoff</button></div>
 </div>
 
 
@@ -158,7 +171,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 let W,H,DPR,f,hy;const camY=1.5;
 function resize(){DPR=Math.min(2,window.devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);f=Math.min(H*1.25,W*2.1);hy=H*(H>W*1.3?0.49:0.45);}
-addEventListener('resize',resize);resize();
+addEventListener('resize',()=>{resize();if(lv)hud();});resize();
 function P(x,y,z){const s=f/z;return{x:W/2+x*s,y:hy+(camY-y)*s,s};}
 const $=id=>document.getElementById(id);
 const store={get(k,d){try{const v=localStorage.getItem('dunk_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('dunk_'+k,JSON.stringify(v))}catch(e){}}};
@@ -166,11 +179,16 @@ const RM=(()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /* ---------- world ---------- */
 const G=9.8,R=0.11,BALLS=10;
-const TANK={x0:-0.78,x1:1.86,zf:11.0,zb:13.4,water:1.62,glass:1.79,cage:3.58};
-const SEAT={x:0.54,y:2.3,z:12.2};
-const TGT={px:-1.95,top:3.75,len:2.0,z:11.4};
-const CHS=1.18; // character scale
-const LAUNCH={x:0.18,y:1.25,z:1.5};
+/* v0.8 runoff: two candidates share one wide tank. Left target dunks the left seat, right target
+   the right seat, the top target (hung over the tank) dunks both. */
+const TANK={x0:-1.32,x1:1.32,zf:11.0,zb:13.4,water:1.62,glass:1.79,cage:3.58};
+const SEATS=[{x:-0.64,y:2.3,z:12.2},{x:0.64,y:2.3,z:12.2}];
+const TGTS=[
+ {px:-1.82,top:3.6,len:1.6,z:10.6,rk:1,pk:1,seats:[0],post:.42},
+ {px:1.82,top:3.6,len:1.6,z:10.6,rk:1,pk:1,seats:[1],post:.42},
+ {px:0,top:5.15,len:.72,z:12.8,rk:.9,pk:.55,seats:[0,1],arch:true}];
+const CHS=1.08; // character scale
+const LAUNCH={x:0.06,y:1.25,z:1.5};
 
 const CAST=[
  {id:'fil',name:'Sen. Lyle Droneon',title:'The Filibusterer',level:'Easy. Moves: red herring, appeal to tradition, Gish gallop. Light breeze.',
@@ -223,42 +241,7 @@ const MOVES={
  incoh:{name:'Incoherence',def:'Makes claims that cannot all be true at once, hoping nobody lines them up.',spot:'Put two of the claims side by side.',fair:'Pick one story and stick to it.'}
 };
 const LEVEL_MOVES={fil:['red','trad','gish','circ'],spin:['straw','dilemma','loaded','goal'],mayor:['band','what','slope','equiv'],lob:['adhom','auth','cherry','anec'],pun:['scape','cause','lq','incoh']};
-/* Exchanges written on set by the Twain seat: [the crowd asks, the politician cheats].
-   Studio drafts for founder edit. Town issues only; no parties, no real people. */
-/* v0.7 exchanges: every one trimmed to 18 words or fewer (question + answer) so the card never
-   scrolls at the founder's 263 x 480. Lines by the Twain seat; drafts for founder edit. */
-const LINES={
- fil:{
-  red:[['Where did the bridge money go?','Who brought the potato salad? Me. Twice. Next question.'],['Will you fix the Main Street pothole?','Have you seen the moon lately? Nobody paves the moon.'],['Why is the school roof leaking?','Look at the flag on that roof. Look at it wave.']],
-  trad:[['Why plow the north side first?','Grandpa did. He was snowed in forty years, but consistent.'],['The town clock runs slow.','For ninety years. That is not broken. That is heritage.'],['Why does the library close at four?','It closed at four in 1911. Nobody complained in 1911.']],
-  gish:[['One reason for the new tax?','Nine: one, two, the moon, my aunt, page four, nine.'],['Is the water report accurate?','Here are forty-one points, all at once. Answer any. Go.'],['Did the fair lose money?','I have several hundred facts. Check them before the ball lands.']],
-  circ:[['Why should we trust you?','I am trustworthy. I know because I would never lie about it.'],['Why is your bridge plan best?','Because it is the best plan. That is why it is best.'],['Is the budget balanced?','I only pass balanced budgets. I passed it. So it is balanced.']],
-  none:[['Where did the bridge money go?','To the bridge. The receipts are in the town report.'],['Will you fix the Main Street pothole?','Yes, in April. Call me if it is not.'],['Why should we trust you?','Do not. Check my votes. They are posted at the library.']]},
- spin:{
-  straw:[['Could Elm Street get a crosswalk?','So you want cars banned and Grandma walking to Ohio.'],['Can the library open Sundays?','So you hate weekends. Noted.'],['Will you answer questions tonight?','So you want a hot lamp in my face. That is a dentist.']],
-  dilemma:[['Should we repaint the bandstand?','Gold paint, or the town slides into the sea. Choose.'],['Are the parking meters a good idea?','Meters or chaos. There is no third thing. I checked.'],['Is the dunk tank good for the fair?','Dunk me, or love freedom. You cannot do both.']],
-  loaded:[['Did the budget go over?','No. It achieved surprise growth.'],['Why did you skip the meeting?','I did not skip it. I gave it room to breathe.'],['When will you fix the pothole?','It is a traffic-calming feature with historical depth.']],
-  goal:[['Here is the receipt. The money is gone.','Anyone has receipts. Bring a notarized one. In Latin.'],['Ten thousand people signed.','I said a lot. A lot means more than ten thousand.'],['The bridge fell. You promised to resign.','I meant the whole bridge. That was most of it.']],
-  none:[['Did the budget go over?','Yes, four percent, for snow. Reserves will cover it.'],['Why did you skip the meeting?','I had the flu. I will answer questions Monday.'],['Should we repaint the bandstand?','Maybe. It costs nine thousand. Here are three other options.']]},
- mayor:{
-  band:[['Do people want a parking garage?','Everybody who is anybody does. They are all parked in it.'],['Is the dog park popular?','Ninety percent of my birthday party agrees.'],['Who supports the new fee?','The whole town. Hear that roar? Or is that the Tilt-A-Whirl?']],
-  what:[['Where did the snowplow money go?','Where did your overdue library book go? Exactly.'],['Why did you miss the budget vote?','You missed the target. Who is really missing things here?'],['Your fence is on your neighbor\'s lawn.','And what about his lawn, under my fence?']],
-  slope:[['Can you fix the Elm pothole?','Fix one pothole, next it is sidewalks, then a moon base.'],['A dog park fountain?','First a fountain. Then dogs vote. Then a beagle is mayor.'],['Is the dunk tank fair?','Dunk me today, the fire chief tomorrow. By Friday, nobody is dry.']],
-  equiv:[['The town lost forty thousand dollars.','My nephew lost a mitten. Losses happen on all sides.'],['The inspector found cracks in the bridge.','My mug has a crack. Bridges, mugs. Both hold things.'],['You gave your cousin the parks job.','You lent your cousin your car. Same thing exactly.']],
-  none:[['Do people want a parking garage?','I do not know yet. We are asking every household this month.'],['Where did the snowplow money go?','Overtime. Nine storms in February. The breakdown is online.'],['You gave your cousin the parks job.','Fair point. I will step aside and let the board decide.']]},
- lob:{
-  adhom:[['The crossing guard wants a light.','Seen her hat? I would not trust it with a goldfish.'],['The engineer says the bridge is unsafe.','The engineer drives a hatchback. Draw your own conclusions.'],['A student found pollution in the lake.','He is twelve and smells like the lake. Consider the source.']],
-  auth:[['Is the factory\'s candy safe?','Four of five dentists agree. The fifth is not on payroll yet.'],['Is the tap water safe?','An actor who played a doctor says so. Argue with television.'],['Will the bridge design hold?','My cousin read a website. Engineering is settled.']],
-  cherry:[['Is the factory polluting the air?','Smoke 364 days. Day 365? Spotless. Let us talk about that one.'],['What do the dam studies say?','I chose the one my client paid for. Shiniest one.'],['Are the crops by the factory okay?','Look at this one perfect tomato. Ignore the forty acres.']],
-  anec:[['Is the new highway ramp safe?','My uncle drove it twice. He is fine. Mostly.'],['Should kids wear bike helmets?','I never did, and look at me. A lobbyist.'],['Does the factory make neighbors sick?','I met a neighbor. Ninety-four, sharp as a tack.']],
-  none:[['Is the factory polluting the air?','State tests found two bad days. My client must fix both.'],['Is the tap water safe?','Ask the state lab. Their latest test is posted.'],['Will the new bridge hold?','The state engineer signed off. Her report is public.']]},
- pun:{
-  scape:[['Why is traffic so bad downtown?','The marching band. Since practice started, nothing moves.'],['Why is the library budget short?','The book club reads too fast. Somebody had to say it.'],['Why did the fair lose money?','I will not name names. One name: pigeons.']],
-  cause:[['Why did the river flood?','New mayor in May, flood in June. You do the math.'],['Why did test scores go up?','I bought a new tie in March. You are welcome, children.'],['Why did the bakery close?','A week after the bike lane opened. Bikes hate bread.']],
-  lq:[['Will you take our question?','Mine first: have you stopped wasting town money? Yes or no?'],['What will you ask the mayor?','Why does the mayor hate puppies? I am only asking.'],['What is tonight\'s show about?','How long has the library been hiding the truth?']],
-  incoh:[['Is the new bridge good or bad?','Nobody will use it, and it is dangerously crowded. Both.'],['Is the new tax too high?','It is insultingly tiny, and it will bankrupt Elm Street.'],['Is the carnival safe?','Perfectly safe. Never go. I am here every night.']],
-  none:[['Why did the river flood?','Record rain and an old culvert. Both were flagged last year.'],['Why did test scores go up?','Hard to say. Tutoring, smaller classes. Nobody knows yet.'],['Why is traffic so bad downtown?','Two lanes are closed for water mains until June. Sorry.']]}
-};
+/* v0.7's single-seat exchanges (75) retired in v0.8 by the runoff; they live in git history at 88c193c. */
 MOVES.none={name:'No cheat',def:'A straight answer. You can disagree with it, but it plays fair.',spot:'Does it answer the question, with reasons you could check?',fair:'This is the fair version.'};
 /* dunking a straight answer gets noticed (panel: Gitlin, Turkle) */
 const FAIRDUNK=['I told you the truth, plainly. And here I am, wet.','Honest answer, cold water. Lesson noted, folks.','Next time I will lie. That seems to work better.','Did anyone hear the answer? Anyone? Glub.','Fair answer. Unfair water.'];
@@ -317,18 +300,94 @@ const BAGS={};
 function bag(key,arr){if(!BAGS[key]||!BAGS[key].length){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}BAGS[key]=a;}return BAGS[key].pop();}
 
 const SHORT={fil:'Senator',spin:'Skip',mayor:'Mayor',lob:'Chet',pun:'Dale'};
+
+/* ---------- v0.8: the runoff for mayor ----------
+   Founder, 2026-11-07: "there should be two politicians in the dunk tank ... Make candidates answer
+   consistently so that this presents a kind of run off. Dryest candidate wins mayor."
+   Each runoff pairs two candidates. Each candidate holds one platform in every runoff they enter,
+   and keeps it whether they answer straight or cheat: the cheat changes the argument, never the
+   position. Platforms (Twain seat, studio drafts for founder edit):
+     Senator Droneon  - leave it as it is; wait for the study.
+     Skip Twirl       - make the town look new; events pay for it.
+     Mayor Bunting    - build it, put a name on it (the incumbent).
+     Chet Ledger      - let a private firm do it; discloses his clients.
+     Dale Bluster     - crack down; fines, cameras, guards.
+   Row: [crowd asks, left straight answer, left move, left cheat, right straight answer, right move, right cheat].
+   Each runoff teaches its level's four moves; 10 questions, so a 10-ball round never repeats one. */
+const LEVELS=[{k:'fil',a:0,b:1},{k:'spin',a:1,b:2},{k:'mayor',a:2,b:3},{k:'lob',a:3,b:4},{k:'pun',a:4,b:0}];
+const RUN={
+ fil:[
+  ['Fix the Main Street pothole?','Patch it in April, from the road fund.','trad','It has been there since 1952. It is family.','Repave it and add banners. A grant pays half.','red','Have you seen our new town logo? Look at it.'],
+  ['Why does the library close at four?','Staff costs. Six o\'clock costs $40,000.','trad','It closed at four in 1911. No complaints.','Open late with events. Tickets pay the staff.','circ','Late hours are best because they are better.'],
+  ['Where did the bridge money go?','Into the bridge. Receipts are in the report.','gish','Steel, bolts, page nine, the moon, my aunt.','Repairs and new lights. The bills are online.','red','Did you see the new lights? Purple. Gorgeous.'],
+  ['Why should we trust you?','Check my votes. They are posted downtown.','circ','I am honest. I know, because I said so.','Do not. Read my plan. It has numbers.','circ','Trust me. I am trustworthy. That is why.'],
+  ['Should we plow the north side first?','Yes. The hospital is up north.','trad','Grandpa did. Snowed in, but consistent.','Downtown first. The shops need the traffic.','gish','Downtown. Shops, salt, owls, polls, page six.'],
+  ['Is the town budget balanced?','Short $12,000. We cut the parade to cover it.','circ','I only pass balanced budgets. I passed it.','No. A festival fee would close the gap.','red','Balance? Look at the bandstand at sunset.'],
+  ['Can the town clock be fixed?','Yes. A repair costs $3,000, not a new clock.','red','Clocks! My mother had a clock. Lovely woman.','Swap it for a lit sign. Ads pay for it.','gish','Brighter, faster, ads, polls, page four, wow.'],
+  ['Why skip last week\'s meeting?','I had the flu. My notes are on file.','red','Lovely weather. Have you seen the geese?','My mistake. I will be at the next one.','circ','I skipped it because I was not there.'],
+  ['Will the dog park get a fence?','Yes, a wood one, like the old one.','gish','Fences, posts, dogs, Rome, page twelve, ducks.','Yes, a bright one with sponsor names on it.','red','Have you met our new dog mascot? Biscuit.'],
+  ['Do we need a new fire truck?','Not yet. The old one passed inspection.','trad','It has served since 1979, so it is fine.','Yes, and paint it gold. A grant pays most.','gish','Gold, faster, louder, grants, eagles, page two.']],
+ spin:[
+  ['Could Elm Street get a crosswalk?','Yes, painted in town colors. $2,000.','straw','So you want cars banned. Bold.','Yes, with a light. The state pays most.','dilemma','A crosswalk with my name on it, or chaos.'],
+  ['Did the parade go over budget?','Yes, by $4,000. The new floats cost more.','loaded','It achieved surprise growth.','Yes, $4,000. My office will cover it.','loaded','It was a bold investment in joy.'],
+  ['Can the library open Sundays?','Yes, with a cafe. The cafe pays the staff.','straw','So you hate weekends. Noted.','Yes, in my new library wing, next fall.','dilemma','Sundays or my new wing. Pick one.'],
+  ['You promised the garage by June.','It is late. I would fix the old lot.','straw','So you love concrete. Interesting.','I did. It slipped to August. Steel came late.','goal','I meant June of some year.'],
+  ['Ten thousand signed for a skate park.','Then build it, and paint it bright.','loaded','A youth wellness plaza? I love it.','I will put it on the May ballot.','goal','I said a lot. A lot is more than that.'],
+  ['Are parking meters a good idea?','No. Shops lost sales when Elm got meters.','dilemma','Meters or a ghost town. No third thing.','Yes. They pay for my new garage.','loaded','They are curbside giving stations.'],
+  ['The bridge inspection found cracks.','Then close it until it is fixed.','loaded','Those are character lines.','Yes. Repairs start Monday. Detour on Elm.','goal','Any bridge has cracks. Show me a hole.'],
+  ['Will you answer questions tonight?','Yes. Three, then I have a meeting.','straw','So you want a lamp in my face. Rude.','Yes, all of them, until the band starts.','straw','So you think I hide. I am in a tank.'],
+  ['Should we repaint the bandstand?','Yes, blue. It costs $9,000.','dilemma','Gold paint, or the town slides into the sea.','Yes, and add a plaque. My name, small.','dilemma','Repaint it, or bulldoze it. Choose.'],
+  ['Why did the fountain cost double?','Bad bids. I would rebid every contract.','straw','So you hate water. Typical.','Marble went up. I picked marble. My call.','loaded','It is not double. It is premium.']],
+ mayor:[
+  ['Do people want a parking garage?','Six hundred for, five hundred against.','band','Everybody does. They are all parked in it.','Let a private firm build it and charge.','band','Every town that matters has one.'],
+  ['Where did the snowplow money go?','Overtime. Nine storms in February.','what','Where did your library book go?','Ask the mayor. I would hire a private firm.','what','What about the mayor\'s own plow? Ask him.'],
+  ['Can you fix the Elm pothole?','Yes, Tuesday. The crew is booked.','slope','Fix one, then sidewalks, then a moon base.','Let a contractor fix it, with a warranty.','equiv','A pothole is a tiny lake. Lakes are nice.'],
+  ['The factory smoke smells awful.','I will ask the state to test the air.','equiv','My cooking smells too. Smells happen.','They are my client. They pass state tests.','what','What about the bakery? That smells too.'],
+  ['You gave your cousin the parks job.','I did. The board can review it.','equiv','You lent your cousin a car. Same thing.','Post the job. Let anyone apply.','slope','Hire one cousin, soon it is all cousins.'],
+  ['Is the dog park popular?','Yes. Two hundred dogs a week, by count.','band','Ninety percent of my birthday party agrees.','Sell naming rights to pay for upkeep.','band','All the best dogs go there.'],
+  ['Should we ban leaf blowers?','Before eight a.m., yes.','equiv','Leaf blowers, jet engines. Both loud.','No. Landscaping firms need them.','slope','Ban blowers today, rakes tomorrow.'],
+  ['Will you raise the trash fee?','Yes, by two dollars, for the new truck.','band','Every town is raising it. Join us.','No. Let haulers compete on price.','slope','Raise trash fees, next it is air fees.'],
+  ['The town lost forty thousand dollars.','A bad investment. I picked it. I am sorry.','what','What about the money you lost at bingo?','Hire an auditor. Publish the results.','what','What about the state? They lose millions.'],
+  ['Should the fair stay in town?','Yes. It brings in eighty thousand dollars.','slope','Move the fair, and next we lose summer.','Yes, if a sponsor pays for security.','equiv','Fairs, malls. A mall is a fair with a roof.']],
+ lob:[
+  ['Is the factory polluting the air?','State tests found two bad days. Fixable.','cherry','Day 365 was spotless. Let us discuss it.','Yes. Fine them until tests come back clean.','anec','My neighbor coughed. Case closed.'],
+  ['Is the tap water safe?','The state lab says yes. The test is posted.','auth','An actor who played a doctor says so.','Test it monthly and post every result.','adhom','The water chief drives a hatchback. Think.'],
+  ['Should kids wear bike helmets?','Yes. Disclosure: I lobby for helmet makers.','auth','A famous skateboarder says yes. Done.','Yes, and fine parents who skip them.','anec','A kid on Elm wore one and lived. Proof.'],
+  ['Is the new highway ramp safe?','The state engineer signed off. It is public.','anec','My uncle drove it twice. He is fine. Mostly.','Add a camera and a lower speed limit.','cherry','One crash. Forget the ten thousand safe cars.'],
+  ['A student found lead in the lake.','Then test it again with the state lab.','adhom','He is twelve and smells like the lake.','Close the beach until the lab confirms.','auth','My horoscope warned me. Close the beach.'],
+  ['Do speed cameras work?','Some studies say yes. They cost a lot.','cherry','One camera broke in 2019. Enough said.','Oak had fewer crashes after its camera.','auth','A movie cop told me. In a movie.'],
+  ['Does the factory make neighbors sick?','The health board is studying it. Wait.','anec','One neighbor is ninety-four and sharp.','Fund the health study and publish it.','adhom','The plant manager wears socks with sandals.'],
+  ['Is the bridge design sound?','Three engineers reviewed it. Reports online.','auth','My cousin read a website. It is settled.','Get a fourth review. Then build.','cherry','One engineer of four had doubts. That one.'],
+  ['Should the curfew move to eleven?','Yes. Shops lose money at nine.','adhom','Curfew fans go to bed at seven.','No. Keep nine. Calls drop after nine.','anec','A teen sang at ten last May. Keep nine.'],
+  ['What do the dam studies say?','Two say safe, one says repair. Do the repair.','cherry','I read the one my client paid for.','Repair it. Close the trail during the work.','adhom','The safe-dam guy has a ponytail. Repair it.']],
+ pun:[
+  ['Why is traffic so bad downtown?','Two lanes are closed for pipes until June.','scape','The marching band. Ever since practice.','Pipe work. It ends in June. Be patient.','cause','New traffic lights in May. Jams in June.'],
+  ['Why did the river flood?','Record rain and an old culvert.','cause','New mayor in May, flood in June. Math.','Heavy rain. The culvert study is due in fall.','incoh','It barely rained, and it rained all week.'],
+  ['Why is the library budget short?','Fewer state grants. Charge late fees.','scape','The book club reads too fast.','State aid fell. Keep hours, cut new books.','lq','When did you stop returning your books?'],
+  ['Will you take our question?','Yes. Go ahead.','lq','Mine first: why do you hate puppies?','Yes. One at a time, please.','incoh','Yes. No questions tonight. Ask away.'],
+  ['Why did test scores go up?','Hard to say. Tutoring helped. Keep tracking.','cause','I got a new tie in March. You are welcome.','More tutoring. Keep it as it is.','cause','We kept the old desks. Desks did it.'],
+  ['Is the new tax too high?','Yes. Cut it, and fine litterers instead.','incoh','It is tiny, and it will bankrupt us.','It is fair. It matches the county rate.','incoh','Too high, too low, and just right.'],
+  ['Why did the bakery close?','Rent doubled. The owner said so.','scape','Bike riders. Everyone knows they hate bread.','Rent went up. I would freeze rents.','cause','A week after the bike lane opened. Think.'],
+  ['Is the carnival safe?','Mostly. Add two more guards at night.','incoh','Perfectly safe. Never go. I am here nightly.','Yes. It passed inspection Tuesday.','scape','Safe. Any trouble is from out-of-towners.'],
+  ['Why are the potholes back?','Cheap patch. Use the better mix.','lq','How long has the road crew been asleep?','Winter. We patch in spring, as always.','scape','Delivery trucks. All of them. Every one.'],
+  ['Should we add streetlights on Oak?','Yes. Thefts there doubled this year.','lq','Why does Oak Street love crime so much?','Not yet. Finish the lighting study first.','incoh','Oak is too dark, and lights ruin the dark.']]
+};
+const RUNTXT={fil:'Runoff 1, easy. Dodging the question. Light breeze.',spin:'Runoff 2. Rewriting what you said. The targets twist.',mayor:'Runoff 3. The crowd and the other guy. Gusts push the ball.',lob:'Runoff 4, hard. Who says so, and what they leave out. Small targets.',pun:'Runoff 5, hardest. Blame and fog. Small targets, gusts, the lot.'};
 /* ---------- state ---------- */
 const MODES=['dark','light','sharp'],MODE_NAME={dark:'Dark',light:'Light',sharp:'Sharp'};
 let mode=store.get('mode','dark');if(!MODES.includes(mode))mode='dark';
 let sound=store.get('sound',true);
-let ci=0,c=CAST[0],balls=BALLS,dunks=0,streak=0,roundOver=false;
+let ci=0,lv=null,cand=[CAST[0],CAST[1]],balls=BALLS,dunks=0,streak=0,roundOver=false,wet=[0,0],lies=[0,0];
 let ball=null,trail=[],lastPath=[],drag=null,kb=null,anim=null,ready=1;
 let t=0,rt=0,slow=1,slowT=0,shake=0,hitPause=0;
-let seatA=0,ch={yo:0,vy:0,rot:0,state:'sit',timer:0},glassWob=0,tgtFlash=0,wind=0,windShown=0;
-let tg={phi:0,dphi:0,psi:0,dpsi:0},gust=0,gustT=3;
+const newCh=()=>({yo:0,vy:0,rot:0,state:'sit',timer:0,seatA:0,fair:false,splashed:false});
+let chs=[newCh(),newCh()],glassWob=0,tgtFlash=[0,0,0],wind=0,windShown=0;
+const newTg=()=>({phi:0,dphi:0,psi:0,dpsi:0});
+let tgs=[newTg(),newTg(),newTg()],gust=0,gustT=3;
 let breath={ph:0,calm:0,hold:0};
-let heck={active:false,move:null,called:null},heckN=0,heckOrder=[],thrown=0,rBoost=1,calmLock=false,stats={asked:0,right:0,seen:{}};
-let parts=[],rings=[],slosh=0,pop=null,bubble={text:'',t:0},idleT=3;
+let heck={active:false,cheat:[false,false],moves:[null,null],called:null},thrown=0,boostT=-1,calmLock=false,stats={asked:0,right:0,seen:{},fairDunks:0};
+let parts=[],rings=[],slosh=0,pop=null,bubble={text:'',t:0,who:0},sayQ=[],idleT=3;
+const allSit=()=>chs.every(h=>h.state==='sit');
 
 /* ---------- audio ---------- */
 let AC=null;
@@ -350,23 +409,30 @@ const SFX={
 
 /* ---------- UI ---------- */
 function hud(){
- const w=(c.wind&&innerWidth>=360)?` &nbsp; Breeze <b>${wind===0?'calm':(wind<0?'← ':'')+Math.abs(wind).toFixed(1)+(wind>0?' →':'')}</b>`:'';
- $('hud').innerHTML=`Balls <b>${balls}</b> &nbsp; Dunks <b>${dunks}</b>${w}`;
+ const w=(lv.wind&&innerWidth>=520)?` &nbsp; Breeze <b>${wind===0?'calm':(wind<0?'← ':'')+Math.abs(wind).toFixed(1)+(wind>0?' →':'')}</b>`:'';
+ const ballIco='<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" style="vertical-align:-3px;margin-right:3px"><circle cx="10" cy="10" r="8" fill="#ffd23f" stroke="currentColor" stroke-width="2"/></svg>';
+ const n0=`${SHORT[cand[0].id]}&nbsp;<b>${wet[0]}</b>`,n1=`${SHORT[cand[1].id]}&nbsp;<b>${wet[1]}</b>`;
+ if(innerWidth<360){$('hud').classList.add('two');$('hud').innerHTML=`<span>${n0}&nbsp;&nbsp; ${n1}</span><span>${ballIco}<b>${balls}</b>&nbsp;balls</span>`;return;}
+ $('hud').classList.remove('two');
+ const lab=innerWidth>=420?'Balls&nbsp;':ballIco;
+ $('hud').innerHTML=`${lab}<b>${balls}</b>&nbsp;&nbsp; ${n0}&nbsp;&nbsp; ${n1}${w}`;
 }
 function applyMode(){document.documentElement.setAttribute('data-comfort',mode);const nx=MODES[(MODES.indexOf(mode)+1)%3];$('modeBtn').setAttribute('aria-label',`Mode: ${MODE_NAME[mode]}. Switch to ${MODE_NAME[nx]}.`);}
 $('modeBtn').onclick=()=>{mode=MODES[(MODES.indexOf(mode)+1)%3];store.set('mode',mode);applyMode();announce(MODE_NAME[mode]+' mode');};
 function applySound(){$('soundBtn').setAttribute('aria-pressed',sound);$('soundBtn').setAttribute('aria-label',sound?'Sound on':'Sound off');}
 $('soundBtn').onclick=()=>{sound=!sound;store.set('sound',sound);applySound();if(sound)ac();};
 applyMode();applySound();
-function say(txt,dur){bubble.text=txt;bubble.parts=null;bubble.t=dur||3.2;bubble.hidden=false;}
+function say(txt,dur,who){if(bubble.t>0.4&&!bubble.hidden){sayQ.push([txt,dur,who]);return;}bubble.text=txt;bubble.parts=null;bubble.t=dur||3.2;bubble.hidden=false;bubble.who=who||0;}
+function nextSay(){if(sayQ.length&&bubble.t<=0){const[a,b,w]=sayQ.shift();say(a,b,w);}}
+const sideOf=x=>x<0?0:1;
 function hideBubble(){bubble.hidden=true;$('bubClose').style.display='none';}
 function showBubble(){if(bubble.t>0){bubble.hidden=false;}}
 function announce(txt){$('live').textContent=txt;}
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function buildSeatList(){
  const L=$('seatList');L.innerHTML='';
- CAST.forEach((k,i)=>{const b=document.createElement('button');const best=store.get('best_'+k.id,0);
-  b.innerHTML=`${k.title}: ${k.name}<small>${k.level} Best: ${best} of ${BALLS}</small>`;
+ LEVELS.forEach((L2,i)=>{const b=document.createElement('button');const A=CAST[L2.a],B=CAST[L2.b];const el=store.get('elect_'+L2.k,null);
+  b.innerHTML=`${A.name} vs ${B.name}<small>${RUNTXT[L2.k]}${el?' Last winner: '+el+'.':''}</small>`;
   b.setAttribute('aria-pressed',i===ci?'true':'false');
   b.onclick=()=>{setCast(i);closeSheets();};L.appendChild(b);});
 }
@@ -378,49 +444,78 @@ $('menuBtn').onclick=()=>menu(true);$('menuClose').onclick=()=>menu(false);
 $('bubClose').onclick=()=>{hideBubble();announce('Closed.');};
 $('dlgClose').onclick=()=>{$('callit').style.display='none';announce('Closed.');};
 function compact(){return H<640;}
-$('callBtn').onclick=()=>{$('dlg').style.display='none';$('callBtn').style.display='none';$('callQ').textContent='Which move was that?';$('callQ').style.display='block';$('chips').style.display='flex';const b=$('chips').querySelector('button');b&&b.focus();};
+$('callBtn').onclick=()=>{$('dlg').style.display='none';$('callBtn').style.display='none';$('callQ').textContent='Who cheated, and how?';$('callQ').style.display='block';$('chips').style.display='flex';const b=$('chips').querySelector('button');b&&b.focus();};
 $('hint').onclick=(e)=>{if(e.detail>0)return;ac();if(canThrow()&&!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=0;}$('hint').classList.add('gone');cv.focus&&cv.focus();announce('Ball in hand. Arrow keys aim, space throws. On a touch screen, drag anywhere and let go.');};$('seatClose').onclick=closeSheets;
-$('rAgain').onclick=()=>setCast(ci);$('rNext').onclick=()=>setCast((ci+1)%CAST.length);
+$('rAgain').onclick=()=>setCast(ci);$('rNext').onclick=()=>setCast((ci+1)%LEVELS.length);
 addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheets();if($('topbar').classList.contains('open'))menu(false);}});
 
-function setCast(i){ci=i;c=CAST[i];balls=BALLS;dunks=0;streak=0;roundOver=false;ball=null;anim=null;trail=[];lastPath=[];
- ch={yo:0,vy:0,rot:0,state:'sit',timer:0};seatA=0;tg={phi:0,dphi:0,psi:0,dpsi:0};$('result').style.display='none';newWind();hud();
- Object.keys(BAGS).forEach(k=>delete BAGS[k]);heck={active:false,move:null,called:null};heckN=0;thrown=0;rBoost=1;calmLock=false;stats={asked:0,right:0,seen:{}};$('callit').style.display='none';bubble.t=0;announce(`${c.title}, ${c.name}, is on the seat. ${c.level}`);}
+function setCast(i){ci=i;const L=LEVELS[i];const src=CAST.find(k=>k.id===L.k);
+ lv={k:L.k,sway:src.sway,tw:src.tw,wind:src.wind,r:src.r};cand=[CAST[L.a],CAST[L.b]];
+ balls=BALLS;dunks=0;streak=0;roundOver=false;ball=null;anim=null;trail=[];lastPath=[];wet=[0,0];lies=[0,0];
+ chs=[newCh(),newCh()];tgs=[newTg(),newTg(),newTg()];$('result').style.display='none';newWind();hud();
+ Object.keys(BAGS).forEach(k=>delete BAGS[k]);heck={active:false,cheat:[false,false],moves:[null,null],called:null};thrown=0;boostT=-1;calmLock=false;stats={asked:0,right:0,seen:{},fairDunks:0};
+ $('callit').style.display='none';bubble.t=0;sayQ=[];
+ announce(`Runoff for mayor: ${cand[0].name} on the left, ${cand[1].name} on the right. The left target dunks ${SHORT[cand[0].id]}, the right target dunks ${SHORT[cand[1].id]}, the top target dunks both. Driest candidate wins. ${RUNTXT[lv.k]}`);}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function pastMoves(){const out=[];for(const k of CAST){if(k===c)break;out.push(...LEVEL_MOVES[k.id]);}return out;}
+function pastMoves(){const out=[];for(const L of LEVELS){if(L.k===lv.k)break;out.push(...LEVEL_MOVES[L.k]);}return out;}
+/* a verdict is 'none' (both straight), 'both' (both cheated) or 'side:move' (one cheated) */
+function verdictOf(h){if(h.cheat[0]&&h.cheat[1])return'both';if(!h.cheat[0]&&!h.cheat[1])return'none';const w=h.cheat[0]?0:1;return w+':'+h.moves[w];}
+function verdictName(v){if(v==='none')return'Both straight';if(v==='both')return'Both cheated';const[w,m]=v.split(':');return `${SHORT[cand[+w].id]}: ${MOVES[m].name}`;}
 function newHeckle(){
- const set=LEVEL_MOVES[c.id];const mv=bag('mv'+c.id,set.concat(['none']));const ex=bag('ln'+c.id+mv,LINES[c.id][mv]);
- heck={active:true,move:mv,called:null};
+ const set=LEVEL_MOVES[lv.k];
+ if(thrown===0){// the first ball teaches the arm and the three targets; the questions start with ball two
+  heck={active:true,cheat:[false,false],moves:[null,null],called:null,legend:true};bubble.t=0;
+  const n0=SHORT[cand[0].id],n1=SHORT[cand[1].id];
+  $('dlg').innerHTML=`<p><span class="who">Runoff for mayor.</span> ${cand[0].name} on the left, ${cand[1].name} on the right.</p><p>Left target dunks ${n0}. Right target dunks ${n1}. Top target dunks both. Driest candidate wins.</p>`;
+  $('dlg').style.display='block';$('callBtn').style.display='none';$('chips').innerHTML='';$('callQ').style.display='none';$('teach').textContent='';
+  $('callit').classList.remove('aside');$('callit').style.display='block';announce($('dlg').textContent);return;}const Q=bag('q'+lv.k,RUN[lv.k]);
+ /* usually one candidate cheats; now and then both answer straight, now and then both cheat */
+ const roll=Math.random();let cheat=[false,false];
+ if(roll<.15){}else if(roll<.28)cheat=[true,true];else cheat[Math.random()<.5?0:1]=true;
+ const moves=[cheat[0]?Q[2]:null,cheat[1]?Q[5]:null];
+ const ans=[cheat[0]?Q[3]:Q[1],cheat[1]?Q[6]:Q[4]];
+ heck={active:true,cheat,moves,called:null,q:Q};
  bubble.t=0;bubble.parts=null;
  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
- $('dlg').innerHTML=`<p class="crowd"><span class="who">Crowd:</span> ${esc(ex[0])}</p><p><span class="who">${SHORT[c.id]}:</span> ${esc(ex[1])}</p>`;
+ $('dlg').innerHTML=`<p class="crowd"><span class="who">Crowd:</span> ${esc(Q[0])}</p><p><span class="who">${SHORT[cand[0].id]}:</span> ${esc(ans[0])}</p><p><span class="who">${SHORT[cand[1].id]}:</span> ${esc(ans[1])}</p>`;
  $('callit').classList.remove('aside');
- const ask=thrown>=1;
+ const ask=true;
  const box=$('callit');$('teach').textContent='';
+ const said=`From the crowd: ${Q[0]} ${cand[0].name}: ${ans[0]} ${cand[1].name}: ${ans[1]}`;
  if(ask){
-  const others=shuffle(set.filter(m=>m!==mv)),earlier=shuffle(pastMoves());
-  const d2=mv==='none'?others[1]:Math.random()<.4?'none':(earlier.length&&Math.random()<.5?earlier[0]:others[1]);
-  const chips=shuffle([mv,others[0],d2]);
+  const v=verdictOf(heck),other=m=>shuffle(set.filter(x=>x!==m).concat(pastMoves().slice(0,2)))[0];
+  let d=[];
+  if(v==='none')d=['0:'+pick(set),Math.random()<.5?'1:'+pick(set):'both'];
+  else if(v==='both')d=['0:'+moves[0],'1:'+moves[1]];
+  else{const[w,m]=v.split(':');const o=1-(+w);d=[Math.random()<.5?o+':'+m:w+':'+other(m),Math.random()<.5?'none':(Math.random()<.5?'both':o+':'+other(m))];
+   if(d[0]===d[1])d[1]='none';}
+  const chips=shuffle([v,...d]);
   $('chips').innerHTML='';
-  chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=MOVES[id].name;b.onclick=()=>callMove(id);$('chips').appendChild(b);});
+  chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=verdictName(id);b.onclick=()=>callMove(id);$('chips').appendChild(b);});
   $('dlg').style.display='block';
   if(compact()){$('chips').style.display='none';$('callQ').style.display='none';$('callBtn').style.display='block';}
-  else{$('callBtn').style.display='none';$('chips').style.display='flex';$('callQ').textContent='Call the move';$('callQ').style.display='block';}
+  else{$('callBtn').style.display='none';$('chips').style.display='flex';$('callQ').textContent='Who cheated, and how?';$('callQ').style.display='block';}
   box.style.display='block';
-  announce(`From the crowd: ${ex[0]} ${c.name}: ${ex[1]} Call the move: ${chips.map(i=>MOVES[i].name).join(', ')}.`);
- }else{$('dlg').style.display='block';$('callBtn').style.display='none';$('chips').innerHTML='';$('callQ').style.display='none';box.style.display='block';announce(`From the crowd: ${ex[0]} ${c.name}: ${ex[1]}`);}
+  announce(`${said} Call it: ${chips.map(verdictName).join(', ')}.`);
+ }
 }
 function callMove(id){
- if(heck.called!==null)return;const M=MOVES[heck.move];stats.asked++;stats.seen[heck.move]=1;
- if(id===heck.move){heck.called=true;stats.right++;rBoost=1.22;calmLock=true;breath.calm=1;SFX.steady();setTimeout(()=>SFX.steady(),110);
-  $('teach').innerHTML=heck.move==='none'?`<b>Called it: no cheat.</b> A straight answer. Aim steadied.`:`<b>Called it: ${M.name}.</b> ${M.def} Aim steadied.`;
-  announce(`Called it. ${M.name}. ${M.def}`);}
+ if(heck.called!==null)return;stats.asked++;heck.moves.forEach(m=>{if(m)stats.seen[m]=1;});
+ const v=verdictOf(heck),nm=i=>SHORT[cand[i].id];
+ let truth;
+ if(v==='none')truth='Both answered straight.';
+ else if(v==='both')truth=`Both cheated. ${nm(0)}: ${MOVES[heck.moves[0]].name}. ${nm(1)}: ${MOVES[heck.moves[1]].name}.`;
+ else{const w=+v.split(':')[0],M=MOVES[heck.moves[w]];truth=`${nm(w)}: ${M.name}. ${M.def}`;}
+ if(id===v){heck.called=true;stats.right++;calmLock=true;breath.calm=1;SFX.steady();setTimeout(()=>SFX.steady(),110);
+  boostT=v==='none'?-1:v==='both'?2:+v.split(':')[0];
+  $('teach').innerHTML=`<b>Called it.</b> ${truth} Aim steadied.`;
+  announce(`Called it. ${truth} Aim steadied.`);}
  else{heck.called=false;tone(220,.18,'square',.05);
-  $('teach').innerHTML=heck.move==='none'?`<b>That was a straight answer.</b> ${M.def}`:`<b>That was ${M.name}.</b> ${M.def}`;
-  announce(`Not quite. That was ${M.name}. ${M.def} Spot it: ${M.spot}`);}
+  $('teach').innerHTML=`<b>Not quite.</b> ${truth}`;
+  announce(`Not quite. ${truth}`);}
  $('chips').innerHTML='';$('callQ').style.display='none';
 }
-function newWind(){wind=c.wind?Math.round((Math.random()*6-3)*10)/10:0;}
+function newWind(){wind=lv.wind?Math.round((Math.random()*6-3)*10)/10:0;}
 
 /* ---------- breathing ---------- */
 function swayAmp(){let a=0.15-0.115*breath.calm;if(breath.hold>5)a+=Math.min(.18,(breath.hold-5)*.06);return a;}
@@ -434,7 +529,7 @@ function steadiness(){return breath.hold>5?'SHAKY':breath.calm>.8?'STEADY':'BREA
 /* ---------- input ---------- */
 function restPt(){return P(LAUNCH.x,LAUNCH.y,LAUNCH.z);}
 function maxPull(){return Math.min(W,H)*0.24;}
-function canThrow(){return !ball&&!anim&&balls>0&&!roundOver&&ch.state==='sit'&&!document.querySelector('.sheet.open');}
+function canThrow(){return !ball&&!anim&&balls>0&&!roundOver&&allSit()&&!document.querySelector('.sheet.open');}
 function startPull(e){ac();if($('topbar').classList.contains('open')){menu(false);return;}if(!canThrow())return;$('callit').classList.add('aside');bubble.pulled=!bubble.hidden;hideBubble();cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';}
 cv.addEventListener('pointerdown',startPull);
 $('hint').addEventListener('pointerdown',e=>{e.preventDefault();$('hint').classList.add('gone');startPull(e);});
@@ -455,21 +550,24 @@ function clampPull(dx,dy){const m=maxPull(),l=Math.hypot(dx,dy);if(l>m){dx*=m/l;
 function aimPull(dx,dy){[dx,dy]=clampPull(dx,dy);const s=swayVec();return[dx+s[0],dy+s[1]];}
 function launchState(dx,dy){
  const m=maxPull(),nx=dx/m,ny=dy/m,p=Math.min(1.1,Math.hypot(dx,dy)/m);
- return{x:LAUNCH.x,y:LAUNCH.y,z:LAUNCH.z,vx:-4.6*nx,vy:1+9*ny,vz:8+14*p,p,age:0,hitT:false,front:false,bonked:false};
+ return{x:LAUNCH.x,y:LAUNCH.y,z:LAUNCH.z,vx:-4.6*nx,vy:1+9*ny,vz:8+14*p,p,age:0,hit:-1,rim:false,front:false,bonked:false};
 }
 function release(dx,dy){const v=aimPull(dx,dy);anim={v,t:0,launched:false};breath.hold=0;}
-function launch(v){ball=launchState(v[0],v[1]);ball.rBoost=rBoost;ball.move=heck.move;rBoost=1;calmLock=false;thrown++;if(heck.move)stats.seen[heck.move]=1;heck.active=false;$('callit').style.display='none';bubble.t=Math.min(bubble.t,1.2);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
+function launch(v){ball=launchState(v[0],v[1]);ball.boost=boostT;ball.cheat=heck.legend?null:heck.cheat.slice();ball.moves=heck.moves.slice();
+ if(!heck.legend)heck.cheat.forEach((x,i)=>{if(x)lies[i]++;});heck.moves.forEach(m=>{if(m)stats.seen[m]=1;});
+ boostT=-1;calmLock=false;thrown++;heck.active=false;$('callit').style.display='none';bubble.t=Math.min(bubble.t,1.2);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
 
 /* ---------- physics ---------- */
-function tgtPos(){return{x:TGT.px+TGT.len*Math.sin(tg.phi),y:TGT.top-TGT.len*Math.cos(tg.phi)};}
-function breeze(tt){return c.sway*(Math.sin(tt*.7)*.6+Math.sin(tt*1.9+1.3)*.3+Math.sin(tt*.23+2)*.5)+gust;}
+function tgtPos(i){const T=TGTS[i],s=tgs[i];return{x:T.px+T.len*Math.sin(s.phi),y:T.top-T.len*Math.cos(s.phi)};}
+function tgtR(i,b){const k=(b?b.boost:boostT)===i?1.22:1;return lv.r*TGTS[i].rk*k;}
+function breeze(tt){return lv.sway*(Math.sin(tt*.7)*.6+Math.sin(tt*1.9+1.3)*.3+Math.sin(tt*.23+2)*.5)+gust;}
 function stepTarget(dt){
- gustT-=dt;if(gustT<=0){gustT=2+Math.random()*4;gust=(Math.random()<.5?-1:1)*c.sway*(1+Math.random());}
+ gustT-=dt;if(gustT<=0){gustT=2+Math.random()*4;gust=(Math.random()<.5?-1:1)*lv.sway*(1+Math.random());}
  gust*=Math.pow(.25,dt);
- const Fw=breeze(t);
- tg.dphi+=(-(G/TGT.len)*Math.sin(tg.phi)-.25*tg.dphi+Fw*.9)*dt;tg.phi+=tg.dphi*dt;
- tg.dpsi+=(-6*tg.psi-.6*tg.dpsi+Fw*2.2*c.tw)*dt;tg.psi+=tg.dpsi*dt;
- if(Math.abs(tg.psi)>1.3){tg.psi=Math.sign(tg.psi)*1.3;tg.dpsi*=-.3;}
+ TGTS.forEach((T,i)=>{const s=tgs[i],Fw=breeze(t+i*1.9)*T.pk*(i===1?-1:1);
+  s.dphi+=(-(G/T.len)*Math.sin(s.phi)-.25*s.dphi+Fw*.9)*dt;s.phi+=s.dphi*dt;
+  s.dpsi+=(-6*s.psi-.6*s.dpsi+Fw*2.2*lv.tw)*dt;s.psi+=s.dpsi*dt;
+  if(Math.abs(s.psi)>1.3){s.psi=Math.sign(s.psi)*1.3;s.dpsi*=-.3;}});
 }
 function step(b,dt,live){
  const px=b.x,py=b.y,pz=b.z;
@@ -477,49 +575,58 @@ function step(b,dt,live){
  b.x+=b.vx*dt;b.y+=b.vy*dt;b.z+=b.vz*dt;b.age+=dt;
  if(!live)return;
  const cross=(zp)=>pz<zp&&b.z>=zp,at=(zp)=>{const k=(zp-pz)/(b.z-pz);return[px+(b.x-px)*k,py+(b.y-py)*k];};
- if(!b.hitT&&cross(TGT.z)){const[cx,cy]=at(TGT.z),T=tgtPos(),cw=Math.max(.12,Math.abs(Math.cos(tg.psi)));
-  const tr=c.r*(b.rBoost||1);const ex=(cx-T.x)/(tr*cw+R*.6),ey=(cy-T.y)/(tr+R*.6),e2=ex*ex+ey*ey;
+ for(let i=0;i<TGTS.length;i++){const TG=TGTS[i],s=tgs[i];if(b.hit>=0||b.rim||!cross(TG.z))continue;
+  const[cx,cy]=at(TG.z),T=tgtPos(i),cw=Math.max(.12,Math.abs(Math.cos(s.psi)));
+  const tr=tgtR(i,b);const ex=(cx-T.x)/(tr*cw+R*.6),ey=(cy-T.y)/(tr+R*.6),e2=ex*ex+ey*ey;
   const rx=(cx-T.x)/(tr*cw+.07+R),ry=(cy-T.y)/(tr+.07+R),r2=rx*rx+ry*ry;
-  if(e2<1){b.hitT=true;b.z=TGT.z-.01;b.vz=-Math.abs(b.vz)*.35;b.vy=b.vy*.5+1.5;b.vx+=(cx-T.x)*4;tg.dphi+=b.vx*.25+(cx-T.x)*1.5;tg.dpsi+=(cx-T.x)*12;dunk(T);}
-  else if(r2<1){b.hitT=true;b.z=TGT.z-.01;b.vz=-Math.abs(b.vz)*.3;b.vx+=(cx-T.x)*6;b.vy+=(cy-T.y)*6;tg.dpsi+=(cx-T.x)*16;tg.dphi+=(cx-T.x)*2;SFX.rim();rings.push({x:cx,y:cy,z:TGT.z,r:.05,a:1});say(bagOr('r',RIM,'m'+c.id,c.miss),2.2);announce('Off the rim.');}}
- if(!b.front&&cross(TANK.zf)){const[cx,cy]=at(TANK.zf);
+  if(e2<1){b.hit=i;b.z=TG.z-.01;b.vz=-Math.abs(b.vz)*.35;b.vy=b.vy*.5+1.5;b.vx+=(cx-T.x)*4;s.dphi+=b.vx*.25+(cx-T.x)*1.5;s.dpsi+=(cx-T.x)*12;dunk(i,T);}
+  else if(r2<1){b.rim=true;b.z=TG.z-.01;b.vz=-Math.abs(b.vz)*.3;b.vx+=(cx-T.x)*6;b.vy+=(cy-T.y)*6;s.dpsi+=(cx-T.x)*16;s.dphi+=(cx-T.x)*2;SFX.rim();rings.push({x:cx,y:cy,z:TG.z,r:.05,a:1,k:i});
+   const w=i===2?(Math.random()<.5?0:1):i;say(bagOr('r',RIM,'m'+cand[w].id,cand[w].miss),2.2,w);announce('Off the rim.');}}
+ if(!b.front&&b.hit<0&&!b.rim&&cross(TANK.zf)){const[cx,cy]=at(TANK.zf);
   if(cx>TANK.x0-R&&cx<TANK.x1+R&&cy<TANK.cage+R){b.front=true;b.z=TANK.zf-.01;
    const glass=cy<TANK.glass;b.vz=-Math.abs(b.vz)*(glass?.32:.18);b.vx*=.7;b.vy*=glass?.8:.5;
-   if(glass){SFX.glass();glassWob=1;slosh=Math.max(slosh,.4);}else{SFX.mesh();b.bonked=true;say(bagOr('b'+c.id,c.bonk,'m'+c.id,c.miss),2.6);announce('Hit the net.');}
+   if(glass){SFX.glass();glassWob=1;slosh=Math.max(slosh,.4);}else{const w=sideOf(cx);SFX.mesh();b.bonked=true;say(bagOr('b'+cand[w].id,cand[w].bonk,'m'+cand[w].id,cand[w].miss),2.6,w);announce('Hit the net.');}
    shakeIt(.25);}}
  if(b.z>14.2&&b.vz>0){b.z=14.2;b.vz=-b.vz*.3;SFX.bounce(2);}
  if(b.y<R){b.y=R;if(b.vy<0){const v=-b.vy;b.vy=v*.45;b.vx*=.78;b.vz*=.78;if(v>1.2)SFX.bounce(v);}}
 }
-function dunk(T){
- if(ball&&ball.move==='none'){ch.fair=true;stats.fairDunks=(stats.fairDunks||0)+1;}
- SFX.clang();tgtFlash=1;rings.push({x:T.x,y:T.y,z:TGT.z,r:.1,a:1});
- dunks++;streak++;hud();shakeIt(.6);hitPause=RM?0:.07;if(!RM){slow=.25;slowT=.45;}
- setTimeout(()=>{SFX.drop();ch.state='fall';ch.vy=.6;},90);
- pop={text:streak>1?`DUNK! ${streak} in a row`:'DUNK!',t:1.4};
- announce(`Dunk! ${c.name} hits the water. ${dunks} dunks, ${balls} balls left.`);
+function dunk(i,T){
+ const hitSeats=TGTS[i].seats.filter(s=>chs[s].state==='sit');
+ SFX.clang();tgtFlash[i]=1;rings.push({x:T.x,y:T.y,z:TGTS[i].z,r:.1,a:1,k:i});
+ hitSeats.forEach(s=>{wet[s]++;dunks++;const h=chs[s];h.fair=!!(ball&&ball.cheat&&!ball.cheat[s]);if(h.fair)stats.fairDunks++;});
+ streak++;hud();shakeIt(.6);hitPause=RM?0:.07;if(!RM){slow=.25;slowT=.45;}
+ setTimeout(()=>{SFX.drop();hitSeats.forEach(s=>{chs[s].state='fall';chs[s].vy=.6;});},90);
+ pop={text:hitSeats.length>1?'DOUBLE DUNK!':streak>1?`DUNK! ${streak} in a row`:'DUNK!',t:1.4};
+ const who=hitSeats.map(s=>cand[s].name).join(' and ');
+ announce(`Dunk! ${who} ${hitSeats.length>1?'hit':'hits'} the water. ${SHORT[cand[0].id]} ${wet[0]}, ${SHORT[cand[1].id]} ${wet[1]}. ${balls} balls left.`);
 }
 function shakeIt(a){if(!RM)shake=Math.max(shake,a);}
-function splashAt(){
- SFX.splash();slosh=1.2;shakeIt(.4);
- for(let i=0;i<90;i++){const a=Math.random()*Math.PI*2,sp=1+Math.random()*3.2;
-  parts.push({k:'drop',x:SEAT.x+Math.cos(a)*.3,y:TANK.water,z:SEAT.z+Math.sin(a)*.25,vx:Math.cos(a)*sp*.8,vy:3+Math.random()*5,vz:Math.sin(a)*sp*.6-(Math.random()<.25?2.5:0),life:2,r:.025+Math.random()*.045});}
+function splashAt(sx){
+ SFX.splash();slosh=1.2;shakeIt(.4);const S=SEATS[sx];
+ for(let i=0;i<70;i++){const a=Math.random()*Math.PI*2,sp=1+Math.random()*3.2;
+  parts.push({k:'drop',x:S.x+Math.cos(a)*.3,y:TANK.water,z:S.z+Math.sin(a)*.25,vx:Math.cos(a)*sp*.8,vy:3+Math.random()*5,vz:Math.sin(a)*sp*.6-(Math.random()<.25?2.5:0),life:2,r:.025+Math.random()*.045});}
  setTimeout(()=>SFX.cheer(),350);
 }
 function endBall(){
- if(!ball.hitT||ch.state==='sit'){streak=0;if(!ball.bonked&&!ball.hitT)say(bag('m'+c.id,c.miss),2.6);}
+ if(ball.hit<0){streak=0;if(!ball.bonked&&!ball.rim){const w=sideOf(ball.x);say(bag('m'+cand[w].id,cand[w].miss),2.6,w);}}
  lastPath=trail.slice();ball=null;
- if(balls<=0)setTimeout(checkEnd,ch.state==='sit'?700:2600);else newWind();hud();
+ if(balls<=0)setTimeout(checkEnd,allSit()?700:2600);else newWind();hud();
 }
-function checkEnd(){if(ball||balls>0||roundOver)return;if(ch.state!=='sit'){setTimeout(checkEnd,500);return;}
- roundOver=true;const key='best_'+c.id,best=store.get(key,0),nb=dunks>best;if(nb)store.set(key,dunks);
- $('rTitle').textContent=dunks===0?'Bone dry':dunks>=7?'Soaked':'Round over';
- $('rText').textContent=`${dunks} dunk${dunks===1?'':'s'} out of ${BALLS} on ${c.name}. ${nb?'New best!':'Best: '+Math.max(best,dunks)+'.'}`;
- const g=$('rGuide');g.innerHTML='';LEVEL_MOVES[c.id].forEach(id=>{const M=MOVES[id];const li=document.createElement('li');li.innerHTML=`<b>${M.name}.</b> ${M.def} <br>Spot it: ${M.spot} <br>Fair version: ${M.fair}`;g.appendChild(li);});
- $('rTwain').textContent='\u201c'+TWAIN[c.id].q+'\u201d';$('rTwainSrc').textContent=TWAIN[c.id].src;
+function checkEnd(){if(ball||balls>0||roundOver)return;if(!allSit()||sayQ.length){setTimeout(checkEnd,500);return;}
+ roundOver=true;const nm=i=>cand[i].name,sh=i=>SHORT[cand[i].id];
+ const tie=wet[0]===wet[1],win=wet[0]<wet[1]?0:1,lose=1-win;
+ if(tie){$('rTitle').textContent='Dead heat';
+  $('rText').textContent=`Both candidates were dunked ${wet[0]} time${wet[0]===1?'':'s'}. The town calls a recount.`;}
+ else{store.set('elect_'+lv.k,nm(win));$('rTitle').textContent=cand[win].id==='mayor'?`Re-elected: ${nm(win)}`:`Mayor-elect: ${nm(win)}`;
+  $('rText').textContent=`${sh(win)} stayed driest: dunked ${wet[win]} time${wet[win]===1?'':'s'}, to ${sh(lose)}'s ${wet[lose]}.`;}
+ $('rText').textContent+=` In this race, ${sh(0)} cheated ${lies[0]} time${lies[0]===1?'':'s'} and ${sh(1)} cheated ${lies[1]}.`;
+ if(!tie&&lies[0]!==lies[1]){const honest=lies[0]<lies[1]?0:1;$('rText').textContent+=honest===win?' You kept the straighter talker dry.':' The one you kept dry cheated more.';}
+ const g=$('rGuide');g.innerHTML='';LEVEL_MOVES[lv.k].forEach(id=>{const M=MOVES[id];const li=document.createElement('li');li.innerHTML=`<b>${M.name}.</b> ${M.def} <br>Spot it: ${M.spot} <br>Fair version: ${M.fair}`;g.appendChild(li);});
+ $('rTwain').textContent='“'+TWAIN[lv.k].q+'”';$('rTwainSrc').textContent=TWAIN[lv.k].src;
  {const M=MOVES.none,li=document.createElement('li');li.innerHTML=`<b>No cheat.</b> ${M.def} <br>Spot it: ${M.spot}`;g.appendChild(li);}
- if(stats.asked)$('rText').textContent+=` You called ${stats.right} of ${stats.asked} moves.`;
+ if(stats.asked)$('rText').textContent+=` You called ${stats.right} of ${stats.asked}.`;
  if(stats.fairDunks)$('rText').textContent+=` You dunked ${stats.fairDunks} straight answer${stats.fairDunks===1?'':'s'}.`;
- $('result').style.display='block';$('rAgain').focus();announce($('rText').textContent);}
+ $('result').style.display='block';$('rAgain').focus();announce($('rTitle').textContent+'. '+$('rText').textContent);}
 
 /* ---------- update ---------- */
 let last=performance.now(),wasSteady=false;
@@ -543,22 +650,24 @@ function frame(now){
   trail.push({x:ball.x,y:ball.y,z:ball.z});if(trail.length>200)trail.shift();
   const sp=Math.hypot(ball.vx,ball.vy,ball.vz);
   if((sp<.5&&ball.y<=R+.01)||(ball.vz<0&&ball.z<2.2)||ball.age>6||Math.abs(ball.x)>12)endBall();}
- if(ch.state==='fall'){seatA=Math.min(1.25,seatA+dt*9);ch.vy-=G*dt;ch.yo+=ch.vy*dt;ch.rot=Math.max(-0.9,ch.rot-dt*3.5);
-  if(SEAT.y+ch.yo<TANK.water+.05&&!ch.splashed){ch.splashed=true;splashAt();}
-  if(SEAT.y+ch.yo<0.3){ch.yo=0.3-SEAT.y;ch.vy=0;ch.state='under';ch.timer=1.5;}}
- else if(ch.state==='under'){ch.timer-=dt;ch.yo=0.3-SEAT.y+Math.sin(t*3)*.04;if(Math.random()<dt*14)parts.push({k:'bub',x:SEAT.x+(Math.random()-.5)*.3,y:1.0,z:SEAT.z,vy:.8+Math.random(),life:1});
-  if(ch.timer<=0){ch.state='climb';ch.timer=0;ch.splashed=false;if(ch.fair){ch.fair=false;say(bag('fd',FAIRDUNK),3.8);announce('That was a straight answer, and you dunked it anyway.');}else say(bag('d'+c.id,c.dunk),3.4);}}
- else if(ch.state==='climb'){ch.timer+=dt;const k=Math.min(1,ch.timer/1.1);const e=1-Math.pow(1-k,3);ch.yo=(0.3-SEAT.y)*(1-e);ch.rot=-0.9*(1-e);seatA=1.25*(1-Math.min(1,k*1.6));
-  if(k>=1){ch.state='sit';ch.yo=0;ch.rot=0;seatA=0;}}
+ chs.forEach((h,si)=>{const S=SEATS[si];
+ if(h.state==='fall'){h.seatA=Math.min(1.25,h.seatA+dt*9);h.vy-=G*dt;h.yo+=h.vy*dt;h.rot=Math.max(-0.9,h.rot-dt*3.5);
+  if(S.y+h.yo<TANK.water+.05&&!h.splashed){h.splashed=true;splashAt(si);}
+  if(S.y+h.yo<0.3){h.yo=0.3-S.y;h.vy=0;h.state='under';h.timer=1.5;}}
+ else if(h.state==='under'){h.timer-=dt;h.yo=0.3-S.y+Math.sin(t*3+si)*.04;if(Math.random()<dt*14)parts.push({k:'bub',x:S.x+(Math.random()-.5)*.3,y:1.0,z:S.z,vy:.8+Math.random(),life:1});
+  if(h.timer<=0){h.state='climb';h.timer=0;h.splashed=false;const k=cand[si];
+   if(h.fair){h.fair=false;say(bag('fd',FAIRDUNK),3.8,si);announce(`${k.name} gave a straight answer, and you dunked it anyway.`);}else say(bag('d'+k.id,k.dunk),3.4,si);}}
+ else if(h.state==='climb'){h.timer+=dt;const k=Math.min(1,h.timer/1.1);const e=1-Math.pow(1-k,3);h.yo=(0.3-S.y)*(1-e);h.rot=-0.9*(1-e);h.seatA=1.25*(1-Math.min(1,k*1.6));
+  if(k>=1){h.state='sit';h.yo=0;h.rot=0;h.seatA=0;}}});
  for(const p of parts){p.life-=dt;if(p.k==='drop'){p.vy-=G*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.z+=p.vz*dt;
    const inTank=p.x>TANK.x0&&p.x<TANK.x1&&p.z>TANK.zf&&p.z<TANK.zb;if((inTank&&p.y<TANK.water&&p.vy<0)||p.y<0||p.z<1.5)p.life=0;}
   else{p.y+=p.vy*dt;if(p.y>TANK.water)p.life=0;}}
  parts=parts.filter(p=>p.life>0);
  for(const r of rings){r.r+=dt*1.6;r.a-=dt*1.8;}rings=rings.filter(r=>r.a>0);
- slosh*=Math.pow(.35,dt);glassWob*=Math.pow(.02,dt);tgtFlash*=Math.pow(.05,dt);shake*=Math.pow(.004,rdt);
+ slosh*=Math.pow(.35,dt);glassWob*=Math.pow(.02,dt);tgtFlash=tgtFlash.map(v=>v*Math.pow(.05,dt));shake*=Math.pow(.004,rdt);
  if(pop){pop.t-=rdt;if(pop.t<=0)pop=null;}
- if(bubble.t>0)bubble.t-=rdt;
- if(canThrow()&&!heck.active&&bubble.t<=0.3&&!aiming)newHeckle();
+ if(bubble.t>0)bubble.t-=rdt;nextSay();
+ if(canThrow()&&!heck.active&&bubble.t<=0.3&&!sayQ.length&&!aiming)newHeckle();
  windShown+=(wind-windShown)*Math.min(1,rdt*3);
  draw();requestAnimationFrame(frame);
 }
@@ -621,44 +730,50 @@ function drawBackdrop(){
  const sh=ctx.createLinearGradient(0,P(0,3.9,z).y,0,P(0,0,z).y);sh.addColorStop(0,pl.wallShade[0]);sh.addColorStop(1,pl.wallShade[1]);rectW(-4.2,4.2,0,3.9,z,sh);
  const aw=P(-4.4,4.0,z-.3),awR=P(4.4,4.0,z-.3),sc=(awR.x-aw.x)/12;
  paperOn(1.1);for(let i=0;i<12;i++){ctx.fillStyle=i%2?'#ffd23f':'#c8342b';ctx.beginPath();ctx.moveTo(aw.x+i*sc,aw.y-sc*.9);ctx.lineTo(aw.x+(i+1)*sc,aw.y-sc*.9);ctx.lineTo(aw.x+(i+1)*sc,aw.y);ctx.arc(aw.x+(i+.5)*sc,aw.y,sc/2,0,Math.PI);ctx.closePath();ctx.fill();}paperOff();
- const s1=P(-2.4,5.4,z-.4),s2=P(2.4,4.25,z-.4);ctx.lineWidth=Math.max(2,s1.s*.06);ctx.strokeStyle='#ffd23f';paperOn(1.3);rr(s1.x,s1.y,s2.x-s1.x,s2.y-s1.y,s1.s*.2,'#3a0f1e');paperOff();
- ctx.fillStyle='#ffd23f';fitText('DUNK-O-RAMA',(s1.x+s2.x)/2,(s1.y+s2.y)/2+1,(s2.x-s1.x)*.88,s1.s*.62,900);
- for(let i=0;i<14;i++){const x=s1.x+(s2.x-s1.x)*(i+.5)/14,on=Math.floor(t*4+i)%3!==0;ctx.fillStyle=on?'#fff6c2':'#7a5a20';ctx.beginPath();ctx.arc(x,s1.y,s1.s*.07,0,7);ctx.fill();ctx.beginPath();ctx.arc(x,s2.y,s1.s*.07,0,7);ctx.fill();}
  if(pl.lights){const top=hy*.32;ctx.strokeStyle=pl.cord;ctx.lineWidth=1.5;ctx.beginPath();for(let i=0;i<=40;i++){const x=i/40*W,y=top+Math.sin(i/40*Math.PI)*H*.05;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();
   for(let i=1;i<20;i++){const x=i/20*W,y=top+Math.sin(i/20*Math.PI)*H*.05+5,col=['#ffd23f','#ff7a59','#7fd6ff','#b6ff8a'][i%4];const fl=.6+.4*Math.sin(t*3+i*1.7);
    ctx.globalAlpha=.25*fl;ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,12,0,7);ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill();}}
 }
 
-function drawTarget(){
- const cr=c.r*(ball?(ball.rBoost||1):rBoost);
- const T=tgtPos(),p=P(T.x,T.y,TGT.z),z=TGT.z;
- const lp=P(TGT.px-.95,0,z),rp2=P(TGT.px+.95,0,z),lt=P(TGT.px-.95,TGT.top+.15,z),rt2=P(TGT.px+.95,TGT.top+.15,z);
- // frame: two posts and a crossbar
- ctx.strokeStyle='#2a2230';ctx.lineCap='round';ctx.lineWidth=Math.max(4,p.s*.1);
- ctx.beginPath();ctx.moveTo(lp.x,lp.y);ctx.lineTo(lt.x,lt.y);ctx.lineTo(rt2.x,rt2.y);ctx.lineTo(rp2.x,rp2.y);ctx.stroke();
- ctx.strokeStyle='#d9d4e3';ctx.lineWidth=Math.max(2,p.s*.05);ctx.stroke();
- ell(lp.x,lp.y,p.s*.2,p.s*.05,'rgba(0,0,0,.3)',false);ell(rp2.x,rp2.y,p.s*.2,p.s*.05,'rgba(0,0,0,.3)',false);
- // disc geometry
- const cw=Math.cos(tg.psi),up={x:-Math.sin(tg.phi),y:Math.cos(tg.phi)},rt={x:Math.cos(tg.phi),y:Math.sin(tg.phi)};
+function drawTarget(i){
+ const TG=TGTS[i],s=tgs[i],cr=tgtR(i,ball);
+ const T=tgtPos(i),p=P(T.x,T.y,TG.z),z=TG.z;
+ const cw=Math.cos(s.psi),up={x:-Math.sin(s.phi),y:Math.cos(s.phi)},rt={x:Math.cos(s.phi),y:Math.sin(s.phi)};
+ ctx.lineCap='round';
+ if(TG.arch){// arch over the tank: two posts on the cage top and a crossbar
+  const ax=TANK.x1-.05,lb=P(-ax,TANK.cage,z),rb=P(ax,TANK.cage,z),lt=P(-ax,TG.top+.95,z),rt2=P(ax,TG.top+.95,z);
+  ctx.strokeStyle='#2a2230';ctx.lineWidth=Math.max(4,p.s*.1);ctx.beginPath();ctx.moveTo(lb.x,lb.y);ctx.lineTo(lt.x,lt.y);ctx.lineTo(rt2.x,rt2.y);ctx.lineTo(rb.x,rb.y);ctx.stroke();
+  ctx.strokeStyle='#d9d4e3';ctx.lineWidth=Math.max(2,p.s*.05);ctx.stroke();
+  // the marquee rides the arch: the top target hangs from the sign
+  const m1=P(-ax,TG.top+.95,z),m2=P(ax,TG.top+.15,z);ctx.lineWidth=Math.max(2,m1.s*.06);ctx.strokeStyle='#ffd23f';paperOn(1.3);rr(m1.x,m1.y,m2.x-m1.x,m2.y-m1.y,m1.s*.16,'#3a0f1e');paperOff();
+  ctx.fillStyle='#ffd23f';fitText('DUNK-O-RAMA',(m1.x+m2.x)/2,(m1.y+m2.y)/2+1,(m2.x-m1.x)*.86,m1.s*.5,900);
+  for(let k=0;k<12;k++){const x=m1.x+(m2.x-m1.x)*(k+.5)/12,on=Math.floor(t*4+k)%3!==0;ctx.fillStyle=on?'#fff6c2':'#7a5a20';ctx.beginPath();ctx.arc(x,m1.y,m1.s*.06,0,7);ctx.fill();ctx.beginPath();ctx.arc(x,m2.y,m1.s*.06,0,7);ctx.fill();}
+ }else{// side frame: two posts and a crossbar
+  const lp=P(TG.px-TG.post,0,z),rp2=P(TG.px+TG.post,0,z),lt=P(TG.px-TG.post,TG.top+.15,z),rt2=P(TG.px+TG.post,TG.top+.15,z);
+  ctx.strokeStyle='#2a2230';ctx.lineWidth=Math.max(4,p.s*.1);ctx.beginPath();ctx.moveTo(lp.x,lp.y);ctx.lineTo(lt.x,lt.y);ctx.lineTo(rt2.x,rt2.y);ctx.lineTo(rp2.x,rp2.y);ctx.stroke();
+  ctx.strokeStyle='#d9d4e3';ctx.lineWidth=Math.max(2,p.s*.05);ctx.stroke();
+  ell(lp.x,lp.y,p.s*.16,p.s*.04,'rgba(0,0,0,.3)',false);ell(rp2.x,rp2.y,p.s*.16,p.s*.04,'rgba(0,0,0,.3)',false);}
  // two wires
  ctx.strokeStyle=mode==='light'?'#3a3340':'#e9e3f5';ctx.lineWidth=Math.max(1.5,p.s*.018);
- for(const sd of [-1,1]){const top=P(TGT.px+sd*.28,TGT.top+.15,z);const ax=T.x+up.x*cr*.82+rt.x*sd*cr*.5*cw,ay=T.y+up.y*cr*.82+rt.y*sd*cr*.5*cw;const a=P(ax,ay,z);
+ for(const sd of [-1,1]){const top=P(TG.px+sd*.24,TG.top+.15,z);const ax=T.x+up.x*cr*.82+rt.x*sd*cr*.5*cw,ay=T.y+up.y*cr*.82+rt.y*sd*cr*.5*cw;const a=P(ax,ay,z);
   ctx.beginPath();ctx.moveTo(top.x,top.y);ctx.lineTo(a.x,a.y);ctx.stroke();}
- // slack trip cord to the tank latch
- const bot=P(T.x-up.x*cr,T.y-up.y*cr,z),latch=P(TANK.x0,2.0,TANK.zf);
- ctx.strokeStyle='rgba(30,20,40,.85)';ctx.lineWidth=Math.max(1.5,p.s*.02);ctx.beginPath();ctx.moveTo(bot.x,bot.y);ctx.quadraticCurveTo((bot.x+latch.x)/2,Math.max(bot.y,latch.y)+p.s*.35,latch.x,latch.y);ctx.stroke();
+ // slack trip cord to each seat it drops: the cord shows which target dunks whom
+ const bot=P(T.x-up.x*cr,T.y-up.y*cr,z);
+ ctx.strokeStyle=mode==='sharp'?'rgba(255,255,0,.85)':'rgba(30,20,40,.85)';ctx.lineWidth=Math.max(1.5,p.s*.022);
+ TG.seats.forEach(si=>{const S=SEATS[si];const latch=TG.arch?P(S.x+(si?.35:-.35),S.y+.05,TANK.zb-.05):P(si?TANK.x1:TANK.x0,2.0,TANK.zf);
+  ctx.beginPath();ctx.moveTo(bot.x,bot.y);ctx.quadraticCurveTo((bot.x+latch.x)/2,Math.max(bot.y,latch.y)+p.s*.3,latch.x,latch.y);ctx.stroke();});
  paperOn(1.2);// disc: thickness then face
- const rpx=cr*p.s,ang=-tg.phi,ew=Math.abs(cw);
+ const rpx=cr*p.s,ang=-s.phi,ew=Math.abs(cw);
  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(ang);
- const th=Math.sin(tg.psi)*p.s*.07;
+ const th=Math.sin(s.psi)*p.s*.07;
  ctx.lineWidth=1;ctx.strokeStyle=OUT;
  ell(th,0,(rpx+p.s*.05)*ew,rpx+p.s*.05,'#3d414c');
  ell(0,0,(rpx+p.s*.05)*ew,rpx+p.s*.05,'#8d93a1',false);
- const face=cw>=0;
- [['#ffffff',1],['#c8342b',.8],['#ffffff',.58],['#c8342b',.36],['#ffd23f',.15]].forEach(([col,k],i)=>{ell(0,0,rpx*k*ew,rpx*k,face||i===0?col:'#b9b3c4',false);});
- paperOff();if(tgtFlash>.05){ctx.globalAlpha=tgtFlash*.8;ell(0,0,(rpx+p.s*.06)*ew,rpx+p.s*.06,'#fff6c2',false);ctx.globalAlpha=1;}
+ const face=cw>=0,ring=TG.arch?'#2f6fb0':'#c8342b';
+ [['#ffffff',1],[ring,.8],['#ffffff',.58],[ring,.36],['#ffd23f',.15]].forEach(([col,k],j)=>{ell(0,0,rpx*k*ew,rpx*k,face||j===0?col:'#b9b3c4',false);});
+ paperOff();if(tgtFlash[i]>.05){ctx.globalAlpha=tgtFlash[i]*.8;ell(0,0,(rpx+p.s*.06)*ew,rpx+p.s*.06,'#fff6c2',false);ctx.globalAlpha=1;}
  ctx.restore();
- for(const r of rings){const q=P(r.x,r.y,r.z);ctx.strokeStyle=`rgba(255,240,180,${Math.max(0,r.a)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(q.x,q.y,r.r*q.s+cr*q.s,0,7);ctx.stroke();}
+ for(const r of rings){if(r.k!==i)continue;const q=P(r.x,r.y,r.z);ctx.strokeStyle=`rgba(255,240,180,${Math.max(0,r.a)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(q.x,q.y,r.r*q.s+cr*q.s,0,7);ctx.stroke();}
 }
 
 function waterEdge(z,amp){const pts=[];for(let i=0;i<=24;i++){const x=TANK.x0+(TANK.x1-TANK.x0)*i/24;const y=TANK.water+Math.sin(i*.9+t*6)*.03*amp+Math.sin(i*.37-t*3.4)*.05*amp;pts.push(P(x,y,z));}return pts;}
@@ -670,11 +785,15 @@ function drawTank(){
  quad(P(TANK.x0,0,zf),P(TANK.x0,0,zb),P(TANK.x0,TANK.cage,zb),P(TANK.x0,TANK.cage,zf),sideFill);
  quad(P(TANK.x1,0,zf),P(TANK.x1,0,zb),P(TANK.x1,TANK.cage,zb),P(TANK.x1,TANK.cage,zf),sideFill);
  rectW(TANK.x0,TANK.x1,0,TANK.water,zb,'#1f5f8f');
- const sh=P(SEAT.x-.45,SEAT.y,SEAT.z);ctx.save();ctx.translate(sh.x,sh.y);ctx.rotate(seatA);ctx.lineWidth=1.5;ctx.strokeStyle=OUT;rr(0,-sh.s*.04,sh.s*.95,sh.s*.09,sh.s*.03,'#c99a5b');ctx.restore();
- ctx.strokeStyle='#8c8799';ctx.lineWidth=Math.max(2,sh.s*.05);const bk=P(SEAT.x-.45,SEAT.y,zb);ctx.beginPath();ctx.moveTo(bk.x,bk.y);ctx.lineTo(sh.x,sh.y);ctx.stroke();
- const cp=P(SEAT.x,SEAT.y+ch.yo,SEAT.z);
- const mood=ch.state==='fall'?'fall':ch.state==='under'?'under':ch.state==='climb'?'wet':(bubble.t>0?'talk':'idle');
- paperOn(1);drawChar(c,cp.x,cp.y,cp.s*CHS,ch.rot,mood,t);paperOff();
+ // a divider down the back wall: two seats, one tank
+ {const d1=P(0,TANK.water,zb),d2=P(0,TANK.cage,zb);ctx.strokeStyle='rgba(255,210,63,.35)';ctx.lineWidth=Math.max(2,d1.s*.04);ctx.beginPath();ctx.moveTo(d1.x,d1.y);ctx.lineTo(d2.x,d2.y);ctx.stroke();}
+ drawTarget(2);// the top target hangs behind the seats
+ SEATS.forEach((S,si)=>{const h=chs[si],dir=si?1:-1;// planks hinge at the outer wall, so they drop away from the middle
+  const sh=P(S.x+dir*.42,S.y,S.z);ctx.save();ctx.translate(sh.x,sh.y);ctx.rotate(-dir*h.seatA);ctx.lineWidth=1.5;ctx.strokeStyle=OUT;rr(si?-sh.s*.84:0,-sh.s*.04,sh.s*.84,sh.s*.09,sh.s*.03,'#c99a5b');ctx.restore();
+  ctx.strokeStyle='#8c8799';ctx.lineWidth=Math.max(2,sh.s*.05);const bk=P(S.x+dir*.42,S.y,zb);ctx.beginPath();ctx.moveTo(bk.x,bk.y);ctx.lineTo(sh.x,sh.y);ctx.stroke();});
+ SEATS.forEach((S,si)=>{const h=chs[si];const cp=P(S.x,S.y+h.yo,S.z);
+  const mood=h.state==='fall'?'fall':h.state==='under'?'under':h.state==='climb'?'wet':(bubble.t>0&&!bubble.hidden&&bubble.who===si?'talk':'idle');
+  paperOn(1);drawChar(cand[si],cp.x,cp.y,cp.s*CHS,h.rot*(si?-1:1),mood,t+si*1.3);paperOff();});
  const amp=.3+slosh;const edge=waterEdge(zf,amp),edgeB=waterEdge(zb,amp*.6);
  ctx.fillStyle='rgba(110,190,240,.55)';ctx.beginPath();edge.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));for(let i=edgeB.length-1;i>=0;i--)ctx.lineTo(edgeB[i].x,edgeB[i].y);ctx.closePath();ctx.fill();
  const bot=P(TANK.x1,0,zf),bl=P(TANK.x0,0,zf);
@@ -685,18 +804,20 @@ function drawTank(){
  const wob=Math.sin(t*40)*glassWob*3;const g1=P(TANK.x0,TANK.glass,zf),g2=P(TANK.x1,0,zf);
  ctx.fillStyle='rgba(200,235,255,.08)';ctx.fillRect(g1.x+wob,g1.y,g2.x-g1.x,g2.y-g1.y);
  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=Math.max(2,g1.s*.05);
- for(const k of [.15,.22,.7]){const a=P(TANK.x0+(TANK.x1-TANK.x0)*k,TANK.glass-.1,zf),b=P(TANK.x0+(TANK.x1-TANK.x0)*k-.25,.15,zf);ctx.beginPath();ctx.moveTo(a.x+wob,a.y);ctx.lineTo(b.x+wob,b.y);ctx.stroke();}
+ for(const k of [.12,.18,.62,.8]){const a=P(TANK.x0+(TANK.x1-TANK.x0)*k,TANK.glass-.1,zf),b=P(TANK.x0+(TANK.x1-TANK.x0)*k-.25,.15,zf);ctx.beginPath();ctx.moveTo(a.x+wob,a.y);ctx.lineTo(b.x+wob,b.y);ctx.stroke();}
  const m1=P(TANK.x0,TANK.cage,zf),m2=P(TANK.x1,TANK.glass,zf);ctx.save();ctx.beginPath();ctx.rect(m1.x,m1.y,m2.x-m1.x,m2.y-m1.y);ctx.clip();
  ctx.strokeStyle='rgba(225,225,235,.28)';ctx.lineWidth=1;const step=m1.s*.22;for(let x=m1.x-(m2.y-m1.y);x<m2.x;x+=step){ctx.beginPath();ctx.moveTo(x,m2.y);ctx.lineTo(x+(m2.y-m1.y),m1.y);ctx.moveTo(x,m1.y);ctx.lineTo(x+(m2.y-m1.y),m2.y);ctx.stroke();}ctx.restore();
  paperOn(1);ctx.strokeStyle='#c8342b';ctx.lineWidth=Math.max(3,m1.s*.09);ctx.lineJoin='round';
  const fA=P(TANK.x0,TANK.cage,zf),fB=P(TANK.x1,0,zf),gl=P(0,TANK.glass,zf);ctx.strokeRect(fA.x,fA.y,fB.x-fA.x,fB.y-fA.y);
  ctx.beginPath();ctx.moveTo(fA.x,gl.y);ctx.lineTo(fB.x,gl.y);ctx.stroke();
  const tb=P(TANK.x0,TANK.cage,zb),tb2=P(TANK.x1,TANK.cage,zb);ctx.lineWidth=Math.max(2,m1.s*.06);ctx.beginPath();ctx.moveTo(fA.x,fA.y);ctx.lineTo(tb.x,tb.y);ctx.lineTo(tb2.x,tb2.y);ctx.lineTo(fB.x,fA.y);ctx.stroke();
- const pl1=P(TANK.x0+.5,1.05,zf),pl2=P(TANK.x1-.5,.66,zf);ctx.lineWidth=2;ctx.strokeStyle='#ffd23f';rr(pl1.x,pl1.y,pl2.x-pl1.x,pl2.y-pl1.y,4,'#1b1328');
- paperOff();ctx.fillStyle='#ffffff';fitText(c.title.toUpperCase(),(pl1.x+pl2.x)/2,(pl1.y+pl2.y)/2,(pl2.x-pl1.x)*.9,pl1.s*.17,800);
- // wind sock on tank top: shows the breeze that moves the target (and the ball, for the Mayor)
- const fp=P(TANK.x1,TANK.cage,zf),ft=P(TANK.x1,TANK.cage+.9,zf);ctx.strokeStyle=mode==='light'?'#3a3340':'#e9e3f5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fp.x,fp.y);ctx.lineTo(ft.x,ft.y);ctx.stroke();
- const bz=breeze(t)+(c.wind?windShown:0),len=ft.s*(.08+.12*Math.min(3,Math.abs(bz))),dir=bz<0?-1:1,fl=Math.sin(t*12)*ft.s*.03;
+ // one name plate per seat
+ [[TANK.x0+.18,-.08],[.08,TANK.x1-.18]].forEach(([a,b],si)=>{const pl1=P(a,1.05,zf),pl2=P(b,.66,zf);ctx.lineWidth=2;ctx.strokeStyle='#ffd23f';paperOn(1);rr(pl1.x,pl1.y,pl2.x-pl1.x,pl2.y-pl1.y,4,'#1b1328');paperOff();
+  ctx.fillStyle='#ffffff';fitText(SHORT[cand[si].id].toUpperCase(),(pl1.x+pl2.x)/2,(pl1.y+pl2.y)/2,(pl2.x-pl1.x)*.86,pl1.s*.22,800);});
+ paperOff();
+ // wind sock on the arch: shows the breeze that moves the targets (and the ball, in gusty runoffs)
+ const ax=TANK.x1-.05,fp=P(ax,TGTS[2].top+.95,TGTS[2].z),ft=P(ax,TGTS[2].top+1.6,TGTS[2].z);ctx.strokeStyle=mode==='light'?'#3a3340':'#e9e3f5';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fp.x,fp.y);ctx.lineTo(ft.x,ft.y);ctx.stroke();
+ const bz=breeze(t)+(lv.wind?windShown:0),len=ft.s*(.08+.12*Math.min(3,Math.abs(bz))),dir=bz<0?-1:1,fl=Math.sin(t*12)*ft.s*.03;
  ctx.fillStyle='#ffd23f';ctx.strokeStyle=OUT;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(ft.x,ft.y);ctx.lineTo(ft.x+dir*len,ft.y+ft.s*.1+fl);ctx.lineTo(ft.x,ft.y+ft.s*.22);ctx.closePath();ctx.fill();ctx.stroke();
 }
 
@@ -762,7 +883,7 @@ function drawBallAt(x,y,z){const p=P(x,y,z),r=R*p.s;
  ctx.fillStyle=ballFill(p.x,p.y,r);ctx.beginPath();ctx.arc(p.x,p.y,r,0,7);ctx.fill();ctx.strokeStyle=OUT;ctx.lineWidth=Math.max(1.5,r*.08);ctx.stroke();
  ctx.strokeStyle='rgba(200,52,43,.8)';ctx.lineWidth=Math.max(1,r*.07);ctx.beginPath();ctx.arc(p.x,p.y,r*.75,-1,1.2);ctx.stroke();}
 function drawShadow(b){const s=P(b.x,0,b.z);const k=Math.max(.2,1-b.y/5);ell(s.x,s.y,R*s.s*1.3*k,R*s.s*.35*k,'rgba(0,0,0,.35)',false);}
-function previewPts(dx,dy){const b=launchState(dx,dy),pts=[];for(let i=0;i<200&&b.age<.4;i++){step(b,1/60,false);if(i%3===0)pts.push({x:b.x,y:b.y,z:b.z});if(b.z>TGT.z||b.y<0)break;}return pts;}
+function previewPts(dx,dy){const b=launchState(dx,dy),pts=[];for(let i=0;i<200&&b.age<.4;i++){step(b,1/60,false);if(i%3===0)pts.push({x:b.x,y:b.y,z:b.z});if(b.z>13||b.y<0)break;}return pts;}
 function elbow(){const m=maxPull(),rp=restPt();return{x:rp.x+m*.7,y:rp.y+m*2.7};}
 // cartoon glove (original: cream glove, striped carnival cuff). Local units = ball radius.
 function drawGlove(x,y,br,ang,hold){
@@ -818,8 +939,8 @@ function drawArm(){
 }
 function wrap(txt,maxW){const words=txt.split(' '),lines=[];let l='';for(const w of words){const tt=l?l+' '+w:w;if(ctx.measureText(tt).width>maxW&&l){lines.push(l);l=w;}else l=tt;}if(l)lines.push(l);return lines;}
 function drawBubble(){
- const bc=$('bubClose');if(bubble.t<=0||bubble.hidden||ch.state==='under'||ch.state==='fall'){if(bc.style.display!=='none')bc.style.display='none';return;}
- const hp=P(SEAT.x,SEAT.y+ch.yo+1.15*CHS,SEAT.z);const fs=18,lh=fs*1.32,maxW=Math.min(W*.7-30,330);
+ const bc=$('bubClose'),bh0=chs[bubble.who||0];if(bubble.t<=0||bubble.hidden||bh0.state==='under'||bh0.state==='fall'){if(bc.style.display!=='none')bc.style.display='none';return;}
+ const BS=SEATS[bubble.who||0],hp=P(BS.x,BS.y+bh0.yo+1.15*CHS,BS.z);const fs=18,lh=fs*1.32,maxW=Math.min(W*.7-30,330);
  const segs=bubble.parts||[{who:null,text:bubble.text}],rows=[];
  segs.forEach((sg,k)=>{const lab=sg.who?sg.who+': ':'';ctx.font=`${sg.crowd?'italic 600':'700'} ${fs}px system-ui,sans-serif`;
   wrap(lab+sg.text,maxW-28).forEach((l,i)=>rows.push({t:l,crowd:!!sg.crowd,lab:i===0?lab:''}));if(k<segs.length-1)rows.push({gap:1});});
@@ -844,7 +965,7 @@ function drawPop(){if(!pop)return;const k=1-pop.t/1.4;const sc=k<.15?k/.15*1.25:
 
 function draw(){
  ctx.save();if(shake>.01){ctx.translate((Math.random()-.5)*shake*24,(Math.random()-.5)*shake*24);}
- drawBackdrop();drawTarget();drawTank();
+ drawBackdrop();drawTank();drawTarget(0);drawTarget(1);
  if(!ball&&lastPath.length){ctx.fillStyle='rgba(255,255,255,.45)';lastPath.forEach((q,i)=>{if(i%4)return;const p=P(q.x,q.y,q.z);ctx.beginPath();ctx.arc(p.x,p.y,Math.max(1.5,R*p.s*.18),0,7);ctx.fill();});}
  for(const p of parts)if(p.k==='drop'){const q=P(p.x,p.y,p.z);ctx.fillStyle='rgba(170,225,255,.9)';ctx.beginPath();ctx.ellipse(q.x,q.y,Math.max(1.5,p.r*q.s),Math.max(2,p.r*q.s*1.4),0,0,7);ctx.fill();}
  if(ball){drawShadow(ball);trail.forEach((q,i)=>{if(i%2||i<trail.length-24)return;const p=P(q.x,q.y,q.z);ctx.fillStyle=`rgba(255,240,190,${.15+.5*i/trail.length})`;ctx.beginPath();ctx.arc(p.x,p.y,R*p.s*.5,0,7);ctx.fill();});drawBallAt(ball.x,ball.y,ball.z);}
