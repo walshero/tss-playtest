@@ -3,10 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dunk-O-Rama v0.9</title>
+<title>Dunk-O-Rama v1.0</title>
 <meta name="spec-source" content="convening/DUNK-O-RAMA-CONVENING.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students learning to spot rhetorical cheats. Lab build.">
-<!-- TSP build: Dunk-O-Rama v0.9 | LAB | 2026-11-07
+<!-- TSP build: Dunk-O-Rama v1.0 | LAB | 2026-11-08
+     v1.0 (founder, 2026-11-08): a fair answer cannot be dunked; targets open only for a fallacy, and
+     only after the player calls it. Layman critical-thinking terms (fallacy, fair answer) replace
+     "cheat". Senator becomes Councilman; Skip becomes Spencer; surnames are the short names.
+     A round is ten questions; a question with two fair answers has no throw.
      v0.9 (founder, 2026-11-07 11:28): a dunked cheater climbs out and gives the straight answer, then
      gets a towel. Not every candidate is a cheat: per-candidate cheat rates (Senator 20%, Chet 25%,
      Mayor 45%, Skip 65%, Dale 65%).
@@ -103,6 +107,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 #bubClose:focus-visible{outline:3px solid #ffd23f;outline-offset:2px}
 #callit.aside{visibility:hidden}
 #callBtn{display:none;width:100%;margin-top:4px;position:sticky;bottom:-12px;box-shadow:0 -8px 0 var(--chrome)}
+#nextQ{display:none;width:100%;margin-top:6px}
 #callit .chips{clear:both}
 #callit .chips:empty{display:none}
 
@@ -134,7 +139,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v0.9</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1 class="se-brand">Dunk-O-Rama <span class="ver">v1.0</span> <span class="tsp-labchip">LAB</span></h1>
   <div class="sp">
     <button id="seatBtn" aria-haspopup="dialog">Runoffs</button>
     <button id="modeBtn" class="icon" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" fill="currentColor" style="fill:var(--ink)"/></svg></button>
@@ -143,7 +148,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="menuClose" type="button">Close menu</button>
 </header>
-<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v0.9, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
+<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Dunk-O-Rama v1.0, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div></div>
 
 <div id="seatSheet" class="panel sheet" role="dialog" aria-label="Pick a runoff">
   <h2>Pick a runoff</h2>
@@ -154,7 +159,7 @@ a.nav:focus-visible,button:focus-visible{outline:3px solid var(--ink);outline-of
 <button id="hint">Pull the glove back, let go</button>
 
 <button id="bubClose" type="button" aria-label="Close the speech bubble"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-<div id="callit" class="panel" role="group" aria-label="The crowd asks"><button id="dlgClose" class="icon" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="dlg"></div><button id="callBtn" type="button">Call it</button><p class="q" id="callQ">Who cheated, and how?</p><div class="chips" id="chips"></div><p class="teach" id="teach" aria-live="polite"></p></div>
+<div id="callit" class="panel" role="group" aria-label="The crowd asks"><button id="dlgClose" class="icon" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="dlg"></div><button id="callBtn" type="button">Call it</button><p class="q" id="callQ">Who used a fallacy?</p><div class="chips" id="chips"></div><p class="teach" id="teach" aria-live="polite"></p><button id="nextQ" type="button">Next question</button></div>
 
 <div id="result" class="panel" role="dialog" aria-label="Round over">
   <h2 id="rTitle">Round over</h2>
@@ -194,13 +199,13 @@ const CHS=1.08; // character scale
 const LAUNCH={x:0.06,y:1.25,z:1.5};
 
 const CAST=[
- {id:'fil',name:'Sen. Lyle Droneon',title:'The Filibusterer',level:'Easy. Moves: red herring, appeal to tradition, Gish gallop. Light breeze.',
+ {id:'fil',name:'Councilman Lyle Droneon',title:'The Filibusterer',level:'Easy. Moves: red herring, appeal to tradition, Gish gallop. Light breeze.',
   suit:'#59647e',pants:'#454e63',tie:'#c8342b',skin:'#f0c4a0',bw:0.52,r:0.34,sway:0.5,tw:1,wind:0,
   idle:['And another thing. Section four, paragraph nine...','I yield my time to... myself.','Point of order! That was a practice throw.','I have forty more pages. Single-spaced.','Let the record show I am perfectly dry.'],
   miss:['Noted. Tabled. Forgotten.','Motion to dismiss that throw. Seconded by me.','The chair recognizes your miss.'],
   bonk:['That net was in the budget for a reason.','Out of order! You hit the procedure.'],
-  dunk:["I'll be entering this splash into the record.",'Glub. The senator from the deep end yields.','Moist. Very moist. Moving on to page ten.']},
- {id:'spin',name:'Skip Twirl',title:'The Spin Doctor',level:'Medium. Moves: straw man, false dilemma, loaded language. The target twists.',
+  dunk:["I'll be entering this splash into the record.",'Glub. The councilman from the deep end yields.','Moist. Very moist. Moving on to page ten.']},
+ {id:'spin',name:'Spencer Twirl',title:'The Spin Doctor',level:'Medium. Moves: straw man, false dilemma, loaded language. The target twists.',
   suit:'#6a3fa0',pants:'#4b2c74',tie:'#ffd23f',skin:'#e7b48c',bw:0.46,r:0.31,sway:0.7,tw:2.1,wind:0,
   idle:['Let me reframe that throw for you.','Every miss is a win, if you squint.',"The target isn't twisting. It's evolving.",'Off the record? You throw like a committee.'],
   miss:['That miss was a strategic success.','Sources close to the ball say it was tired.','Historic restraint on your part.'],
@@ -245,8 +250,9 @@ const MOVES={
 };
 const LEVEL_MOVES={fil:['red','trad','gish','circ'],spin:['straw','dilemma','loaded','goal'],mayor:['band','what','slope','equiv'],lob:['adhom','auth','cherry','anec'],pun:['scape','cause','lq','incoh']};
 /* v0.7's single-seat exchanges (75) retired in v0.8 by the runoff; they live in git history at 88c193c. */
-MOVES.none={name:'No cheat',def:'A straight answer. You can disagree with it, but it plays fair.',spot:'Does it answer the question, with reasons you could check?',fair:'This is the fair version.'};
+MOVES.none={name:'Fair answer',def:'An answer with reasons you could check. You can disagree with it, but it plays fair.',spot:'Does it answer the question, with reasons you could check?',fair:'This is the fair version.'};
 /* dunking a straight answer gets noticed (panel: Gitlin, Turkle) */
+const LOCKED=['That answer was fair. The board stays up.','You cannot dunk a fair answer. House rules.','I gave reasons you could check. Board stays.','Fair answer, dry seat. That is the deal.'];
 const FAIRDUNK=['I told you the truth, plainly. And here I am, wet.','Honest answer, cold water. Lesson noted, folks.','Next time I will lie. That seems to work better.','Did anyone hear the answer? Anyone? Glub.','Fair answer. Unfair water.'];
 
 /* Verified against the University of Virginia list of Pudd'nhead Wilson's New Calendar epigraphs
@@ -265,7 +271,7 @@ const LEVELTXT={fil:'Level 1, easy. Dodging the question. Light breeze.',spin:'L
 const REACT={
  fil:{miss:['Noted. Tabled. Forgotten.','Motion to dismiss that throw. Seconded by me.','The chair recognizes your miss.','Let the record show the ball agreed with me.','That throw has been referred to committee, where it will live forever.'],
       bonk:['That net was in the budget for a reason.','Out of order! You hit the procedure.','Nets have protected senators since 1789. Tradition.'],
-      dunk:["I'll be entering this splash into the record.",'Glub. The senator from the deep end yields.','Moist. Very moist. Moving on to page ten.','I yield the floor. The floor is wet.','Glub. Point of order. Glub.']},
+      dunk:["I'll be entering this splash into the record.",'Glub. The councilman from the deep end yields.','Moist. Very moist. Moving on to page ten.','I yield the floor. The floor is wet.','Glub. Point of order. Glub.']},
  spin:{miss:['That miss was a strategic success.','Sources close to the ball say it was tired.','Historic restraint on your part.','Missing is the new hitting. You heard it here first.','We will call that a soft launch.'],
       bonk:['The net and I are on message.','Hit the net? Bold choice. Wrong, but bold.','The net and I have a working relationship.'],
       dunk:['This water polls very well with me.','I meant to do that. Write it down.','Wet is the new dry. Trust me.','I am not wet. I am hydrated by circumstance.','Off the record: cold. On the record: refreshing.']},
@@ -282,7 +288,7 @@ const REACT={
 CAST.forEach(k=>{k.level=LEVELTXT[k.id];Object.assign(k,REACT[k.id]);});
 /* v0.5: enough reactions that a 10-ball round never repeats a line */
 const MORE={
- fil:{miss:['Even the ball knows better than to interrupt a senator.','I have a forty-page response to that throw. Section one: no.','Missed. As my grandfather used to say. He missed a lot.','That ball has been sent to a subcommittee for further study.','The senator recognizes the gentleman\'s wild optimism.'],
+ fil:{miss:['Even the ball knows better than to interrupt a councilman.','I have a forty-page response to that throw. Section one: no.','Missed. As my grandfather used to say. He missed a lot.','That ball has been sent to a subcommittee for further study.','The councilman recognizes the gentleman\'s wild optimism.'],
       dunk:['Glub. I will be filing a minority report. From the bottom.','My grandfather never got dunked. He also never left the house.','This is a tradition now. Write it down. Then stop writing.','Let the minutes reflect that I am underwater.','I would like to extend my remarks. Also my arms. Help.']},
  spin:{miss:['Our internal numbers show that ball never existed.','The ball and I have agreed to see other people.','I would call that a near miss. Near me, I mean. Very near.','Let me rephrase your throw for you: an apology.','That was not a miss. It was a hit on a longer timeline.'],
       dunk:['Let me be clear. I am damp. Unclearly damp.','This is what victory looks like from underneath.','Strategically submerged. Big difference.','Glub. No comment. Glub. Still no comment.','The polls close in five minutes. So does my mouth. Glub.']},
@@ -302,7 +308,7 @@ function bagOr(key,arr,fk,farr){if(BAGS[key]&&!BAGS[key].length)return bag(fk,fa
 const BAGS={};
 function bag(key,arr){if(!BAGS[key]||!BAGS[key].length){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}BAGS[key]=a;}return BAGS[key].pop();}
 
-const SHORT={fil:'Senator',spin:'Skip',mayor:'Mayor',lob:'Chet',pun:'Dale'};
+const SHORT={fil:'Droneon',spin:'Twirl',mayor:'Bunting',lob:'Ledger',pun:'Bluster'};
 
 /* ---------- v0.8: the runoff for mayor ----------
    Founder, 2026-11-07: "there should be two politicians in the dunk tank ... Make candidates answer
@@ -310,15 +316,15 @@ const SHORT={fil:'Senator',spin:'Skip',mayor:'Mayor',lob:'Chet',pun:'Dale'};
    Each runoff pairs two candidates. Each candidate holds one platform in every runoff they enter,
    and keeps it whether they answer straight or cheat: the cheat changes the argument, never the
    position. Platforms (Twain seat, studio drafts for founder edit):
-     Senator Droneon  - leave it as it is; wait for the study.
-     Skip Twirl       - make the town look new; events pay for it.
+     Councilman Droneon - leave it as it is; wait for the study.
+     Spencer Twirl    - make the town look new; events pay for it.
      Mayor Bunting    - build it, put a name on it (the incumbent).
      Chet Ledger      - let a private firm do it; discloses his clients.
      Dale Bluster     - crack down; fines, cameras, guards.
    Row: [crowd asks, left straight answer, left move, left cheat, right straight answer, right move, right cheat].
    Each runoff teaches its level's four moves; 10 questions, so a 10-ball round never repeats one. */
-/* how often each candidate cheats. The Senator and Chet mostly answer straight; Skip and Dale mostly
-   do not; the Mayor is a coin flip. Runoffs: straight v cheat, cheat v coin, coin v straight,
+/* how often each candidate uses a fallacy. Droneon and Ledger mostly answer fairly; Twirl and Bluster
+   mostly do not; the Mayor is a coin flip. Runoffs: straight v cheat, cheat v coin, coin v straight,
    straight v cheat, cheat v straight. */
 const CHEATRATE={fil:.2,spin:.65,mayor:.45,lob:.25,pun:.65};
 const LEVELS=[{k:'fil',a:0,b:1},{k:'spin',a:1,b:2},{k:'mayor',a:2,b:3},{k:'lob',a:3,b:4},{k:'pun',a:4,b:0}];
@@ -363,7 +369,7 @@ const RUN={
   ['Is the new highway ramp safe?','The state engineer signed off. It is public.','anec','My uncle drove it twice. He is fine. Mostly.','Add a camera and a lower speed limit.','cherry','One crash. Forget the ten thousand safe cars.'],
   ['A student found lead in the lake.','Then test it again with the state lab.','adhom','He is twelve and smells like the lake.','Close the beach until the lab confirms.','auth','My horoscope warned me. Close the beach.'],
   ['Do speed cameras work?','Some studies say yes. They cost a lot.','cherry','One camera broke in 2019. Enough said.','Oak had fewer crashes after its camera.','auth','A movie cop told me. In a movie.'],
-  ['Does the factory make neighbors sick?','The health board is studying it. Wait.','anec','One neighbor is ninety-four and sharp.','Fund the health study and publish it.','adhom','The plant manager wears socks with sandals.'],
+  ['Does the factory make neighbors sick?','The health board is studying it. Wait.','anec','One neighbor is ninety-four and sharp.','Fund the health study and publish it.','adhom','The plant boss wears socks with sandals.'],
   ['Is the bridge design sound?','Three engineers reviewed it. Reports online.','auth','My cousin read a website. It is settled.','Get a fourth review. Then build.','cherry','One engineer of four had doubts. That one.'],
   ['Should the curfew move to eleven?','Yes. Shops lose money at nine.','adhom','Curfew fans go to bed at seven.','No. Keep nine. Calls drop after nine.','anec','A teen sang at ten last May. Keep nine.'],
   ['What do the dam studies say?','Two say safe, one says repair. Do the repair.','cherry','I read the one my client paid for.','Repair it. Close the trail during the work.','adhom','The safe-dam guy has a ponytail. Repair it.']],
@@ -419,9 +425,9 @@ function hud(){
  const w=(lv.wind&&innerWidth>=520)?` &nbsp; Breeze <b>${wind===0?'calm':(wind<0?'← ':'')+Math.abs(wind).toFixed(1)+(wind>0?' →':'')}</b>`:'';
  const ballIco='<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" style="vertical-align:-3px;margin-right:3px"><circle cx="10" cy="10" r="8" fill="#ffd23f" stroke="currentColor" stroke-width="2"/></svg>';
  const n0=`${SHORT[cand[0].id]}&nbsp;<b>${wet[0]}</b>`,n1=`${SHORT[cand[1].id]}&nbsp;<b>${wet[1]}</b>`;
- if(innerWidth<360){$('hud').classList.add('two');$('hud').innerHTML=`<span>${n0}&nbsp;&nbsp; ${n1}</span><span>${ballIco}<b>${balls}</b>&nbsp;balls</span>`;return;}
+ if(innerWidth<420){$('hud').classList.add('two');$('hud').innerHTML=`<span>${n0}&nbsp;&nbsp; ${n1}</span><span><b>${balls}</b>&nbsp;questions left</span>`;return;}
  $('hud').classList.remove('two');
- const lab=innerWidth>=420?'Balls&nbsp;':ballIco;
+ const lab='Questions&nbsp;';
  $('hud').innerHTML=`${lab}<b>${balls}</b>&nbsp;&nbsp; ${n0}&nbsp;&nbsp; ${n1}${w}`;
 }
 function applyMode(){document.documentElement.setAttribute('data-comfort',mode);const nx=MODES[(MODES.indexOf(mode)+1)%3];$('modeBtn').setAttribute('aria-label',`Mode: ${MODE_NAME[mode]}. Switch to ${MODE_NAME[nx]}.`);}
@@ -449,9 +455,10 @@ $('seatBtn').onclick=()=>openSheet('seatSheet');
 function menu(open){$('topbar').classList.toggle('open',open);$('menuBtn').setAttribute('aria-expanded',open);$('corner').style.visibility=open?'hidden':'visible';if(open){const f=$('topbar').querySelector('a,button');f&&f.focus();}else $('menuBtn').focus({preventScroll:true});}
 $('menuBtn').onclick=()=>menu(true);$('menuClose').onclick=()=>menu(false);
 $('bubClose').onclick=()=>{hideBubble();announce('Closed.');};
+$('nextQ').onclick=nextQuestion;
 $('dlgClose').onclick=()=>{$('callit').style.display='none';announce('Closed.');};
 function compact(){return H<640;}
-$('callBtn').onclick=()=>{$('dlg').style.display='none';$('callBtn').style.display='none';$('callQ').textContent='Who cheated, and how?';$('callQ').style.display='block';$('chips').style.display='flex';const b=$('chips').querySelector('button');b&&b.focus();};
+$('callBtn').onclick=()=>{$('dlg').style.display='none';$('callBtn').style.display='none';$('callQ').textContent=CALLQ();$('callQ').style.display='block';$('chips').style.display='flex';const b=$('chips').querySelector('button');b&&b.focus();};
 $('hint').onclick=(e)=>{if(e.detail>0)return;ac();if(canThrow()&&!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=0;}$('hint').classList.add('gone');cv.focus&&cv.focus();announce('Ball in hand. Arrow keys aim, space throws. On a touch screen, drag anywhere and let go.');};$('seatClose').onclick=closeSheets;
 $('rAgain').onclick=()=>setCast(ci);$('rNext').onclick=()=>setCast((ci+1)%LEVELS.length);
 addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheets();if($('topbar').classList.contains('open'))menu(false);}});
@@ -462,66 +469,72 @@ function setCast(i){ci=i;const L=LEVELS[i];const src=CAST.find(k=>k.id===L.k);
  chs=[newCh(),newCh()];tgs=[newTg(),newTg(),newTg()];$('result').style.display='none';newWind();hud();
  Object.keys(BAGS).forEach(k=>delete BAGS[k]);heck={active:false,cheat:[false,false],moves:[null,null],called:null};thrown=0;boostT=-1;calmLock=false;stats={asked:0,right:0,seen:{},fairDunks:0};
  $('callit').style.display='none';bubble.t=0;sayQ=[];
- announce(`Runoff for mayor: ${cand[0].name} on the left, ${cand[1].name} on the right. The left target dunks ${SHORT[cand[0].id]}, the right target dunks ${SHORT[cand[1].id]}, the top target dunks both. Driest candidate wins. ${RUNTXT[lv.k]}`);}
+ announce(`Runoff for mayor: ${cand[0].name} on the left, ${cand[1].name} on the right. The left target dunks ${SHORT[cand[0].id]}, the right target dunks ${SHORT[cand[1].id]}, the top target dunks both. Only a candidate who used a fallacy can be dunked. Driest candidate wins. ${RUNTXT[lv.k]}`);}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function pastMoves(){const out=[];for(const L of LEVELS){if(L.k===lv.k)break;out.push(...LEVEL_MOVES[L.k]);}return out;}
 /* a verdict is 'none' (both straight), 'both' (both cheated) or 'side:move' (one cheated) */
 function verdictOf(h){if(h.cheat[0]&&h.cheat[1])return'both';if(!h.cheat[0]&&!h.cheat[1])return'none';const w=h.cheat[0]?0:1;return w+':'+h.moves[w];}
-function verdictName(v){if(v==='none')return'Both straight';if(v==='both')return'Both cheated';const[w,m]=v.split(':');return `${SHORT[cand[+w].id]}: ${MOVES[m].name}`;}
+function verdictName(v){if(v==='none')return'Both fair';if(v==='both')return'Both used a fallacy';const[w,m]=v.split(':');return `${SHORT[cand[+w].id]}: ${MOVES[m].name}`;}
 function newHeckle(){
- const set=LEVEL_MOVES[lv.k];
- if(thrown===0){// the first ball teaches the arm and the three targets; the questions start with ball two
-  heck={active:true,cheat:[false,false],moves:[null,null],called:null,legend:true};bubble.t=0;
-  const n0=SHORT[cand[0].id],n1=SHORT[cand[1].id];
-  $('dlg').innerHTML=`<p><span class="who">Runoff for mayor.</span> ${cand[0].name} on the left, ${cand[1].name} on the right.</p><p>Left target dunks ${n0}. Right target dunks ${n1}. Top target dunks both. Driest candidate wins.</p>`;
-  $('dlg').style.display='block';$('callBtn').style.display='none';$('chips').innerHTML='';$('callQ').style.display='none';$('teach').textContent='';
-  $('callit').classList.remove('aside');$('callit').style.display='block';announce($('dlg').textContent);return;}const Q=bag('q'+lv.k,RUN[lv.k]);
- /* founder 2026-11-07: "Dont make all candidates cheats!" Each candidate has a cheat rate that holds
-    in every runoff they enter, so a player can learn who talks straight. */
+ const set=LEVEL_MOVES[lv.k];const Q=bag('q'+lv.k,RUN[lv.k]);
+ /* founder 2026-11-07: "Dont make all candidates cheats!" Each candidate has a fallacy rate that
+    holds in every runoff they enter, so a player can learn who argues fairly. */
  const cheat=cand.map(k=>Math.random()<CHEATRATE[k.id]);
  const moves=[cheat[0]?Q[2]:null,cheat[1]?Q[5]:null];
  const ans=[cheat[0]?Q[3]:Q[1],cheat[1]?Q[6]:Q[4]];
- heck={active:true,cheat,moves,called:null,q:Q};
+ /* founder 2026-11-08: a candidate who answered fairly cannot be dunked. A target opens only for a
+    fallacy; the top target opens only when both used one. Nothing opens until the player calls it. */
+ const open=[cheat[0],cheat[1],cheat[0]&&cheat[1]];
+ heck={active:true,cheat,moves,called:null,q:Q,open};
  bubble.t=0;bubble.parts=null;
  const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
  $('dlg').innerHTML=`<p class="crowd"><span class="who">Crowd:</span> ${esc(Q[0])}</p><p><span class="who">${SHORT[cand[0].id]}:</span> ${esc(ans[0])}</p><p><span class="who">${SHORT[cand[1].id]}:</span> ${esc(ans[1])}</p>`;
- $('callit').classList.remove('aside');
- const ask=true;
+ $('callit').classList.remove('aside');$('nextQ').style.display='none';
  const box=$('callit');$('teach').textContent='';
  const said=`From the crowd: ${Q[0]} ${cand[0].name}: ${ans[0]} ${cand[1].name}: ${ans[1]}`;
- if(ask){
-  const v=verdictOf(heck),other=m=>shuffle(set.filter(x=>x!==m).concat(pastMoves().slice(0,2)))[0];
-  let d=[];
-  if(v==='none')d=['0:'+pick(set),Math.random()<.5?'1:'+pick(set):'both'];
-  else if(v==='both')d=['0:'+moves[0],'1:'+moves[1]];
-  else{const[w,m]=v.split(':');const o=1-(+w);d=[Math.random()<.5?o+':'+m:w+':'+other(m),Math.random()<.5?'none':(Math.random()<.5?'both':o+':'+other(m))];
-   if(d[0]===d[1])d[1]='none';}
-  const chips=shuffle([v,...d]);
-  $('chips').innerHTML='';
-  chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=verdictName(id);b.onclick=()=>callMove(id);$('chips').appendChild(b);});
-  $('dlg').style.display='block';
-  if(compact()){$('chips').style.display='none';$('callQ').style.display='none';$('callBtn').style.display='block';}
-  else{$('callBtn').style.display='none';$('chips').style.display='flex';$('callQ').textContent='Who cheated, and how?';$('callQ').style.display='block';}
-  box.style.display='block';
-  announce(`${said} Call it: ${chips.map(verdictName).join(', ')}.`);
- }
+ const v=verdictOf(heck),other=m=>shuffle(set.filter(x=>x!==m).concat(pastMoves().slice(0,2)))[0];
+ let d=[];
+ if(v==='none')d=['0:'+pick(set),Math.random()<.5?'1:'+pick(set):'both'];
+ else if(v==='both')d=['0:'+moves[0],'1:'+moves[1]];
+ else{const[w,m]=v.split(':');const o=1-(+w);d=[Math.random()<.5?o+':'+m:w+':'+other(m),Math.random()<.6?'none':(Math.random()<.5?'both':o+':'+other(m))];
+  if(d[0]===d[1])d[1]='none';}
+ const chips=shuffle([v,...d]);
+ $('chips').innerHTML='';
+ chips.forEach(id=>{const b=document.createElement('button');b.type='button';b.textContent=verdictName(id);b.onclick=()=>callMove(id);$('chips').appendChild(b);});
+ $('dlg').style.display='block';
+ $('callQ').textContent=CALLQ();
+ if(compact()){$('chips').style.display='none';$('callQ').style.display='none';$('callBtn').style.display='block';}
+ else{$('callBtn').style.display='none';$('chips').style.display='flex';$('callQ').style.display='block';}
+ box.style.display='block';
+ announce(`${said} ${CALLQ()} ${chips.map(verdictName).join(', ')}.`);
 }
+/* layman critical-thinking terms: a fallacy is a trick in reasoning; a fair answer is one you can check */
+const CALLQ=()=>stats.asked===0?'Who used a fallacy (a trick in reasoning)?':'Who used a fallacy?';
+function openLine(){const o=heck.open,nm=i=>SHORT[cand[i].id];
+ if(o[2])return 'Both targets are open, and the top one dunks both.';
+ if(o[0])return `${nm(0)}'s target, on the left, is open.`;
+ if(o[1])return `${nm(1)}'s target, on the right, is open.`;
+ return 'Both answers were fair, so no target opens.';}
 function callMove(id){
  if(heck.called!==null)return;stats.asked++;heck.moves.forEach(m=>{if(m)stats.seen[m]=1;});
  const v=verdictOf(heck),nm=i=>SHORT[cand[i].id];
  let truth;
- if(v==='none')truth='Both answered straight.';
- else if(v==='both')truth=`Both cheated. ${nm(0)}: ${MOVES[heck.moves[0]].name}. ${nm(1)}: ${MOVES[heck.moves[1]].name}.`;
+ if(v==='none')truth='Both answers were fair.';
+ else if(v==='both')truth=`Both used a fallacy. ${nm(0)}: ${MOVES[heck.moves[0]].name}. ${nm(1)}: ${MOVES[heck.moves[1]].name}.`;
  else{const w=+v.split(':')[0],M=MOVES[heck.moves[w]];truth=`${nm(w)}: ${M.name}. ${M.def}`;}
- if(id===v){heck.called=true;stats.right++;calmLock=true;breath.calm=1;SFX.steady();setTimeout(()=>SFX.steady(),110);
+ const ol=openLine();
+ if(id===v){heck.called=true;stats.right++;if(v!=='none'){calmLock=true;breath.calm=1;}SFX.steady();setTimeout(()=>SFX.steady(),110);
   boostT=v==='none'?-1:v==='both'?2:+v.split(':')[0];
-  $('teach').innerHTML=`<b>Called it.</b> ${truth} Aim steadied.`;
-  announce(`Called it. ${truth} Aim steadied.`);}
+  $('teach').innerHTML=`<b>Called it.</b> ${truth} ${ol}${v!=='none'?' Aim steadied.':''}`;}
  else{heck.called=false;tone(220,.18,'square',.05);
-  $('teach').innerHTML=`<b>Not quite.</b> ${truth}`;
-  announce(`Not quite. ${truth}`);}
+  $('teach').innerHTML=`<b>Not quite.</b> ${truth} ${ol}`;}
+ announce($('teach').textContent);
  $('chips').innerHTML='';$('callQ').style.display='none';
+ if(v==='none'){$('nextQ').style.display='block';$('nextQ').focus();}
 }
+function nextQuestion(){// both answered fairly: no throw; the question still counts
+ $('nextQ').style.display='none';$('callit').style.display='none';heck.active=false;thrown++;balls--;hud();
+ if(balls<=0)setTimeout(checkEnd,300);}
 function newWind(){wind=lv.wind?Math.round((Math.random()*6-3)*10)/10:0;}
 
 /* ---------- breathing ---------- */
@@ -536,8 +549,9 @@ function steadiness(){return breath.hold>5?'SHAKY':breath.calm>.8?'STEADY':'BREA
 /* ---------- input ---------- */
 function restPt(){return P(LAUNCH.x,LAUNCH.y,LAUNCH.z);}
 function maxPull(){return Math.min(W,H)*0.24;}
-function canThrow(){return !ball&&!anim&&balls>0&&!roundOver&&allSit()&&!document.querySelector('.sheet.open');}
-function startPull(e){ac();if($('topbar').classList.contains('open')){menu(false);return;}if(!canThrow())return;$('callit').classList.add('aside');bubble.pulled=!bubble.hidden;hideBubble();cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';}
+function canThrow(){return !ball&&!anim&&balls>0&&!roundOver&&allSit()&&heck.active&&heck.called!==null&&heck.open.some(x=>x)&&!document.querySelector('.sheet.open');}
+function needCall(){if(heck.active&&heck.called===null&&!roundOver){$('callit').style.display='block';$('callit').classList.remove('aside');announce('Call it first: who used a fallacy?');return true;}return false;}
+function startPull(e){ac();if($('topbar').classList.contains('open')){menu(false);return;}if(needCall())return;if(!canThrow())return;$('callit').classList.add('aside');bubble.pulled=!bubble.hidden;hideBubble();cv.setPointerCapture(e.pointerId);drag={x0:e.clientX,y0:e.clientY,dx:0,dy:0,lx:e.clientX,ly:e.clientY,moved:0};breath.hold=0;breath.calm=calmLock?1:0;cv.style.cursor='grabbing';}
 cv.addEventListener('pointerdown',startPull);
 $('hint').addEventListener('pointerdown',e=>{e.preventDefault();$('hint').classList.add('gone');startPull(e);});
 cv.addEventListener('pointermove',e=>{if(!drag)return;drag.dx=e.clientX-drag.x0;drag.dy=e.clientY-drag.y0;drag.moved+=Math.hypot(e.clientX-drag.lx,e.clientY-drag.ly);drag.lx=e.clientX;drag.ly=e.clientY;});
@@ -547,7 +561,7 @@ addEventListener('keydown',e=>{
  if(document.querySelector('.sheet.open')||$('result').style.display==='block')return;
  const k=e.key;if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','Enter'].includes(k))return;
  if(e.target&&e.target.tagName==='BUTTON'&&(k===' '||k==='Enter'))return;
- if(!canThrow())return;e.preventDefault();ac();
+ if(needCall()){e.preventDefault();return;}if(!canThrow())return;e.preventDefault();ac();
  if(!kb){kb={dx:0,dy:maxPull()*0.35,moved:0};breath.hold=0;breath.calm=calmLock?1:0;hideBubble();$('callit').classList.add('aside');}const st=maxPull()*0.03;
  if(k==='ArrowLeft')kb.dx+=st;if(k==='ArrowRight')kb.dx-=st;if(k==='ArrowUp')kb.dy-=st;if(k==='ArrowDown')kb.dy+=st;
  if(k.startsWith('Arrow'))kb.moved+=6;
@@ -560,8 +574,8 @@ function launchState(dx,dy){
  return{x:LAUNCH.x,y:LAUNCH.y,z:LAUNCH.z,vx:-4.6*nx,vy:1+9*ny,vz:8+14*p,p,age:0,hit:-1,rim:false,front:false,bonked:false};
 }
 function release(dx,dy){const v=aimPull(dx,dy);anim={v,t:0,launched:false};breath.hold=0;}
-function launch(v){ball=launchState(v[0],v[1]);ball.boost=boostT;ball.cheat=heck.legend?null:heck.cheat.slice();ball.moves=heck.moves.slice();ball.q=heck.legend?null:heck.q;
- if(!heck.legend)heck.cheat.forEach((x,i)=>{if(x)lies[i]++;});heck.moves.forEach(m=>{if(m)stats.seen[m]=1;});
+function launch(v){ball=launchState(v[0],v[1]);ball.boost=boostT;ball.cheat=heck.cheat.slice();ball.moves=heck.moves.slice();ball.q=heck.q;ball.open=heck.open.slice();
+ heck.cheat.forEach((x,i)=>{if(x)lies[i]++;});heck.moves.forEach(m=>{if(m)stats.seen[m]=1;});
  boostT=-1;calmLock=false;thrown++;heck.active=false;$('callit').style.display='none';bubble.t=Math.min(bubble.t,1.2);trail=[];lastPath=[];balls--;hud();SFX.snap(ball.p);$('hint').classList.add('gone');}
 
 /* ---------- physics ---------- */
@@ -586,6 +600,8 @@ function step(b,dt,live){
   const[cx,cy]=at(TG.z),T=tgtPos(i),cw=Math.max(.12,Math.abs(Math.cos(s.psi)));
   const tr=tgtR(i,b);const ex=(cx-T.x)/(tr*cw+R*.6),ey=(cy-T.y)/(tr+R*.6),e2=ex*ex+ey*ey;
   const rx=(cx-T.x)/(tr*cw+.07+R),ry=(cy-T.y)/(tr+.07+R),r2=rx*rx+ry*ry;
+  if(b.open&&!b.open[i]&&(e2<1||r2<1)){b.rim=true;b.z=TG.z-.01;b.vz=-Math.abs(b.vz)*.3;b.vx+=(cx-T.x)*5;SFX.mesh();shakeIt(.15);
+   const w=i===2?(b.open[0]?1:0):i;say(bag('lk',LOCKED),2.6,w);announce(`That target is boarded up: ${cand[w].name} answered fairly.`);continue;}
   if(e2<1){b.hit=i;b.z=TG.z-.01;b.vz=-Math.abs(b.vz)*.35;b.vy=b.vy*.5+1.5;b.vx+=(cx-T.x)*4;s.dphi+=b.vx*.25+(cx-T.x)*1.5;s.dpsi+=(cx-T.x)*12;dunk(i,T);}
   else if(r2<1){b.rim=true;b.z=TG.z-.01;b.vz=-Math.abs(b.vz)*.3;b.vx+=(cx-T.x)*6;b.vy+=(cy-T.y)*6;s.dpsi+=(cx-T.x)*16;s.dphi+=(cx-T.x)*2;SFX.rim();rings.push({x:cx,y:cy,z:TG.z,r:.05,a:1,k:i});
    const w=i===2?(Math.random()<.5?0:1):i;say(bagOr('r',RIM,'m'+cand[w].id,cand[w].miss),2.2,w);announce('Off the rim.');}}
@@ -605,7 +621,7 @@ function dunk(i,T){
  setTimeout(()=>{SFX.drop();hitSeats.forEach(s=>{chs[s].state='fall';chs[s].vy=.6;chs[s].towel=0;});},90);
  pop={text:hitSeats.length>1?'DOUBLE DUNK!':streak>1?`DUNK! ${streak} in a row`:'DUNK!',t:1.4};
  const who=hitSeats.map(s=>cand[s].name).join(' and ');
- announce(`Dunk! ${who} ${hitSeats.length>1?'hit':'hits'} the water. ${SHORT[cand[0].id]} ${wet[0]}, ${SHORT[cand[1].id]} ${wet[1]}. ${balls} balls left.`);
+ announce(`Dunk! ${who} ${hitSeats.length>1?'hit':'hits'} the water. ${SHORT[cand[0].id]} ${wet[0]}, ${SHORT[cand[1].id]} ${wet[1]}. ${balls} questions left.`);
 }
 function shakeIt(a){if(!RM)shake=Math.max(shake,a);}
 function splashAt(sx){
@@ -626,13 +642,13 @@ function checkEnd(){if(ball||balls>0||roundOver)return;if(!allSit()||sayQ.length
   $('rText').textContent=`Both candidates were dunked ${wet[0]} time${wet[0]===1?'':'s'}. The town calls a recount.`;}
  else{store.set('elect_'+lv.k,nm(win));$('rTitle').textContent=cand[win].id==='mayor'?`Re-elected: ${nm(win)}`:`Mayor-elect: ${nm(win)}`;
   $('rText').textContent=`${sh(win)} stayed driest: dunked ${wet[win]} time${wet[win]===1?'':'s'}, to ${sh(lose)}'s ${wet[lose]}.`;}
- $('rText').textContent+=` In this race, ${sh(0)} cheated ${lies[0]} time${lies[0]===1?'':'s'} and ${sh(1)} cheated ${lies[1]}.`;
- if(!tie&&lies[0]!==lies[1]){const honest=lies[0]<lies[1]?0:1;$('rText').textContent+=honest===win?' You kept the straighter talker dry.':' The one you kept dry cheated more.';}
+ $('rText').textContent+=` In this race, ${sh(0)} used ${lies[0]} fallac${lies[0]===1?'y':'ies'} and ${sh(1)} used ${lies[1]}.`;
+ if(!tie&&lies[0]!==lies[1]){const honest=lies[0]<lies[1]?0:1;$('rText').textContent+=honest===win?' The fairer arguer stayed dry.':' The one who stayed dry used more fallacies.';}
  const g=$('rGuide');g.innerHTML='';LEVEL_MOVES[lv.k].forEach(id=>{const M=MOVES[id];const li=document.createElement('li');li.innerHTML=`<b>${M.name}.</b> ${M.def} <br>Spot it: ${M.spot} <br>Fair version: ${M.fair}`;g.appendChild(li);});
  $('rTwain').textContent='“'+TWAIN[lv.k].q+'”';$('rTwainSrc').textContent=TWAIN[lv.k].src;
- {const M=MOVES.none,li=document.createElement('li');li.innerHTML=`<b>No cheat.</b> ${M.def} <br>Spot it: ${M.spot}`;g.appendChild(li);}
+ {const M=MOVES.none,li=document.createElement('li');li.innerHTML=`<b>Fair answer.</b> ${M.def} <br>Spot it: ${M.spot}`;g.appendChild(li);}
  if(stats.asked)$('rText').textContent+=` You called ${stats.right} of ${stats.asked}.`;
- if(stats.fairDunks)$('rText').textContent+=` You dunked ${stats.fairDunks} straight answer${stats.fairDunks===1?'':'s'}.`;
+ 
  $('result').style.display='block';$('rAgain').focus();announce($('rTitle').textContent+'. '+$('rText').textContent);}
 
 /* ---------- update ---------- */
@@ -664,7 +680,7 @@ function frame(now){
  else if(h.state==='under'){h.timer-=dt;h.yo=0.3-S.y+Math.sin(t*3+si)*.04;if(Math.random()<dt*14)parts.push({k:'bub',x:S.x+(Math.random()-.5)*.3,y:1.0,z:S.z,vy:.8+Math.random(),life:1});
   if(h.timer<=0){h.state='climb';h.timer=0;h.splashed=false;const k=cand[si];
    if(h.fair){h.fair=false;say(bag('fd',FAIRDUNK),3.8,si);announce(`${k.name} gave a straight answer, and you dunked it anyway.`);}
-   else if(h.straight){const a=h.straight;h.straight=null;say(`Fine. Straight answer: ${a}`,4.2,si);announce(`${k.name}, dripping: straight answer. ${a} Someone hands over a towel.`);}
+   else if(h.straight){const a=h.straight;h.straight=null;say(`Fine. Fair answer: ${a}`,4.2,si);announce(`${k.name}, dripping, gives the fair answer. ${a} Someone hands over a towel.`);}
    else say(bag('d'+k.id,k.dunk),3.4,si);}}
  else if(h.state==='climb'){h.timer+=dt;const k=Math.min(1,h.timer/1.1);const e=1-Math.pow(1-k,3);h.yo=(0.3-S.y)*(1-e);h.rot=-0.9*(1-e);h.seatA=1.25*(1-Math.min(1,k*1.6));
   if(k>=1){h.state='sit';h.yo=0;h.rot=0;h.seatA=0;h.towel=4.5;}}
@@ -677,7 +693,7 @@ function frame(now){
  slosh*=Math.pow(.35,dt);glassWob*=Math.pow(.02,dt);tgtFlash=tgtFlash.map(v=>v*Math.pow(.05,dt));shake*=Math.pow(.004,rdt);
  if(pop){pop.t-=rdt;if(pop.t<=0)pop=null;}
  if(bubble.t>0)bubble.t-=rdt;nextSay();
- if(canThrow()&&!heck.active&&bubble.t<=0.3&&!sayQ.length&&!aiming)newHeckle();
+ if(!ball&&!anim&&balls>0&&!roundOver&&allSit()&&!heck.active&&bubble.t<=0.3&&!sayQ.length&&!aiming&&!document.querySelector('.sheet.open'))newHeckle();
  windShown+=(wind-windShown)*Math.min(1,rdt*3);
  draw();requestAnimationFrame(frame);
 }
@@ -779,8 +795,12 @@ function drawTarget(i){
  ctx.lineWidth=1;ctx.strokeStyle=OUT;
  ell(th,0,(rpx+p.s*.05)*ew,rpx+p.s*.05,'#3d414c');
  ell(0,0,(rpx+p.s*.05)*ew,rpx+p.s*.05,'#8d93a1',false);
- const face=cw>=0,ring=TG.arch?'#2f6fb0':'#c8342b';
+ const src=ball?ball.open:(heck.active&&heck.called!==null?heck.open:null),shut=src&&!src[i];
+ const face=cw>=0,ring=shut?'#7d7889':TG.arch?'#2f6fb0':'#c8342b';
  [['#ffffff',1],[ring,.8],['#ffffff',.58],[ring,.36],['#ffd23f',.15]].forEach(([col,k],j)=>{ell(0,0,rpx*k*ew,rpx*k,face||j===0?col:'#b9b3c4',false);});
+ if(shut){// two crossed boards: this candidate answered fairly
+  for(const a of [.6,-.6]){ctx.save();ctx.rotate(a);rr(-rpx*1.15,-rpx*.2,rpx*2.3,rpx*.4,rpx*.06,'#a8743f');ctx.strokeStyle='rgba(60,35,15,.55)';ctx.lineWidth=Math.max(1,rpx*.04);ctx.beginPath();ctx.moveTo(-rpx,0);ctx.lineTo(rpx,0);ctx.stroke();ctx.restore();}
+  ctx.lineWidth=1;ctx.strokeStyle=OUT;}
  paperOff();if(tgtFlash[i]>.05){ctx.globalAlpha=tgtFlash[i]*.8;ell(0,0,(rpx+p.s*.06)*ew,rpx+p.s*.06,'#fff6c2',false);ctx.globalAlpha=1;}
  ctx.restore();
  for(const r of rings){if(r.k!==i)continue;const q=P(r.x,r.y,r.z);ctx.strokeStyle=`rgba(255,240,180,${Math.max(0,r.a)})`;ctx.lineWidth=3;ctx.beginPath();ctx.arc(q.x,q.y,r.r*q.s+cr*q.s,0,7);ctx.stroke();}
