@@ -4,26 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Down the Nerve v0.11</title>
+<title>Down the Nerve v0.12</title>
 <meta name="spec-source" content="claude/SPEC-DOWN-THE-NERVE-v0.8-AUDIO-2026-11-06.md">
 <meta name="audience" content="Founder playtest first. Audience ruling D4 still open (12 and up, mapped to OpenStax, recommended). Lab build.">
 <!-- tsp:source claude/SPEC-DOWN-THE-NERVE-2026-11-05.md; convening/DOWN-THE-NERVE-CONVENING.md (D12 Brainbow, S.T.U.N. Runner feel); Tight Spiral Studios -->
 <style>
-:root{--bg:#04050a;--panel:#0d1220;--panel2:#141b2e;--ink:#eef2f6;--rule:#8f9bb0;--cyan:#3fd6ff;--mag:#ff4fa3;--yel:#ffd23f;--grn:#6dff8a;color-scheme:dark}
+:root{--bg:#04050a;--panel:#0d1220;--panel2:#141b2e;--ink:#eef2f6;--rule:#8f9bb0;--inkfill:#eef2f6;--ground:#04050a;--cyan:#3fd6ff;--mag:#ff4fa3;--yel:#ffd23f;--grn:#6dff8a;color-scheme:dark}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
-#backdrop{position:fixed;inset:0;z-index:0;background:var(--bg)}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--ground)}
+#backdrop{position:fixed;inset:0;z-index:0;background:var(--ground)}
 #game{position:fixed;inset:0;z-index:1;width:100%;height:100%;display:block;touch-action:none}
 .ui{position:fixed;z-index:3;color:var(--ink);font:20px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif}
-#bar{top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;background:linear-gradient(var(--bg),rgba(4,5,10,0))}
+#bar{top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;background:linear-gradient(var(--ground),rgba(4,5,10,0))}
 #bar .title{font-weight:700;font-size:20px;margin-right:auto}
-.chip{font-size:18px;border:1px solid var(--rule);border-radius:12px;padding:0 8px;margin-left:6px;font-weight:600}
-.btn{min-height:44px;min-width:44px;border-radius:22px;border:2px solid var(--ink);background:var(--panel);color:var(--ink);font:700 18px "Avenir Next","Segoe UI",system-ui,sans-serif;padding:0 11px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-.btn.primary{background:var(--ink);color:var(--bg)}
-#hud{left:0;right:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:8px 12px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(rgba(4,5,10,0),var(--bg))}
+.chip{font-size:18px;border:1px solid var(--rule);background:var(--ground);border-radius:12px;padding:0 8px;margin-left:6px;font-weight:600}
+.btn{min-height:44px;min-width:44px;border-radius:22px;border:2px solid var(--inkfill);background:var(--panel);color:var(--ink);font:700 18px "Avenir Next","Segoe UI",system-ui,sans-serif;padding:0 11px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn.primary{background:var(--inkfill);color:var(--bg)}
+#hud{left:0;right:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:8px 12px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(rgba(4,5,10,0),var(--ground))}
 #speed{text-align:right}
 #speed .num{font-size:44px;font-weight:800;line-height:1}
 #speed .unit,#trip,#legname{font-size:18px}
+#trip>div,#speed>div{background:var(--ground);border-radius:10px;padding:1px 8px;width:max-content;margin:2px auto}#speed>div{margin:2px 0 2px auto}
 #trip{text-align:center;flex:1}
 #bal{width:120px;height:70px}
 #inset{top:calc(64px + env(safe-area-inset-top));right:12px;width:132px;text-align:center;display:none}
@@ -35,7 +36,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
 .card h2{font-size:26px;margin:0 0 8px}.card h3{font-size:22px;margin:18px 0 6px}
 .card p,.card li{font-size:20px}.card .row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .seg{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
-.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.seg button[aria-pressed=true]{background:var(--inkfill);color:var(--bg)}
 a{color:#9cc8f2}
 #tray{left:0;right:0;bottom:0;z-index:4;background:rgba(13,18,32,.94);border-top:2px solid var(--rule);padding:12px 14px calc(14px + env(safe-area-inset-bottom));display:none;max-height:72vh;overflow:auto}
 #tray h2{font-size:24px;margin:0}#tray .sub{font-size:18px;margin:2px 0 8px}
@@ -43,22 +44,22 @@ a{color:#9cc8f2}
 #cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:10px 0}
 .wk{min-height:56px;border-radius:12px;border:2px solid var(--rule);background:var(--panel2);color:var(--ink);font:600 18px "Avenir Next","Segoe UI",system-ui,sans-serif;display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;text-align:left}
 .wk svg{flex:0 0 34px}
-.wk[aria-pressed=true]{border-color:var(--ink);background:#26304a;box-shadow:0 0 0 2px var(--ink) inset}
+.wk[aria-pressed=true]{border-color:var(--inkfill);background:#26304a;box-shadow:0 0 0 2px var(--inkfill) inset}
 .wk.red[aria-pressed=true]{border-color:#ff4fa3}.wk.grn[aria-pressed=true]{border-color:#6dff8a}
 #preview{width:150px;height:96px}
-#effect{top:calc(62px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:max-content;max-width:92vw;display:none;border-radius:14px;padding:8px 16px;font-weight:800;font-size:22px;border:3px solid var(--ink);text-align:center}
+#effect{top:calc(62px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:max-content;max-width:92vw;display:none;border-radius:14px;padding:8px 16px;font-weight:800;font-size:22px;border:3px solid var(--inkfill);text-align:center}
 #effect.bad{background:#3a1420}#effect.good{background:#12341f}
 #effect small{display:block;font-size:18px;font-weight:600}
 #steerHint{position:fixed;left:50%;transform:translateX(-50%);top:70%;min-height:48px;padding:0 18px;font-size:20px;white-space:nowrap;display:none}
 #replay{left:0;right:0;bottom:0;display:none;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(rgba(4,5,10,0),rgba(4,5,10,.96) 30%);text-align:center}
 #replay .rtag{display:inline-block;font:800 18px/1 "Avenir Next","Segoe UI",system-ui,sans-serif;letter-spacing:.2em;color:#04050a;background:#3fd6ff;border-radius:6px;padding:5px 10px}
 #replay p{font-size:22px;font-weight:600;margin:10px auto 12px;max-width:620px;line-height:1.4}
-#hits{display:flex;gap:6px;align-items:center;font-size:18px;font-weight:700}
+#hits{display:flex;gap:6px;align-items:center;font-size:18px;font-weight:700;background:var(--ground);border-radius:10px;padding:2px 8px;width:max-content}
 #hits svg{width:26px;height:26px}
 .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 12px;margin:8px 0 4px;font-size:18px}
 .legend div{display:flex;gap:8px;align-items:center}.legend svg{flex:0 0 30px}
 #trayBal{width:150px;height:96px}
-@media (prefers-color-scheme: dark){:root{--bg:#04050a;--panel:#0d1220;--panel2:#141b2e;--ink:#eef2f6;--rule:#8f9bb0}}
+@media (prefers-color-scheme: dark){:root{--bg:#04050a;--panel:#0d1220;--panel2:#141b2e;--ink:#eef2f6;--rule:#8f9bb0;--inkfill:#eef2f6;--ground:#04050a}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:560px){#bar .title .name{display:none}#bar{gap:6px;padding-left:6px;padding-right:6px}#bal{width:96px}#speed .unit{max-width:96px}}
 #msgs{position:fixed;z-index:4;left:0;right:0;top:calc(58px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 8px}#msgs.low{top:auto;bottom:calc(112px + env(safe-area-inset-bottom))}#msgs.sl,#msgs.sr{width:min(46vw,340px);align-items:stretch}#msgs.sl>*,#msgs.sr>*{width:auto!important;max-width:100%!important;white-space:normal!important}#msgs.sl{right:auto;left:8px}#msgs.sr{left:auto;right:8px}#msgs>*{position:static!important;transform:none!important;left:auto!important;top:auto!important;bottom:auto!important;max-width:min(560px,94vw)}#msgs #steerHint{pointer-events:auto}#replay{top:calc(52px + env(safe-area-inset-top));bottom:auto!important;background:linear-gradient(rgba(4,5,10,.96) 70%,rgba(4,5,10,0))!important;padding:10px 16px 18px!important}#cards .cath{grid-column:1/-1;margin:6px 0 0}#cards .cath h3{margin:4px 0;font-size:20px}#cards .cath p{margin:2px 0 4px;font-size:18px;line-height:1.4}.src{color:#c7cfdb;font-size:16px}.wk small{display:block;font-size:16px;font-weight:600;color:#c7cfdb}.wk span{display:block}#cards .back{grid-column:1/-1;justify-self:start;min-height:44px}#cards .info{grid-column:1/-1;background:#141b2e;border:2px solid #4a5568;border-radius:12px;padding:8px 12px}#cards .info h3{margin:2px 0 4px;font-size:20px}#cards .info .wt{font-size:16px;color:#c7cfdb;font-weight:600}#cards .info p{margin:4px 0;font-size:18px;line-height:1.45}#fxp{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 12px;font-size:18px;margin:6px 0}#fxp svg{vertical-align:middle}.howto{margin-top:10px}.howto summary{min-height:44px;display:flex;align-items:center;font-size:18px;font-weight:700;cursor:pointer}</style>
@@ -69,7 +70,7 @@ a{color:#9cc8f2}
 
 <header id="bar" class="ui">
   <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/lab/" aria-label="Studio home">Studio</a>
-  <span class="title"><span class="name">Down the Nerve</span><span class="chip">v0.11</span><span class="chip tsp-labchip">LAB</span></span>
+  <span class="title"><span class="name">Down the Nerve</span><span class="chip">v0.12</span><span class="chip tsp-labchip">LAB</span></span>
   <button class="btn" id="bRestart" type="button" aria-label="Restart the ride">Back</button>
   <button class="btn" id="bLib" type="button">Library</button>
   <button class="btn" id="bComfort" type="button">Comfort</button>
@@ -98,12 +99,13 @@ a{color:#9cc8f2}
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M3 5 l23 -2 l2 23 l-24 2 z" fill="#ff4fa3" stroke="#eef2f6" stroke-width="2"/></svg>Bads: frayed bands get wider and you slow. Hit three and the signal fades.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="2" width="26" height="26" rx="9" fill="#6dff8a" stroke="#eef2f6" stroke-width="2"/></svg>Greens: steer into them. Frayed bands get narrower. They do not change your speed.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="11" fill="none" stroke="#ffd23f" stroke-width="3"/><circle cx="15" cy="15" r="6" fill="none" stroke="#ffd23f" stroke-width="3"/></svg>Yellow double rings are checkpoints.</div>
+    <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="5" fill="#ffffff"/><circle cx="15" cy="15" r="11" fill="none" stroke="#ffffff" stroke-width="2.5"/></svg>At each gap, steer onto the white spine as its ring closes. Two good landings fire the next neuron. Too few and it costs a hit.</div>
   </div>
   </details>
 </div>
 <div id="hud" class="ui">
   <svg id="bal" viewBox="0 0 120 70" role="img" aria-label="Balance: level">
-    <path d="M60 40 l-12 26 h24 z" fill="#4a5568"/>
+    <path d="M60 40 l-12 26 h24 z" fill="#8f9bb0"/>
     <g id="beam"><line x1="10" y1="40" x2="110" y2="40" stroke="#eef2f6" stroke-width="5" stroke-linecap="round"/>
       <g id="balL"></g><g id="balR"></g></g>
   </svg>
@@ -155,7 +157,7 @@ a{color:#9cc8f2}
 
 <div class="sheet" id="sFade" role="dialog" aria-modal="true" aria-labelledby="hF"><div class="card">
   <h2 id="hF">The signal faded</h2>
-  <p>Three hits. What's happening here: damaged insulation can stop a signal. Each hard thing widened the frayed bands until there was almost no clear path left. Greens narrow them again.</p>
+  <p id="fadeWhy">Three hits. What's happening here: damaged insulation can stop a signal. Each hard thing widened the frayed bands until there was almost no clear path left. Greens narrow them again.</p>
   <div class="row"><button class="btn primary" id="bCp">Back to the checkpoint</button><button class="btn" id="bFadeWeek">Change the week</button></div>
 </div></div>
 <div class="sheet" id="sEnd" role="dialog" aria-modal="true" aria-labelledby="hE"><div class="card">
@@ -231,7 +233,7 @@ function buildRun(w){
       if(spread)pads=[base+spread[0],base+spread[1]];else for(var p=0;p<np;p++)pads.push(base-1.2+p*2.4/(np-1||1));}
     else{var off=rnd(0,TAU);for(var q=0;q<np;q++)pads.push(off+q*TAU/np);}
     var apads=[];if(last&&stressed){for(var ap=0;ap<7;ap++)apads.push(alarm-1.0+ap*2.0/6);}
-    syns.push({s:L.end,pads:pads,tol:last&&stressed?0.34:0.42,done:false,gap:last&&stressed?5.5:4,last:last,stressed:last&&stressed,apads:apads,w:last&&stressed?Math.max(0.35,np/5):1,need:3,fill:0,afill:0,tries:0});
+    syns.push({s:L.end,pads:pads,tol:last&&stressed?0.34:0.42,done:false,gap:last&&stressed?5.5:4,last:last,stressed:last&&stressed,apads:apads,w:last&&stressed?Math.max(0.5,np/5):1,need:3,fill:0,afill:0,tries:0});
     s=L.end+4;
   });
   // outside pictures: one per loaded card, spread across the ride
@@ -292,10 +294,14 @@ function buildWarmup(){buildRun(null);run.warm=true;feats=[];checkpoints=[];run.
   run.warmEnd=70;}
 function endWarmup(){warmDone=true;var fi=run.firstInput;run.warm=false;speak('Now load a week.',false);buildRun(null);run.firstInput=fi;openTray();}
 function hit(title,icon){
-  run.hits++;run.assist=Math.max(0.72,(run.assist||1)-0.1);drawHits();effect(false,title,icon);
+  run.lastHit='band';run.hits++;run.assist=Math.max(0.72,(run.assist||1)-0.1);drawHits();effect(false,title,icon);
   if(run.hits===2){setTimeout(function(){if(AC&&S.sound){tone(880,0.12,'square',0.06);setTimeout(function(){tone(660,0.16,'square',0.06);},150);}speak('One hit left',false);},950);}
   if(run.hits>=3){run.faded=true;setTimeout(function(){speak('The signal faded.',false);openSheet('sFade');},500);}
+  fadeText();
 }
+var FADE_BAND=null;
+function fadeText(){var p=document.getElementById('fadeWhy');if(!p)return;if(FADE_BAND===null)FADE_BAND=p.textContent;
+  p.textContent=run.lastHit==='miss'?"Three hits. The last one was at a gap: too few messengers landed, so the next neuron stayed quiet. A neuron fires only when enough signal arrives at once. Greens give you more landing spines.":FADE_BAND;}
 function drawHits(){var h=document.getElementById('hits');var out='';for(var i=0;i<3;i++){out+= i<run.hits
   ?'<svg viewBox="0 0 26 26" aria-hidden="true"><path d="M3 4 l19 -2 l2 20 l-20 2 z" fill="#ff4fa3" stroke="#eef2f6" stroke-width="2"/></svg>'
   :'<svg viewBox="0 0 26 26" aria-hidden="true"><path d="M3 4 l19 -2 l2 20 l-20 2 z" fill="none" stroke="#8f9bb0" stroke-width="2" stroke-dasharray="3 3"/></svg>';}
@@ -667,26 +673,44 @@ function addBtn(label,primary,fn){var b=document.createElement('button');b.class
 // What lands carries over between beats (summation, OpenStax A&P 12.5; Arnsten 2009).
 var BURST=[],RING=null,BEAT=1.0;
 function startLanding(sy){
+  BEAT=[1.0,0.92,0.85,0.8][run.leg]||0.8;
   var beats=sy.last?(sy.stressed?6:4):3;
-  run.lm={t:0,k:0,beats:beats,max:sy.last?9:6,tgt:sy.pads[Math.floor(Math.random()*sy.pads.length)],a0:run.s,hits:0};
+  run.lm={t:0,k:0,beats:beats,max:sy.last?(sy.stressed?8:6):5,tgt:reachPick(sy.pads,run.theta,false),a0:run.s,hits:0};
   RING={fill:sy.last?Math.min(1,sy.fill/sy.need):0,t:0,col:'#ff4fa3',hold:true};sfxSlowIn();
 }
-function nextTarget(sy){var pads=sy.pads;if(pads.length<2)return pads[0];var cur=run.lm.tgt,best=null,bd=9;
+function reachPick(pads,from,skip){var reach=2.7*BEAT*0.6,ok=pads.filter(function(p){var d=Math.abs(angDiff(p,from));return d<=reach&&!(skip&&d<0.05);});
+  if(!ok.length){var near=pads.slice().sort(function(a,b){return Math.abs(angDiff(a,from))-Math.abs(angDiff(b,from));});if(skip){var far=near[1];if(far!==undefined&&run.lm&&run.lm.k%3===0&&Math.abs(angDiff(far,from))<=2.7*BEAT)return far;} return near[0];} // nothing in easy reach: hold, and every third beat jump if a full beat can cover it
+  if(Math.random()<0.6){ok.sort(function(a,b){return Math.abs(angDiff(b,from))-Math.abs(angDiff(a,from));});return ok[0];}
+  return ok[Math.floor(Math.random()*ok.length)];}
+function nextTarget(sy){if(sy.pads.length<2)return sy.pads[0];return reachPick(sy.pads,run.theta,true);
+  var pads=sy.pads,cur=run.lm.tgt,best=null,bd=9;
   pads.forEach(function(p){var d=Math.abs(angDiff(p,cur));if(d>0.05&&d<bd){bd=d;best=p;}});
   var others=pads.filter(function(p){return Math.abs(angDiff(p,cur))>0.05;});return Math.random()<0.6?best:others[Math.floor(Math.random()*others.length)];}
 function landingBeat(sy){
-  var lm=run.lm;lm.k++;var d=Math.abs(angDiff(run.theta,lm.tgt));var full=d<0.3,half=!full&&d<0.6;
+  var lm=run.lm;lm.k++;var d=Math.abs(angDiff(run.theta,lm.tgt));var full=d<0.25,half=!full&&d<0.5;
   var onAlarm=sy.apads.some(function(p){return Math.abs(angDiff(run.theta,p))<0.3;});
   var parts=[];for(var k=0;k<8;k++){var a=run.theta+0.5*(k/7-0.5);var kind=onAlarm?2:(full||half)&&Math.abs(angDiff(a,lm.tgt))<0.5?1:0;
     parts.push({a0:a,a1:kind===1?lm.tgt:kind===2?a:a+(Math.random()-0.5)*0.6,kind:kind,t:0,d:k*0.02});}
   BURST=BURST.concat(parts);
   if(onAlarm&&sy.stressed){sy.afill++;sfxBeat(-1);if(sy.afill>=2){endLanding();RING={fill:1,t:0,col:'#ff4f7a'};sy.done=true;alarmFinish();return;}}
-  else if(full||half){var add=(full?1:0.5)*(sy.last?sy.w:1);sy.fill+=add;lm.hits++;sfxBeat(sy.last?Math.min(1,sy.fill/sy.need):1);}
+  else if(full||half){var add=(full?1:0.5)*(sy.last?sy.w:1);sy.fill+=add;lm.hits+=full?1:0.5;sfxBeat(sy.last?Math.min(1,sy.fill/sy.need):1);}
   else sfxBeat(0);
   var done=sy.last?sy.fill>=sy.need:lm.hits>=2;
   if(RING)RING.fill=sy.last?Math.min(1,sy.fill/sy.need):(done?1:0);
-  if(done||lm.k>=lm.max){fireRelay(sy,done);return;}
+  if(done){fireRelay(sy,true);return;}
+  if(lm.k>=lm.max){missLanding(sy);return;}
   lm.tgt=nextTarget(sy);
+}
+function missLanding(sy){ // below threshold: no action potential. Costs a hit; a fresh spark tries again.
+  endLanding();RING=null;sy.done=false;sfxFizzle();
+  if(sy.last)sy.fill*=0.5;else sy.fill=0; // some of what landed lingers (summation fades)
+  run.s=sy.s-7;run.v=Math.min(run.v,3*S.speed);run.lastHit='miss';
+  run.hits++;drawHits();run.flash=0.6;run.flashCol='#ff4fa3';
+  var e=document.getElementById('effect');e.className='ui bad';e.textContent='Did not fire';e.style.display='block';effectT=2.2;logEvent(false,'Did not fire');
+  speak('Not enough crossed. The next neuron stayed quiet.',false);
+  lesson('A neuron fires only when enough messengers land at once. Too few, and the signal stops at the gap.');
+  if(run.hits===2){setTimeout(function(){if(AC&&S.sound){tone(880,0.12,'square',0.06);setTimeout(function(){tone(660,0.16,'square',0.06);},150);}speak('One hit left',false);},1600);}
+  if(run.hits>=3){run.faded=true;fadeText();setTimeout(function(){speak('The signal faded.',false);openSheet('sFade');},900);}
 }
 function endLanding(){run.lm=null;sfxSlowOut();if(RING)RING.hold=false;}
 function fireRelay(sy,clean){
