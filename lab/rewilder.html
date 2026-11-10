@@ -3,9 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.6.1</title>
+<title>Rewilder v0.6.2</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.6.1 | LAB | 2026-11-10
+<!-- TSP build: Rewilder v0.6.2 | LAB | 2026-11-10
+     v0.6.2 (founder: "when the objectives are 'complete' don't end the world the player has just built.
+     Let them altar and continue playing if they wish."): finishing all five sites shows the summary once
+     and the game keeps running. After that, hold Down and smash on a grown site to dig it up and plant
+     the other choice. Rain, crews and the blimp keep coming.
      v0.6.1 (founder, with a phone screenshot: "Messages often cover player and movement. Either tap away
      or if timed, out of the way of character."): messages now sit on the half of the screen the
      character is not in, run wider and shorter, and close on a tap.
@@ -176,7 +180,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.6.1</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.6.2</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -345,13 +349,13 @@ const cam={x:0,y:0};
 const P={x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,walk:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0};
 const stats={hits:0,crews:0,paved:0,start:0,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0};
 let F={hard:4,soak:0,tn:0,tm:0,pn:0,pm:0,unmet:0,links:0,haze:true};
-let hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0;
+let done=false,hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0;
 
 function buildSite(d,i){const rows=[];for(let f=0;f<d.floors;f++){const row=[];for(let c=0;c<d.cols;c++){let t=d.cell(c,f);if(KB[d.id]&&KB[d.id][0]===c&&KB[d.id][1]===f)t='k';const hp=t?HP[t]+(f<2&&t!=='k'&&d.floors>2?2:0):0;row.push(t?{t,hp,max:hp,seed:i*1000+f*17+c*3,stack:d.id==='coal'&&f>=7}:null)}
   row.stack=d.id==='coal'&&f>=7;row.deck=d.id==='highway'&&f===4;rows.push(row)}
  return {...d,i,w:d.cols*d.cw,cx:d.x+d.cols*d.cw/2,rows,state:'standing',g:0,t:0,paved:false,saved:0,seed:i*97+13,sprigT:6+i,choice:null,lift:null,liftT:10,dmgd:false,chainT:0,jet:null,jetT:5,why:[],sway:0,cars:d.id==='highway'?[0,1,2,3,4,5,6].map(i=>({x:d.x+30+i*96,c:CARC[i%5],dead:0,v:30+hr(i)*16})):[],trolley:d.id==='highway'?{x:d.x+60,dir:1}:null}}
 function resetWorld(){sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];crates=[];pits=[];notes.clear();told.clear();
- Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0});baron=null;baronT=40;baronHp=3;barrels=[];tar=[];who='beaver';rest={energy:100};
+ Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0});done=false;baron=null;baronT=40;baronHp=3;barrels=[];tar=[];who='beaver';rest={energy:100};
  folk=[0,1,2,3,4,5].map(i=>({x:560+i*290+hr(i)*120,dir:i%2?1:-1,v:i%2?70+hr(i)*30:24+hr(i)*14,bike:i%2===1,c:['#c8342b','#3b6ea8','#e8c25a','#7a1a12','#2f8f8a','#b06ad0'][i],hop:0,seed:i}));
  Object.assign(stats,{hits:0,crews:0,paved:0,start:T,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0});
  crewT=14;stormT=26;rain=0;flood=0;rainbow=0;sed=null;beach=0;gardeners=0;crewSeen=0}
@@ -441,21 +445,21 @@ function openCard(lab,title,chain,text,srcHtml){cardOpen=true;$('cardLab').textC
 function showNote(id){const n=NOTES[id];openCard(n.lab,n.title,'',n.text,'Sources:<br>'+linkList(n.src))}
 function cause(k){if(told.has('c_'+k)||state!=='play')return;told.add('c_'+k);const c=CAUSE[k];setTimeout(()=>{if(state==='play')openCard('What just happened',c.title,c.chain,c.text,'')},900)}
 $('cardBtn').onclick=()=>{$('cardSheet').classList.remove('open');cardOpen=false;if(state==='play'&&sites.every(s=>s.state==='grown'))setTimeout(finish,900)};
-function openPick(s){pickOpen=true;$('pickLab').textContent='The '+s.name+' is down';const b=$('pickBtns');b.innerHTML='';
+function openPick(s,re){pickOpen=true;$('pickLab').textContent=re?'Replant the '+CH[s.choice].short:'The '+s.name+' is down';const b=$('pickBtns');b.innerHTML='';
  PICK[s.id].forEach(k=>{const c=CH[k],el=document.createElement('button');el.type='button';el.innerHTML=c.name+'<span>'+c.does+'</span>';
-  el.onclick=()=>{s.choice=k;s.state='growing';s.g=0;pickOpen=false;$('pickSheet').classList.remove('open');SFX.pick();toast(c.name+'. Stand close to tend it.',3.5);once('lens','The Lens button shows how the sites affect each other.',5)};b.appendChild(el)});
+  el.onclick=()=>{if(re&&k===s.choice){pickOpen=false;$('pickSheet').classList.remove('open');return}s.choice=k;s.state='growing';s.g=re?.35:0;hudKey='';pickOpen=false;$('pickSheet').classList.remove('open');SFX.pick();toast(c.name+'. Stand close to tend it.',3.5);once('lens','The Lens button shows how the sites affect each other.',5)};b.appendChild(el)});
  $('pickSheet').classList.add('open');b.querySelector('button').focus({preventScroll:true})}
-function renderNotes(end){const list=$('notesList');list.innerHTML='';
+function renderNotes(end){const list=$('notesList');list.innerHTML='';list.style.display=end?'none':'';
  SITE_DEF.forEach(d=>{const li=document.createElement('li');if(notes.has(d.id)){const n=NOTES[d.id];li.innerHTML='<b>'+n.title+'.</b> '+n.text+'<br><span class="src">Sources:<br>'+linkList(n.src)+'</span>'}else li.textContent='Locked: bring down the '+d.name+' and let something finish growing there.';list.appendChild(li)});
  const b=$('notesBtns');b.innerHTML='';
- if(end){const again=document.createElement('button');again.type='button';again.textContent='Play again';again.onclick=()=>{closeNotes();startGame()};b.appendChild(again);
+ if(end){const again=document.createElement('button');again.type='button';const keep=document.createElement('button');keep.type='button';keep.textContent='Keep playing';keep.onclick=()=>{closeNotes();toast('The city is yours. Hold Down and smash on a grown site to dig it up and plant the other choice.',7)};b.appendChild(keep);again.textContent='Start over';again.onclick=()=>{closeNotes();startGame()};b.appendChild(again);
   const back=document.createElement('a');back.className='nav';back.href='./index.html';back.textContent='Back to the lab';b.appendChild(back)}
- const c=document.createElement('button');c.type='button';c.textContent=end?'Look at the city':'Close';c.onclick=closeNotes;b.appendChild(c)}
+ if(!end){const c=document.createElement('button');c.type='button';c.textContent='Close';c.onclick=closeNotes;b.appendChild(c)}}
 function openNotes(end){notesOpen=true;if(menuOpen){menuOpen=false;$('topbar').classList.remove('open');$('menuBtn').setAttribute('aria-expanded',false)}
  if(end){const secs=Math.round(T-stats.start),m=Math.floor(secs/60),s=secs%60;$('notesLab').textContent='The city breathes';$('notesTitle').textContent='All five sites are grown';
   const grew=sites.map(s=>CH[s.choice].short).join(', '),prev=store.get('last',null);
   $('notesLead').textContent='You grew: '+grew+'. It took '+m+' min '+s+' s. You dropped '+stats.floors+' floors, toppled '+stats.topples+' buildings, smashed '+stats.cars+' cars, sent the blimp off '+stats.baron+' times, sent '+stats.lifts+' repair crews home, and turned back '+stats.crews+' pave crews. Rain flooded young growth '+stats.floods+' times and fed it '+stats.boosts+' times. Crews paved over your work '+stats.paved+' times. '+
-   (prev?'Last time you grew: '+prev.grew+'. That run took '+Math.floor(prev.secs/60)+' min '+(prev.secs%60)+' s, with '+prev.floods+' floods, '+prev.boosts+' good rains, '+prev.crews+' pave crews, and '+prev.paved+' pave-overs. What changed, and why?':'Try a different mix or a different order next time, and see which numbers move.');
+   (prev?'Last time you grew: '+prev.grew+'. That run took '+Math.floor(prev.secs/60)+' min '+(prev.secs%60)+' s, with '+prev.floods+' floods, '+prev.boosts+' good rains, '+prev.crews+' pave crews, and '+prev.paved+' pave-overs. What changed, and why?':'Try a different mix or a different order, and see which numbers move.')+(' The field notes on the real places are in the menu.');
   store.set('last',{grew,secs,floods:stats.floods,boosts:stats.boosts,crews:stats.crews,paved:stats.paved})}
  else{$('notesLab').textContent='Real places';$('notesTitle').textContent='Field notes';$('notesLead').textContent=notes.size+' of 5 unlocked. Each note is a real project. The way the sites affect each other in the game is a simplified model.'}
  renderNotes(end);$('notesSheet').classList.add('open');$('notesBtns').querySelector('button').focus({preventScroll:true});$('notesSheet').querySelector('.paperCard').scrollTop=0}
@@ -464,7 +468,7 @@ $('notesBtn').onclick=()=>openNotes(false);
 function setLens(o){lensOn=o;$('lensBtn').setAttribute('aria-pressed',o);$('lens').classList.toggle('on',o);document.body.classList.toggle('lensOn',o);lensT=0;if(o)once('lens2','The Lens slows time. Press it again to close it.',3)}
 $('lensBtn').onclick=()=>setLens(!lensOn);
 $('tagBtn').onclick=()=>{if(canTag())tagOut()};
-function finish(){if(state!=='play')return;state='end';setLens(false);document.body.classList.remove('playing');resize();SFX.grow();openNotes(true);$('startBtn').textContent='Play again'}
+function finish(){if(state!=='play'||done)return;done=true;setLens(false);SFX.grow();openNotes(true)}
 function startGame(){resetWorld();state='play';ac();musStart();document.body.classList.add('playing');resize();hudKey='';hud();cam.x=0;
  toast('Smash anything. Cut a notch three blocks deep from one edge and the building topples that way, so get clear.',5)}
 $('startBtn').onclick=startGame;
@@ -639,7 +643,8 @@ function baronStep(dt){const b=baron;b.life+=dt;if(b.jolt>0)b.jolt-=dt;if(b.hat>
    const c=crates.find(c=>c.g&&Math.abs(c.x-b.x)<26&&!b.snagged.includes(c));if(c){b.snagged.push(c);b.snag=4.5;b.jolt=.4;word('SNAG',b.x,GY-150,'#e8c25a');once('snag','The blimp\'s anchor caught on your block. Hit it while it is stuck.',4.5)}
    if(Math.abs(d)<8){b.state='hover';b.hold=6}}}
  else if(b.state==='hover'){b.hold-=dt;b.drop-=dt;if(b.drop<=0){b.drop=1.6;barrels.push({x:b.x+(Math.random()-.5)*70,y:b.y+50,vy:0})}if(b.hold<=0){b.state='fly';b.tx=null}}}
-function dig(){if(sites.some(s=>P.x>s.x-36&&P.x<s.x+s.w+36)){once('digwhere','Dig on open ground, between the sites.',3.5);SFX.whiff();return}
+function dig(){const gs=done&&sites.find(s=>s.state==='grown'&&P.x>s.x&&P.x<s.x+s.w);if(gs){openPick(gs,true);return}
+ if(sites.some(s=>P.x>s.x-36&&P.x<s.x+s.w+36)){once('digwhere','Dig on open ground, between the sites.',3.5);SFX.whiff();return}
  const x=P.x+P.face*34;let p=pits.find(p=>Math.abs(p.x-x)<54);if(!p){if(pits.length>=5)pits.shift();p={x,d:0};pits.push(p)}
  p.d=Math.min(3,p.d+1);debris(p.x,GY-4,9,'#6b4a30');SFX.hit();word(p.d>=2?'DEEP':'DIG',p.x,GY-60,'#e3cf9a');if(p.d===2)once('deep','That pit is deep enough to trap a crew.',3.5)}
 function crate(x,y,dir){if(crates.length>=10)crates.shift();crates.push({x,y,vx:dir*170,vy:-140,g:false,seed:Math.floor(x+y)});SFX.clang();word('SHOVE',x,y-34,'#e8c25a')}
@@ -687,7 +692,7 @@ function update(raw){if(hitstop>0){hitstop-=raw;return}const dt=(lensOn&&state==
   if(s.state==='growing'&&!s.paving){const near=P.x>=s.x-30&&P.x<=s.x+s.w+30&&P.y>GY-140;s.tend=near;const m=rate(s);
    s.g+=dt/20*m*(near?2:1);if(near&&Math.random()<dt*3)leaves(P.x+(Math.random()-.5)*60,GY-10,1);
    if(s.g>=1){s.g=1;s.state='grown';notes.add(s.id);SFX.grow();leaves(s.cx,GY-60,26);P.cheer=1.6;hudKey='';word('GROWN',s.cx,GY-170,'#7cc35a');folk.forEach(f=>f.cheer=3.5);
-    if(sites.every(q=>q.state==='grown'))setTimeout(finish,2600);else toast('The '+CH[s.choice].short+' is grown. A field note about a real place like it waits in the menu.',5)}}
+    if(sites.every(q=>q.state==='grown')){if(done)toast('All five are grown again. Keep going, or change something else.',5);else setTimeout(finish,2600)}else toast('The '+CH[s.choice].short+' is grown. A field note about a real place like it waits in the menu.',5)}}
   if(s.state==='grown'){s.sprigT-=dt;if(s.sprigT<=0&&sprigs.length<4){s.sprigT=10+Math.random()*6;sprigs.push({x:s.x+20+Math.random()*(s.w-40),y:GY-24})}}});
  if(sites.some(s=>s.state==='growing'||s.state==='grown')){
   if(rain>0){rain-=dt;if(rain<=0){rain=0;stormT=30;resolveRain()}}
