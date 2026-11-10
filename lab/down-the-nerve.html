@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Signal Rider v0.15</title>
+<title>Signal Rider v0.16</title>
 <meta name="spec-source" content="claude/SPEC-DOWN-THE-NERVE-v0.8-AUDIO-2026-11-06.md">
 <meta name="audience" content="Founder playtest first. Audience ruling D4 still open (12 and up, mapped to OpenStax, recommended). Lab build.">
 <!-- tsp:source claude/SPEC-DOWN-THE-NERVE-2026-11-05.md; convening/DOWN-THE-NERVE-CONVENING.md (D12 Brainbow, S.T.U.N. Runner feel); Tight Spiral Studios -->
@@ -75,7 +75,7 @@ a{color:#9cc8f2}
 
 <header id="bar" class="ui">
   <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/lab/" aria-label="Studio home">Studio</a>
-  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.15</span><span class="chip tsp-labchip">LAB</span></span>
+  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.16</span><span class="chip tsp-labchip">LAB</span></span>
   <button class="btn" id="bMenu" type="button" aria-haspopup="dialog">Menu</button>
 </header>
 
@@ -102,7 +102,7 @@ a{color:#9cc8f2}
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M3 5 l23 -2 l2 23 l-24 2 z" fill="#ff4fa3" stroke="#eef2f6" stroke-width="2"/></svg>Bads: frayed bands get wider and you slow. Hit three and the signal fades.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="2" width="26" height="26" rx="9" fill="#6dff8a" stroke="#eef2f6" stroke-width="2"/></svg>Greens: steer into them. Frayed bands get narrower. They do not change your speed.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="11" fill="none" stroke="#ffd23f" stroke-width="3"/><circle cx="15" cy="15" r="6" fill="none" stroke="#ffd23f" stroke-width="3"/></svg>Yellow double rings are checkpoints.</div>
-    <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="5" fill="#ffffff"/><circle cx="15" cy="15" r="11" fill="none" stroke="#ffffff" stroke-width="2.5"/></svg>At each gap, steer onto the white spine as its ring closes. Two good landings fire the next neuron. Too few and it costs a hit.</div>
+    <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="5" fill="#ffffff"/><circle cx="15" cy="15" r="11" fill="none" stroke="#ffffff" stroke-width="2.5"/></svg>At each gap, match the shape: steer onto the spine whose receptor matches the messenger in the center before its ring closes. Two good landings fire the next neuron. Too few and it costs a hit.</div>
   </div>
   </details>
 </div>
@@ -146,7 +146,7 @@ a{color:#9cc8f2}
   <li>Yellow double rings: checkpoints, halfway through each leg and at each relay.</li>
   <li>The end of each fiber: a gap, then the next neuron's landing spines. Line up with a lit spine to land.</li>
   <li>Before each ride you load a week onto the balance. Every card in the deck: short night, test tomorrow, phone at 2 a.m., missed bus, loud room (stress); real sleep, a walk, a friend, a good meal, practice (support). Each card you load shows up as a picture during the ride. Choose the calm road to ride with no week.</li>
-  <li>The week changes the last relay, in the thinking cortex: stress cubes take landing spines away and strengthen the alarm road's pull; support cubes add spines back; practice moves the balance point so stress tips it less. The first three relays carry the touch the same either way, because stress does not stop you feeling a touch.</li></ul>
+  <li>The week changes the last relay, in the thinking cortex: stress cubes take landing spines away and strengthen the survival shortcut's pull; support cubes add spines back; practice moves the balance point so stress tips it less. The first three relays carry the touch the same either way, because stress does not stop you feeling a touch.</li></ul>
   <h3>What's happening here</h3>
   <p>A long stretch of short nights thins the landing spines in the thinking cortex, and the alarm circuits get stronger. That is the body protecting you, not failing. In animal studies, thinned spines grew back once the stress eased. Pad counts in the game are a simplified picture; most of this evidence comes from rats.</p>
   <h3>Sources</h3>
@@ -218,6 +218,8 @@ function buildRun(w){
   var chosen=w?DECK.filter(function(c){return w[c.id];}):[];
   var poolR=chosen.filter(function(c){return c.t==='r';}),poolG=chosen.filter(function(c){return c.t==='g';});
   if(!poolR.length)poolR=DECK.filter(function(c){return c.t==='r';});if(!poolG.length)poolG=DECK.filter(function(c){return c.t==='g';});
+  var BAGR=[],BAGG=[],LASTR=null,LASTG=null;
+  function bagDraw(bag,pool,last){if(!bag.length){var sh=pool.slice();for(var q=sh.length-1;q>0;q--){var j=Math.floor(Math.random()*(q+1));var t=sh[q];sh[q]=sh[j];sh[j]=t;}if(sh.length>1&&sh[sh.length-1]===last){var t2=sh[0];sh[0]=sh[sh.length-1];sh[sh.length-1]=t2;}bag.push.apply(bag,sh);}return bag.pop();}
   var pR=w?Math.max(0.25,Math.min(0.75,0.5+0.05*(m.R-m.G))):0.5;
   var alarm=rnd(0,TAU);
   legs.forEach(function(L,i){
@@ -235,7 +237,7 @@ function buildRun(w){
       var bad=gi===0?pR>=0.5:gi===1?pR<0.5:Math.random()<pR;
       var n=bad?Math.max(1,Math.min(4,1+Math.floor(i*0.6+m.R*0.2+Math.random()*0.9)+m.clAdj)):Math.min(4,1+Math.floor(i*0.4+m.G*0.25+Math.random()*0.9));
       var span=bad?0.6:(n-1)*1.6,ps=clearSpan(s+26+(L.len-48)*(gi+0.5)/4,span),a0=rnd(0,TAU),pool=bad?poolR:poolG;
-      for(var k=0;k<n;k++){var card=pool[Math.floor(Math.random()*pool.length)];
+      for(var k=0;k<n;k++){var card=bad?(LASTR=bagDraw(BAGR,poolR,LASTR)):(LASTG=bagDraw(BAGG,poolG,LASTG));
         pickups.push(bad?{s:ps+(k%2)*0.6,a:a0+(k-(n-1)/2)*0.5,good:false,hit:false,card:card,grp:i*10+gi,n:n}
                         :{s:ps+k*1.6,a:a0,good:true,hit:false,card:card,grp:i*10+gi,n:n});}
     }
@@ -262,11 +264,11 @@ function buildRun(w){
 
 
 // ---------- effects, hits, checkpoints ----------
-var BANDMAX=2.0,BANDMIN=0.35;
+var BANDMAX=2.0,BANDMIN=0.35,SURGE=1.3;
 function effect(good,title,icon){
   var e=document.getElementById('effect');var ic=icon?'<svg viewBox="0 0 34 34" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px">'+icon+'</svg>':'';
   if(good){run.bandT=Math.max(BANDMIN,run.bandT-0.3);run.flash=0.6;run.flashCol='#6dff8a';
-    e.className='ui good';e.innerHTML=ic+title;forestReact(true);run.floatTxt='+ clear path';sfxGood();}
+    e.className='ui good';e.innerHTML=ic+title;forestReact(true);run.floatTxt='+ clear path';sfxGood();run.surgeT=2.0;run.v*=1.15;run.boostT=Math.max(run.boostT,0.35);}
   else{run.bandT=Math.min(BANDMAX,run.bandT+0.32);run.v=Math.max(1.5*S.speed,run.v*0.45);run.slowT=0.9;run.flash=0.6;run.flashCol='#ff4fa3';
     e.className='ui bad';e.innerHTML=ic+title;forestReact(false);run.floatTxt='- speed';sfxBad();}
   run.bandPulse=1;run.floatT=1.2;e.style.display='block';effectT=2.2;
@@ -275,7 +277,7 @@ function effect(good,title,icon){
 var effectT=0;
 var SAY={'Hit a frayed band':'Frayed band'};
 function spoken(title){if(SAY[title])return SAY[title];for(var i=0;i<DECK.length;i++){if(DECK[i].cap===title)return DECK[i].label;}return title;}
-var WHY={"night": "Short nights. The alarm system runs hot after lost sleep.", "phone": "A phone in bed means later, lighter sleep.", "test": "A test tomorrow. One hard moment dims the thinking road for a while.", "pile": "Deadlines piling up. Stress that feels out of control weighs more.", "food": "Skipped meals. When basics are missing, everything costs more.", "rent": "Rent due. A shaky floor makes every task heavier.", "work": "A shift before class. Time squeezed from both ends.", "bus": "A missed bus. Surprises stack when the day has no slack.", "loud": "A loud room. Noise taxes attention.", "alone": "Feeling alone. The alarm road gets louder without people around.", "sleep": "A full night of sleep. Landing places relight overnight.", "walk": "A walk. Moving helps new connections grow.", "friend": "A friend. Support buffers the stress response.", "prof": "A professor who cares. Support at school counts.", "practice": "Practice. The balance point moves.", "breath": "Slow breathing. The calming system switches on.", "plan": "An if-then plan. A plan turns a pile into steps.", "outside": "Time outside. A place that settles you.", "club": "A group where you belong. Belonging lowers the load.", "pantry": "The campus pantry. Help lightens the load.", "fray": "A frayed band. That is damaged insulation, and the signal crawls through it."};
+var WHY={"night": "Short nights. The alarm system runs hot after lost sleep.", "phone": "A phone in bed means later, lighter sleep.", "test": "A test tomorrow. One hard moment dims the thinking road for a while.", "pile": "Deadlines piling up. Stress that feels out of control weighs more.", "food": "Skipped meals. When basics are missing, everything costs more.", "rent": "Rent due. A shaky floor makes every task heavier.", "work": "A shift before class. Time squeezed from both ends.", "bus": "A missed bus. Surprises stack when the day has no slack.", "loud": "A loud room. Noise taxes attention.", "alone": "Feeling alone. The survival shortcut gets louder without people around.", "sleep": "A full night of sleep. Landing places relight overnight.", "walk": "A walk. Moving helps new connections grow.", "friend": "A friend. Support buffers the stress response.", "prof": "A professor who cares. Support at school counts.", "practice": "Practice. The balance point moves.", "breath": "Slow breathing. The calming system switches on.", "plan": "An if-then plan. A plan turns a pile into steps.", "outside": "Time outside. A place that settles you.", "club": "A group where you belong. Belonging lowers the load.", "pantry": "The campus pantry. Help lightens the load.", "fray": "A frayed band. That is damaged insulation, and the signal crawls through it."};
 function whyFor(title){if(title==='Hit a frayed band')return WHY.fray;for(var i=0;i<DECK.length;i++){if(DECK[i].cap===title)return WHY[DECK[i].id]||title;}return title;}
 // ---------- v0.8 replay recorder ----------
 var REC=[],EVT=[],RP=null;
@@ -327,7 +329,7 @@ function restoreCp(){var c=run.cp;run.s=c.s;run.leg=c.leg;run.band=run.bandT=c.b
 
 // ---------- week deck ----------
 var DECK=[{"id": "night", "label": "Short nights", "t": "r", "cat": "sleep", "w": 2, "cap": "Short nights, all week", "fact": "After a night without sleep, the brain's alarm center reacted over 60% more strongly to upsetting pictures.", "src": "Yoo et al., 2007, Current Biology", "ic": "<circle cx=\"24\" cy=\"12\" r=\"7\" fill=\"#ffd23f\"/><circle cx=\"27\" cy=\"10\" r=\"6\" fill=\"#141b2e\"/><rect x=\"4\" y=\"22\" width=\"26\" height=\"8\" rx=\"3\" fill=\"#8f9bb0\"/>"}, {"id": "phone", "label": "Phone in bed", "t": "r", "cat": "sleep", "w": 1, "cap": "Phone buzzing, 2:14 a.m.", "fact": "Reading on a lit screen before bed delayed sleep and the sleep hormone melatonin, compared with a printed book.", "src": "Chang et al., 2015, PNAS", "ic": "<rect x=\"10\" y=\"3\" width=\"14\" height=\"28\" rx=\"3\" fill=\"#d9e2ee\"/><rect x=\"12\" y=\"7\" width=\"10\" height=\"18\" fill=\"#3fd6ff\"/>"}, {"id": "test", "label": "Test tomorrow", "t": "r", "cat": "school", "w": 1, "cap": "Test tomorrow, 8 a.m.", "fact": "Short stress can take the brain's planning center offline within minutes. It comes back when the stress passes.", "src": "Arnsten, 2009, Nature Reviews Neuroscience", "ic": "<rect x=\"7\" y=\"4\" width=\"20\" height=\"26\" rx=\"2\" fill=\"#d9e2ee\"/><path d=\"M11 11h12M11 16h12M11 21h8\" stroke=\"#141b2e\" stroke-width=\"2\"/>"}, {"id": "pile", "label": "Deadlines piling up", "t": "r", "cat": "school", "w": 2, "cap": "Three deadlines, one week", "fact": "Stress that feels out of your control hits harder. A sense of control lets the planning center calm the alarm.", "src": "Maier and Seligman, 2016, Psychological Review", "ic": "<rect x=\"6\" y=\"18\" width=\"22\" height=\"5\" fill=\"#d9e2ee\"/><rect x=\"8\" y=\"12\" width=\"20\" height=\"5\" fill=\"#8f9bb0\"/><rect x=\"5\" y=\"6\" width=\"22\" height=\"5\" fill=\"#d9e2ee\"/><rect x=\"7\" y=\"24\" width=\"20\" height=\"5\" fill=\"#8f9bb0\"/>"}, {"id": "food", "label": "Skipped meals", "t": "r", "cat": "basics", "w": 2, "cap": "Skipped lunch again", "fact": "In a national survey of about 86,000 students, 48% at two-year colleges had faced food insecurity in the past 30 days.", "src": "Hope Center #RealCollege report, 2019", "ic": "<ellipse cx=\"17\" cy=\"21\" rx=\"13\" ry=\"7\" fill=\"#d9e2ee\"/><ellipse cx=\"17\" cy=\"19\" rx=\"8\" ry=\"4\" fill=\"#141b2e\"/><path d=\"M8 6l18 22\" stroke=\"#ff4fa3\" stroke-width=\"3\"/>"}, {"id": "rent", "label": "Rent due", "t": "r", "cat": "basics", "w": 2, "cap": "Rent due Friday", "fact": "In the Hope Center's national survey, 60% of two-year college students had faced housing insecurity in the past year.", "src": "Hope Center #RealCollege report, 2019", "ic": "<path d=\"M4 16 L17 5 L30 16 V30 H4z\" fill=\"#d9e2ee\"/><rect x=\"13\" y=\"20\" width=\"8\" height=\"10\" fill=\"#141b2e\"/><circle cx=\"26\" cy=\"9\" r=\"5\" fill=\"#ffd23f\"/>"}, {"id": "work", "label": "Shift before class", "t": "r", "cat": "time", "w": 1, "cap": "Closing shift, then class", "fact": "In 2020, 40% of full-time and 74% of part-time undergraduates were working while enrolled.", "src": "National Center for Education Statistics, 2022", "ic": "<rect x=\"5\" y=\"11\" width=\"24\" height=\"17\" rx=\"2\" fill=\"#d9e2ee\"/><rect x=\"12\" y=\"6\" width=\"10\" height=\"6\" rx=\"2\" fill=\"none\" stroke=\"#d9e2ee\" stroke-width=\"2\"/><rect x=\"5\" y=\"17\" width=\"24\" height=\"3\" fill=\"#8f9bb0\"/>"}, {"id": "bus", "label": "Missed the bus", "t": "r", "cat": "time", "w": 1, "cap": "Missed the bus, in the rain", "fact": "A surprise you cannot control is the kind of stress that lands hardest; predictable stress is easier to absorb.", "src": "Maier and Seligman, 2016, Psychological Review", "ic": "<rect x=\"3\" y=\"8\" width=\"28\" height=\"16\" rx=\"3\" fill=\"#ffd23f\"/><circle cx=\"10\" cy=\"26\" r=\"3\" fill=\"#d9e2ee\"/><circle cx=\"24\" cy=\"26\" r=\"3\" fill=\"#d9e2ee\"/><rect x=\"6\" y=\"11\" width=\"22\" height=\"6\" fill=\"#141b2e\"/>"}, {"id": "loud", "label": "Loud, crowded room", "t": "r", "cat": "place", "w": 1, "cap": "A loud, crowded room", "fact": "Children at schools under flight paths read worse the louder the aircraft noise.", "src": "Stansfeld et al., 2005, The Lancet (RANCH study)", "ic": "<path d=\"M5 13h6l7-6v20l-7-6H5z\" fill=\"#d9e2ee\"/><path d=\"M22 10q5 7 0 14M26 7q8 10 0 20\" stroke=\"#d9e2ee\" stroke-width=\"2\" fill=\"none\"/>"}, {"id": "alone", "label": "Feeling alone", "t": "r", "cat": "people", "w": 2, "cap": "Nobody to text back", "fact": "Across 148 studies, people with stronger social ties had 50% better odds of survival over the study periods.", "src": "Holt-Lunstad et al., 2010, PLOS Medicine", "ic": "<circle cx=\"17\" cy=\"10\" r=\"5\" fill=\"#d9e2ee\"/><path d=\"M8 30q9-18 18 0\" fill=\"#d9e2ee\"/><circle cx=\"5\" cy=\"27\" r=\"2\" fill=\"#8f9bb0\"/><circle cx=\"29\" cy=\"27\" r=\"2\" fill=\"#8f9bb0\"/>"}, {"id": "sleep", "label": "A full night of sleep", "t": "g", "cat": "body", "w": 2, "cap": "A full night of sleep", "fact": "Adults need 7 or more hours a night. About a third of U.S. adults get less.", "src": "Centers for Disease Control and Prevention", "ic": "<circle cx=\"24\" cy=\"10\" r=\"6\" fill=\"#ffd23f\"/><rect x=\"4\" y=\"20\" width=\"26\" height=\"9\" rx=\"3\" fill=\"#6dff8a\"/><path d=\"M6 20q5-6 11 0\" fill=\"#d9e2ee\"/>"}, {"id": "walk", "label": "A walk or workout", "t": "g", "cat": "body", "w": 1, "cap": "A walk outside", "fact": "Exercise raises BDNF, a protein that helps new connections between neurons grow.", "src": "van Praag; reviewed in Liu and Nusslock, 2018, Frontiers in Neuroscience", "ic": "<circle cx=\"17\" cy=\"6\" r=\"4\" fill=\"#d9e2ee\"/><path d=\"M17 11l-3 9 4 4-2 7M15 15l-5 4M17 15l6 3M14 20l-4 10\" stroke=\"#d9e2ee\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\"/>"}, {"id": "friend", "label": "A friend who listens", "t": "g", "cat": "kin", "w": 2, "cap": "A friend on the steps", "fact": "In a lab stress test, men who had their best friend with them beforehand had lower stress-hormone (cortisol) responses.", "src": "Heinrichs et al., 2003, Biological Psychiatry", "ic": "<circle cx=\"11\" cy=\"9\" r=\"4\" fill=\"#d9e2ee\"/><circle cx=\"23\" cy=\"9\" r=\"4\" fill=\"#6dff8a\"/><path d=\"M5 30q6-14 12 0M17 30q6-14 12 0\" fill=\"#d9e2ee\"/>"}, {"id": "prof", "label": "A professor who cares", "t": "g", "cat": "kin", "w": 1, "cap": "A professor who answers", "fact": "Graduates who had a professor who cared, one who made them excited to learn, and a mentor had more than double the odds of being engaged at work.", "src": "Gallup-Purdue Index, 2014", "ic": "<circle cx=\"12\" cy=\"9\" r=\"4\" fill=\"#6dff8a\"/><path d=\"M5 30q7-15 14 0\" fill=\"#6dff8a\"/><rect x=\"18\" y=\"8\" width=\"13\" height=\"10\" rx=\"2\" fill=\"#d9e2ee\"/><path d=\"M20 12h9M20 15h6\" stroke=\"#141b2e\" stroke-width=\"1.5\"/>"}, {"id": "practice", "label": "Practice", "t": "g", "cat": "skills", "w": 1, "cap": "Practice, the same road again", "fact": "Skills and abilities set the balance point: with more skill, the same weight tips the scale less.", "src": "Alberta Family Wellness Initiative, Resilience Scale", "ic": "<path d=\"M5 26q12-24 24 0\" stroke=\"#6dff8a\" stroke-width=\"4\" fill=\"none\"/><path d=\"M5 20q12-18 24 0\" stroke=\"#d9e2ee\" stroke-width=\"2\" fill=\"none\"/>"}, {"id": "breath", "label": "Slow breathing", "t": "g", "cat": "skills", "w": 1, "cap": "Six slow breaths", "fact": "Breathing slowly, about six breaths a minute, raises heart-rate variability, a sign the body's calming system is working.", "src": "Zaccaro et al., 2018, Frontiers in Human Neuroscience", "ic": "<path d=\"M6 17q5-9 11 0t11 0\" stroke=\"#6dff8a\" stroke-width=\"3\" fill=\"none\"/><path d=\"M6 24q5-6 11 0t11 0\" stroke=\"#d9e2ee\" stroke-width=\"2\" fill=\"none\"/>"}, {"id": "plan", "label": "An if-then plan", "t": "g", "cat": "skills", "w": 1, "cap": "If 7 p.m., then essay", "fact": "Across 94 studies, if-then plans (\"If it's 7 p.m., then I start the essay\") helped people reach goals, a medium-to-large effect.", "src": "Gollwitzer and Sheeran, 2006, Advances in Experimental Social Psychology", "ic": "<rect x=\"6\" y=\"6\" width=\"22\" height=\"24\" rx=\"2\" fill=\"#d9e2ee\"/><path d=\"M10 13l3 3 5-6M10 22l3 3 5-6\" stroke=\"#14301f\" stroke-width=\"2.5\" fill=\"none\"/><path d=\"M20 14h5M20 23h5\" stroke=\"#141b2e\" stroke-width=\"2\"/>"}, {"id": "outside", "label": "Time outside", "t": "g", "cat": "belong", "w": 1, "cap": "Time outside", "fact": "People who spent at least 120 minutes a week in nature were more likely to report good health and well-being.", "src": "White et al., 2019, Scientific Reports", "ic": "<path d=\"M17 4 L27 20 H7z\" fill=\"#6dff8a\"/><path d=\"M17 12 L29 28 H5z\" fill=\"#3fbf6a\"/><rect x=\"15\" y=\"27\" width=\"4\" height=\"5\" fill=\"#8f6a4a\"/>"}, {"id": "club", "label": "A group where you belong", "t": "g", "cat": "belong", "w": 1, "cap": "Your club meets tonight", "fact": "A one-hour activity showing new students that worries about belonging are common and fade raised Black students' grades over three years.", "src": "Walton and Cohen, 2011, Science", "ic": "<circle cx=\"9\" cy=\"11\" r=\"3.5\" fill=\"#d9e2ee\"/><circle cx=\"17\" cy=\"9\" r=\"3.5\" fill=\"#6dff8a\"/><circle cx=\"25\" cy=\"11\" r=\"3.5\" fill=\"#d9e2ee\"/><path d=\"M3 28q6-12 12 0M11 26q6-13 12 0M19 28q6-12 12 0\" fill=\"#d9e2ee\"/>"}, {"id": "pantry", "label": "Campus food pantry", "t": "g", "cat": "help", "w": 1, "cap": "The campus pantry", "fact": "Basic-needs gaps are common (48% food insecurity at two-year colleges), so campuses run pantries and emergency aid. Using them is support, not failure.", "src": "Hope Center #RealCollege report, 2019", "ic": "<rect x=\"7\" y=\"10\" width=\"20\" height=\"20\" rx=\"2\" fill=\"#d9e2ee\"/><rect x=\"11\" y=\"5\" width=\"12\" height=\"7\" rx=\"2\" fill=\"#6dff8a\"/><path d=\"M11 18h12M11 23h12\" stroke=\"#141b2e\" stroke-width=\"2\"/>"}];
-var CATS=[{"id": "sleep", "t": "r", "name": "Sleep", "intro": "Sleep is when the brain resets its emotional circuits. Lose it and the alarm system runs hot the next day.", "fx": "Each sleep block also takes one landing spine from the thinking cortex."}, {"id": "school", "t": "r", "name": "School pressure", "intro": "Short bursts, like a test, are positive stress: you rise to them and recover. A pile that never clears is heavier.", "fx": "Weighs on the balance. A pile of deadlines weighs double."}, {"id": "basics", "t": "r", "name": "Money and basics", "intro": "Food and a place to live are the floor everything else stands on. When the floor shakes, every other task costs more.", "fx": "Heavy blocks: each weighs double on the balance."}, {"id": "time", "t": "r", "name": "Time squeeze", "intro": "When every hour is spoken for, small surprises stack up with nowhere to go.", "fx": "Red block groups on the ride get one block bigger."}, {"id": "place", "t": "r", "name": "Surroundings", "intro": "Where you are shapes how hard everything else is.", "fx": "Frayed bands start wider."}, {"id": "people", "t": "r", "name": "Feeling alone", "intro": "Feeling cut off is a real load on the body, not just a mood.", "fx": "The alarm road pulls harder at the thinking cortex."}, {"id": "body", "t": "g", "name": "Body", "intro": "Sleep and movement change the brain's chemistry, and over time its structure.", "fx": "Adds one landing spine at the thinking cortex."}, {"id": "kin", "t": "g", "name": "People", "intro": "Support from other people buffers the body's stress response.", "fx": "The alarm road pulls less."}, {"id": "skills", "t": "g", "name": "Skills", "intro": "Skills move the balance point, so the same weight tips you less. This is the fulcrum on the balance.", "fx": "Slides the balance point toward the reds."}, {"id": "belong", "t": "g", "name": "Places and belonging", "intro": "Places that settle you and groups that include you lower the load you carry.", "fx": "Frayed bands start narrower."}, {"id": "help", "t": "g", "name": "Help and resources", "intro": "Using help is a skill, not a weakness. Colleges run pantries and emergency aid because basic needs are common.", "fx": "Red block groups on the ride get one block smaller."}];
+var CATS=[{"id": "sleep", "t": "r", "name": "Sleep", "intro": "Sleep is when the brain resets its emotional circuits. Lose it and the alarm system runs hot the next day.", "fx": "Each sleep block also takes one landing spine from the thinking cortex."}, {"id": "school", "t": "r", "name": "School pressure", "intro": "Short bursts, like a test, are positive stress: you rise to them and recover. A pile that never clears is heavier.", "fx": "Weighs on the balance. A pile of deadlines weighs double."}, {"id": "basics", "t": "r", "name": "Money and basics", "intro": "Food and a place to live are the floor everything else stands on. When the floor shakes, every other task costs more.", "fx": "Heavy blocks: each weighs double on the balance."}, {"id": "time", "t": "r", "name": "Time squeeze", "intro": "When every hour is spoken for, small surprises stack up with nowhere to go.", "fx": "Red block groups on the ride get one block bigger."}, {"id": "place", "t": "r", "name": "Surroundings", "intro": "Where you are shapes how hard everything else is.", "fx": "Frayed bands start wider."}, {"id": "people", "t": "r", "name": "Feeling alone", "intro": "Feeling cut off is a real load on the body, not just a mood.", "fx": "The survival shortcut pulls harder at the thinking cortex."}, {"id": "body", "t": "g", "name": "Body", "intro": "Sleep and movement change the brain's chemistry, and over time its structure.", "fx": "Adds one landing spine at the thinking cortex."}, {"id": "kin", "t": "g", "name": "People", "intro": "Support from other people buffers the body's stress response.", "fx": "The survival shortcut pulls less."}, {"id": "skills", "t": "g", "name": "Skills", "intro": "Skills move the balance point, so the same weight tips you less. This is the fulcrum on the balance.", "fx": "Slides the balance point toward the reds."}, {"id": "belong", "t": "g", "name": "Places and belonging", "intro": "Places that settle you and groups that include you lower the load you carry.", "fx": "Frayed bands start narrower."}, {"id": "help", "t": "g", "name": "Help and resources", "intro": "Using help is a skill, not a weakness. Colleges run pantries and emergency aid because basic needs are common.", "fx": "Red block groups on the ride get one block smaller."}];
 var week={night:true,test:true,walk:true,friend:true};
 function weekModel(w){
   var R=0,G=0,red=0,green=0,cat={};
@@ -349,7 +351,7 @@ function drawFx(m){var el=document.getElementById('fxp');if(!el)return;
   var grp=m.clAdj>0?'one bigger':m.clAdj<0?'one smaller':'normal';
   var bw=Math.round(30+60*(m.band0-0.45)/(1.6-0.45));
   el.innerHTML='<div><b>'+m.pads+'</b> landing spines at the thinking cortex</div>'+
-   '<div>Alarm road pull: <b>'+pull+'</b></div>'+
+   '<div>Shortcut pull: <b>'+pull+'</b></div>'+
    '<div>Frayed bands: <b>'+band+'</b> <svg width="96" height="14" viewBox="0 0 96 14" aria-hidden="true"><rect x="0" y="3" width="96" height="8" rx="4" fill="#26304a"/><rect x="0" y="3" width="'+bw+'" height="8" rx="4" fill="#ff8020"/></svg></div>'+
    '<div>Red block groups: <b>'+grp+'</b></div>';}
 function drawTrayBal(m){
@@ -364,7 +366,7 @@ function drawTrayBal(m){
   for(var k=0;k<6;k++){var a=-Math.PI/2+k*Math.PI*2/6,x=75+Math.cos(a)*38,y=48+Math.sin(a)*38;
     svg+= k<m.pads?'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="8" fill="#ff4fa3" stroke="#eef2f6" stroke-width="2"/>':'<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="none" stroke="#8f6a86" stroke-width="2" stroke-dasharray="3 3"/>';}
   document.getElementById('preview').innerHTML=svg;document.getElementById('preview').setAttribute('aria-label','Thinking cortex: '+m.pads+' landing spines');
-  drawFx(m);document.getElementById('trayReadout').textContent=(m.pads<5?'Fewer landing spines at the thinking cortex. The alarm road will pull.':m.pads>5?'Extra landing spines at the thinking cortex. The alarm road stays quiet.':'The balance is close to level.');
+  drawFx(m);document.getElementById('trayReadout').textContent=(m.pads<5?'Fewer landing spines at the thinking cortex. The survival shortcut will pull.':m.pads>5?'Extra landing spines at the thinking cortex. The survival shortcut stays quiet.':'The balance is close to level.');
 }
 var trayCat=null,infoId=null,seenCats={};
 function catOf(id){for(var i=0;i<CATS.length;i++)if(CATS[i].id===id)return CATS[i];}
@@ -692,9 +694,9 @@ function finish(){
   var m=run.model;
   if(!run.week){why.textContent='The calm road: no week loaded, so the thinking cortex offered five landing spines and nothing pulled at you.';
     myth.textContent='"A nerve signal is electricity racing down a wire." It is rebuilt at every node and tops out near 120 meters per second.';}
-  else if(run.stressed){why.textContent="What's happening here: your week tipped the balance toward stress. The thinking cortex offered "+m.pads+" landing spines instead of five, and the alarm road pulled you sideways. That pull is the body protecting you. The touch itself got through the first three relays just the same.";
+  else if(run.stressed){why.textContent="What's happening here: your week tipped the balance toward stress. The thinking cortex offered "+m.pads+" landing spines instead of five, and the survival shortcut pulled you sideways. That pull is the body protecting you. The touch itself got through the first three relays just the same.";
     myth.textContent='"Stress breaks your brain for good." In animal studies, thinned spines grew back once the stress eased. Try the same week with sleep, a friend, or practice added.';}
-  else{why.textContent="What's happening here: your week tipped the balance toward support. The thinking cortex offered "+m.pads+" landing spines and the alarm road stayed quiet.";
+  else{why.textContent="What's happening here: your week tipped the balance toward support. The thinking cortex offered "+m.pads+" landing spines and the survival shortcut stayed quiet.";
     myth.textContent='"Your brain is set once you grow up." Connections keep changing with use throughout life.';}
   addBtn('Change the week',true,function(){closeSheets();openTray();});
   addBtn('Ride the same week',false,function(){closeSheets();buildRun(run.week);});
@@ -708,14 +710,15 @@ function addBtn(label,primary,fn){var b=document.createElement('button');b.class
 // The tube ends; time slows. On each beat the spark releases messengers where you are. A white spine
 // with a closing ring is the target for that beat, and it moves to a new spine each beat, so landing
 // takes several moves. Relays 1-3 fire on the first beat that lands. The thinking cortex needs its ring
-// filled: under a hard week it has fewer spines and each landing counts for less, while the alarm road
-// pulls; two beats on the thorny alarm face and the alarm road fires first (an arrival, not a failure).
+// filled: under a hard week it has fewer spines and each landing counts for less, while the survival shortcut
+// pulls; two beats on the thorny shortcut face and the survival shortcut fires first (an arrival, not a failure).
 // What lands carries over between beats (summation, OpenStax A&P 12.5; Arnsten 2009).
 var BURST=[],RING=null,BEAT=1.0;
 function startLanding(sy){
-  BEAT=[1.0,0.92,0.85,0.8][run.leg]||0.8;
+  BEAT=[1.1,1.0,0.95,0.9][run.leg]||0.9;
+  if(!sy.rshape){var sh=SHAPES.slice();for(var q=sh.length-1;q>0;q--){var j=Math.floor(Math.random()*(q+1));var t=sh[q];sh[q]=sh[j];sh[j]=t;}sy.rshape=sy.pads.map(function(p,i){return sh[i%sh.length];});}
   var beats=sy.last?(sy.stressed?6:4):3;
-  run.lm={t:0,k:0,beats:beats,max:sy.last?(sy.stressed?8:6):5,tgt:reachPick(sy.pads,run.theta,false),a0:run.s,hits:0};
+  run.lm={t:0,k:0,beats:beats,max:sy.last?(sy.stressed?8:6):5,tgt:reachPick(sy.pads,run.theta,true),a0:run.s,hits:0};
   RING={fill:sy.last?Math.min(1,sy.fill/sy.need):0,t:0,col:'#ff4fa3',hold:true};sfxSlowIn();
 }
 function reachPick(pads,from,skip){var reach=2.7*BEAT*0.6,ok=pads.filter(function(p){var d=Math.abs(angDiff(p,from));return d<=reach&&!(skip&&d<0.05);});
@@ -726,8 +729,18 @@ function nextTarget(sy){if(sy.pads.length<2)return sy.pads[0];return reachPick(s
   var pads=sy.pads,cur=run.lm.tgt,best=null,bd=9;
   pads.forEach(function(p){var d=Math.abs(angDiff(p,cur));if(d>0.05&&d<bd){bd=d;best=p;}});
   var others=pads.filter(function(p){return Math.abs(angDiff(p,cur))>0.05;});return Math.random()<0.6?best:others[Math.floor(Math.random()*others.length)];}
+var SHAPES=['circle','triangle','square','diamond','plus'],SHAPE_HZ={circle:392,triangle:494,square:587,diamond:659,plus:784};
+function shapePath(c,x,y,r,k){c.beginPath();
+  if(k==='circle'){c.arc(x,y,r,0,TAU);}
+  else if(k==='triangle'){c.moveTo(x,y-r);c.lineTo(x+r*0.95,y+r*0.75);c.lineTo(x-r*0.95,y+r*0.75);c.closePath();}
+  else if(k==='square'){c.rect(x-r*0.82,y-r*0.82,r*1.64,r*1.64);}
+  else if(k==='diamond'){c.moveTo(x,y-r);c.lineTo(x+r,y);c.lineTo(x,y+r);c.lineTo(x-r,y);c.closePath();}
+  else {var w=r*0.38;c.rect(x-w,y-r,w*2,r*2);c.rect(x-r,y-w,r*2,w*2);}}
+function keyOf(sy,pa){var i=sy.pads.indexOf(pa);return sy.rshape?sy.rshape[i]:SHAPES[0];}
+function playKey(sy){if(!run.lm)return;var k=keyOf(sy,run.lm.tgt);run.lm.key=k;if(AC&&S.sound)tone(SHAPE_HZ[k],0.22,'triangle',0.08);}
 function landingBeat(sy){
   var lm=run.lm;lm.k++;var d=Math.abs(angDiff(run.theta,lm.tgt));var full=d<0.25,half=!full&&d<0.5;
+  if(!full&&!half&&sy.pads.some(function(p){return p!==lm.tgt&&Math.abs(angDiff(run.theta,p))<0.25;})&&AC&&S.sound){tone(150,0.18,'square',0.06);}
   var onAlarm=sy.apads.some(function(p){return Math.abs(angDiff(run.theta,p))<0.3;});
   var parts=[];for(var k=0;k<8;k++){var a=run.theta+0.5*(k/7-0.5);var kind=onAlarm?2:(full||half)&&Math.abs(angDiff(a,lm.tgt))<0.5?1:0;
     parts.push({a0:a,a1:kind===1?lm.tgt:kind===2?a:a+(Math.random()-0.5)*0.6,kind:kind,t:0,d:k*0.02});}
@@ -739,7 +752,7 @@ function landingBeat(sy){
   if(RING)RING.fill=sy.last?Math.min(1,sy.fill/sy.need):(done?1:0);
   if(done){fireRelay(sy,true);return;}
   if(lm.k>=lm.max){missLanding(sy);return;}
-  lm.tgt=nextTarget(sy);
+  lm.tgt=nextTarget(sy);playKey(sy);
 }
 function missLanding(sy){ // below threshold: no action potential. Costs a hit; a fresh spark tries again.
   endLanding();RING=null;sy.done=false;sfxFizzle();
@@ -760,6 +773,7 @@ function fireRelay(sy,clean){
   run.s=sy.s+sy.gap-1.5;finish();
 }
 function updateLanding(dt,sy){ // returns true while the slow-motion landing owns the frame
+  if(run.lm&&!run.lm.keyed&&sy&&sy.rshape){run.lm.keyed=true;playKey(sy);}
   var faceS=sy.s+sy.gap-1.5;
   if(!run.lm){if(run.s>=sy.s){startLanding(sy);}else return false;}
   var lm=run.lm;var tick0=(lm.t%BEAT);lm.t+=dt;if(tick0<0.5&&lm.t%BEAT>=0.5&&AC&&S.sound)tone(1200,0.04,'sine',0.04,null,panOf(lm.tgt,1.5));
@@ -773,10 +787,14 @@ function drawLeap(sy,zf){
   if(sy&&sy.apads.length&&zf>0.4&&zf<ZMAX){
     sy.apads.forEach(function(pa){var p=proj(pa,zf,1.0);var R2=Math.max(5,0.22*f/zf);cx.fillStyle='#ff4f7a';cx.shadowColor='#ff4f7a';cx.shadowBlur=blur()*2;cx.globalAlpha=0.9;
       cx.beginPath();for(var k=0;k<10;k++){var aa=k*TAU/10,rr=k%2?R2:R2*0.45;cx.lineTo(p[0]+Math.cos(aa)*rr,p[1]+Math.sin(aa)*rr);}cx.closePath();cx.fill();});cx.globalAlpha=1;}
-  if(run.lm&&sy&&zf>0.3){ // target spine: white, with a ring closing on the beat
-    var lm=run.lm,p=proj(lm.tgt,zf,1.0),rr0=Math.max(8,0.26*f/zf),ph=1-((lm.t%BEAT)/BEAT);
-    cx.fillStyle='#ffffff';cx.shadowColor='#ffffff';cx.shadowBlur=blur()*3;cx.beginPath();cx.arc(p[0],p[1],rr0,0,TAU);cx.fill();
-    cx.strokeStyle='#ffffff';cx.lineWidth=4;cx.globalAlpha=0.9;cx.beginPath();cx.arc(p[0],p[1],rr0*(1.3+2.2*ph),0,TAU);cx.stroke();cx.globalAlpha=1;cx.shadowBlur=0;}
+  if(run.lm&&sy&&zf>0.3&&sy.rshape){ // lock and key: receptor shapes on the spines, the messenger in the center
+    var lm=run.lm,ph=1-((lm.t%BEAT)/BEAT),rs=Math.max(9,0.24*f/zf);
+    sy.pads.forEach(function(pa,i){var p=proj(pa,zf,1.0);cx.fillStyle='#04050a';cx.globalAlpha=0.85;cx.beginPath();cx.arc(p[0],p[1],rs*1.35,0,TAU);cx.fill();cx.globalAlpha=1;
+      cx.fillStyle='#ffffff';cx.shadowColor='#ffffff';cx.shadowBlur=blur();shapePath(cx,p[0],p[1],rs,sy.rshape[i]);cx.fill();cx.shadowBlur=0;});
+    var kx=cxv,ky=cyv,kr=Math.max(22,0.07*Math.min(W,H)),k=lm.key||keyOf(sy,lm.tgt);
+    cx.fillStyle='#04050a';cx.globalAlpha=0.9;cx.beginPath();cx.arc(kx,ky,kr*1.55,0,TAU);cx.fill();cx.globalAlpha=1;
+    cx.fillStyle='#ffe066';cx.shadowColor='#ffe066';cx.shadowBlur=blur()*2;shapePath(cx,kx,ky,kr,k);cx.fill();cx.shadowBlur=0;
+    cx.strokeStyle='#ffe066';cx.lineWidth=4;cx.globalAlpha=0.9;cx.beginPath();cx.arc(kx,ky,kr*(1.6+1.6*ph),0,TAU);cx.stroke();cx.globalAlpha=1;}
   if(BURST.length){var alive=false;BURST.forEach(function(m){m.t+=1/60*(run.lm?0.6:1);var q=Math.max(0,Math.min(1,(m.t-m.d)/0.45));if(q<1)alive=true;
       var a=m.a0+(angDiff(m.a1,m.a0))*q,zz=Math.max(0.6,1.0+Math.max(0.2,(zf||2)-1)*q),rr=0.86+0.14*q;var pp2=proj(a,zz,rr);
       cx.globalAlpha=m.kind?1:Math.max(0,1-q);cx.fillStyle=m.kind===2?'#ff4f7a':m.kind?'#ffffff':'#8f9bb0';cx.shadowColor=cx.fillStyle;cx.shadowBlur=blur()*1.5;
@@ -790,13 +808,13 @@ function drawLeap(sy,zf){
 }
 function alarmFinish(){
   run.over=true;run.flash=1;run.flashCol='#ff4f7a';sfxAlarmFire();
-  document.getElementById('hE').textContent='The alarm road fired first';
+  document.getElementById('hE').textContent='The survival shortcut fired first';
   document.getElementById('endStats').textContent='Your touch reached the brain in about '+run.realMs.toFixed(1)+' milliseconds, with '+run.hits+' of 3 hits.';
   document.getElementById('endWhy').textContent="What's happening here: your week tipped the balance toward stress. The thinking cortex had fewer landing spines, and the alarm neuron beside it, with plenty of spines, fired first. That is the body protecting you, not a failure.";
-  document.getElementById('endMyth').textContent='"Stress makes your whole brain weaker." The alarm road gets stronger. Try the same week with sleep or a walk added, or steer against the pull and leap at the thinking spines.';
+  document.getElementById('endMyth').textContent='"Stress makes your whole brain weaker." The survival shortcut gets stronger. Try the same week with sleep or a walk added, or steer against the pull and leap at the thinking spines.';
   var btns=document.getElementById('endBtns');btns.innerHTML='';
   [['Ride the same week',function(){closeSheets();buildRun(run.week);}],['Change the week',function(){closeSheets();openTray();}]].forEach(function(b,i){var e=document.createElement('button');e.className='btn'+(i?'':' primary');e.type='button';e.textContent=b[0];e.onclick=b[1];btns.appendChild(e);});
-  addReplayBtn();speak('The alarm road fired first.',false);setTimeout(function(){openSheet('sEnd');},700);
+  addReplayBtn();speak('The survival shortcut fired first.',false);setTimeout(function(){openSheet('sEnd');},700);
 }
 function addReplayBtn(){if(!EVT.length)return;var btns=document.getElementById('endBtns'),e=document.createElement('button');e.className='btn';e.type='button';e.textContent='Replay the last red and green';
   e.onclick=function(){closeSheets();var o=run.over;run.over=false;if(!startReplay()){run.over=o;openSheet('sEnd');return;}run.endAfter=true;};btns.appendChild(e);}
@@ -851,7 +869,7 @@ function update(dt){
   var syL=syns[run.leg];if(syL&&!syL.done&&!run.warm&&updateLanding(dt,syL)){if(toastT>0){toastT-=dt;if(toastT<=0)toastEl.style.display='none';}audioCues(dt);return;}
   // speed
   if(run.slowT>0){run.slowT-=dt;run.v+= (1.2*S.speed-run.v)*Math.min(1,dt*6);}
-  else{run.v+=(cruise-run.v)*Math.min(1,dt*(run.v>cruise?0.6:1.2));}
+  else{var tgtv=cruise*(run.surgeT>0?SURGE:1);run.surgeT=Math.max(0,(run.surgeT||0)-dt);run.v+=(tgtv-run.v)*Math.min(1,dt*(run.v>tgtv?0.6:1.6));}
   run.boostT=Math.max(0,run.boostT-dt);run.flash=Math.max(0,run.flash-dt*2.5);
   var ds=run.v*dt;var prev=run.s;run.s+=ds;
   // real distance/time
