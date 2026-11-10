@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sidewalk War v0.1: a pavement ant strategy game</title>
+<meta name="spec-source" content="claude/SPEC-SIDEWALK-WAR-2026-11-09.md">
+<meta name="audience" content="Curious players and students, about 12 and up, learning how real ant colonies forage, recognize strangers, and settle borders without a commander">
+<!--
+  TSP BUILD BANNER
+  Sidewalk War v0.1, LAB, 2026-11-09
+  A real-time strategy game about pavement ant colonies (Tetramorium immigrans)
+  fighting for a garden edge. The player is the colony's chemistry, not its general:
+  scent trails, alarm calls, and colony emphasis. Ants make their own choices.
+  Art: studio-cut, after Animata (real-time rigged shadow puppetry) and the
+  Lumino City paper-set bar: hand-cut edges, fibre noise, double shadows, rigged
+  six-legged puppets walking a tripod gait. All drawn in code, no external hosts.
+  Sources live in the FIELD NOTES array below; studio inventions are labelled there.
+-->
+<style>
+:root{
+  --paper:#f6efe0; --card:#fffaf0; --ink:#15110a; --ink2:#2e2516; --line:#6e5b36;
+  --btn:#fffaf0; --btnInk:#15110a; --on:#15110a; --onInk:#fffaf0; --focus:#0a4f8a;
+  color-scheme: light;
+}
+html[data-mode="dark"]{
+  --paper:#14120f; --card:#211d17; --ink:#f4f1ea; --ink2:#e4ddcd; --line:#a39370;
+  --btn:#211d17; --btnInk:#f4f1ea; --on:#f4f1ea; --onInk:#14120f; --focus:#8cc8ff;
+  color-scheme: dark;
+}
+html[data-mode="sharp"]{
+  --paper:#ffffff; --card:#ffffff; --ink:#000000; --ink2:#000000; --line:#000000;
+  --btn:#ffffff; --btnInk:#000000; --on:#000000; --onInk:#ffffff; --focus:#0040c0;
+  color-scheme: light;
+}
+html[data-light="dusk"],html[data-light="night"]{
+    --paper:#14120f; --card:#211d17; --ink:#f4f1ea; --ink2:#e4ddcd; --line:#a39370;
+    --btn:#211d17; --btnInk:#f4f1ea; --on:#f4f1ea; --onInk:#14120f; --focus:#8cc8ff;
+    color-scheme: dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-mode]){
+    --paper:#14120f; --card:#211d17; --ink:#f4f1ea; --ink2:#e4ddcd; --line:#a39370;
+    --btn:#211d17; --btnInk:#f4f1ea; --on:#f4f1ea; --onInk:#14120f; --focus:#8cc8ff;
+    color-scheme: dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{font:20px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
+.backdrop{position:fixed;inset:0;background:var(--paper);z-index:0}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100dvh;height:100dvh}
+.se-chrome{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:6px 10px;background:var(--card);border-bottom:2px solid var(--line)}
+.se-brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.se-chrome a,.se-rail a{color:var(--ink);text-decoration:none;font-weight:700;font-size:18px;padding:10px 12px;min-height:44px;display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:10px;background:var(--btn)}
+h1{margin:0;font:700 20px/1.2 Georgia,"Iowan Old Style",serif;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
+.ver,.tsp-labchip{font:700 18px/1 system-ui,sans-serif;padding:4px 7px;border:2px solid var(--ink);border-radius:8px;color:var(--ink);background:var(--card)}
+.modebtn{width:48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--btn);color:var(--btnInk);display:grid;place-items:center;cursor:pointer;flex:none}
+.modebtn svg{width:28px;height:28px}
+.brief{margin:0;padding:8px 12px 4px;font-size:20px;color:var(--ink)}
+.stats{display:flex;flex-wrap:wrap;gap:4px 16px;padding:2px 12px 6px;font-size:18px;font-weight:600;color:var(--ink)}
+.stats b{font-weight:800}
+.stage{position:relative;flex:1;min-height:320px;overflow:hidden;background:#2a2318;touch-action:none}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+.note{position:absolute;left:10px;right:10px;bottom:10px;max-width:640px;margin:0 auto;background:var(--card);color:var(--ink);border:2px solid var(--ink);border-radius:6px;padding:12px 56px 12px 14px;box-shadow:4px 5px 0 rgba(0,0,0,.35),9px 12px 18px rgba(0,0,0,.25);transform:rotate(-0.6deg);display:none}
+.note.show{display:block}
+.note h2{margin:0 0 4px;font:700 20px/1.2 Georgia,serif}
+.note p{margin:0;font-size:18px;line-height:1.35}
+.note .src{margin-top:6px;font-size:18px;font-style:italic;color:var(--ink2)}
+.note .x{position:absolute;top:6px;right:6px;width:44px;height:44px;border:2px solid var(--line);border-radius:8px;background:var(--btn);color:var(--btnInk);font-size:22px;font-weight:800;cursor:pointer}
+.controls{display:flex;flex-wrap:wrap;gap:8px;padding:8px 10px;background:var(--card);border-top:2px solid var(--line)}
+.grp{display:flex;gap:6px;flex-wrap:nowrap}
+.controls button{min-height:48px;min-width:48px;padding:8px 12px;font:700 18px/1.1 system-ui,sans-serif;color:var(--btnInk);background:var(--btn);border:2px solid var(--line);border-radius:10px;cursor:pointer}
+.controls button[hidden]{display:none}
+.controls button{font-weight:500}
+.controls #tTrail[aria-pressed="true"],.controls #tAlarm[aria-pressed="true"]{font-weight:800}
+.controls button[aria-pressed="true"]{background:var(--on);color:var(--onInk);border-color:var(--on)}
+button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offset:2px}
+.se-rail{display:flex;gap:10px;justify-content:space-between;padding:6px 10px;background:var(--card);border-top:2px solid var(--line)}
+.sheet{position:absolute;inset:0;background:rgba(10,8,5,.55);display:none;align-items:center;justify-content:center;padding:12px;z-index:5}
+.sheet.show{display:flex}
+.sheet .panel{background:var(--card);color:var(--ink);border:2px solid var(--ink);border-radius:8px;max-width:680px;width:100%;max-height:100%;overflow:auto;padding:16px 18px}
+.sheet h2{margin:0 0 8px;font:700 22px/1.2 Georgia,serif}
+.sheet h3{margin:14px 0 2px;font:700 20px/1.2 Georgia,serif}
+.sheet p{margin:0 0 4px;font-size:18px}
+.sheet .src{font-style:italic;color:var(--ink2)}
+.sheet .row{display:flex;gap:10px;justify-content:flex-end;margin-top:12px;position:sticky;bottom:-16px;background:var(--card);padding:8px 0}
+.sheet button{min-height:52px;padding:8px 16px;font:700 18px system-ui,sans-serif;background:var(--on);color:var(--onInk);border:2px solid var(--on);border-radius:10px;cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.short{display:none}
+@media (max-width:560px){ .se-brand{flex-basis:100%} .se-chrome a{padding:8px 10px} .brief{font-size:18px;padding-top:6px} .long{display:none} .short{display:inline} .controls{gap:6px} .controls button{padding:8px 10px} .note .src{display:none} .note{padding:10px 54px 10px 12px} }
+</style>
+</head>
+<body>
+<div class="backdrop" aria-hidden="true"></div>
+<div class="app">
+  <header class="se-chrome">
+    <div class="se-brand">
+      <h1>Sidewalk War <span class="ver">v0.1</span><span class="tsp-labchip">LAB</span></h1>
+    </div>
+    <a href="../index.html">Studio</a>
+    <a href="../arcade.html">Cabinet</a>
+    <button class="modebtn" id="modeBtn" aria-label="Mode: Light. Next: Dark.">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
+    </button>
+  </header>
+  <p class="brief" id="brief"><span class="long">Your pavement ant colony lives under the left sidewalk crack. Tap the ground to lay a scent trail to food, and hold the garden where the aphids live before the summer flight.</span><span class="short">Tap to lay scent. Win the aphid garden.</span></p>
+  <div class="stats" id="stats" aria-hidden="true"></div>
+  <div class="stage" id="stage" data-art-class="studio-cut">
+    <canvas id="cv" role="img" aria-label="A garden bed above a concrete sidewalk and a strip of lawn. Two pavement ant colonies forage and fight across it."></canvas>
+    <div class="note" id="note" role="status" aria-live="polite">
+      <h2 id="noteH"></h2><p id="noteP"></p><p class="src" id="noteS"></p>
+      <button class="x" id="noteX" aria-label="Close field note">X</button>
+    </div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH">
+      <div class="panel"><h2 id="sheetH">Field notes</h2><div id="sheetBody"></div>
+        <div class="row"><button id="sheetBtn">Back to the sidewalk</button></div></div>
+    </div>
+  </div>
+  <div class="controls" role="toolbar" aria-label="Colony controls">
+    <div class="grp" role="group" aria-label="What a tap does">
+      <button id="tTrail" aria-pressed="true">Scent trail</button>
+      <button id="tAlarm" aria-pressed="false" hidden>Alarm call</button>
+      <button id="bNotes">Notes</button>
+    </div>
+    <div class="grp" role="group" aria-label="Colony emphasis">
+      <button id="eForage" aria-pressed="true">Forage</button>
+      <button id="eBrood" aria-pressed="false">Brood</button>
+      <button id="eMuster" aria-pressed="false">Muster</button>
+      <button id="bPause" aria-pressed="false">Pause</button>
+    </div>
+  </div>
+  <nav class="se-rail" aria-label="Site">
+    <a href="index.html">Back</a>
+    <a href="../index.html">Home</a>
+  </nav>
+</div>
+<div class="sr" id="live" aria-live="polite"></div>
+<script>
+"use strict";
+/* ---------------- FIELD NOTES (research first; studio inventions labelled) ---------------- */
+const NOTES = {
+  colony:{h:"Meet the pavement ant",p:"These are Tetramorium immigrans. Biologists split them from the European T. caespitum in 2017, after DNA work showed that North America's pavement ant was its own species.",s:"Wagner et al. 2017, Myrmecological News 25: 95-129."},
+  scale:{h:"How to read the board",p:"Each ant you see stands for 20 workers, and one game day stands for about a week of spring. Your colony carries an amber dot and the rival carries a pale dash, the way field researchers paint-mark ants.",s:"Studio staging."},
+  trail:{h:"The scent road",p:"A forager that finds food walks home laying a scent trail. Nestmates follow the strongest scent, and each one that finds food adds more. No ant gives orders; the trail does the organizing.",s:"van Oudenhove et al. 2012, J. Chemical Ecology 38: 802-809 (mass recruitment)."},
+  fade:{h:"Scent fades",p:"Trail scent evaporates. When a food source runs out, nobody refreshes its trail, so it fades and the colony stops sending ants there. Heat speeds the fading.",s:"van Oudenhove et al. 2012, J. Chemical Ecology 38: 802-809."},
+  recognize:{h:"Friend or stranger",p:"Ants tell nestmates from strangers by touching them with their antennae. Every colony wears its own blend of waxy hydrocarbons on the body, and the blend is the badge.",s:"Sano, Bannon & Greene 2018, J. Insect Behavior 31: 186-199."},
+  decide:{h:"Who chooses to fight",p:"Smelling a stranger does not start a fight by itself. A worker fights more readily when it has just met nestmates and when a crowd is already fighting.",s:"Greene, SICB 2013 meeting abstract 49.2; Hoover et al. 2016, Current Zoology 62: 277-284."},
+  war:{h:"A war of pushing",p:"Pavement ant wars are mostly ritual. Pairs lock mandibles and push for hours, and few ants die. The wars likely settle borders by showing how big each colony is.",s:"Plowes 2008, cited in Sano, Bannon & Greene 2018 and Hoover et al. 2016."},
+  recruit:{h:"Run for help",p:"Some ants skip the fight and run home to recruit more workers. That feedback can grow a sidewalk war in about thirty minutes.",s:"Sano, Bannon & Greene 2018, citing Hoover et al. 2016 and Plowes 2008."},
+  workers:{h:"No soldiers here",p:"Pavement ant workers are all one size, so the colony has no soldier caste. Older workers forage and defend, and younger workers tend the brood underground.",s:"Wikipedia, Tetramorium immigrans; AntWiki."},
+  aphids:{h:"The aphid garden",p:"Pavement ants collect honeydew, the sugary waste aphids leave on plants. The aphids keep making it, so the garden pays every day for the colony that holds it.",s:"AntWiki, Tetramorium immigrans; Wikipedia."},
+  seeds:{h:"Seed raiders",p:"Pavement ants raid seed beds and eat insects, both dead and alive, along with almost any human food that hits the pavement.",s:"AntWiki, Tetramorium immigrans; MacGown & Whitehouse, Mississippi Entomological Museum."},
+  brood:{h:"Food becomes ants, slowly",p:"The queen lays eggs, workers feed the larvae, and pupae become new workers. A colony that stops foraging today feels it weeks later.",s:"General ant life cycle; the timing here is studio staging."},
+  rain:{h:"Rain on the sidewalk",p:"Here the rain washes trail scent away and sends foragers underground. The sources in these notes do not measure rain, so treat this as a studio guess.",s:"Studio invention."},
+  season:{h:"Spring is war season",p:"Field observers see pavement ant wars mostly in spring and early summer, while colonies set their territories.",s:"Field observation, Cortez, Colorado, 2021 (tightloop.com); Something's Crawling in My Hair, 2023."},
+  flight:{h:"The summer flight",p:"In summer, winged queens and males leave the nest to mate. A queen that survives the flight can found a new colony on her own.",s:"AntWiki records of sexuals (around 27 June); Wikipedia, Tetramorium immigrans."}
+};
+const seen = new Set(); const queue = [];
+
+/* ---------------- DOM ---------------- */
+const $ = id=>document.getElementById(id);
+const cv=$("cv"), ctx=cv.getContext("2d"), stage=$("stage");
+const live=$("live");
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------------- MODES (three on one button) ---------------- */
+const MODES=["light","dark","sharp"], MODE_NAME={light:"Light",dark:"Dark",sharp:"Sharp"};
+let mode;
+function sysDark(){ try{return matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){return false;} }
+function setMode(m){ mode=m; document.documentElement.setAttribute("data-mode",m);
+  const nx=MODES[(MODES.indexOf(m)+1)%3];
+  $("modeBtn").setAttribute("aria-label","Mode: "+MODE_NAME[m]+". Next: "+MODE_NAME[nx]+".");
+  try{localStorage.setItem("sw-mode",m);}catch(e){}
+  bgDirty=true; }
+$("modeBtn").onclick=()=>setMode(MODES[(MODES.indexOf(mode)+1)%3]);
+
+/* ---------------- WORLD ---------------- */
+let W=1000, H=760, scale=1, ox=0, oy=0, dpr=1;
+const CELL=12; let GX,GY;
+let trail=[], war=[];       // per colony Float32Array
+const TC=50; let TX,TY, ctrl;
+let foods=[], colonies=[], ants=[], pairs=[], fx=[];
+let bg=null, bgDirty=true;
+let day=1, dayT=0, DAYLEN=35, DAYS=12, rainT=0, paused=false, over=false, time=0;
+let tool="trail", cursor={x:500,y:400,show:false};
+let rng = mulberry(20261109);
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+const R=()=>Math.random();
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const dist2=(a,b,c,d)=>(a-c)*(a-c)+(b-d)*(b-d);
+
+function newGame(){
+  const r=stage.getBoundingClientRect();
+  W = clamp(Math.round(r.width*1.45),560,1000);
+  H = clamp(Math.round(W*(r.height/Math.max(1,r.width))),380,1500);
+  GX=Math.ceil(W/CELL); GY=Math.ceil(H/CELL);
+  trail=[new Float32Array(GX*GY),new Float32Array(GX*GY)];
+  war=[new Float32Array(GX*GY),new Float32Array(GX*GY)];
+  TX=Math.ceil(W/TC); TY=Math.ceil(H/TC); ctrl=new Float32Array(TX*TY);
+  const gy=H*0.30, sy=H*0.74; // garden bottom edge, sidewalk bottom edge
+  world.gy=gy; world.sy=sy;
+  colonies=[
+    mkColony(0,"Your colony",W*0.2,H*0.52),
+    mkColony(1,"Rival colony",W*0.8,H*0.52)];
+  colonies[1].emph="forage";
+  foods=[
+    {kind:"aphids",name:"aphid garden",x:W*0.5,y:gy*0.48,r:46,amt:40,max:40,regen:0.7,val:1.0},
+    {kind:"crumb",name:"pretzel crumb",x:W*0.5,y:H*0.6,r:24,amt:110,max:110,regen:0,val:0.8},
+    {kind:"seeds",name:"spilled seeds",x:W*0.28,y:sy+(H-sy)*0.55,r:30,amt:70,max:70,regen:0,val:0.6},
+    {kind:"beetle",name:"dead beetle",x:W*0.73,y:sy+(H-sy)*0.5,r:26,amt:60,max:60,regen:0,val:1.2}];
+  ants=[]; pairs=[]; fx=[];
+  for(const c of colonies){ for(let i=0;i<14;i++) spawn(c); }
+  $("tAlarm").hidden=true; setTool("trail"); day=1; dayT=0; rainT=0; over=false; time=0; seen.clear(); queue.length=0; flags={};
+  bgDirty=true; fit();
+  setTimeout(()=>note("colony"),2500); setTimeout(()=>note("scale"),12000);
+}
+const world={gy:0,sy:0};
+let flags={};
+function mkColony(id,name,x,y){ return {id,name,nest:{x,y},food:24,inside:36,brood:[],emph:"forage",alarmT:0,layT:0,lost:0,born:0,queens:0,aiT:0}; }
+function spawn(c){
+  ants.push({c:c.id,x:c.nest.x+(R()-.5)*8,y:c.nest.y+(R()-.5)*8,a:R()*6.283,st:"out",load:0,t:22+R()*20,ph:R()*6.28,foe:null,mate:0,rt:0});
+}
+function total(c){ let n=c.inside; for(const a of ants) if(a.c===c.id) n++; return n; }
+function surface(c){ let n=0; for(const a of ants) if(a.c===c.id) n++; return n; }
+
+/* ---------------- GRID HELPERS ---------------- */
+function gi(x,y){ const i=(x/CELL)|0, j=(y/CELL)|0; if(i<0||j<0||i>=GX||j>=GY) return -1; return j*GX+i; }
+function sample(g,x,y){ const k=gi(x,y); return k<0?0:g[k]; }
+function deposit(g,x,y,q,cap){ const k=gi(x,y); if(k>=0) g[k]=Math.min(cap,g[k]+q); }
+function paintLine(g,x0,y0,x1,y1,q,cap){
+  const d=Math.hypot(x1-x0,y1-y0), n=Math.ceil(d/6); const wob=R()*6.28;
+  for(let s=0;s<=n;s++){ const u=s/n; const w=Math.sin(u*9+wob)*10*Math.sin(u*Math.PI);
+    const nx=-(y1-y0)/d, ny=(x1-x0)/d;
+    deposit(g,x0+(x1-x0)*u+nx*w,y0+(y1-y0)*u+ny*w,q,cap); }
+}
+
+/* ---------------- PLAYER ACTIONS ---------------- */
+function applyTool(x,y){
+  if(over) return;
+  const c=colonies[0];
+  if(tool==="trail"){
+    paintLine(trail[0],c.nest.x,c.nest.y,x,y,0.9,1.6);
+    for(let i=0;i<3&&c.inside>0;i++){ c.inside--; spawn(c); const a=ants[ants.length-1]; a.a=Math.atan2(y-c.nest.y,x-c.nest.x); }
+    fx.push({k:"ring",x,y,t:0,col:0});
+    if(!flags.trailNoted){flags.trailNoted=1; setTimeout(()=>note("trail"),1500);}
+  } else {
+    paintLine(war[0],c.nest.x,c.nest.y,x,y,1.2,2);
+    for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++) deposit(war[0],x+dx*CELL,y+dy*CELL,1.5,2.5);
+    c.alarmT=12; fx.push({k:"alarm",x,y,t:0});
+    say("Alarm call. Workers pour out toward the spot you marked.");
+  }
+}
+function setTool(t){ tool=t; $("tTrail").setAttribute("aria-pressed",t==="trail"); $("tAlarm").setAttribute("aria-pressed",t==="alarm"); }
+function setEmph(e){ colonies[0].emph=e; for(const [id,v] of [["eForage","forage"],["eBrood","brood"],["eMuster","muster"]]) $(id).setAttribute("aria-pressed",e===v);
+  if(e==="brood" && !flags.broodN){flags.broodN=1; note("brood");}
+  if(e==="muster" && !flags.workN){flags.workN=1; note("workers");} }
+$("tTrail").onclick=()=>setTool("trail"); $("tAlarm").onclick=()=>setTool("alarm");
+$("eForage").onclick=()=>setEmph("forage"); $("eBrood").onclick=()=>setEmph("brood"); $("eMuster").onclick=()=>setEmph("muster");
+$("bPause").onclick=()=>{ paused=!paused; $("bPause").setAttribute("aria-pressed",paused); $("bPause").textContent=paused?"Resume":"Pause"; };
+$("bNotes").onclick=()=>openNotes();
+$("sheetBtn").onclick=()=>closeSheet();
+
+function toWorld(e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left-ox)/scale, y:(e.clientY-r.top-oy)/scale}; }
+cv.addEventListener("pointerdown",e=>{ const p=toWorld(e); if(p.x<0||p.y<0||p.x>W||p.y>H) return; cursor.show=false; applyTool(p.x,p.y); });
+document.addEventListener("keydown",e=>{
+  if($("sheet").classList.contains("show")){ if(e.key==="Escape"||e.key==="Enter"){closeSheet();e.preventDefault();} return; }
+  const k=e.key, step=e.shiftKey?60:24;
+  if(k.startsWith("Arrow")){ cursor.show=true; if(k==="ArrowLeft")cursor.x-=step; if(k==="ArrowRight")cursor.x+=step; if(k==="ArrowUp")cursor.y-=step; if(k==="ArrowDown")cursor.y+=step;
+    cursor.x=clamp(cursor.x,0,W); cursor.y=clamp(cursor.y,0,H); e.preventDefault(); return; }
+  if(k==="Enter" && cursor.show && document.activeElement===document.body){ applyTool(cursor.x,cursor.y); e.preventDefault(); }
+  if(k===" " && document.activeElement===document.body){ $("bPause").click(); e.preventDefault(); }
+  if(k==="t"||k==="T") setTool("trail"); if((k==="a"||k==="A") && !$("tAlarm").hidden) setTool("alarm");
+  if(k==="1") setEmph("forage"); if(k==="2") setEmph("brood"); if(k==="3") setEmph("muster");
+  if(k==="n"||k==="N") openNotes();
+});
+
+/* ---------------- NOTES UI ---------------- */
+let noteTimer=0;
+function note(id){ if(seen.has(id)||!NOTES[id]) return; seen.add(id); queue.push(id); if(!$("note").classList.contains("show")) nextNote(); }
+function nextNote(){ const id=queue.shift(); if(!id){ $("note").classList.remove("show"); return; }
+  const n=NOTES[id]; $("noteH").textContent=n.h; $("noteP").textContent=n.p; $("noteS").textContent="Source: "+n.s;
+  $("note").classList.add("show"); noteTimer=11; }
+$("noteX").onclick=()=>{ noteTimer=0; nextNote(); };
+function openNotes(){ const b=$("sheetBody"); b.innerHTML="";
+  const ids=Object.keys(NOTES).filter(k=>seen.has(k));
+  const p=document.createElement("p"); p.textContent=ids.length+" of "+Object.keys(NOTES).length+" notes found. Play on to find the rest."; b.appendChild(p);
+  for(const k of ids){ const n=NOTES[k]; const h=document.createElement("h3"); h.textContent=n.h; const t=document.createElement("p"); t.textContent=n.p; const s=document.createElement("p"); s.className="src"; s.textContent="Source: "+n.s; b.append(h,t,s); }
+  $("sheetH").textContent="Field notes"; $("sheetBtn").textContent="Back to the sidewalk"; $("sheetBtn").onclick=closeSheet;
+  $("sheet").classList.add("show"); wasPaused=paused; paused=true; $("sheetBtn").focus(); }
+let wasPaused=false;
+function closeSheet(){ $("sheet").classList.remove("show"); paused=wasPaused; }
+let lastSay=0;
+function say(t){ live.textContent=t; }
+
+/* ---------------- SIMULATION ---------------- */
+const SPEED=46;
+function step(dt){
+  time+=dt;
+  // season clock
+  dayT+=dt; if(dayT>=DAYLEN){ dayT=0; day++;
+    if(day===5||day===9){ rainT=8; note("rain"); say("Rain on day "+day+". Trails wash away and foragers head underground."); }
+    if(day===3) note("season");
+    if(day>DAYS){ endSeason(); return; }
+    if(day%3===0) say("Day "+day+" of "+DAYS+". You hold "+Math.round(share()*100)+" percent of the ground."); }
+  if(rainT>0) rainT-=dt;
+  // evaporation
+  const ev=Math.pow(rainT>0?0.55:0.93,dt), evw=Math.pow(rainT>0?0.5:0.80,dt);
+  for(let c=0;c<2;c++){ const g=trail[c], w=war[c]; for(let k=0;k<g.length;k++){ g[k]*=ev; w[k]*=evw; } }
+  // food regen
+  for(const f of foods){ if(f.regen) f.amt=Math.min(f.max,f.amt+f.regen*dt); }
+  // colonies
+  for(const c of colonies) colonyStep(c,dt);
+  // ants
+  for(const a of ants) antStep(a,dt);
+  encounters();
+  pairStep(dt);
+  ants=ants.filter(a=>!a.dead);
+  // territory every frame (cheap)
+  territory(dt);
+  for(const f of fx) f.t+=dt; fx=fx.filter(f=>f.t<(f.k==="ring"?1.2:f.k==="alarm"?1.6:f.k==="dust"?0.6:3));
+  if(noteTimer>0){ noteTimer-=dt; if(noteTimer<=0) nextNote(); }
+}
+function colonyStep(c,dt){
+  const tot=total(c), surf=surface(c);
+  c.food-=tot*0.0045*dt; if(c.food<0){ c.food=0; c.starve=(c.starve||0)+dt; if(c.starve>3&&c.inside>0){c.inside--;c.lost++;c.starve=0;} }
+  // emergence
+  let frac={forage:0.5,brood:0.28,muster:0.72}[c.emph];
+  if(c.alarmT>0){ c.alarmT-=dt; frac+=0.2; }
+  if(rainT>0) frac*=0.15;
+  c.emT=(c.emT||0)-dt;
+  if(c.emT<=0 && c.inside>0 && surf<frac*tot){ c.inside--; spawn(c); c.emT=0.35; }
+  // brood pipeline
+  c.layT-=dt;
+  const layEvery = c.emph==="brood"?2.2:3.6;
+  if(c.layT<=0 && c.food>3 && c.brood.length<14){ c.brood.push({st:0,t:7}); c.food-=0.4; c.layT=layEvery; }
+  const larvaRate = c.emph==="brood"?1.7:1;
+  for(const b of c.brood){
+    if(b.st===1){ if(c.food>0.2){ b.t-=dt*larvaRate; c.food-=0.12*dt*larvaRate; } }
+    else b.t-=dt;
+    if(b.t<=0){ b.st++; b.t= b.st===1?12:8; if(b.st===3){ c.inside++; c.born++; b.done=1; } }
+  }
+  c.brood=c.brood.filter(b=>!b.done);
+  if(c.id===1) rivalAI(c,dt);
+}
+function rivalAI(c,dt){
+  c.aiT-=dt; if(c.aiT>0) return; c.aiT=2.5;
+  const tot=total(c);
+  let threat=0; for(const p of pairs) if(Math.abs(p.mx-c.nest.x)<W*0.45) threat++;
+  if(c.food<tot*0.25) c.emph="forage";
+  else if(threat>3) c.emph= R()<0.7?"muster":"forage";
+  else c.emph= R()<0.45?"brood":"forage";
+  if(threat>5 && R()<0.35){ const p=pairs[(R()*pairs.length)|0]; paintLine(war[1],c.nest.x,c.nest.y,p.mx,p.my,1.1,2); c.alarmT=10; }
+  if(R()<0.12){ const f=R()<0.5?foods[0]:foods[(R()*foods.length)|0]; if(f.amt>3) paintLine(trail[1],c.nest.x,c.nest.y,f.x,f.y,0.8,1.6); }
+}
+function sense(a,x,y){
+  const c=a.c, mw = colonies[c].emph==="muster"?2.2:1.0;
+  return sample(trail[c],x,y) + mw*sample(war[c],x,y)*1.4;
+}
+function antStep(a,dt){
+  if(a.st==="fight") return;
+  const c=colonies[a.c];
+  a.ph+=dt*(reduced?6:16);
+  if(a.st==="out"){
+    a.t-=dt; if(a.t<=0||rainT>0) a.st="return";
+    // sensors
+    const d=14, s=0.55;
+    const l=sense(a,a.x+Math.cos(a.a-s)*d,a.y+Math.sin(a.a-s)*d);
+    const m=sense(a,a.x+Math.cos(a.a)*d,a.y+Math.sin(a.a)*d);
+    const r=sense(a,a.x+Math.cos(a.a+s)*d,a.y+Math.sin(a.a+s)*d);
+    if(m+l+r>0.04){ if(l>m&&l>r) a.a-=2.2*dt; else if(r>m&&r>l) a.a+=2.2*dt;
+      // prefer moving away from nest along trail
+      const away=Math.atan2(a.y-c.nest.y,a.x-c.nest.x); let df=away-a.a; df=Math.atan2(Math.sin(df),Math.cos(df)); a.a+=df*0.25*dt; }
+    a.a+=(R()-.5)*2.6*dt*(m>0.2?0.4:1);
+    // food
+    for(const f of foods){ if(f.amt>=1 && dist2(a.x,a.y,f.x,f.y)<f.r*f.r){ f.amt-=1; a.load=f.val; a.food=f.kind; a.st="home";
+      if(!flags["f_"+f.kind]){ flags["f_"+f.kind]=1; if(f.kind==="aphids") note("aphids"); if(f.kind==="seeds"||f.kind==="beetle") note("seeds"); }
+      if(f.amt<1 && !flags.fadeN && a.c===0){ flags.fadeN=1; setTimeout(()=>note("fade"),4000); }
+      break; } }
+  }
+  if(a.st==="home"||a.st==="return"||a.st==="recruit"){
+    const ang=Math.atan2(c.nest.y-a.y,c.nest.x-a.x); let df=ang-a.a; df=Math.atan2(Math.sin(df),Math.cos(df)); a.a+=df*3.2*dt+(R()-.5)*1.4*dt;
+    if(a.st==="home") deposit(trail[a.c],a.x,a.y,0.10*a.load*dt*10,1.8);
+    if(a.st==="recruit") deposit(war[a.c],a.x,a.y,0.16*dt*10,2.2);
+    if(dist2(a.x,a.y,c.nest.x,c.nest.y)<14*14){
+      if(a.st==="home"){ c.food+=a.load*2.2; a.load=0; a.food=null; }
+      if(a.st==="recruit"){ c.alarmT=Math.max(c.alarmT,8); }
+      const tot=total(c), surf=surface(c);
+      let frac={forage:0.5,brood:0.28,muster:0.72}[c.emph]; if(c.alarmT>0) frac+=0.2; if(rainT>0) frac*=0.15;
+      if(a.st==="return" || surf>frac*tot){ a.dead=true; c.inside++; return; }
+      a.st="out"; a.t=22+R()*20; a.a+=Math.PI+(R()-.5);
+    }
+  }
+  const sp=SPEED*(a.st==="recruit"?1.35:1)*(a.load?0.85:1);
+  a.x+=Math.cos(a.a)*sp*dt; a.y+=Math.sin(a.a)*sp*dt;
+  if(a.x<6){a.x=6;a.a=Math.PI-a.a;} if(a.x>W-6){a.x=W-6;a.a=Math.PI-a.a;}
+  if(a.y<6){a.y=6;a.a=-a.a;} if(a.y>H-6){a.y=H-6;a.a=-a.a;}
+}
+function encounters(){
+  // spatial hash
+  const B=40, cols=Math.ceil(W/B), hash=new Map();
+  for(let i=0;i<ants.length;i++){ const a=ants[i]; const k=((a.y/B)|0)*cols+((a.x/B)|0); let v=hash.get(k); if(!v){v=[];hash.set(k,v);} v.push(a); }
+  const near=(x,y,rad,fn)=>{ const i0=((x-rad)/B)|0,i1=((x+rad)/B)|0,j0=((y-rad)/B)|0,j1=((y+rad)/B)|0;
+    for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){ const v=hash.get(j*cols+i); if(v) for(const b of v) fn(b); } };
+  for(const a of ants){
+    if(a.st==="fight"||a.dead) continue;
+    // recent nestmate contact
+    let mates=0; near(a.x,a.y,34,b=>{ if(b!==a && b.c===a.c && dist2(a.x,a.y,b.x,b.y)<34*34) mates++; });
+    if(mates>0) a.mate=time;
+    let foe=null; near(a.x,a.y,10,b=>{ if(!foe && b.c!==a.c && b.st!=="fight" && !b.dead && dist2(a.x,a.y,b.x,b.y)<10*10) foe=b; });
+    if(!foe) continue;
+    if(!flags.meet){ flags.meet=1; note("recognize"); $("tAlarm").hidden=false; say("Your ants met the rival. Alarm call is ready."); }
+    let crowd=0; for(const p of pairs) if(dist2(p.mx,p.my,a.x,a.y)<60*60) crowd++;
+    const recent = time-a.mate<3;
+    const pf = (recent?0.55:0.12) + Math.min(0.35,crowd*0.06);
+    if(R()<pf*0.6){ // lock the pair
+      const p={a,b:foe,mx:(a.x+foe.x)/2,my:(a.y+foe.y)/2,ang:Math.atan2(foe.y-a.y,foe.x-a.x),t:5+R()*8};
+      a.st=foe.st="fight"; a.foe=foe; foe.foe=a; a.load=0; foe.load=0; pairs.push(p);
+      if(!flags.decide && pairs.length>2){ flags.decide=1; note("decide"); }
+    } else if(!recent && R()<0.5){ a.st="recruit"; if(!flags.recruitN && pairs.length>3){flags.recruitN=1; note("recruit");} }
+    else { a.a+=Math.PI*(0.6+R()*0.8); }
+  }
+  if(pairs.length>=6 && !flags.war){ flags.war=1; note("war"); const p=pairs[0]; say("A sidewalk war has started "+where(p.mx,p.my)+".");}
+  if(pairs.length===0 && flags.war && !flags.warEndSaid){ flags.warEndSaid=1; }
+}
+function where(x,y){ const h=x<W*0.38?"on the left":x>W*0.62?"on the right":"in the middle"; const v=y<world.gy?"of the garden":y>world.sy?"of the lawn":"of the sidewalk"; return h+" "+v; }
+function support(c,x,y){ let n=0; for(const a of ants) if(a.c===c && dist2(a.x,a.y,x,y)<55*55) n+= a.st==="fight"?1:0.7; return n; }
+function pairStep(dt){
+  for(const p of pairs){
+    p.t-=dt;
+    const sa=support(p.a.c,p.mx,p.my), sb=support(p.b.c,p.mx,p.my);
+    // push: drift toward weaker side's nest
+    const push=clamp((sa-sb)*0.9,-6,6);
+    const nb=colonies[p.b.c].nest, na=colonies[p.a.c].nest;
+    const tx= push>0? nb.x-p.mx : na.x-p.mx, ty= push>0? nb.y-p.my : na.y-p.my, tl=Math.hypot(tx,ty)||1;
+    p.mx+=tx/tl*Math.abs(push)*dt; p.my+=ty/tl*Math.abs(push)*dt;
+    const j=reduced?0:Math.sin(time*23+p.mx)*1.6;
+    p.a.x=p.mx-Math.cos(p.ang)*5+j*0.4; p.a.y=p.my-Math.sin(p.ang)*5;
+    p.b.x=p.mx+Math.cos(p.ang)*5-j*0.4; p.b.y=p.my+Math.sin(p.ang)*5;
+    if(R()<dt*1.5) fx.push({k:"dust",x:p.mx+(R()-.5)*14,y:p.my+(R()-.5)*14,t:0});
+    if(p.t<=0){
+      // ritual: few die. weaker side slightly more likely to lose one.
+      const weakA = sa<sb;
+      const die = R()<0.05;
+      const victim = die ? (R()<(weakA?0.7:0.3)? p.a : p.b) : null;
+      for(const x of [p.a,p.b]){ x.foe=null; if(x===victim){ x.dead=true; colonies[x.c].lost++; } else { x.st= R()<0.5?"out":"return"; x.t=10+R()*10; x.a=Math.atan2(x.y-colonies[x.c].nest.y,x.x-colonies[x.c].nest.x)+(R()-.5); } }
+      p.done=1;
+    }
+  }
+  pairs=pairs.filter(p=>!p.done);
+}
+function territory(dt){
+  const pres=[new Float32Array(TX*TY),new Float32Array(TX*TY)];
+  for(const a of ants){ const k=((a.y/TC)|0)*TX+((a.x/TC)|0); if(k>=0&&k<pres[0].length) pres[a.c][k]+= a.st==="fight"?2:1; }
+  const kk=1-Math.pow(0.6,dt);
+  for(let k=0;k<ctrl.length;k++){ const d=pres[0][k]-pres[1][k]; if(d!==0) ctrl[k]+= (Math.tanh(d/2)-ctrl[k])*kk; else ctrl[k]*=Math.pow(0.985,dt); }
+  const sm=new Float32Array(ctrl.length);
+  for(let j=0;j<TY;j++)for(let i=0;i<TX;i++){ let t=0,n=0; for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){ const ii=i+di,jj=j+dj; if(ii<0||jj<0||ii>=TX||jj>=TY) continue; const w=(di||dj)?1:3; t+=ctrl[jj*TX+ii]*w; n+=w; } sm[j*TX+i]=t/n; }
+  const mix=1-Math.pow(0.5,dt); for(let k=0;k<ctrl.length;k++) ctrl[k]+= (sm[k]-ctrl[k])*mix;
+  for(const c of colonies){ const i=(c.nest.x/TC)|0,j=(c.nest.y/TC)|0; for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){ const k=(j+dj)*TX+(i+di); if(k>=0&&k<ctrl.length) ctrl[k]= c.id===0?1:-1; } }
+}
+function share(){ let m=0,t=0; for(let k=0;k<ctrl.length;k++){ if(ctrl[k]>0.15){m++;t++;} else if(ctrl[k]<-0.15) t++; } return t?m/t:0.5; }
+function gardenHolder(){ const f=foods[0]; let s=0,n=0; for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){ const k=(((f.y/TC)|0)+dj)*TX+((f.x/TC)|0)+di; if(k>=0&&k<ctrl.length){s+=ctrl[k];n++;} } s/=n||1; return s>0.15?0:s<-0.15?1:-1; }
+let lastHolder=-1;
+
+function endSeason(){
+  over=true; note("flight");
+  const hold=gardenHolder(), sh=share();
+  for(const c of colonies){ const terr = c.id===0?sh:1-sh;
+    c.queens=Math.max(0,Math.round(c.food/6 + total(c)/6 + terr*14 + (hold===c.id?6:0))); }
+  for(const c of colonies) for(let i=0;i<Math.min(28,c.queens);i++) fx.push({k:"alate",x:c.nest.x+(R()-.5)*30,y:c.nest.y,t:-R()*2,c:c.id,dx:(R()-.5)*30});
+  const me=colonies[0].queens, them=colonies[1].queens;
+  const win=me>them;
+  setTimeout(()=>{
+    const b=$("sheetBody"); b.innerHTML="";
+    const lines=[
+      "Your colony sent "+me+" winged queens into the summer air. The rival sent "+them+".",
+      win?"Your colony out-flew its neighbor. The border you pushed and the food you stored became queens.":
+          (me===them?"The two colonies flew even. The border held where the wars put it.":"The rival out-flew you this season. More ground and more stored food would have raised more queens."),
+      "You held "+Math.round(sh*100)+" percent of the ground at the end, and the garden was "+(hold===0?"yours":hold===1?"the rival's":"open ground")+".",
+      "Your colony raised "+colonies[0].born*20+" new workers and lost "+colonies[0].lost*20+".",
+      "You found "+seen.size+" of "+Object.keys(NOTES).length+" field notes. Open Notes to read them again."];
+    for(const t of lines){ const p=document.createElement("p"); p.textContent=t; b.appendChild(p); }
+    $("sheetH").textContent= win?"The summer flight: your colony wins":"The summer flight";
+    $("sheetBtn").textContent="Start a new spring"; $("sheetBtn").onclick=()=>{ $("sheet").classList.remove("show"); paused=false; newGame(); };
+    $("sheet").classList.add("show"); $("sheetBtn").focus();
+    say(lines[0]);
+  },4200);
+}
+
+/* ---------------- ART: studio-cut paper set ---------------- */
+function noise(seed){ let s=seed; return ()=>{ s=(s*16807)%2147483647; return s/2147483647; }; }
+function cutPoly(g,pts,fill,shadow){
+  // hand-cut edge: double shadow, then paper, then fibre
+  if(shadow){ g.save(); g.translate(3,4); g.fillStyle="rgba(20,12,4,.35)"; path(g,pts); g.fill(); g.translate(5,7); g.fillStyle="rgba(20,12,4,.16)"; path(g,pts); g.fill(); g.restore(); }
+  g.fillStyle=fill; path(g,pts); g.fill();
+}
+function path(g,pts){ g.beginPath(); g.moveTo(pts[0][0],pts[0][1]); for(let i=1;i<pts.length;i++) g.lineTo(pts[i][0],pts[i][1]); g.closePath(); }
+function jag(pts,amt,rnd){ const out=[]; for(let i=0;i<pts.length;i++){ const a=pts[i], b=pts[(i+1)%pts.length]; const n=Math.max(1,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/14));
+  for(let s=0;s<n;s++){ const u=s/n; out.push([a[0]+(b[0]-a[0])*u+(rnd()-.5)*amt, a[1]+(b[1]-a[1])*u+(rnd()-.5)*amt]); } } return out; }
+function fibre(g,x,y,w,h,col,n,rnd){ g.strokeStyle=col; g.lineWidth=1; for(let i=0;i<n;i++){ const px=x+rnd()*w, py=y+rnd()*h, a=rnd()*6.28, l=3+rnd()*9; g.beginPath(); g.moveTo(px,py); g.lineTo(px+Math.cos(a)*l,py+Math.sin(a)*l); g.stroke(); } }
+
+const PAL={
+  light:{soil:"#5b3a22",soil2:"#7a5233",slab:"#d9d3c4",slab2:"#cbc4b2",crack:"#2b2620",lawn:"#4f7a2e",blade:"#6f9a3c",blade2:"#3d6223",leaf:"#3f7a34",leaf2:"#5c9a46",stem:"#2f5a25",sun:"rgba(255,226,160,.30)",shade:"rgba(20,14,6,.0)",mound:"#b89a6e"},
+  dark:{soil:"#2e1d12",soil2:"#3d2a1b",slab:"#6f6a60",slab2:"#625d54",crack:"#141210",lawn:"#25401a",blade:"#36592a",blade2:"#1d3314",leaf:"#24482a",leaf2:"#33603a",stem:"#183218",sun:"rgba(120,150,220,.16)",shade:"rgba(6,8,20,.30)",mound:"#76644a"},
+  sharp:{soil:"#3a2a1a",soil2:"#3a2a1a",slab:"#f2f2f2",slab2:"#e6e6e6",crack:"#000000",lawn:"#2f6a22",blade:"#3d7d2a",blade2:"#1f4a16",leaf:"#2a6a2a",leaf2:"#2a6a2a",stem:"#174a17",sun:"rgba(255,255,255,0)",shade:"rgba(0,0,0,0)",mound:"#9a8058"}
+};
+function buildBG(){
+  bg=document.createElement("canvas"); bg.width=W; bg.height=H; const g=bg.getContext("2d"); const P=PAL[mode]; const rnd=noise(7);
+  const gy=world.gy, sy=world.sy;
+  // garden soil
+  g.fillStyle=P.soil; g.fillRect(0,0,W,gy+20);
+  fibre(g,0,0,W,gy,"rgba(255,230,190,.07)",900,rnd);
+  for(let i=0;i<160;i++){ g.fillStyle=rnd()<.5?P.soil2:"rgba(0,0,0,.18)"; g.beginPath(); g.ellipse(rnd()*W,rnd()*gy,1+rnd()*3,1+rnd()*2,rnd()*3,0,6.28); g.fill(); }
+  // plants: cut-paper bean stems with pointed leaves (no lollipop shapes)
+  const plants=[[W*0.5,gy*0.95,gy*0.9],[W*0.16,gy*0.98,gy*0.7],[W*0.84,gy*0.98,gy*0.75],[W*0.33,gy,gy*0.5],[W*0.67,gy,gy*0.55]];
+  for(const [px,py,ht] of plants){
+    const top=py-ht; g.save();
+    g.strokeStyle="rgba(15,10,4,.35)"; g.lineWidth=9; g.beginPath(); g.moveTo(px+4,py+5); g.quadraticCurveTo(px+16,top+ht*0.5,px+6,top+6); g.stroke();
+    g.strokeStyle=P.stem; g.lineWidth=7; g.beginPath(); g.moveTo(px,py); g.quadraticCurveTo(px+12,top+ht*0.5,px+2,top); g.stroke();
+    const nl=Math.round(ht/34);
+    for(let i=0;i<nl;i++){ const u=0.15+i/(nl)*0.85; const lx=px+6*Math.sin(u*3), ly=py-ht*u; const side=i%2?1:-1; const L=26+rnd()*20, ang=side*(0.5+rnd()*0.5)-Math.PI/2*0.2;
+      const tip=[lx+Math.cos(ang)*L*side*1.2, ly-Math.abs(Math.sin(ang))*L*0.7-8];
+      const leaf=jag([[lx,ly],[ (lx+tip[0])/2, (ly+tip[1])/2-10],tip,[ (lx+tip[0])/2+4,(ly+tip[1])/2+8]],3,rnd);
+      cutPoly(g,leaf,i%3?P.leaf:P.leaf2,true);
+      g.strokeStyle="rgba(0,0,0,.25)"; g.lineWidth=1.2; g.beginPath(); g.moveTo(lx,ly); g.lineTo(tip[0],tip[1]); g.stroke(); }
+    g.restore();
+  }
+  // aphids on the centre stem
+  const f=foods[0];
+  for(let i=0;i<34;i++){ const a=rnd()*6.28, r=rnd()*f.r*0.8; const x=f.x+Math.cos(a)*r*0.6+8, y=f.y+Math.sin(a)*r;
+    g.fillStyle="rgba(10,20,0,.35)"; g.beginPath(); g.ellipse(x+1.5,y+2,4,2.8,a,0,6.28); g.fill();
+    g.fillStyle=mode==="dark"?"#9ab86a":"#b8d98a"; g.beginPath(); g.ellipse(x,y,4,2.8,a,0,6.28); g.fill(); }
+  // sidewalk slabs
+  g.fillStyle=P.crack; g.fillRect(0,gy-6,W,sy-gy+12);
+  const slabsW=W/4;
+  for(let i=0;i<4;i++){ const x0=i*slabsW+3, x1=(i+1)*slabsW-3;
+    const pts=jag([[x0,gy+4],[x1,gy+2],[x1,sy-3],[x0,sy-2]],2.4,rnd);
+    cutPoly(g,pts,i%2?P.slab:P.slab2,false);
+    fibre(g,x0,gy,x1-x0,sy-gy,"rgba(40,30,20,.10)",500,rnd);
+    for(let k=0;k<120;k++){ g.fillStyle="rgba(30,25,20,"+(0.08+rnd()*0.18)+")"; g.fillRect(x0+rnd()*(x1-x0),gy+rnd()*(sy-gy),1+rnd()*2,1+rnd()*2); } }
+  // torn soil edge overhanging the sidewalk
+  const edge=[[0,0],[W,0],[W,gy]]; for(let x=W;x>=0;x-=16) edge.push([x,gy+(rnd()-.5)*10+4]); edge.push([0,gy]);
+  g.save(); g.globalCompositeOperation="source-over"; cutPoly(g,edge.slice(2),P.soil,true); g.restore();
+  // lawn
+  g.fillStyle=P.lawn; g.fillRect(0,sy,W,H-sy);
+  fibre(g,0,sy,W,H-sy,"rgba(0,0,0,.10)",600,rnd);
+  for(let i=0;i<520;i++){ const x=rnd()*W, y=sy+6+rnd()*(H-sy), h=12+rnd()*26, lean=(rnd()-.5)*10;
+    g.fillStyle="rgba(10,20,4,.3)"; g.beginPath(); g.moveTo(x+2,y+3); g.lineTo(x+lean+3,y-h+3); g.lineTo(x+5,y+3); g.fill();
+    g.fillStyle=rnd()<.5?P.blade:P.blade2; g.beginPath(); g.moveTo(x-2.5,y); g.lineTo(x+lean,y-h); g.lineTo(x+2.5,y); g.fill(); }
+  // grass fringe over the sidewalk's bottom edge
+  for(let x=0;x<W;x+=5){ const h=8+rnd()*16; g.fillStyle=rnd()<.5?P.blade:P.blade2; g.beginPath(); g.moveTo(x-2,sy+6); g.lineTo(x+(rnd()-.5)*8,sy+6-h); g.lineTo(x+2,sy+6); g.fill(); }
+  // seeds and beetle
+  const fs=foods[2]; for(let i=0;i<26;i++){ const x=fs.x+(rnd()-.5)*fs.r*1.6, y=fs.y+(rnd()-.5)*fs.r; g.fillStyle="rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(x+1.5,y+2,4,2.4,rnd()*3,0,6.28); g.fill(); g.fillStyle="#d8b46a"; g.beginPath(); g.ellipse(x,y,4,2.4,rnd()*3,0,6.28); g.fill(); }
+  // nests: crater mounds of excavated grains around a crack
+  for(const c of colonies){ const n=c.nest;
+    for(let i=0;i<150;i++){ const a=rnd()*6.28, r=10+Math.pow(rnd(),0.6)*26; g.fillStyle=rnd()<.5?P.mound:"rgba(60,45,25,.6)"; g.fillRect(n.x+Math.cos(a)*r,n.y+Math.sin(a)*r*0.7,2,2); }
+    g.fillStyle="#0c0905"; g.beginPath(); g.ellipse(n.x,n.y,9,6,0,0,6.28); g.fill(); }
+  // light as material
+  const lg=g.createRadialGradient(W*0.12,-H*0.1,40,W*0.2,0,W*1.1); lg.addColorStop(0,P.sun); lg.addColorStop(1,"rgba(0,0,0,0)"); g.fillStyle=lg; g.fillRect(0,0,W,H);
+  g.fillStyle=P.shade; g.fillRect(0,0,W,H);
+  const vg=g.createRadialGradient(W/2,H/2,Math.min(W,H)*0.35,W/2,H/2,Math.max(W,H)*0.75); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(0,0,0,.28)"); g.fillStyle=vg; g.fillRect(0,0,W,H);
+  bgDirty=false;
+}
+
+/* ---------------- RIGGED ANT PUPPET ---------------- */
+const ANTCOL={light:[{body:"#1a120b",rim:"#e8a33a",mark:"#ffb53d"},{body:"#2a1a10",rim:"#cfe8e8",mark:"#f2fbff"}],
+              dark:[{body:"#120c07",rim:"#ffb44a",mark:"#ffc35e"},{body:"#1e140c",rim:"#bfeaff",mark:"#e6f8ff"}],
+              sharp:[{body:"#000000",rim:"#ffb000",mark:"#ffb000"},{body:"#000000",rim:"#ffffff",mark:"#ffffff"}]};
+function drawAnt(g,a,s){
+  const C=ANTCOL[mode][a.c];
+  g.save(); g.translate(a.x,a.y); g.rotate(a.a); g.scale(s,s);
+  const ph=a.st==="fight"?time*30:a.ph;
+  // shadow
+  g.fillStyle="rgba(10,6,2,.30)"; g.beginPath(); g.ellipse(1.5,2.5,9,3.6,0,0,6.28); g.fill();
+  // legs: alternating tripod (L1,R2,L3 vs R1,L2,R3)
+  g.strokeStyle=C.body; g.lineWidth=1.1; g.lineCap="round";
+  for(let i=0;i<3;i++) for(const side of [-1,1]){
+    const tri = ((i%2===0)===(side<0))?0:Math.PI; const sw=Math.sin(ph+tri)*2.4;
+    const bx=1.5-i*2.2, by=side*1.2;
+    const kx=bx+(i-1)*2.2+sw*0.5, ky=side*4.4;
+    const fx2=bx+(i-1)*4.4+sw, fy=side*7.2;
+    g.beginPath(); g.moveTo(bx,by); g.lineTo(kx,ky); g.lineTo(fx2,fy); g.stroke(); }
+  // rim light then body: gaster, postpetiole, petiole, mesosoma, head
+  const parts=[[-6.4,0,4.0,3.1],[-2.9,0,1.1,1.0],[-1.5,0,1.0,0.9],[1.3,0,2.4,1.5],[5.0,0,2.2,2.0]];
+  g.fillStyle=C.rim; for(const p of parts){ g.beginPath(); g.ellipse(p[0],p[1]-0.5,p[2]+0.7,p[3]+0.7,0,0,6.28); g.fill(); }
+  g.fillStyle=C.body; for(const p of parts){ g.beginPath(); g.ellipse(p[0],p[1],p[2],p[3],0,0,6.28); g.fill(); }
+  // colony paint mark on gaster: round dot (yours) or dash (rival)
+  g.fillStyle=C.mark; g.beginPath(); if(a.c===0) g.arc(-6.6,0,1.5,0,6.28); else g.rect(-8.2,-0.8,3.4,1.6); g.fill();
+  // elbowed antennae
+  const aw=Math.sin(ph*0.7)*0.5; g.strokeStyle=C.body; g.lineWidth=0.9;
+  for(const side of [-1,1]){ g.beginPath(); g.moveTo(6.4,side*1); g.lineTo(9.2,side*(2.4+aw)); g.lineTo(11.6,side*(1.0+aw)); g.stroke(); }
+  // mandibles + load
+  if(a.load){ g.fillStyle=a.food==="aphids"?"#d9f08a":a.food==="seeds"?"#e2bf72":a.food==="beetle"?"#6b4a2a":"#e6c38a"; g.beginPath(); g.ellipse(8.6,0,2.2,1.8,0,0,6.28); g.fill(); g.strokeStyle="#000"; g.lineWidth=0.5; g.stroke(); }
+  g.restore();
+}
+
+/* ---------------- RENDER ---------------- */
+function fit(){
+  const r=stage.getBoundingClientRect(); dpr=Math.min(2,window.devicePixelRatio||1);
+  cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
+  scale=Math.min(r.width/W,r.height/H); ox=(r.width-W*scale)/2; oy=(r.height-H*scale)/2;
+}
+new ResizeObserver(()=>fit()).observe(stage);
+function render(){
+  if(bgDirty) buildBG();
+  const g=ctx; g.setTransform(1,0,0,1,0,0); g.fillStyle="#1d1810"; g.fillRect(0,0,cv.width,cv.height);
+  g.setTransform(dpr*scale,0,0,dpr*scale,dpr*ox,dpr*oy);
+  g.drawImage(bg,0,0);
+  // territory: your ground hatched, rival ground dotted, border dashed
+  const amber=ANTCOL[mode][0].rim, pale=ANTCOL[mode][1].rim;
+  g.lineWidth=1.4;
+  for(let j=0;j<TY;j++) for(let i=0;i<TX;i++){ const v=ctrl[j*TX+i]; const x=i*TC,y=j*TC;
+    if(v>0.15){ g.strokeStyle=amber; g.globalAlpha=Math.min(0.28,v*0.3); g.beginPath(); for(let d=-TC;d<TC;d+=12){ g.moveTo(x+d,y+TC); g.lineTo(x+d+TC,y); } g.save(); g.beginPath(); g.rect(x,y,TC,TC); g.clip(); g.beginPath(); for(let d=-TC;d<TC;d+=12){ g.moveTo(x+d,y+TC); g.lineTo(x+d+TC,y);} g.stroke(); g.restore(); }
+    else if(v<-0.15){ g.fillStyle=pale; g.globalAlpha=Math.min(0.32,-v*0.34); for(let yy=6;yy<TC;yy+=12) for(let xx=6;xx<TC;xx+=12){ g.fillRect(x+xx-1.5,y+yy-1.5,3,3);} } }
+  g.globalAlpha=1;
+  g.strokeStyle=mode==="sharp"?"#d40000":"#fff3d6"; g.lineWidth=3; g.setLineDash([10,7]); g.beginPath();
+  for(let j=0;j<TY;j++) for(let i=0;i<TX;i++){ const v=ctrl[j*TX+i]; if(Math.abs(v)<0.15) continue;
+    if(i+1<TX){ const w=ctrl[j*TX+i+1]; if(w*v<0 && Math.abs(w)>0.35 && Math.abs(v)>0.35){ g.moveTo((i+1)*TC,j*TC); g.lineTo((i+1)*TC,(j+1)*TC);} }
+    if(j+1<TY){ const w=ctrl[(j+1)*TX+i]; if(w*v<0 && Math.abs(w)>0.35 && Math.abs(v)>0.35){ g.moveTo(i*TC,(j+1)*TC); g.lineTo((i+1)*TC,(j+1)*TC);} } }
+  g.stroke(); g.setLineDash([]);
+  // scent trails: amber dots (yours), pale dots (rival); alarm scent as rings
+  for(let c=0;c<2;c++){ const tg=trail[c], wg=war[c]; g.fillStyle=c===0?amber:pale;
+    for(let j=0;j<GY;j+=1) for(let i=0;i<GX;i+=1){ const v=tg[j*GX+i]; if(v>0.08){ g.globalAlpha=Math.min(0.75,v*0.6); g.beginPath(); g.arc(i*CELL+6+(c?2:-2),j*CELL+6,1.8,0,6.28); g.fill(); }
+      const w=wg[j*GX+i]; if(w>0.15 && (i+j)%2===0){ g.globalAlpha=Math.min(0.6,w*0.4); g.strokeStyle=g.fillStyle; g.lineWidth=1.2; g.beginPath(); g.arc(i*CELL+6,j*CELL+6,3.4,0,6.28); g.stroke(); } } }
+  g.globalAlpha=1;
+  // food: crumb and beetle as paper cut-outs, sized by what is left
+  drawFoods(g);
+  // ants
+  const s = mode==="sharp"?1.6:1.4;
+  for(const a of ants) drawAnt(g,a,s);
+  // fx
+  for(const f of fx){
+    if(f.k==="ring"){ g.strokeStyle=amber; g.lineWidth=3; g.globalAlpha=1-f.t/1.2; g.beginPath(); g.arc(f.x,f.y,8+f.t*30,0,6.28); g.stroke(); }
+    if(f.k==="alarm"){ g.strokeStyle=mode==="sharp"?"#d40000":"#ffd36b"; g.lineWidth=4; g.globalAlpha=1-f.t/1.6; for(let r=0;r<3;r++){ g.beginPath(); g.arc(f.x,f.y,10+f.t*40+r*12,0,6.28); g.stroke(); } }
+    if(f.k==="dust"){ g.fillStyle="rgba(230,215,180,.8)"; g.globalAlpha=1-f.t/0.6; g.beginPath(); g.arc(f.x,f.y-f.t*10,1.6,0,6.28); g.fill(); }
+    if(f.k==="alate" && f.t>0){ const y=f.y-f.t*f.t*60, x=f.x+f.dx*f.t+Math.sin(f.t*8)*6; g.globalAlpha=Math.max(0,1-f.t/3);
+      g.fillStyle="rgba(255,255,255,.55)"; g.beginPath(); g.ellipse(x-3,y-2,6,2.4,-0.6+Math.sin(time*40)*0.4,0,6.28); g.ellipse(x+3,y-2,6,2.4,0.6-Math.sin(time*40)*0.4,0,6.28); g.fill();
+      g.fillStyle=ANTCOL[mode][f.c].body; g.beginPath(); g.ellipse(x,y,2.4,6,0,0,6.28); g.fill(); }
+    g.globalAlpha=1; }
+  // rain
+  if(rainT>0){ g.fillStyle="rgba(20,30,50,.18)"; g.fillRect(0,0,W,H);
+    if(!reduced){ g.strokeStyle="rgba(210,225,255,.55)"; g.lineWidth=1.2; g.beginPath(); for(let i=0;i<160;i++){ const x=(i*61+time*300)%W, y=(i*97+time*900)%H; g.moveTo(x,y); g.lineTo(x-4,y+14);} g.stroke(); } }
+  // keyboard reticle
+  if(cursor.show){ g.strokeStyle=mode==="dark"?"#ffffff":"#000000"; g.lineWidth=3; g.beginPath(); g.arc(cursor.x,cursor.y,16,0,6.28); g.moveTo(cursor.x-24,cursor.y); g.lineTo(cursor.x-8,cursor.y); g.moveTo(cursor.x+8,cursor.y); g.lineTo(cursor.x+24,cursor.y); g.moveTo(cursor.x,cursor.y-24); g.lineTo(cursor.x,cursor.y-8); g.moveTo(cursor.x,cursor.y+8); g.lineTo(cursor.x,cursor.y+24); g.stroke(); }
+}
+function drawFoods(g){
+  const cr=foods[1], be=foods[3];
+  if(cr.amt>=1){ const k=Math.sqrt(cr.amt/cr.max); g.save(); g.translate(cr.x,cr.y); g.rotate(0.4);
+    g.fillStyle="rgba(10,6,2,.35)"; g.beginPath(); g.ellipse(4,5,cr.r*k,cr.r*0.55*k,0,0,6.28); g.fill();
+    g.fillStyle="#b4793a"; g.beginPath(); g.ellipse(0,0,cr.r*k,cr.r*0.55*k,0,0,6.28); g.fill();
+    g.fillStyle="#f4ecd8"; for(let i=0;i<5;i++){ g.fillRect((i-2)*cr.r*0.32*k-1.5,(i%2?-3:2)*k,3,3); } g.restore(); }
+  if(be.amt>=1){ const k=0.5+0.5*Math.sqrt(be.amt/be.max); g.save(); g.translate(be.x,be.y); g.rotate(-0.5); g.scale(k,k);
+    g.fillStyle="rgba(10,6,2,.35)"; g.beginPath(); g.ellipse(4,5,22,12,0,0,6.28); g.fill();
+    g.strokeStyle="#1b120a"; g.lineWidth=2.2; for(let i=0;i<3;i++) for(const sd of [-1,1]){ g.beginPath(); g.moveTo(-6+i*7,0); g.lineTo(-10+i*8,sd*18); g.stroke(); }
+    g.fillStyle="#3a2414"; g.beginPath(); g.ellipse(-2,0,18,11,0,0,6.28); g.fill(); g.fillStyle="#2a1a0e"; g.beginPath(); g.ellipse(17,0,6,6,0,0,6.28); g.fill();
+    g.strokeStyle="rgba(255,220,170,.35)"; g.lineWidth=1.5; g.beginPath(); g.moveTo(-20,0); g.lineTo(15,0); g.stroke(); g.restore(); }
+}
+function hud(){
+  const me=colonies[0], th=colonies[1];
+  const hold=gardenHolder();
+  if(hold!==lastHolder && hold!==-1){ say("The aphid garden now belongs to "+(hold===0?"your colony":"the rival")+"."); }
+  if(hold!==-1) lastHolder=hold;
+  $("stats").innerHTML="<span>Day <b>"+Math.min(day,DAYS)+"</b> of "+DAYS+(rainT>0?" (rain)":"")+"</span>"+
+    "<span>Workers <b>"+(total(me)*20).toLocaleString()+"</b></span>"+
+    "<span>Food <b>"+Math.round(me.food)+"</b></span>"+
+    "<span>Ground <b>"+Math.round(share()*100)+"%</b></span>"+
+    "<span>Garden <b>"+(hold===0?"yours":hold===1?"rival":"open")+"</b></span>"+
+    "<span>Rival <b>"+(total(th)*20).toLocaleString()+"</b></span>";
+}
+
+/* ---------------- LOOP ---------------- */
+let last=performance.now(), hudT=0;
+function loop(now){
+  let dt=Math.min(0.05,(now-last)/1000); last=now;
+  if(!paused && !over){ step(dt); }
+  else if(over){ time+=dt; for(const f of fx) f.t+=dt; }
+  render();
+  hudT-=dt; if(hudT<=0){ hud(); hudT=0.5; }
+  requestAnimationFrame(loop);
+}
+let stored=null; try{stored=localStorage.getItem("sw-mode");}catch(e){}
+setMode(MODES.includes(stored)?stored:(sysDark()?"dark":"light"));
+newGame();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
