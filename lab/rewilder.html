@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.6</title>
+<title>Rewilder v0.6.1</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.6 | LAB | 2026-11-10
+<!-- TSP build: Rewilder v0.6.1 | LAB | 2026-11-10
+     v0.6.1 (founder, with a phone screenshot: "Messages often cover player and movement. Either tap away
+     or if timed, out of the way of character."): messages now sit on the half of the screen the
+     character is not in, run wider and shorter, and close on a tap.
      v0.6 (founder: "1. Ok, let's remove the metal boxes that are just tedious to break, except in special
      design strategy situations. Forget about highlighting blocks in gold because now everything is
      breakable except the gold block. You can suffer damage from collapsing blocks if you dig under too
@@ -119,14 +122,16 @@ body.playing #hud{display:flex}
 .se-rail{display:flex;gap:6px}
 #title{position:fixed;z-index:2;left:50%;top:calc(70px + env(safe-area-inset-top));margin:0;transform:translateX(-50%) rotate(-2deg);background:#fbf3dc;color:#1b1328;border:3px solid #1b1328;border-radius:6px;padding:2px 22px 6px;font:900 clamp(44px,12vw,84px)/1.05 Rockwell,"Roboto Slab","Bookman Old Style",Georgia,serif;letter-spacing:-.01em;box-shadow:0 6px 0 rgba(0,0,0,.35);white-space:nowrap;pointer-events:none}
 body.playing #title{display:none}
-#toast{position:fixed;z-index:3;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top));max-width:min(560px,92vw);background:var(--chrome);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:8px 14px;font-size:20px;font-weight:700;line-height:1.3;text-align:center;opacity:0;transition:opacity .25s ease;pointer-events:none}
-#toast.on{opacity:1}
+#toast{position:fixed;z-index:3;left:8px;right:8px;margin:0 auto;width:fit-content;top:calc(64px + env(safe-area-inset-top));max-width:min(560px,calc(100vw - 16px));box-sizing:border-box;cursor:pointer;background:var(--chrome);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:8px 14px;font-size:20px;font-weight:700;line-height:1.3;text-align:center;opacity:0;transition:opacity .25s ease;pointer-events:none}
+#toast.on{opacity:1;pointer-events:auto}
+#toast.low{top:auto;bottom:calc(24px + env(safe-area-inset-bottom))}
+body.touch.playing #toast.low{bottom:calc(196px + env(safe-area-inset-bottom))}
 #lens{position:fixed;z-index:3;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top));width:min(600px,94vw);box-sizing:border-box;background:var(--chrome);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:10px 14px;font-size:18px;line-height:1.4;display:none}
 #lens.on{display:block}
 #lens p{margin:0 0 6px}
 #lens p:last-child{margin:0}
 #lens b{color:var(--accent)}
-body.lensOn #toast{top:auto;bottom:calc(196px + env(safe-area-inset-bottom))}
+body.lensOn #toast,body.touch.playing.lensOn #toast{top:auto;bottom:calc(196px + env(safe-area-inset-bottom))}
 #startBtn{position:fixed;z-index:3;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom));font-size:22px;min-height:60px;padding:10px 30px;border-radius:30px;white-space:nowrap;background:#2f6b3a;color:#fffdf6;border:3px solid #fffdf6;box-shadow:0 4px 0 rgba(0,0,0,.4)}
 body.playing #startBtn{display:none}
 #pad{position:fixed;z-index:3;left:0;right:0;bottom:0;display:none;justify-content:space-between;padding:8px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));pointer-events:none}
@@ -171,7 +176,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.6</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.6.1</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -423,7 +428,9 @@ $('soundBtn').onclick=()=>{soundOn=!soundOn;store.set('sound',soundOn);applySoun
 function setMenu(o){menuOpen=o;$('topbar').classList.toggle('open',o);$('menuBtn').setAttribute('aria-expanded',o);if(o)$('menuClose').focus();else $('menuBtn').focus()}
 $('menuBtn').onclick=()=>setMenu(!menuOpen);$('menuClose').onclick=()=>setMenu(false);
 function say(t){$('say').textContent='';setTimeout(()=>{$('say').textContent=t},30)}
-function toast(t,d){const el=$('toast');el.textContent=t;el.classList.add('on');toastT=d||3.5;say(t)}
+function placeToast(){const el=$('toast'),hy=OY+(P.y-70-cam.y)*S;if(state!=='play')el.classList.remove('low');else if(hy<H*.45)el.classList.add('low');else if(hy>H*.55)el.classList.remove('low')}
+function toast(t,d){const el=$('toast');el.textContent=t;placeToast();el.classList.add('on');toastT=d||3.5;say(t)}
+$('toast').onclick=()=>{toastT=0;$('toast').classList.remove('on')};
 function once(k,t,d){if(told.has(k))return false;told.add(k);toast(t,d||4.5);return true}
 let hudKey='';
 function hud(){const pips=Math.ceil(P.energy/20),freed=sites.filter(s=>s.state==='grown').length,ct=canTag(),k=pips+'|'+freed+'|'+ct;if(k===hudKey)return;hudKey=k;$('tagBtn').classList.toggle('can',ct);$('tagBtn').setAttribute('aria-label',who==='beaver'?'Tag in Mossback the turtle':'Tag in Big Gnaw the beaver');
@@ -651,7 +658,7 @@ function spawnTruck(){const grow=sites.filter(s=>s.state==='growing'&&!s.paving&
 
 /* ---------- update ---------- */
 function update(raw){if(hitstop>0){hitstop-=raw;return}const dt=(lensOn&&state==='play')?raw*.3:raw;T+=dt;sites.forEach(s=>{if(s.sway>0)s.sway*=Math.pow(.015,dt)});
- if(toastT>0){toastT-=raw;if(toastT<=0)$('toast').classList.remove('on')}
+ if(toastT>0){toastT-=raw;placeToast();if(toastT<=0)$('toast').classList.remove('on')}
  const coal=sites[2];
  if(coal.state==='standing'&&!coal.paved){const top=coal.rows.length-1;coal.rows.forEach((row,f)=>{if(!row.stack)return;const above=coal.rows[f+1];row.forEach((k,c)=>{if(k&&k.hp>0&&!(above&&above[c]&&above[c].hp>0)&&Math.random()<dt*7)puff(coal.x+(c+.5)*coal.cw,GY-(f+1)*coal.fh-4,{kind:'smoke',vx:18+Math.random()*10,vy:-26-Math.random()*14,r:9,gr:16,c:'#5f5650',life:4,max:4})})});
   if(!coal.rows.some(r=>r.stack)&&top>=0&&Math.random()<dt*4)puff(coal.x+Math.random()*coal.w,GY-coal.rows.length*coal.fh,{kind:'smoke',vx:14,vy:-20,r:7,gr:12,c:'#5f5650',life:3,max:3})}
