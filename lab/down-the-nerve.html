@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Signal Rider v0.18</title>
+<title>Signal Rider v0.19</title>
 <meta name="spec-source" content="claude/SPEC-DOWN-THE-NERVE-v0.8-AUDIO-2026-11-06.md">
 <meta name="audience" content="Founder playtest first. Audience ruling D4 still open (12 and up, mapped to OpenStax, recommended). Lab build.">
 <!-- tsp:source claude/SPEC-DOWN-THE-NERVE-2026-11-05.md; convening/DOWN-THE-NERVE-CONVENING.md (D12 Brainbow, S.T.U.N. Runner feel); Tight Spiral Studios -->
@@ -75,7 +75,7 @@ a{color:#9cc8f2}
 
 <header id="bar" class="ui">
   <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/lab/" aria-label="Studio home">Studio</a>
-  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.18</span><span class="chip tsp-labchip">LAB</span></span>
+  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.19</span><span class="chip tsp-labchip">LAB</span></span>
   <button class="btn" id="bMenu" type="button" aria-haspopup="dialog">Menu</button>
 </header>
 
@@ -131,6 +131,8 @@ a{color:#9cc8f2}
   <h3>Glow</h3><div class="seg" data-k="glow"><button class="btn" data-v="0">Soft</button><button class="btn" data-v="1">Standard</button><button class="btn" data-v="2">Bright</button></div>
   <h3>View</h3><div class="seg" data-k="roll"><button class="btn" data-v="1">Tube turns with you</button><button class="btn" data-v="0">Tube stays still</button></div>
   <h3>Sound</h3><div class="seg" data-k="sound"><button class="btn" data-v="1">On</button><button class="btn" data-v="0">Off</button></div>
+  <h3>Music</h3><div class="seg" data-k="music"><button class="btn" data-v="1">On</button><button class="btn" data-v="0">Off</button></div>
+  <h3>Curves</h3><div class="seg" data-k="curves"><button class="btn" data-v="1">Winding</button><button class="btn" data-v="0.4">Gentle</button></div>
   <div class="row"><button class="btn primary" data-close>Back to the ride</button></div>
 </div></div>
 
@@ -190,7 +192,7 @@ a{color:#9cc8f2}
 var cv=document.getElementById('game'),cx=cv.getContext('2d');
 var W=0,H=0,DPR=1,bgCanvas=null;
 var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-var S={speed:1,glow:1,roll:reduce?0:1,outside:1,sound:1};
+var S={speed:1,glow:1,roll:reduce?0:1,outside:1,sound:1,music:1,curves:reduce?0.4:1};
 try{var saved=JSON.parse(localStorage.getItem('dtn.comfort')||'null');if(saved)for(var k in saved)S[k]=saved[k];}catch(e){}
 function save(){try{localStorage.setItem('dtn.comfort',JSON.stringify(S));}catch(e){}}
 
@@ -201,13 +203,22 @@ var run,legs,feats,nodes,syns,pickups,checkpoints,streaks=[];
 for(var si=0;si<70;si++)streaks.push({a:Math.random()*Math.PI*2,z:Math.random()*30,c:si%8});
 function rnd(a,b){return a+Math.random()*(b-a);}
 function angDiff(a,b){var d=(a-b)%TAU;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;return d;}
-function curveX(u){return 4*Math.sin(u*0.025)+1.5*Math.sin(u*0.055+1.1);}
-function curveY(u){return 3*Math.sin(u*0.021+2.0)+1.0*Math.sin(u*0.047);}
+var STRAIGHT=null,BANK=0;
+function buildStraight(){ // 1 in open stretches, easing to 0 within 5-15 units of a band, a block or a landing
+  var N=Math.ceil((legs[3].end||600)+80),d=new Array(N).fill(99),mark=function(u){u=Math.round(u);if(u>=0&&u<N)d[u]=0;};
+  feats.forEach(function(x){mark(x.s);});
+  syns.forEach(function(x){for(var u=x.s-16;u<=x.s+6;u++)mark(u);});
+  for(var i=1;i<N;i++)d[i]=Math.min(d[i],d[i-1]+1);for(i=N-2;i>=0;i--)d[i]=Math.min(d[i],d[i+1]+1);
+  STRAIGHT=d.map(function(v){var q=Math.max(0,Math.min(1,(v-2)/7));return q*q*(3-2*q);});}
+function strAt(u){if(!STRAIGHT)buildStraight();var i=Math.max(0,Math.min(STRAIGHT.length-2,Math.floor(u))),fr=Math.max(0,Math.min(1,u-i));return STRAIGHT[i]+(STRAIGHT[i+1]-STRAIGHT[i])*fr;}
+function curveX(u){return (S.curves||1)*(0.5+0.5*strAt(u))*(8.0*Math.sin(u*0.031)+2.8*Math.sin(u*0.068+1.1));}
+function curveY(u){return (S.curves||1)*(0.5+0.5*strAt(u))*(5.6*Math.sin(u*0.026+2.0)+2.0*Math.sin(u*0.061));}
 function dcurve(f,u){return (f(u+0.5)-f(u-0.5));}
 
 var STEERED=false,hintShown=null,steerHint=document.getElementById('steerHint');
 steerHint.onclick=function(){firstTouch();steerHint.style.display='none';hintShown=false;};
 function buildRun(w){
+  STRAIGHT=null;BANK=0;
   var m=w?weekModel(w):{tilt:0,pads:5,drift:0,red:0,green:0,prac:0,R:0,G:0,band0:0.7,clAdj:0};
   var stressed=m.tilt>0.15;
   legs=[{name:'Fingertip to brainstem',len:230,realM:1.0},
@@ -268,7 +279,7 @@ var BANDMAX=2.0,BANDMIN=0.35,SURGE=1.3;
 function effect(good,title,icon){
   var e=document.getElementById('effect');var ic=icon?'<svg viewBox="0 0 34 34" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px">'+icon+'</svg>':'';
   if(good){run.bandT=Math.max(BANDMIN,run.bandT-0.3);run.flash=0.6;run.flashCol='#6dff8a';
-    e.className='ui good';e.innerHTML=ic+title;forestReact(true);run.floatTxt='+ clear path';sfxGood();run.surgeT=2.0;run.v*=1.15;run.boostT=Math.max(run.boostT,0.35);}
+    e.className='ui good';e.innerHTML=ic+title;forestReact(true);run.floatTxt='+ clear path';sfxGood();musGood();run.surgeT=2.0;run.v*=1.15;run.boostT=Math.max(run.boostT,0.35);}
   else{run.bandT=Math.min(BANDMAX,run.bandT+0.32);run.v=Math.max(1.5*S.speed,run.v*0.45);run.slowT=0.9;run.flash=0.6;run.flashCol='#ff4fa3';
     e.className='ui bad';e.innerHTML=ic+title;forestReact(false);run.floatTxt='- speed';sfxBad();}
   run.bandPulse=1;run.floatT=1.2;e.style.display='block';effectT=2.2;
@@ -464,8 +475,8 @@ function spawnBolt(col){var mn=Math.min(W,H),x,y,tries=0;do{x=rnd(0,W);y=rnd(0,H
   var b2=[[br.x,br.y]];for(var k2=0;k2<4;k2++){br.a+=rnd(-0.5,0.5);br.x+=Math.cos(br.a)*rnd(22,40);br.y+=Math.sin(br.a)*rnd(22,40);b2.push([br.x,br.y]);}
   BOLTS.push({p:pts,b:b2,t:0,life:rnd(0.35,0.55),col:col});}
 function drawPlate(imgs,alpha,scale,pan,ctx){
-  ctx=ctx||cx;var hx=dcurve(curveX,run.s),hy=dcurve(curveY,run.s);
-  ctx.save();ctx.translate(W/2-hx*W*pan,H/2-hy*H*pan);if(S.roll)ctx.rotate(Math.PI/2-run.theta);
+  ctx=ctx||cx;var hx=0.18*Math.tanh(dcurve(curveX,run.s)/0.18),hy=0.18*Math.tanh(dcurve(curveY,run.s)/0.18);
+  ctx.save();ctx.translate(W/2-hx*W*pan,H/2-hy*H*pan);if(S.roll)ctx.rotate(Math.PI/2-run.theta);ctx.rotate(BANK);
   var m=Math.hypot(W,H)*scale;
   [[bgFrom,1-bgMix],[bgTo,bgMix]].forEach(function(p){var im=imgs[p[0]];if(!im||!im.complete||!im.width||p[1]<=0)return;var r=im.width/im.height,dw=m,dh=m;if(r>1)dw=m*r;else dh=m/r;
     ctx.globalAlpha=p[1]*alpha;ctx.drawImage(im,-dw/2,-dh/2,dw,dh);});
@@ -630,7 +641,7 @@ function synth(f,dur,type,vol,opt){if(!AC||!S.sound)return;opt=opt||{};var t=AC.
 function noiseHit(dur,vol,f0,f1){if(!AC||!S.sound)return;var t=AC.currentTime,n=Math.floor(AC.sampleRate*dur),b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
   var src=AC.createBufferSource();src.buffer=b;var fl=AC.createBiquadFilter();fl.type='lowpass';fl.frequency.setValueAtTime(f0,t);fl.frequency.exponentialRampToValueAtTime(f1,t+dur);var g=AC.createGain();g.gain.value=vol;src.connect(fl);fl.connect(g);g.connect(master);src.start(t);}
 // red: low, muffled, losing ground
-function sfxBad(){synth(98,0.55,'sawtooth',0.16,{to:41,f0:1300,f1:110,q:6,det:-12,echo:false});synth(103,0.55,'sawtooth',0.12,{to:44,f0:1100,f1:100,q:6,det:14,echo:false});noiseHit(0.32,0.25,900,90);}
+function sfxBad(){musBad();synth(98,0.55,'sawtooth',0.16,{to:41,f0:1300,f1:110,q:6,det:-12,echo:false});synth(103,0.55,'sawtooth',0.12,{to:44,f0:1100,f1:100,q:6,det:14,echo:false});noiseHit(0.32,0.25,900,90);}
 // green: bright, rising, with the grid echo
 function sfxGood(){[523.25,659.25,783.99,1046.5].forEach(function(fq,i){synth(fq,0.22,'square',0.07,{at:i*0.055,f0:900,f1:5200,q:10});});synth(261.6,0.5,'sine',0.08,{at:0,to:523.25,echo:false});}
 function sfxCheck(){synth(880,0.3,'triangle',0.09,{f0:3000,f1:6000});synth(1318.5,0.4,'triangle',0.07,{at:0.09,f0:3000,f1:6000});}
@@ -715,7 +726,7 @@ function addBtn(label,primary,fn){var b=document.createElement('button');b.class
 // What lands carries over between beats (summation, OpenStax A&P 12.5; Arnsten 2009).
 var BURST=[],RING=null,BEAT=1.0;
 function startLanding(sy){
-  BEAT=[1.1,1.0,0.95,0.9][run.leg]||0.9;
+  BEAT=[1.1,1.0,0.95,0.9][run.leg]||0.9;musLandStart();MUS.mi=0;
   if(!sy.rshape){var sh=SHAPES.slice();for(var q=sh.length-1;q>0;q--){var j=Math.floor(Math.random()*(q+1));var t=sh[q];sh[q]=sh[j];sh[j]=t;}sy.rshape=sy.pads.map(function(p,i){return sh[i%sh.length];});}
   var beats=sy.last?(sy.stressed?6:4):3;
   run.lm={t:0,k:0,beats:beats,max:sy.last?(sy.stressed?8:6):5,tgt:reachPick(sy.pads,run.theta,true),a0:run.s,hits:0};
@@ -748,7 +759,7 @@ function landingBeat(sy){
     parts.push({a0:a,a1:kind===1?lm.tgt:kind===2?a:a+(Math.random()-0.5)*0.6,kind:kind,t:0,d:k*0.02});}
   BURST=BURST.concat(parts);
   if(onAlarm&&sy.stressed){sy.afill++;sfxBeat(-1);if(sy.afill>=2){endLanding();RING={fill:1,t:0,col:'#ff4f7a'};sy.done=true;alarmFinish();return;}}
-  else if(full||half){var add=(full?1:0.5)*(sy.last?sy.w:1);sy.fill+=add;lm.hits+=full?1:0.5;sfxBeat(sy.last?Math.min(1,sy.fill/sy.need):1);}
+  else if(full||half){var add=(full?1:0.5)*(sy.last?sy.w:1);sy.fill+=add;lm.hits+=full?1:0.5;if(!musMatch(full))sfxBeat(sy.last?Math.min(1,sy.fill/sy.need):1);}
   else sfxBeat(0);
   var done=sy.last?sy.fill>=sy.need:lm.hits>=2;
   if(RING)RING.fill=sy.last?Math.min(1,sy.fill/sy.need):(done?1:0);
@@ -849,6 +860,35 @@ function addReplayBtn(){if(!EVT.length)return;var btns=document.getElementById('
 function panOf(a,z){var p=proj(a,Math.max(0.8,z),1);return Math.max(-1,Math.min(1,(p[0]-cxv)/(f||1)));}
 function sfxSlowIn(){if(!AC||!S.sound)return;tone(660,0.7,'sine',0.1,110);tone(90,0.9,'sine',0.12,55);}
 function sfxSlowOut(){if(!AC||!S.sound)return;tone(110,0.4,'sine',0.08,660);}
+// v0.19 music: lookahead scheduler on the audio clock. G major pentatonic, the receptor tones.
+var MUS={bus:null,lp:null,next:0,step:0,tempo:112,hookT:0,landing:false,mi:0,nb:null};
+var MOTIF=[659.25,0,587.33,0,493.88,0,587.33,659.25, 0,783.99,0,659.25,587.33,0,493.88,0,
+           587.33,0,493.88,0,440,0,493.88,587.33, 0,659.25,0,587.33,493.88,0,392,0];
+var MNOTES=MOTIF.filter(function(x){return x>0;}),ROOTS=[82.41,65.41,98.0,73.42];
+function musInit(){if(!AC||MUS.bus)return;MUS.bus=AC.createGain();MUS.bus.gain.value=0;MUS.lp=AC.createBiquadFilter();MUS.lp.type='lowpass';MUS.lp.frequency.value=9000;
+  MUS.bus.connect(MUS.lp);MUS.lp.connect(master);var n=Math.floor(AC.sampleRate*0.3);MUS.nb=AC.createBuffer(1,n,AC.sampleRate);var dd=MUS.nb.getChannelData(0);for(var i=0;i<n;i++)dd[i]=Math.random()*2-1;MUS.next=AC.currentTime+0.1;}
+function mNote(t,f,dur,type,vol,cut,slide){var o=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+dur);
+  fl.type='lowpass';fl.frequency.value=cut||4000;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.008);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(fl);fl.connect(g);g.connect(MUS.bus);o.start(t);o.stop(t+dur+0.05);}
+function mNoise(t,dur,vol,hp){var src=AC.createBufferSource(),g=AC.createGain(),fl=AC.createBiquadFilter();src.buffer=MUS.nb;fl.type='highpass';fl.frequency.value=hp;
+  g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);src.connect(fl);fl.connect(g);g.connect(MUS.bus);src.start(t);src.stop(t+dur+0.02);}
+function musStep(t,st){var bar=Math.floor(st/16)%4,i=st%16,root=ROOTS[bar],land=MUS.landing;
+  if(i%8===0)mNote(t,120,0.32,'sine',0.5,800,42);                        // kick
+  if(!land&&(i===4||i===12))mNoise(t,0.16,0.22,1500);                     // clap
+  if(!land&&i%2===0)mNoise(t,0.04,0.07,7000);                             // hat
+  if(i%2===0&&(!land||i%8===0))mNote(t,i%4===0?root:root*1.5,0.22,'sawtooth',0.14,520); // bass
+  if(!land){var h=MOTIF[st%32];if(h){var hv=0.045+0.06*Math.min(1,MUS.hookT/3);mNote(t,h,0.16,'square',hv,3200);}}}
+function musTick(dt){if(!AC)return;musInit();var want=(S.music&&S.sound&&run&&!run.over&&!run.faded&&!paused)?(window.speechSynthesis&&speechSynthesis.speaking?0.22:0.6):0;
+  MUS.bus.gain.setTargetAtTime(want,AC.currentTime,0.15);if(!want){MUS.next=AC.currentTime+0.05;return;}
+  MUS.hookT=Math.max(0,MUS.hookT-dt);MUS.landing=!!run.lm;var tempo=MUS.landing?120/BEAT:(run.surgeT>0?120:112);
+  var sp=60/tempo/4;if(MUS.next<AC.currentTime-0.2)MUS.next=AC.currentTime+0.02;
+  while(MUS.next<AC.currentTime+0.12){musStep(MUS.next,MUS.step);MUS.step++;MUS.next+=sp;}}
+function musGood(){MUS.hookT=8;}
+window.__sr={curveX:function(u){return curveX(u);},strAt:function(u){return strAt(u);},mus:function(){return MUS;},bank:function(){return BANK;}};
+function musBad(){if(!MUS.lp||!AC)return;var t=AC.currentTime;MUS.lp.frequency.cancelScheduledValues(t);MUS.lp.frequency.setValueAtTime(650,t);MUS.lp.frequency.exponentialRampToValueAtTime(9000,t+2.2);}
+function musLandStart(){if(!AC||!MUS.bus)return;MUS.step=0;MUS.next=AC.currentTime+0.02;}
+function musMatch(full){if(!AC||!MUS.bus||!S.music||!S.sound)return false;var t=AC.currentTime,f=MNOTES[MUS.mi%MNOTES.length];MUS.mi++;
+  mNote(t,f,0.5,'square',full?0.16:0.08,5200);if(full)mNote(t,f*1.5,0.5,'triangle',0.08,5200);return true;}
 function sfxBeat(q){if(!AC||!S.sound)return;if(q<0){tone(150,0.3,'sawtooth',0.1,95);return;}if(q===0){tone(140,0.18,'square',0.07,100);return;}
   [0,4,7].forEach(function(st,i){setTimeout(function(){tone(440*Math.pow(2,(st+12*q)/12),0.18,'triangle',0.06);},i*40);});}
 function sfxFire(){if(!AC||!S.sound)return;[523.25,659.25,783.99,1046.5,1318.5].forEach(function(fq,i){setTimeout(function(){tone(fq,0.6,'triangle',0.06);},i*55);});}
@@ -891,12 +931,13 @@ function update(dt){
   var L=legs[run.leg];
   if(run.driftRate>0&&run.leg===3){var d=angDiff(run.alarm,run.theta);run.theta+=Math.sign(d)*Math.min(Math.abs(d),run.driftRate*dt*(run.lm?0.6:1));run.drift=1;}else run.drift=0;
   // slow-motion landing
-  var syL=syns[run.leg];if(syL&&!syL.done&&!run.warm&&updateLanding(dt,syL)){if(toastT>0){toastT-=dt;if(toastT<=0)toastEl.style.display='none';}audioCues(dt);return;}
+  var syL=syns[run.leg];if(syL&&!syL.done&&!run.warm&&updateLanding(dt,syL)){if(toastT>0){toastT-=dt;if(toastT<=0)toastEl.style.display='none';}audioCues(dt);musTick(dt);return;}
   // speed
   if(run.slowT>0){run.slowT-=dt;run.v+= (1.2*S.speed-run.v)*Math.min(1,dt*6);}
   else{var tgtv=cruise*(run.surgeT>0?SURGE:1);run.surgeT=Math.max(0,(run.surgeT||0)-dt);run.v+=(tgtv-run.v)*Math.min(1,dt*(run.v>tgtv?0.6:1.6));}
   run.boostT=Math.max(0,run.boostT-dt);run.flash=Math.max(0,run.flash-dt*2.5);
   var ds=run.v*dt;var prev=run.s;run.s+=ds;
+  var bk=(reduce||S.curves<0.5)?0:Math.max(-0.17,Math.min(0.17,-(curveX(run.s+10)-2*curveX(run.s+5)+curveX(run.s))*0.09));BANK+=(bk-BANK)*Math.min(1,dt*1.8);
   // real distance/time
   // the speedometer reads the fiber, not the onramp
   var vReal=Math.min(120,run.v/(6.5*S.speed*rampF())*75); var mPer=L.realM/L.len; var dm=ds*mPer; run.realM+=dm; if(vReal>0.5)run.realMs+=dm/vReal*1000;
@@ -927,7 +968,8 @@ function update(dt){
   if(toastT>0){toastT-=dt;if(toastT<=0)toastEl.style.display='none';}
   if(insetT>0){insetT-=dt;if(insetT<=0)insetEl.style.display='none';}
   recFrame();
-  if(AC&&hum){hum.frequency.setTargetAtTime(48+run.v*7,AC.currentTime,0.08);}
+  if(AC&&hum){hum.frequency.setTargetAtTime(48+run.v*7,AC.currentTime,0.08);humG.gain.setTargetAtTime(S.music?0.015:0.035,AC.currentTime,0.3);}
+  musTick(dt);
   // HUD
   document.getElementById('spd').textContent=Math.round(vReal);
   document.getElementById('tripv').textContent=run.realM.toFixed(2)+' m · '+run.realMs.toFixed(1)+' ms';
@@ -960,7 +1002,7 @@ function proj(a,z,rad){ // angle around tube, depth, radius factor
   var u=run.s+z;
   var CG=4.5;var ox=CG*(curveX(u)-curveX(run.s)-dcurve(curveX,run.s)*z), oy=CG*(curveY(u)-curveY(run.s)-dcurve(curveY,run.s)*z);
   var x=Math.cos(a)*R*(rad||1)+ox, y=Math.sin(a)*R*(rad||1)+oy;
-  var rot=S.roll?(Math.PI/2-run.theta):0;var c=Math.cos(rot),s=Math.sin(rot);
+  var rot=(S.roll?(Math.PI/2-run.theta):0)+BANK;var c=Math.cos(rot),s=Math.sin(rot);
   var rx=x*c-y*s, ry=x*s+y*c;
   var fk=f*(1+run.boostT*(reduce?0:0.6));
   return [cxv+rx*fk/z, cyv+ry*fk/z];
