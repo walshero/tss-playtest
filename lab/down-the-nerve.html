@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Signal Rider v0.19</title>
+<title>Signal Rider v0.20</title>
 <meta name="spec-source" content="claude/SPEC-DOWN-THE-NERVE-v0.8-AUDIO-2026-11-06.md">
 <meta name="audience" content="Founder playtest first. Audience ruling D4 still open (12 and up, mapped to OpenStax, recommended). Lab build.">
 <!-- tsp:source claude/SPEC-DOWN-THE-NERVE-2026-11-05.md; convening/DOWN-THE-NERVE-CONVENING.md (D12 Brainbow, S.T.U.N. Runner feel); Tight Spiral Studios -->
@@ -67,6 +67,7 @@ a{color:#9cc8f2}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:560px){#bar .title .name{display:none}#bar{gap:6px;padding-left:6px;padding-right:6px}#bal{width:96px}#speed .unit{max-width:96px}}
 #msgs{position:fixed;z-index:4;left:0;right:0;top:calc(var(--barb,58px) + 6px);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 8px}#msgs.low{top:auto;bottom:calc(var(--hudh,112px) + 6px)}#msgs.sl,#msgs.sr{width:min(46vw,340px);align-items:stretch}#msgs.sl>*,#msgs.sr>*{width:auto!important;max-width:100%!important;white-space:normal!important}#msgs.sl{right:auto;left:8px}#msgs.sr{left:auto;right:8px}#msgs>*{position:static!important;transform:none!important;left:auto!important;top:auto!important;bottom:auto!important;max-width:min(560px,94vw)}#msgs #steerHint{pointer-events:auto;white-space:normal;max-width:calc(100vw - 24px);text-align:center;line-height:1.25;padding:8px 18px;width:max-content}#replay{top:calc(52px + env(safe-area-inset-top));bottom:auto!important;background:linear-gradient(rgba(4,5,10,.96) 70%,rgba(4,5,10,0))!important;padding:10px 16px 18px!important}#cards .cath{grid-column:1/-1;margin:6px 0 0}#cards .cath h3{margin:4px 0;font-size:20px}
+.replay ul{margin:4px 0 8px;padding-left:22px}.replay li{margin:4px 0}.replay .sub{margin:8px 0 0}
 .catnav{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 2px}.catnav .btn{min-height:52px;font-size:19px}.nextcat{flex:1 1 220px}.prog{grid-column:1/-1;margin:2px 0}#cards .cath p{margin:2px 0 4px;font-size:18px;line-height:1.4}.src{color:#c7cfdb;font-size:16px}.wk small{display:block;font-size:16px;font-weight:600;color:#c7cfdb}.wk span{display:block}#cards .back{grid-column:1/-1;justify-self:start;min-height:44px}#cards .info{grid-column:1/-1;background:#141b2e;border:2px solid #4a5568;border-radius:12px;padding:8px 12px}#cards .info h3{margin:2px 0 4px;font-size:20px}#cards .info .wt{font-size:16px;color:#c7cfdb;font-weight:600}#cards .info p{margin:4px 0;font-size:18px;line-height:1.45}#fxp{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 12px;font-size:18px;margin:6px 0}#fxp svg{vertical-align:middle}.howto{margin-top:10px}.howto summary{min-height:44px;display:flex;align-items:center;font-size:18px;font-weight:700;cursor:pointer}</style>
 </head>
 <body>
@@ -75,7 +76,7 @@ a{color:#9cc8f2}
 
 <header id="bar" class="ui">
   <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/lab/" aria-label="Studio home">Studio</a>
-  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.19</span><span class="chip tsp-labchip">LAB</span></span>
+  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.20</span><span class="chip tsp-labchip">LAB</span></span>
   <button class="btn" id="bMenu" type="button" aria-haspopup="dialog">Menu</button>
 </header>
 
@@ -172,11 +173,13 @@ a{color:#9cc8f2}
 <div class="sheet" id="sFade" role="dialog" aria-modal="true" aria-labelledby="hF"><div class="card">
   <h2 id="hF">The signal faded</h2>
   <p id="fadeWhy">Three hits. What's happening here: damaged insulation can stop a signal. Each hard thing widened the frayed bands until there was almost no clear path left. Greens narrow them again.</p>
+  <div id="fadeWeek" class="replay"></div>
   <div class="row"><button class="btn primary" id="bCp">Back to the checkpoint</button><button class="btn" id="bFadeWeek">Change the week</button></div>
 </div></div>
 <div class="sheet" id="sEnd" role="dialog" aria-modal="true" aria-labelledby="hE"><div class="card">
   <h2 id="hE">You reached the thinking cortex</h2>
   <p id="endStats"></p>
+  <div id="endWeek" class="replay"></div>
   <p id="endWhy"></p>
   <h3>Words for what you felt</h3>
   <ul><li><strong>Saltatory conduction:</strong> the signal leaps node to node along the insulated fiber.</li>
@@ -206,19 +209,24 @@ function angDiff(a,b){var d=(a-b)%TAU;if(d>Math.PI)d-=TAU;if(d<-Math.PI)d+=TAU;r
 var STRAIGHT=null,BANK=0;
 function buildStraight(){ // 1 in open stretches, easing to 0 within 5-15 units of a band, a block or a landing
   var N=Math.ceil((legs[3].end||600)+80),d=new Array(N).fill(99),mark=function(u){u=Math.round(u);if(u>=0&&u<N)d[u]=0;};
-  feats.forEach(function(x){mark(x.s);});
+  feats.forEach(function(x){mark(x.s);});pickups.forEach(function(x){mark(x.s);});
   syns.forEach(function(x){for(var u=x.s-16;u<=x.s+6;u++)mark(u);});
   for(var i=1;i<N;i++)d[i]=Math.min(d[i],d[i-1]+1);for(i=N-2;i>=0;i--)d[i]=Math.min(d[i],d[i+1]+1);
-  STRAIGHT=d.map(function(v){var q=Math.max(0,Math.min(1,(v-2)/7));return q*q*(3-2*q);});}
+  STRAIGHT=d.map(function(v){var q=Math.max(0,Math.min(1,(v-4)/10));return q*q*(3-2*q);});}
 function strAt(u){if(!STRAIGHT)buildStraight();var i=Math.max(0,Math.min(STRAIGHT.length-2,Math.floor(u))),fr=Math.max(0,Math.min(1,u-i));return STRAIGHT[i]+(STRAIGHT[i+1]-STRAIGHT[i])*fr;}
-function curveX(u){return (S.curves||1)*(0.5+0.5*strAt(u))*(8.0*Math.sin(u*0.031)+2.8*Math.sin(u*0.068+1.1));}
-function curveY(u){return (S.curves||1)*(0.5+0.5*strAt(u))*(5.6*Math.sin(u*0.026+2.0)+2.0*Math.sin(u*0.061));}
+var PX=null,PY=null,PDU=0.5;
+function buildPath(){if(!STRAIGHT)buildStraight();var n=Math.ceil(STRAIGHT.length/PDU)+2,sx=0,x=0,sy=0,y=0;PX=new Float32Array(n);PY=new Float32Array(n);
+  for(var i=0;i<n;i++){var u=i*PDU,e=strAt(u),kx=e*(0.0075*Math.sin(u*0.045)+0.0025*Math.sin(u*0.11+1.1)),ky=e*(0.005*Math.sin(u*0.038+2.0)+0.0018*Math.sin(u*0.09));
+    sx+=(kx-sx*0.02)*PDU;x+=sx*PDU;sy+=(ky-sy*0.02)*PDU;y+=sy*PDU;PX[i]=x;PY[i]=y;}}
+function pathAt(A,u){var t=u/PDU,i=Math.max(0,Math.min(A.length-2,Math.floor(t))),fr=Math.max(0,Math.min(1,t-i));return A[i]+(A[i+1]-A[i])*fr;}
+function curveX(u){if(!PX)buildPath();return (S.curves||1)*pathAt(PX,u)/4.5*8;}
+function curveY(u){if(!PY)buildPath();return (S.curves||1)*pathAt(PY,u)/4.5*8;}
 function dcurve(f,u){return (f(u+0.5)-f(u-0.5));}
 
 var STEERED=false,hintShown=null,steerHint=document.getElementById('steerHint');
 steerHint.onclick=function(){firstTouch();steerHint.style.display='none';hintShown=false;};
 function buildRun(w){
-  STRAIGHT=null;BANK=0;
+  STRAIGHT=null;PX=null;PY=null;BANK=0;
   var m=w?weekModel(w):{tilt:0,pads:5,drift:0,red:0,green:0,prac:0,R:0,G:0,band0:0.7,clAdj:0};
   var stressed=m.tilt>0.15;
   legs=[{name:'Fingertip to brainstem',len:230,realM:1.0},
@@ -264,7 +272,7 @@ function buildRun(w){
   // outside pictures: one per loaded card, spread across the ride
   var total=legs[3].end, pics=[]; // founder 2026-11-06: no pop-up cards during the ride
   var band0=m.band0!==undefined?m.band0:0.7;
-  run={s:0,v:4,theta:Math.PI/2,leg:0,realM:0,realMs:0,stressed:stressed,model:m,week:w,alarm:alarm,
+  run={rec:{g:{},r:{},bands:0,match:0,half:0,wrong:0,missBeat:0,stalls:0,grown:0,lost:0},s:0,v:4,theta:Math.PI/2,leg:0,realM:0,realMs:0,stressed:stressed,model:m,week:w,alarm:alarm,
        drift:0,driftRate:m.drift,slowT:0,boostT:0,goodT:0,flash:0,flashCol:'#ff4fa3',over:false,faded:false,pics:pics,firstInput:false,
        toldNode:false,toldFray:false,missCount:0,band:band0,bandT:band0,bandPulse:0,hits:0,floatTxt:null,floatT:0};
   saveCp();drawHits();
@@ -682,7 +690,35 @@ function setBalance(t,green,red){if(typeof green==='number'){var L2='',R2='';for
 
 // ---------- sheets ----------
 function quietBeacon(){try{beacon(false);}catch(e){}}
-function openSheet(id){var s=document.getElementById(id);s.style.display='flex';s.classList.add('open');paused=true;var b=s.querySelector('button');if(b)b.focus();}
+function weekReplay(){
+  if(!run||!run.rec)return '';var m=run.model||{},cat=m.cat||{},rec=run.rec,out=[],ride=[];
+  var nm=function(id){var c=CATS.filter(function(x){return x.id===id;})[0];return c?c.name:id;};
+  var lab=function(id){var d=DECK.filter(function(x){return x.id===id;})[0];return d?d.label:id;};
+  var tally=function(o){return Object.keys(o).map(function(k){return lab(k)+(o[k]>1?' x'+o[k]:'');}).join(', ');};
+  var sum=function(o){return Object.keys(o).reduce(function(a,k){return a+o[k];},0);};
+  if(!run.week){out.push('Calm road: no week loaded, so nothing tipped the balance.');}
+  else{
+    var sp='The thinking cortex had '+m.pads+' landing spines (a calm road has 5).';
+    if(cat.sleep)sp+=' Your '+nm('sleep')+' blocks took '+cat.sleep+'.';if(cat.body)sp+=' Your '+nm('body')+' blocks gave one back.';out.push(sp);
+    var pull=m.drift<0.05?'':m.drift<0.45?'lightly':m.drift<0.8?'strongly':'very strongly';
+    out.push(pull?'The survival shortcut pulled '+pull+'.'+(cat.people?' Your '+nm('people')+' blocks made it stronger.':'')+(cat.kin?' Your '+nm('kin')+' blocks eased it.':''):'The survival shortcut stayed quiet.'+(cat.kin?' Your '+nm('kin')+' blocks helped keep it that way.':''));
+    var band=m.band0<0.65?'narrow':m.band0<0.95?'medium':m.band0<1.25?'wide':'very wide';
+    out.push('Frayed bands started '+band+'.'+(cat.place?' Your '+nm('place')+' blocks widened them.':'')+(cat.belong?' Your '+nm('belong')+' blocks narrowed them.':''));
+    if(m.clAdj)out.push('Red block groups were one block '+(m.clAdj>0?'bigger ('+nm('time')+').':'smaller ('+nm('help')+').'));
+  }
+  var g=sum(rec.g),r=sum(rec.r);
+  ride.push(g?'You steered into '+g+' green'+(g>1?'s':'')+', each a speed surge: '+tally(rec.g)+'.':'You collected no greens. Steering into one gives a surge.');
+  ride.push(r?'Pink blocks hit you '+r+' time'+(r>1?'s':'')+': '+tally(rec.r)+'.':'You dodged every pink block.');
+  if(rec.bands)ride.push('Frayed bands caught you '+rec.bands+' time'+(rec.bands>1?'s':'')+'.');
+  var beats=rec.match+rec.half+rec.wrong+rec.missBeat;
+  if(beats)ride.push('At the gaps: '+rec.match+' match'+(rec.match===1?'':'es')+', '+rec.half+' half, '+rec.wrong+' wrong shape, '+rec.missBeat+' missed.'+(rec.stalls?' The signal stalled '+rec.stalls+' time'+(rec.stalls>1?'s':'')+'.':''));
+  if(rec.grown||rec.lost)ride.push('On the last leg, greens grew back '+rec.grown+' spine'+(rec.grown===1?'':'s')+' and pinks dimmed '+rec.lost+'.');
+  var pairs=[['sleep','body'],['people','kin'],['basics','help'],['time','help'],['place','belong'],['school','skills']],tip='';
+  if(run.week){for(var i=0;i<pairs.length;i++){if(cat[pairs[i][0]]&&!cat[pairs[i][1]]){var c=CATS.filter(function(x){return x.id===pairs[i][1];})[0];var TIPFX={body:'It adds a landing spine at the thinking cortex.',kin:'It eases the pull of the survival shortcut.',help:'It makes red block groups one block smaller.',belong:'It narrows the frayed bands.',skills:'It makes each red block weigh less on the balance.'};tip='Try next: add a block from '+c.name+'. '+(TIPFX[c.id]||c.fx);break;}}
+    if(!tip)tip=g<2?'Try next: the same week, steering into more greens.':'Try next: a harder week, and see what holds.';}
+  var li=function(a){return a.map(function(x){return '<li>'+x+'</li>';}).join('');};
+  return '<h3>Your week, replayed</h3>'+(out.length?'<p class="sub">What your week set up</p><ul>'+li(out)+'</ul>':'')+'<p class="sub">What happened on the ride</p><ul>'+li(ride)+'</ul>'+(tip?'<p><b>'+tip+'</b></p>':'');}
+function openSheet(id){if(id==='sEnd'||id==='sFade'){var wr=document.getElementById(id==='sEnd'?'endWeek':'fadeWeek');if(wr)wr.innerHTML=weekReplay();}var s=document.getElementById(id);s.style.display='flex';s.classList.add('open');paused=true;var b=s.querySelector('button');if(b)b.focus();}
 function closeSheets(){document.querySelectorAll('.sheet').forEach(function(s){s.style.display='none';s.classList.remove('open');});paused=false;last=performance.now();}
 document.querySelectorAll('[data-close]').forEach(function(b){b.addEventListener('click',closeSheets);});
 document.getElementById('bMenu').onclick=function(){openSheet('sMenu');};
@@ -754,6 +790,7 @@ function landingBeat(sy){
   var wrongPad=null;if(!full&&!half){sy.pads.forEach(function(p){if(p!==lm.tgt&&Math.abs(angDiff(run.theta,p))<0.25)wrongPad=p;});}
   if(wrongPad!==null&&AC&&S.sound){tone(150,0.18,'square',0.06);}
   lm.fb={kind:full?'full':half?'half':wrongPad!==null?'wrong':'miss',ang:full||half?lm.tgt:(wrongPad!==null?wrongPad:run.theta),t0:lm.t};
+  run.rec[{full:'match',half:'half',wrong:'wrong',miss:'missBeat'}[lm.fb.kind]]++;
   var onAlarm=sy.apads.some(function(p){return Math.abs(angDiff(run.theta,p))<0.3;});
   var parts=[];for(var k=0;k<8;k++){var a=run.theta+0.5*(k/7-0.5);var kind=onAlarm?2:(full||half)&&Math.abs(angDiff(a,lm.tgt))<0.5?1:0;
     parts.push({a0:a,a1:kind===1?lm.tgt:kind===2?a:a+(Math.random()-0.5)*0.6,kind:kind,t:0,d:k*0.02});}
@@ -768,7 +805,7 @@ function landingBeat(sy){
   lm.tgt=nextTarget(sy);playKey(sy);lm.keyT=lm.t;
 }
 function missLanding(sy){ // below threshold: no action potential. Costs a hit; a fresh spark tries again.
-  endLanding();RING=null;sy.done=false;sfxFizzle();
+  run.rec.stalls++;endLanding();RING=null;sy.done=false;sfxFizzle();
   if(sy.last)sy.fill*=0.5;else sy.fill=0; // some of what landed lingers (summation fades)
   run.s=sy.s-7;run.v=Math.min(run.v,3*S.speed);run.lastHit='miss';
   run.hits++;drawHits();run.flash=0.6;run.flashCol='#ff4fa3';
@@ -937,7 +974,7 @@ function update(dt){
   else{var tgtv=cruise*(run.surgeT>0?SURGE:1);run.surgeT=Math.max(0,(run.surgeT||0)-dt);run.v+=(tgtv-run.v)*Math.min(1,dt*(run.v>tgtv?0.6:1.6));}
   run.boostT=Math.max(0,run.boostT-dt);run.flash=Math.max(0,run.flash-dt*2.5);
   var ds=run.v*dt;var prev=run.s;run.s+=ds;
-  var bk=(reduce||S.curves<0.5)?0:Math.max(-0.17,Math.min(0.17,-(curveX(run.s+10)-2*curveX(run.s+5)+curveX(run.s))*0.09));BANK+=(bk-BANK)*Math.min(1,dt*1.8);
+  var bk=(reduce||S.curves<0.5)?0:Math.max(-0.08,Math.min(0.08,-(curveX(run.s+10)-2*curveX(run.s+5)+curveX(run.s))*0.09));BANK+=(bk-BANK)*Math.min(1,dt*1.8);
   // real distance/time
   // the speedometer reads the fiber, not the onramp
   var vReal=Math.min(120,run.v/(6.5*S.speed*rampF())*75); var mPer=L.realM/L.len; var dm=ds*mPer; run.realM+=dm; if(vReal>0.5)run.realMs+=dm/vReal*1000;
@@ -947,14 +984,14 @@ function update(dt){
   // frays
   feats.forEach(function(f){
     var z=f.s-run.s;
-    if(!f.hit&&run.s>=f.s&&run.s<=f.s+f.len&&Math.abs(angDiff(run.theta,f.a))<run.band*f.wm/2){f.hit=true;hit('Hit a frayed band');
+    if(!f.hit&&run.s>=f.s&&run.s<=f.s+f.len&&Math.abs(angDiff(run.theta,f.a))<run.band*f.wm/2){f.hit=true;run.rec.bands++;hit('Hit a frayed band');
       if(!run.toldFray){run.toldFray=true;lesson('Frayed bands are damaged insulation. The signal slows there.');}}
   });
   pickups.forEach(function(p){if(!p.hit&&prev<p.s&&run.s>=p.s&&Math.abs(angDiff(run.theta,p.a))<0.42){p.hit=true;
     if(run.warm){effect(p.good,p.card.cap,p.card.ic);var wl=p.warm;setTimeout(function(){speak(wl,true);},900);}
-    else if(p.good)effect(true,p.card.cap,p.card.ic);else hit(p.card.cap,p.card.ic);
-    var sy4=syns[3];if(!run.warm&&run.leg===3&&sy4&&!sy4.done&&sy4.stressed){if(p.good&&sy4.pads.length<5){sy4.pads.push(sy4.pads[sy4.pads.length-1]+0.55);sy4.w=Math.min(1,sy4.w+0.15);}
-      else if(!p.good&&sy4.pads.length>2){sy4.pads.pop();sy4.w=Math.max(0.3,sy4.w-0.1);}}}});
+    else{var rc=run.rec[p.good?'g':'r'];rc[p.card.id]=(rc[p.card.id]||0)+1;if(p.good)effect(true,p.card.cap,p.card.ic);else hit(p.card.cap,p.card.ic);}
+    var sy4=syns[3];if(!run.warm&&run.leg===3&&sy4&&!sy4.done&&sy4.stressed){if(p.good&&sy4.pads.length<5){run.rec.grown++;sy4.pads.push(sy4.pads[sy4.pads.length-1]+0.55);sy4.w=Math.min(1,sy4.w+0.15);}
+      else if(!p.good&&sy4.pads.length>2){run.rec.lost++;sy4.pads.pop();sy4.w=Math.max(0.3,sy4.w-0.1);}}}});
   if(run.warm){pickups.forEach(function(p){if(!p.hit&&!p.told&&run.s>p.s+1){p.told=true;speak(p.good?'You passed a support. Steer into greens.':'You dodged a stress cube.',true);}});}
   pickups.forEach(function(p){if(p.good&&!p.hit&&!p.passed&&run.s>p.s+0.6){p.passed=true;if(!run.warm&&AC&&S.sound)tone(560,0.18,'sine',0.035,400,panOf(p.a,1.2));}});
   if(run.warm&&run.s>=run.warmEnd){endWarmup();return;}
