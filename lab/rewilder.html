@@ -3,9 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.6.2</title>
+<title>Rewilder v0.7</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.6.2 | LAB | 2026-11-10
+<!-- TSP build: Rewilder v0.7 | LAB | 2026-11-10
+     v0.7 (founder: "Pretty fun! Breaking the buildings down like a beaver is a little too easy now. Make
+     the physics have to make sense to break and don't just do it after X hits. I love the little details
+     like kites. Add dog walkers and foodcarts etc. Let the place keep evolving over time in fun ways.
+     electrocute if we attack electric green infrastructure. But make it look better."):
+     Buildings now stand or fall by weight and balance, not by a hit count. Each floor carries the blocks
+     above it: if their centre of mass sits outside what is left underneath, the building topples that
+     way; if what is left cannot carry the weight, that floor is crushed; any block no longer tied to the
+     ground falls. Blocks are tougher, foundations most of all. Grown sites keep gaining life on a timer:
+     dog walkers, a food cart, a busker, a kid with a balloon, a bench reader, flower patches, a kayak,
+     string lights between grown neighbours, butterflies, a market stall, a hot-air balloon. Wind turbines
+     and solar canopies zap like the tram does. The zap is a cartoon X-ray with a jagged aura and smoke.
      v0.6.2 (founder: "when the objectives are 'complete' don't end the world the player has just built.
      Let them altar and continue playing if they wish."): finishing all five sites shows the summary once
      and the game keeps running. After that, hold Down and smash on a grown site to dig it up and plant
@@ -180,7 +191,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.6.2</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.7</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -278,7 +289,7 @@ const CAUSE={
  sediment:{title:'The dam let go of a century of mud',chain:'Dam falls, then a sediment surge, then young water sites buried.',text:'The dam held back mud as well as water. Growth that was well rooted held on. Downstream, the same mud is building a beach at the river mouth. The order you free things in matters.'},
  need:{title:'The crews are a symptom',chain:'Structure gone, then a need unmet, then pave crews, then pavement returns.',text:'People still need to get around and keep the lights on. Until something meets that need, crews keep coming. A transit hub, a tram, wind, or solar would meet it. Open the Lens to see which need is short.'}
 };
-const HP={g:1,c:3,s:3,v:3,a:3,k:9},KB={garage:[2,5],highway:[4,2],coal:[3,4],dam:[2,5]};
+const HP={g:2,c:4,s:6,v:4,a:3,k:9},CAP={g:12,c:18,s:22,v:18,a:99,k:99},KB={garage:[2,5],highway:[5,4],coal:[3,4],dam:[2,5]};
 const SITE_DEF=[
  {id:'garage',x:260,cols:5,cw:50,floors:8,fh:50,name:'parking garage',col:'#9a958e',cell:(c,f)=>(c+f)%2?'c':'g'},
  {id:'highway',x:640,cols:12,cw:60,floors:5,fh:46,name:'elevated highway',col:'#b3ada2',cell:(c,f)=>f===4?'c':c%3===1?'s':null},
@@ -346,16 +357,16 @@ let state='title',sites=[],trucks=[],parts=[],sprigs=[],props=[],words=[],T=0,sh
 let mode=store.get('mode','dark'),soundOn=store.get('sound',true);
 const notes=new Set(),told=new Set();
 const cam={x:0,y:0};
-const P={x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,walk:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0};
+const P={x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,walk:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,singe:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0};
 const stats={hits:0,crews:0,paved:0,start:0,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0};
 let F={hard:4,soak:0,tn:0,tm:0,pn:0,pm:0,unmet:0,links:0,haze:true};
-let done=false,hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0;
+let life=[],lifeT=14,lifeI=0,done=false,hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0;
 
-function buildSite(d,i){const rows=[];for(let f=0;f<d.floors;f++){const row=[];for(let c=0;c<d.cols;c++){let t=d.cell(c,f);if(KB[d.id]&&KB[d.id][0]===c&&KB[d.id][1]===f)t='k';const hp=t?HP[t]+(f<2&&t!=='k'&&d.floors>2?2:0):0;row.push(t?{t,hp,max:hp,seed:i*1000+f*17+c*3,stack:d.id==='coal'&&f>=7}:null)}
+function buildSite(d,i){const rows=[];for(let f=0;f<d.floors;f++){const row=[];for(let c=0;c<d.cols;c++){let t=d.cell(c,f);if(KB[d.id]&&KB[d.id][0]===c&&KB[d.id][1]===f)t='k';const hp=t?HP[t]+(f<2&&t!=='k'&&d.floors>2?3:0):0;row.push(t?{t,hp,max:hp,seed:i*1000+f*17+c*3,stack:d.id==='coal'&&f>=7}:null)}
   row.stack=d.id==='coal'&&f>=7;row.deck=d.id==='highway'&&f===4;rows.push(row)}
  return {...d,i,w:d.cols*d.cw,cx:d.x+d.cols*d.cw/2,rows,state:'standing',g:0,t:0,paved:false,saved:0,seed:i*97+13,sprigT:6+i,choice:null,lift:null,liftT:10,dmgd:false,chainT:0,jet:null,jetT:5,why:[],sway:0,cars:d.id==='highway'?[0,1,2,3,4,5,6].map(i=>({x:d.x+30+i*96,c:CARC[i%5],dead:0,v:30+hr(i)*16})):[],trolley:d.id==='highway'?{x:d.x+60,dir:1}:null}}
 function resetWorld(){sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];crates=[];pits=[];notes.clear();told.clear();
- Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0});done=false;baron=null;baronT=40;baronHp=3;barrels=[];tar=[];who='beaver';rest={energy:100};
+ Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,singe:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0});life=[];lifeT=14;lifeI=0;done=false;baron=null;baronT=40;baronHp=3;barrels=[];tar=[];who='beaver';rest={energy:100};
  folk=[0,1,2,3,4,5].map(i=>({x:560+i*290+hr(i)*120,dir:i%2?1:-1,v:i%2?70+hr(i)*30:24+hr(i)*14,bike:i%2===1,c:['#c8342b','#3b6ea8','#e8c25a','#7a1a12','#2f8f8a','#b06ad0'][i],hop:0,seed:i}));
  Object.assign(stats,{hits:0,crews:0,paved:0,start:T,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0});
  crewT=14;stormT=26;rain=0;flood=0;rainbow=0;sed=null;beach=0;gardeners=0;crewSeen=0}
@@ -470,7 +481,7 @@ $('lensBtn').onclick=()=>setLens(!lensOn);
 $('tagBtn').onclick=()=>{if(canTag())tagOut()};
 function finish(){if(state!=='play'||done)return;done=true;setLens(false);SFX.grow();openNotes(true)}
 function startGame(){resetWorld();state='play';ac();musStart();document.body.classList.add('playing');resize();hudKey='';hud();cam.x=0;
- toast('Smash anything. Cut a notch three blocks deep from one edge and the building topples that way, so get clear.',5)}
+ toast('Smash anything. A building stands while its weight sits over what is left underneath. Cut out one side, low down, and it topples that way.',5)}
 $('startBtn').onclick=startGame;
 cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');if(state!=='play'&&!cardOpen&&!notesOpen&&!menuOpen)startGame();
  else if(state==='play'){const wx=e.clientX/S+cam.x,wy=(e.clientY-OY)/S+cam.y;if(Math.abs(wx-FRX)<95&&wy>GY-160&&wy<GY+30&&canTag())tagOut()}});
@@ -528,7 +539,7 @@ function cellXY(s,c,f){return[s.x+(c+.5)*s.cw,GY-(f+.5)*s.fh]}
 function siteColor(s,k){return k.t==='k'?'#c9962e':s.paved||k.t==='a'?'#3a3a40':k.t==='s'?'#5b6b82':k.t==='g'?'#bcd6e0':s.col}
 function killCell(s,c,f){const k=s.rows[f][c];k.hp=0;const[x,y]=cellXY(s,c,f);if(k.t==='k'){crate(x,y,x<s.cx?-1:1);return}debris(x,y,7,siteColor(s,k));
  if(s.id==='garage'&&k.t==='g'&&props.length<10){props.push({x,y,vy:-120,c:['#c8342b','#3b6ea8','#e8c25a','#ece6dc','#5a7a4a'][Math.floor(hr(k.seed)*5)],state:'fall',t:0,dir:1,y0:y});}}
-function hitCell(s,c,f,power){const k=s.rows[f][c],[x,y]=cellXY(s,c,f);
+function hitCell(s,c,f,power){const k=s.rows[f]&&s.rows[f][c];if(!k||k.hp<=0)return;const[x,y]=cellXY(s,c,f);
  if(!s.dmgd){s.dmgd=true;for(let i=0;i<4;i++)puff(s.x+30+i*40,GY-s.rows.length*s.fh-8,{kind:'bird',vx:60+Math.random()*80,vy:-90-Math.random()*60,r:6,c:'#6d7684',life:3,max:3})}
  let dmg=power;
  if(k.t==='k'){k.hp=0;crate(x,y,x<s.cx?-1:1);s.sway=1.5;once('kout','The gold block never breaks. Push it onto the yellow lift pad, into a crew\'s path, or upstream of something growing.',7);checkFails(s);return}
@@ -540,13 +551,28 @@ function hitCell(s,c,f,power){const k=s.rows[f][c],[x,y]=cellXY(s,c,f);
  else{SFX.hit();shake=RM?0:3}
  if(k.hp<=0)killCell(s,c,f);
  checkFails(s)}
-function checkFails(s){if(s.state!=='standing')return false;
- for(let f=0;f<s.rows.length-2;f++){const E=s.rows[f].filter(k=>k);if(E.length<2)continue;const need=Math.max(2,Math.ceil(E.length/2));let L=0,R=0;while(L<E.length&&E[L].hp<=0)L++;while(R<E.length&&E[E.length-1-R].hp<=0)R++;
-  if(L<E.length&&(L>=need||R>=need)){topple(s,L>=need?-1:1);return true}}
- for(let f=0;f<s.rows.length;f++){const row=s.rows[f];let tot=0,dead=0,st=0,sa=0;
-  row.forEach(k=>{if(!k)return;tot++;if(k.hp<=0)dead++;if(k.t==='s'){st++;if(k.hp>0)sa++}});
-  if(tot===0||dead>=Math.ceil(.6*tot)){failFloor(s,f);return true}}
- if(!s.rows.length&&s.state==='standing')collapse(s);return false}
+function checkFails(s){if(s.state!=='standing')return false;const R=s.rows;
+ R.forEach(r=>r.forEach((k,c)=>{if(k&&k.hp<=0)r[c]=null}));
+ while(R.length&&!R[R.length-1].some(k=>k))R.pop();
+ if(!R.length){collapse(s);return true}
+ // weight and balance: does each floor still hold what sits on it?
+ for(let f=0;f<R.length-1;f++){let lo=99,hi=-1,cap=0;R[f].forEach((k,c)=>{if(k){lo=Math.min(lo,c);hi=Math.max(hi,c);cap+=CAP[k.t]}});
+  let n=0,sx=0;for(let g=f+1;g<R.length;g++)R[g].forEach((k,c)=>{if(k){n++;sx+=c+.5}});
+  if(!n)break;if(hi<0)continue;const com=sx/n;
+  if(n>=4&&(com<lo-.15||com>hi+1.15)){topple(s,com<lo?-1:1);return true}
+  if(n>cap){crush(s,f,R.length-1-f);return true}}
+ // anything no longer tied to the ground falls
+ const seen=R.map(r=>r.map(()=>false)),q=[];R[0].forEach((k,c)=>{if(k){seen[0][c]=true;q.push([c,0])}});
+ while(q.length){const[c,f]=q.pop();[[c-1,f],[c+1,f],[c,f-1],[c,f+1]].forEach(([a,b])=>{if(R[b]&&R[b][a]&&!seen[b][a]){seen[b][a]=true;q.push([a,b])}})}
+ let moved=0;
+ for(let f=1;f<R.length;f++)for(let c=0;c<R[f].length;c++){const k=R[f][c];if(!k||seen[f][c]||R[f-1][c])continue;R[f-1][c]=k;R[f][c]=null;moved++;
+  if(f-1===0||(R[f-2]&&R[f-2][c])){const[x,y]=cellXY(s,c,f-1);dust(x,y+s.fh/2,2,30);if(k.t!=='k'){k.hp-=1;if(k.hp<=0)killCell(s,c,f-1)}}
+  if(state==='play'&&P.tumble<=0&&colOf(s,P.x)===c&&chestF(s)===f-1&&(P.climb===s||P.support===s||P.support==='ground')){if(P.climb===s)knock(P.x<s.cx?-1:1,6);else hurt(6);once('debris','Falling blocks. Do not stand under what you just cut loose.',4.5)}}
+ if(moved){s.chainT=.1;s.sway=Math.max(s.sway,.9);if(moved>2){SFX.bump();shake=RM?0:4}}
+ return moved>0}
+function crush(s,f,above){const y=GY-(f+.5)*s.fh;s.rows[f].forEach((k,c)=>{if(k&&k.hp>0)killCell(s,c,f)});stats.floors++;s.sway=2.6;hitstop=.09;SFX.floor();shake=RM?0:10;dust(s.cx,y+s.fh/2,14,s.w);word('KRUNCH',s.cx,y-84,'#ffd23f');s.chainT=.12;
+ if(state==='play'){trucks.forEach(t=>{if(t.state!=='tipped'&&t.x>s.x-20&&t.x<s.x+s.w+20)tipTruck(t)});if(s.lift&&s.lift.state!=='leave'&&s.lift.y>y){s.lift.state='leave';stats.lifts++;word('BONK',s.lift.x,s.lift.y-50)}
+  if(colOf(s,P.x)>=0&&P.tumble<=0&&(P.climb===s||P.support===s||P.support==='ground')&&chestF(s)<=f){hurt(Math.min(20,6+above*2));once('bonk','The floors above came down on you. The more weight you dig under, the more it hurts.',5)}}}
 function failFloor(s,f){const row=s.rows[f],above=s.rows.length-1-f,y=GY-(f+.5)*s.fh;
  row.forEach((k,c)=>{if(k&&k.hp>0)killCell(s,c,f)});
  s.rows.splice(f,1);stats.floors++;s.sway=2.6;hitstop=.09;
@@ -622,11 +648,15 @@ function strike(power){const tu=who==='turtle';if(tu)power=3;P.punch=.26;P.cool=
  if(s){const q=target(s);if(q){hitCell(s,q[0],q[1],power);return}}
  const fk=folk.find(f=>Math.abs(f.x-rx)<60);
  if(fk&&!P.climb&&P.y>GY-120){fk.hop=.5;word('NOPE',fk.x,GY-96,'#fbf3dc');SFX.whiff();once('folk','No smashing people or bikes. Cars are fair game.',4.5);return}
+ const es=sites.find(s=>(s.state==='growing'||s.state==='grown')&&s.g>.3&&((s.choice==='canopy'&&rx>s.x&&rx<s.x+s.w)||(s.choice==='wind'&&rx>s.x+140&&rx<s.x+s.w+10)));
+ if(es&&!P.climb&&P.y>GY-140){zap();return}
+ const lf=life.find(l=>l.kind!=='balloon'&&l.kind!=='lights'&&l.kind!=='butterfly'&&l.kind!=='flowers'&&l.kind!=='kayak'&&Math.abs(l.x-rx)<60);
+ if(lf&&!P.climb&&P.y>GY-120){word('NOPE',lf.x,GY-96,'#fbf3dc');SFX.whiff();once('folk','No smashing people or bikes. Cars are fair game.',4.5);return}
  const g=sites.find(s=>s.state==='growing'&&P.x>=s.x-10&&P.x<=s.x+s.w+10&&P.y>GY-60);
  if(g){g.g=Math.max(0,g.g-.1);leaves(rx,GY-20,10);SFX.setback();once('setback','Go easy. That site is growing, and smashing sets it back.',4);return}
  SFX.whiff()}
 function crunch(x,y,c){debris(x,y,14,c);stars(x,y,5);word('CRUNCH',x,y-40,'#ffd23f');SFX.crunch();shake=RM?0:6;stats.cars++}
-function zap(){P.energy=Math.max(0,P.energy-20);P.zap=.7;P.dizzy=1.2;P.vx=-P.face*260;P.vy=-220;P.support=null;sparks(P.x+P.face*50,P.y-50,18,'#9fd0ff');word('ZZZAP',P.x,P.y-170,'#9fd0ff');SFX.zap();shake=RM?0:8;hudKey='';once('zap','Trolleys and trams run on live wire. Leave them be.',4.5)}
+function zap(){P.energy=Math.max(0,P.energy-20);P.zap=.9;P.singe=2.4;P.dizzy=1.2;P.vx=-P.face*260;P.vy=-220;P.support=null;sparks(P.x+P.face*50,P.y-50,18,'#9fd0ff');word('ZZZAP',P.x,P.y-170,'#9fd0ff');SFX.zap();shake=RM?0:8;hudKey='';once('zap','Anything electric bites back: trolleys, trams, turbines, solar. Leave them be.',5)}
 function canTag(){return state==='play'&&P.nap<=0&&!paused()}
 function tagOut(){const e=P.energy;P.energy=rest.energy;rest.energy=e;who=who==='beaver'?'turtle':'beaver';P.dizzy=0;P.zap=0;P.cheer=.9;SFX.tag();word('TAG',P.x,P.y-175,'#ffd23f');dust(P.x,P.y,8,60);hudKey='';
  toast(who==='turtle'?'Mossback tags in. She is slow, her bite is heavy, and rubble bounces off her shell.':'Big Gnaw tags back in, rested.',5)}
@@ -722,7 +752,7 @@ function update(raw){if(hitstop>0){hitstop-=raw;return}const dt=(lensOn&&state==
   if((t.state==='drive'||t.state==='leave')&&P.support==='ground'&&!P.climb&&Math.abs(t.x-P.x)<38&&P.bump<=0){hurt(8);P.vx=(P.x<t.x?-1:1)*320;P.vy=-280;P.support=null;P.bump=.8}}
  for(let i=sprigs.length-1;i>=0;i--){const g=sprigs[i];if(Math.abs(g.x-P.x)<34&&Math.abs(g.y-(P.y-30))<60){sprigs.splice(i,1);P.energy=Math.min(100,P.energy+18);SFX.eat();leaves(g.x,g.y,6)}}
  P.energy=Math.min(100,P.energy+dt*1.2);
- rest.energy=Math.min(100,rest.energy+dt*5);
+ rest.energy=Math.min(100,rest.energy+dt*5);lifeStep(dt);if(P.singe>0&&Math.random()<dt*14)puff(P.x+P.face*10,P.y-120,{kind:'smoke',vx:(Math.random()-.5)*20,vy:-40,r:5,gr:9,c:'#3a3432',life:1.2,max:1.2});
  for(const f of folk){f.x+=f.dir*f.v*dt;if(f.hop>0)f.hop-=dt;if(f.cheer>0){f.cheer-=dt;if(f.hop<=0)f.hop=.5}if(f.x<70)f.dir=1;if(f.x>sites[4].x-50)f.dir=-1}
  if(P.energy<=40&&P.energy>0)once('taghint','Low on energy. Tap your friend past the reservoir, press Tag, or press T, and they take over while you rest.',6);
  if(P.energy<=0&&P.nap<=0){if(rest.energy>=40)tagOut();else{P.nap=3;P.climb=null;P.support=null;toast('Time for a nap. Willow sprigs grow on finished sites.',4)}}
@@ -762,8 +792,42 @@ function hazards(dt){sites.forEach(s=>{if(s.state!=='standing'||s.paved)return;
     if(J.t>=1.6){s.jet=null;s.jetT=4.5+Math.random()*2.5}}}})}
 
 let trail=[];
+const LIFE=['dog','cart','flowers','busker','kid','bench','kayak','lights','dog','butterfly','stall','balloon','flowers','kid','lights','busker'];
+function addLife(){const gs=sites.filter(s=>s.state==='grown');if(!gs.length||life.length>=18)return;
+ for(let n=0;n<LIFE.length;n++){const kind=LIFE[lifeI++%LIFE.length],s=gs[Math.floor(Math.random()*gs.length)];
+  if(kind==='kayak'&&(sites[4].state==='standing'||life.some(l=>l.kind==='kayak')))continue;
+  if(kind==='balloon'&&life.some(l=>l.kind==='balloon'))continue;
+  if(kind==='lights'){const nb=[sites[s.i-1],sites[s.i+1]].find(q=>q&&q.state==='grown');if(!nb||life.some(l=>l.kind==='lights'&&(l.s===s||l.nb===s)))continue;life.push({kind,s,nb,x:s.cx,seed:lifeI});return}
+  life.push({kind,s,x:s.x+30+Math.random()*(s.w-60),dir:Math.random()<.5?-1:1,seed:lifeI,c:CARC[lifeI%5]});return}}
+function lifeStep(dt){life=life.filter(l=>l.s.state==='grown'&&(!l.nb||l.nb.state==='grown'));
+ if(sites.some(s=>s.state==='grown')){lifeT-=dt;if(lifeT<=0){addLife();lifeT=20}}
+ life.forEach(l=>{if(l.kind==='dog'||l.kind==='kid'){l.x+=l.dir*(l.kind==='dog'?34:22)*dt;if(l.x<l.s.x-110)l.dir=1;if(l.x>l.s.x+l.s.w+110)l.dir=-1}
+  else if(l.kind==='kayak'){l.x-=34*dt;if(l.x<-40)l.x=sites[4].x}else if(l.kind==='balloon'){l.x+=9*dt;if(l.x>WORLD+80)l.x=-80}})}
+function note(x,y){dot(x,y,3.4,INK);line(x+3,y,x+3,y-12,INK,2);line(x+3,y-12,x+9,y-10,INK,2)}
+function drawLife(l){const x=l.x,g=GY-4,sd=l.seed;
+ if(l.kind==='dog'){person(x,g,l.c,sd);const dx=x+l.dir*30,wag=Math.sin(T*14+sd)*5,bob=Math.abs(Math.sin(T*9+sd))*2;line(x+l.dir*4,g-18,dx-l.dir*6,g-12-bob,INK,1.2);
+  shape(ellPts(dx,g-9-bob,11,6,sd),'#b8845a',{lw:1.6});shape(ellPts(dx+l.dir*11,g-14-bob,6,5,sd+1),'#b8845a',{lw:1.6});shape([[dx+l.dir*8,g-18-bob],[dx+l.dir*6,g-25-bob],[dx+l.dir*12,g-20-bob]],'#7a5236',{lw:1.2});dot(dx+l.dir*14,g-15-bob,1.4,INK);
+  line(dx-6,g-5,dx-6,g+2,INK,2);line(dx+6,g-5,dx+6,g+2,INK,2);line(dx-l.dir*10,g-11-bob,dx-l.dir*17,g-17-bob+wag,'#7a5236',2.6)}
+ else if(l.kind==='cart'){line(x,g-22,x,g-66,'#5b3a24',3);for(let i=0;i<4;i++)shape([[x-36+i*18,g-62],[x-18+i*18,g-62],[x,g-84]],i%2?'#fbf3dc':'#c8342b',{lw:1.6});
+  shape(rectPts(x-24,g-30,48,24,sd,.5),'#e8a22a',{lw:2,sh:1});shape(rectPts(x-24,g-30,48,7,sd+1,.3),'#fbf3dc',{lw:1.4});dot(x-14,g-2,5.5,INK);dot(x+14,g-2,5.5,INK);
+  for(let i=0;i<3;i++){const ph=(T*.5+i*.33)%1;ctx.globalAlpha=(1-ph)*.6;dot(x-8+i*5,g-36-ph*26,3+ph*5,'#f1ece2');ctx.globalAlpha=1}person(x+38,g,l.c,sd,true)}
+ else if(l.kind==='flowers'){for(let i=0;i<10;i++){const fx=x-44+i*9+hr(sd+i)*5,h=9+hr(sd+i*3)*10,sw=Math.sin(T*2+i)*1.5;line(fx,g+2,fx+sw,g-h,'#3f8443',2);dot(fx+sw,g-h,3.6,['#c8584a','#e8c25a','#b06ad0','#fbf6ea','#e58ab0'][i%5]);dot(fx+sw,g-h,1.3,'#f0c030')}}
+ else if(l.kind==='busker'){person(x,g,'#7a1a12',sd);shape(ellPts(x+7,g-13,8,6,sd),'#b8845a',{lw:1.6});line(x+7,g-13,x+20,g-24,'#5b3a24',3);for(let i=0;i<3;i++){const ph=(T*.4+i*.33)%1;ctx.globalAlpha=1-ph;note(x+14+i*10+Math.sin(ph*6+i)*6,g-34-ph*44);ctx.globalAlpha=1}
+  shape(rectPts(x-22,g-5,14,7,sd+2,.3),'#3a3a40',{lw:1.2})}
+ else if(l.kind==='kid'){ctx.save();ctx.translate(x,g);ctx.scale(.78,.78);person(0,0,l.c,sd);ctx.restore();const bx=x+l.dir*4+Math.sin(T*2+sd)*5,by=g-58+Math.cos(T*1.7+sd)*3;line(x+3,g-15,bx,by+10,INK,1);shape(ellPts(bx,by,9,11,sd),['#c8342b','#3b6ea8','#e8c25a'][sd%3],{lw:1.6})}
+ else if(l.kind==='bench'){shape(rectPts(x-24,g-13,48,5,sd,.4),'#8a5a34',{lw:1.6});line(x-18,g-8,x-18,g+2,'#5b3a24',3);line(x+18,g-8,x+18,g+2,'#5b3a24',3);shape(rectPts(x-24,g-27,48,4,sd+1,.4),'#8a5a34',{lw:1.4});
+  person(x-6,g-9,l.c,sd);shape(rectPts(x-2,g-27,11,8,sd+2,.3),'#fbf3dc',{lw:1.2});const px=x+16+Math.sin(T*3)*2;shape(ellPts(px,g-18,5,4,sd+3),'#6d7684',{lw:1.2});dot(px+4,g-21,2.4,'#6d7684')}
+ else if(l.kind==='kayak'){const y=GY+28+Math.sin(T*3+sd)*1.5,a=Math.sin(T*5)*.7;shape([[x-26,y],[x-16,y+6],[x+16,y+6],[x+26,y],[x+16,y-3],[x-16,y-3]],'#e8c25a',{lw:1.8,sh:1});shape(rectPts(x-3.5,y-17,7,13,sd,.3),'#c8342b',{lw:1.4});shape(ellPts(x,y-21,4.4,4.2,sd),'#c08a5a',{lw:1.4});
+  line(x-Math.cos(a)*20,y-10-Math.sin(a)*16,x+Math.cos(a)*20,y-10+Math.sin(a)*16,'#5b3a24',2.6)}
+ else if(l.kind==='lights'){const x0=l.s.cx,x1=l.nb.cx,y0=GY-150;ctx.beginPath();ctx.moveTo(x0,y0);ctx.quadraticCurveTo((x0+x1)/2,y0+70,x1,y0);ctx.strokeStyle=INK;ctx.lineWidth=1.6;ctx.stroke();line(x0,GY-6,x0,y0,'#5b3a24',3);line(x1,GY-6,x1,y0,'#5b3a24',3);
+  for(let i=1;i<14;i++){const t=i/14,bx=(1-t)*(1-t)*x0+2*(1-t)*t*(x0+x1)/2+t*t*x1,by=(1-t)*(1-t)*y0+2*(1-t)*t*(y0+70)+t*t*y0;ctx.globalAlpha=.55+.45*Math.sin(T*3+i*1.7);dot(bx,by+5,4.4,['#ffd23f','#c8584a','#9fd0ff','#7cc35a'][i%4]);ctx.globalAlpha=1}}
+ else if(l.kind==='butterfly'){for(let i=0;i<3;i++){const bx=x+Math.sin(T*1.3+i*2+sd)*46,by=g-34-i*12+Math.cos(T*2.1+i)*12,fl=Math.abs(Math.sin(T*16+i))*6+1.5,c=['#e8c25a','#e58ab0','#9fd0ff'][i];shape(ellPts(bx-fl/2-1,by,fl,5,i),c,{lw:1});shape(ellPts(bx+fl/2+1,by,fl,5,i+1),c,{lw:1});line(bx,by-4,bx,by+4,INK,1.6)}}
+ else if(l.kind==='stall'){line(x-30,g,x-30,g-52,'#5b3a24',3);line(x+30,g,x+30,g-52,'#5b3a24',3);for(let i=0;i<5;i++)shape(rectPts(x-34+i*13.6,g-62,13.6,14,sd+i,.3),i%2?'#fbf3dc':'#2f8f8a',{lw:1.4});shape(rectPts(x-32,g-24,64,7,sd,.4),'#8a5a34',{lw:1.6});
+  for(let i=0;i<7;i++)dot(x-25+i*8.4,g-28,4,['#c8342b','#f0a830','#5fae50','#e8c25a'][i%4]);person(x,g-2,'#3b6ea8',sd)}
+ else if(l.kind==='balloon'){const y=GY-430+Math.sin(T*.5+sd)*14;for(let i=0;i<5;i++){const a0=-1.3+i*.52;shape([[x,y+46],[x+Math.sin(a0)*52,y-Math.cos(a0)*6-10],[x+Math.sin(a0+.26)*56,y-44],[x+Math.sin(a0+.52)*52,y-Math.cos(a0+.52)*6-10]],i%2?'#fbf3dc':'#e8a22a',{lw:1.6})}
+  shape(ellPts(x,y-28,52,44,sd),'rgba(0,0,0,0)',{lw:2.2});line(x-14,y+44,x-8,y+62,INK,1.2);line(x+14,y+44,x+8,y+62,INK,1.2);shape(rectPts(x-10,y+62,20,13,sd,.4),'#8a5a34',{lw:1.6});dot(x,y+60,4,'#c08a5a')}}
 function tick(dt){if(P.support==='ground'&&(!trail.length||Math.abs(trail[trail.length-1]-P.x)>3)){trail.push(P.x);if(trail.length>90)trail.shift()}
- ['punch','cool','bump','spin','squash','dizzy','cheer','tumble','zap','stuck'].forEach(k=>{if(P[k]>0)P[k]-=dt})}
+ ['punch','cool','bump','spin','squash','dizzy','cheer','tumble','zap','stuck','singe'].forEach(k=>{if(P[k]>0)P[k]-=dt})}
 function player(dt){tick(dt);P.walk+=dt;
  if(P.nap>0){P.nap-=dt;if(P.nap<=0)P.energy=45;P.vx=0;gravity(dt);camFollow(dt);upQ=smashQ=slamQ=false;sHeld=false;P.charge=0;return}
  if(sHeld){sT+=dt;P.charge=clamp((sT-.12)/.33,0,1);if(P.charge>=1&&!P.chTold){P.chTold=1;SFX.pop()}}else{P.charge=0;P.chTold=0}
@@ -805,14 +869,14 @@ function camFollow(dt){const target=clamp(P.x-viewW*.45,0,Math.max(0,WORLD-viewW
 
 /* ---------- splash: the beaver shows the verb on beats ---------- */
 let demoT=0,demoI=0;
-const BEATS=[];[2.7,4.3,5.7].forEach((b,k)=>{const g=k===2?.3:.4;BEATS.push([b,1,-1,0],[b+g,0,-1,1],[b+g*2,3,1,0],[b+g*3,4,1,1])});
+const BEATS=[[1.5,0],[2.1,1],[2.7,2]];
 function demo(dt){demoT+=dt;const g=sites[0];
- if(demoT>10.5||g.state!=='standing'){if(demoT>10.5){resetWorld();demoT=0;demoI=0}return}
- if(demoT<1.3){P.x=120+demoT/1.3*265;P.vx=200;P.face=1;P.support='ground';P.y=GY}
- else{P.vx=0;P.climb=g;P.support=null;P.x=385;const ty=GY-(g.rows.length-1)*g.fh+15;P.y+=(ty-P.y)*Math.min(1,dt*(demoT<2.6?3:9));if(demoT<2.6)P.y=Math.min(P.y,GY-(demoT-1.3)/1.3*340)}
- while(demoI<BEATS.length&&demoT>=BEATS[demoI][0]){const b=BEATS[demoI++],f=g.rows.length-1,k=g.rows[f][b[1]];P.face=b[2];P.punch=.26;if(b[3])P.spin=.35;
-  if(k&&k.hp>0){const[x,y]=cellXY(g,b[1],f);k.hp=0;killCell(g,b[1],f);shake=RM?0:(b[3]?8:3);if(b[3]){word(['WHUMP','KRAK'][demoI%2],x,y-34,'#ffd23f');stars(x,y,5)}checkFails(g)}}
- if(demoT>7.2&&demoT<7.3)P.cheer=1.6}
+ if(demoT>9.5){resetWorld();demoT=0;demoI=0;return}
+ if(demoT<1.2){P.x=120+demoT/1.2*150;P.vx=200;P.face=1;P.support='ground';P.y=GY}
+ else if(g.state==='standing'){P.vx=0}
+ else{const tx=g.x+g.w+90;P.vx=Math.abs(tx-P.x)>4?200:0;P.x+=Math.sign(tx-P.x)*Math.min(Math.abs(tx-P.x),230*dt);P.face=demoT>5.5?-1:1;if(demoT>5.6&&demoT<5.7)P.cheer=1.8}
+ while(demoI<BEATS.length&&demoT>=BEATS[demoI][0]&&g.state==='standing'){const b=BEATS[demoI++],k=g.rows[0][b[1]];P.x=g.x+b[1]*g.cw+18;P.face=1;P.punch=.26;P.spin=.35;
+  if(k&&k.hp>0){const[x,y]=cellXY(g,b[1],0);k.hp=0;killCell(g,b[1],0);shake=RM?0:8;word(['WHUMP','KRAK','THWACK'][demoI%3],x,y-40,'#ffd23f');stars(x,y,5);checkFails(g)}}}
 
 /* ---------- render ---------- */
 const SKY={dark:{hz:['#2a2027','#6a4a36'],cl:['#0f2a4a','#3d7f93'],sun:'#f2c46a'},light:{hz:['#8c7a62','#d6b98c'],cl:['#4a9be0','#cdeef6'],sun:'#fff1b8'},sharp:{hz:['#1a1416','#5a3a26'],cl:['#06203f','#2f7f9a'],sun:'#ffe066'}};
@@ -856,6 +920,7 @@ function render(){const hz=haze(),sk=SKY[mode]||SKY.dark,clear=1-hz;
  props.forEach(c=>{ctx.save();ctx.translate(c.x,c.y);if(c.state==='fall')ctx.rotate(c.t*5);car(-13,5,c.c,1);ctx.restore()});
  sprigs.forEach(g=>{const y=g.y+Math.sin(T*3+g.x)*4;line(g.x-12,y+8,g.x+12,y-8,'#6b4a30',3);for(let k=0;k<4;k++)shape(ellPts(g.x-5+k*6,y+1-k*4,6,3,k+g.x),'#7cc35a',{lw:1.4})});
  folk.forEach(f=>{if(f.bike)bike(f.x,GY-2,f.c,f.seed,f.hop);else{ctx.save();if(f.hop>0)ctx.translate(0,-Math.sin(f.hop/.5*Math.PI)*14);person(f.x,GY-4,f.c,f.seed,f.hop>0);ctx.restore()}});
+ life.forEach(drawLife);
  tar.forEach(q=>{ctx.globalAlpha=Math.min(1,q.t/2);shape(blobPts(q.x,GY-3,26,7,q.x,9),'#1b1328',{lw:1.4});ctx.globalAlpha=1});
  barrels.forEach(q=>{shape(rectPts(q.x-9,q.y-12,18,24,q.x,.4),'#1b1328',{lw:1.6});line(q.x-9,q.y-2,q.x+9,q.y-2,'#ffd23f',4)});
  trucks.forEach(drawTruck);
@@ -1024,8 +1089,12 @@ function drawBaron(){const b=baron,bob=Math.sin(T*1.5)*6;
  ctx.font=DISPLAY.replace('%',22);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=INK;ctx.save();ctx.scale(b.dir<0&&b.state!=='out'?1:1,1);ctx.fillText('PAVE IT',0,3);ctx.restore();
  shape(rectPts(-28,44,56,20,6,.5),'#7a5236',{lw:2});dot(0,40,6.5,'#c08a5a');if(!(b.hat>0)){shape(rectPts(-7,22,14,13,7,.2),INK,{lw:1});line(-11,35,11,35,INK,3)}if(b.state!=='out'){const fy=34+Math.sin(T*16)*5;line(12,50,26,fy,'#c08a5a',3.4);dot(26,fy,4,'#c08a5a')}
  ctx.restore()}
-function drawHero(){if(P.zap>0&&Math.floor(T*24)%2){for(let k=0;k<6;k++){const a=k/6*6.283+T*9,r0=50,r1=96;ctx.beginPath();ctx.moveTo(P.x+Math.cos(a)*r0,P.y-60+Math.sin(a)*r0);ctx.lineTo(P.x+Math.cos(a+.2)*72,P.y-60+Math.sin(a+.2)*72);ctx.lineTo(P.x+Math.cos(a-.1)*r1,P.y-60+Math.sin(a-.1)*r1);ctx.strokeStyle='#fff7b0';ctx.lineWidth=4;ctx.stroke()}ctx.globalAlpha=.45}
- if(who==='turtle')drawTurtle();else drawBeaver();ctx.globalAlpha=1}
+function drawHero(){if(P.zap>0){const x=P.x,y=P.y,pts=[];for(let i=0;i<22;i++){const a=i/22*6.283,r=(i%2?66:98)+Math.sin(T*46+i*3)*7;pts.push([x+Math.cos(a)*r*.82,y-62+Math.sin(a)*r*.95])}shape(pts,'#fff7b0',{lw:3,st:'#f0a830'});
+  if(Math.floor(T*16)%2){const W='#fbf6ea',f=P.face;shape(blobPts(x,y-56,42,60,3,14),'#1b1328',{lw:2});
+   shape(ellPts(x+f*8,y-106,18,16,1),W,{lw:1.6});dot(x+f*8-6,y-108,4,INK);dot(x+f*8+6,y-108,4,INK);for(let i=-2;i<=2;i++)line(x+f*8+i*4,y-98,x+f*8+i*4,y-92,INK,1.6);
+   line(x,y-88,x,y-34,W,5);for(let i=0;i<4;i++)line(x-17+i*1.5,y-80+i*10,x+17-i*1.5,y-80+i*10,W,3.6);shape(ellPts(x,y-30,13,6,2),W,{lw:1.4});
+   line(x-15,y-82,x-38,y-116,W,4.4);line(x+15,y-82,x+38,y-116,W,4.4);line(x-8,y-26,x-18,y-3,W,4.4);line(x+8,y-26,x+18,y-3,W,4.4);return}}
+ if(who==='turtle')drawTurtle();else drawBeaver()}
 /* Mossback: an original snapping turtle with a sapling on her shell */
 function drawTurtle(){const climbing=!!P.climb,nap=P.nap>0,moving=Math.abs(P.vx)>12&&P.support,cheer=P.cheer>0&&!nap;
  const bob=cheer?Math.abs(Math.sin(T*12))*10:moving?Math.abs(Math.sin(P.walk*8))*3:Math.sin(P.walk*1.6);
