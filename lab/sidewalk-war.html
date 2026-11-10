@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sidewalk War v0.2: a pavement ant strategy game</title>
+<title>Sidewalk War v0.3: a pavement ant strategy game</title>
 <meta name="spec-source" content="claude/SPEC-SIDEWALK-WAR-2026-11-09.md">
 <meta name="audience" content="Curious players and students, about 12 and up, learning how real ant colonies forage, recognize strangers, and settle borders without a commander">
 <!--
   TSP BUILD BANNER
-  Sidewalk War v0.2, LAB, 2026-11-09
+  Sidewalk War v0.3, LAB, 2026-11-09
   A real-time strategy game about pavement ant colonies (Tetramorium immigrans)
   fighting for a garden edge. The player is the colony's chemistry, not its general:
   scent trails, alarm calls, and colony emphasis. Ants make their own choices.
@@ -47,12 +47,13 @@ html[data-light="dusk"],html[data-light="night"]{
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;height:100%}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font:20px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
 .backdrop{position:fixed;inset:0;background:var(--paper);z-index:0}
-.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100dvh}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh;height:100dvh;padding-bottom:env(safe-area-inset-bottom)}
 .se-chrome{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:6px 10px;background:var(--card);border-bottom:2px solid var(--line)}
 .se-brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.se-chrome a,.se-rail a{color:var(--ink);text-decoration:none;font-weight:700;font-size:18px;padding:10px 12px;min-height:44px;display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:10px;background:var(--btn)}
+.se-chrome a,.se-rail a,.se-rail button{color:var(--ink);text-decoration:none;font-weight:700;font-size:18px;padding:10px 12px;min-height:44px;display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:10px;background:var(--btn)}
 h1{margin:0;font:700 20px/1.2 Georgia,"Iowan Old Style",serif;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .ver,.tsp-labchip{font:700 18px/1 system-ui,sans-serif;padding:4px 7px;border:2px solid var(--ink);border-radius:8px;color:var(--ink);background:var(--card)}
 .modebtn{width:52px;height:52px;border-radius:50%;border:2px solid var(--line);background:var(--btn);color:var(--btnInk);display:grid;place-items:center;cursor:pointer;flex:none}
@@ -61,7 +62,15 @@ h1{margin:0;font:700 20px/1.2 Georgia,"Iowan Old Style",serif;display:flex;align
 .stats{display:flex;flex-wrap:wrap;gap:2px 14px;padding:2px 12px 6px;font-size:18px;font-weight:600;color:var(--ink)}
 .stats b{font-weight:800}
 .stats span{white-space:nowrap}
-.stage{position:relative;flex:1 0 auto;min-height:max(60dvh,300px);overflow:hidden;background:#2a2318;touch-action:none}
+.stage{position:relative;flex:1 1 0;min-height:120px;overflow:hidden;background:#2a2318;touch-action:manipulation}
+.corner{position:absolute;top:8px;right:8px;width:52px;height:52px;border-radius:50%;border:2px solid var(--line);background:var(--btn);color:var(--btnInk);display:grid;place-items:center;cursor:pointer;z-index:3}
+.corner svg{width:24px;height:24px}
+#modeBtn2{display:none;top:68px}
+#modeBtn2 svg{width:28px;height:28px}
+.cyc{display:none}
+.tcyc{display:none}
+.st{display:none}
+.se-rail .navonly{display:none}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
 .note{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);background:var(--card);color:var(--ink);border:2px solid var(--ink);border-radius:6px;padding:6px 12px;min-height:48px;font:700 18px/1.25 system-ui,sans-serif;text-align:left;cursor:pointer;box-shadow:3px 4px 0 rgba(0,0,0,.35);display:none}
 .note.show{display:block}
@@ -90,8 +99,8 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offs
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .short{display:none} .vshort{display:none}
 @media (max-width:899px){ .long{display:none} .short{display:inline} }
-@media (max-width:560px){ .se-brand{flex-basis:100%} .se-chrome a{padding:8px 10px} .brief{font-size:18px;padding-top:6px} .long{display:none} .short{display:inline} .controls{gap:6px} .controls button{padding:8px 10px} }
-@media (max-width:340px){ .se-chrome{padding:4px 6px;gap:4px 6px} .se-brand{flex:1 1 140px;flex-basis:140px} .modebtn{order:1} .se-chrome a{order:2} h1{font-size:18px;gap:4px} .ver,.tsp-labchip{padding:3px 5px} .se-chrome a{padding:6px 8px} .brief{padding:4px 8px 2px} .stats{padding:0 8px 4px} .vshort{display:inline} .short{display:none} .st-x{display:none} .topline{display:flex;flex-wrap:wrap;align-items:baseline;padding:4px 8px} .topline .brief{padding:0;margin:0 12px 0 0} .topline .stats{display:contents} .topline .stats span{margin-right:12px} }
+@media (max-width:560px){ #eForage,#eBrood,#eMuster,#bNotes{display:none} .cyc{display:inline-block} .se-rail .navonly{display:inline-flex;cursor:pointer} .grp{flex-wrap:nowrap} .se-brand{flex-basis:100%} .se-chrome a{padding:8px 10px} .brief{font-size:18px;padding-top:6px} .long{display:none} .short{display:inline} .controls{gap:6px} .controls button{padding:8px 10px} }
+@media (max-width:340px){ .se-chrome{padding:4px 6px;gap:4px 6px} .se-brand{flex-basis:100%} h1{font-size:18px;gap:4px} .ver,.tsp-labchip{padding:3px 5px} .se-chrome a{padding:6px 8px} .brief{padding:4px 8px 2px} .stats{padding:0 8px 4px} .vshort{display:inline} .short{display:none} .st-x{display:none} .brief,.st-food{display:none} h1{font-family:system-ui,-apple-system,sans-serif;font-weight:800} .controls{padding:6px} .grp{gap:6px} .controls{position:absolute;left:6px;bottom:calc(56px + env(safe-area-inset-bottom) + 6px);background:transparent;border:0;padding:0;z-index:4} .controls button{box-shadow:2px 3px 0 rgba(0,0,0,.45)} #tTrail,#tAlarm{display:none} .tcyc{display:inline-block} .note{top:8px;bottom:auto;max-width:calc(100% - 76px)} .topline{padding:4px 6px} .topline .stats span{margin-right:8px} .se-rail{padding:4px 6px;gap:6px} .se-rail a,.se-rail button{padding:6px 8px} .se-chrome a{padding:6px 8px} #modeBtn{display:none} #modeBtn2{display:grid} .ver,.tsp-labchip{padding:1px 2px} h1{gap:3px;letter-spacing:-0.5px} .se-chrome{padding:4px 4px} .lt{display:none} .st{display:inline} .tsp-labchip,.ver{font-size:18px} .topline{display:flex;flex-wrap:wrap;align-items:baseline;padding:4px 8px} .topline .brief{padding:0;margin:0 12px 0 0} .topline .stats{display:contents} .topline .stats span{margin-right:12px} }
 </style>
 </head>
 <body>
@@ -99,7 +108,7 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offs
 <div class="app">
   <header class="se-chrome">
     <div class="se-brand">
-      <h1>Sidewalk War <span class="ver">v0.2</span><span class="tsp-labchip">LAB</span></h1>
+      <h1>Sidewalk War <span class="ver">v0.3</span><span class="tsp-labchip">LAB</span></h1>
     </div>
     <a href="../index.html">Studio</a>
     <a href="../arcade.html">Cabinet</a>
@@ -108,8 +117,10 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offs
     </button>
   </header>
   <div class="topline"><p class="brief" id="brief"><span class="long">Your pavement ant colony lives under the left sidewalk crack. Tap the ground to lay a scent trail to food, and hold the garden where the aphids live before the summer flight.</span><span class="short">Tap the ground to lay scent.</span><span class="vshort">Tap to lay scent.</span></p>
-  <div class="stats" id="stats" aria-hidden="true"></div></div>
+  <div class="stats" id="stats" aria-hidden="true"><span>Day <b>1/12</b></span><span>Garden <b>open</b></span><span class="st-x">Ground <b>50%</b></span><span class="st-food">Food <b>24</b></span><span class="st-x">Ants <b>1,000</b> v <b>1,000</b></span></div></div>
   <div class="stage" id="stage" data-art-class="studio-cut">
+    <button class="corner" id="modeBtn2" aria-label="Mode: Light. Next: Dark."><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg></button>
+    <button class="corner" id="bPause" aria-pressed="false" aria-label="Pause the game"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="5" height="16" fill="currentColor"/><rect x="14" y="4" width="5" height="16" fill="currentColor"/></svg></button>
     <canvas id="cv" role="img" aria-label="A garden bed above a concrete sidewalk and a strip of lawn. Two pavement ant colonies forage and fight across it."></canvas>
     <button class="note" id="note" aria-live="polite">Field note: <span id="noteH"></span></button>
     <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH">
@@ -119,19 +130,21 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offs
   </div>
   <div class="controls" role="toolbar" aria-label="Colony controls">
     <div class="grp" role="group" aria-label="What a tap does">
-      <button id="tTrail" aria-pressed="true">Scent trail</button>
-      <button id="tAlarm" aria-pressed="false" hidden>Alarm call</button>
+      <button id="tTrail" aria-pressed="true"><span class="lt">Scent trail</span><span class="st">Trail</span></button>
+      <button id="tAlarm" aria-pressed="false" hidden><span class="lt">Alarm call</span><span class="st">Alarm</span></button>
+      <button id="tCycle" class="tcyc" aria-label="Tap tool: Scent trail.">Trail</button>
       <button id="bNotes">Notes</button>
     </div>
     <div class="grp" role="group" aria-label="Colony emphasis">
       <button id="eForage" aria-pressed="true">Forage</button>
       <button id="eBrood" aria-pressed="false">Brood</button>
       <button id="eMuster" aria-pressed="false">Muster</button>
-      <button id="bPause" aria-pressed="false">Pause</button>
+      <button id="eCycle" class="cyc" aria-label="Colony emphasis: Forage. Tap for Brood.">Forage</button>
     </div>
   </div>
   <nav class="se-rail" aria-label="Site">
     <a href="index.html">Back</a>
+    <button class="navonly" id="bNotes2">Notes</button>
     <a href="../index.html">Home</a>
   </nav>
 </div>
@@ -170,10 +183,10 @@ let mode;
 function sysDark(){ try{return matchMedia("(prefers-color-scheme: dark)").matches;}catch(e){return false;} }
 function setMode(m){ mode=m; document.documentElement.setAttribute("data-mode",m);
   const nx=MODES[(MODES.indexOf(m)+1)%3];
-  $("modeBtn").setAttribute("aria-label","Mode: "+MODE_NAME[m]+". Next: "+MODE_NAME[nx]+".");
+  for(const id of ["modeBtn","modeBtn2"]) $(id).setAttribute("aria-label","Mode: "+MODE_NAME[m]+". Next: "+MODE_NAME[nx]+".");
   try{localStorage.setItem("sw-mode",m);}catch(e){}
   bgDirty=true; }
-$("modeBtn").onclick=()=>setMode(MODES[(MODES.indexOf(mode)+1)%3]);
+$("modeBtn").onclick=$("modeBtn2").onclick=()=>setMode(MODES[(MODES.indexOf(mode)+1)%3]);
 
 /* ---------------- WORLD ---------------- */
 let W=1000, H=760, scale=1, ox=0, oy=0, dpr=1;
@@ -193,7 +206,7 @@ const dist2=(a,b,c,d)=>(a-c)*(a-c)+(b-d)*(b-d);
 function newGame(){
   const r=stage.getBoundingClientRect();
   W = clamp(Math.round(r.width*1.45),560,1000);
-  H = clamp(Math.round(W*(r.height/Math.max(1,r.width))),380,1500);
+  H = clamp(Math.round(W*(r.height/Math.max(1,r.width))),220,1500);
   GX=Math.ceil(W/CELL); GY=Math.ceil(H/CELL);
   trail=[new Float32Array(GX*GY),new Float32Array(GX*GY)];
   war=[new Float32Array(GX*GY),new Float32Array(GX*GY)];
@@ -213,7 +226,7 @@ function newGame(){
   for(const c of colonies){ for(let i=0;i<14;i++) spawn(c); }
   $("tAlarm").hidden=true; setTool("trail"); day=1; dayT=0; rainT=0; over=false; time=0; seen.clear(); queue.length=0; flags={};
   bgDirty=true; fit();
-  setTimeout(()=>note("colony"),20000); setTimeout(()=>note("scale"),45000);
+  showBriefTab(); setTimeout(()=>note("colony"),20000); setTimeout(()=>note("scale"),45000);
 }
 const world={gy:0,sy:0};
 let flags={};
@@ -238,6 +251,7 @@ function paintLine(g,x0,y0,x1,y1,q,cap){
 /* ---------------- PLAYER ACTIONS ---------------- */
 function applyTool(x,y){
   if(over) return;
+  if(noteId==="__brief"){ noteId=null; $("note").classList.remove("show"); if(queue.length) nextNote(); }
   const c=colonies[0];
   if(tool==="trail"){
     paintLine(trail[0],c.nest.x,c.nest.y,x,y,0.9,1.6);
@@ -251,13 +265,18 @@ function applyTool(x,y){
     say("Alarm call. Workers pour out toward the spot you marked.");
   }
 }
-function setTool(t){ tool=t; $("tTrail").setAttribute("aria-pressed",t==="trail"); $("tAlarm").setAttribute("aria-pressed",t==="alarm"); }
-function setEmph(e){ colonies[0].emph=e; for(const [id,v] of [["eForage","forage"],["eBrood","brood"],["eMuster","muster"]]) $(id).setAttribute("aria-pressed",e===v);
+function setTool(t){ tool=t; $("tCycle").textContent=t==="trail"?"Trail":"Alarm"; $("tCycle").setAttribute("aria-label","Tap tool: "+(t==="trail"?"Scent trail":"Alarm call")+"."); $("tTrail").setAttribute("aria-pressed",t==="trail"); $("tAlarm").setAttribute("aria-pressed",t==="alarm"); }
+function setEmph(e){ colonies[0].emph=e; { const nx=["forage","brood","muster"][(["forage","brood","muster"].indexOf(e)+1)%3]; const N={forage:"Forage",brood:"Brood",muster:"Muster"}; $("eCycle").textContent=N[e]; $("eCycle").setAttribute("aria-label","Colony emphasis: "+N[e]+". Tap for "+N[nx]+"."); } for(const [id,v] of [["eForage","forage"],["eBrood","brood"],["eMuster","muster"]]) $(id).setAttribute("aria-pressed",e===v);
   if(e==="brood" && !flags.broodN){flags.broodN=1; note("brood");}
   if(e==="muster" && !flags.workN){flags.workN=1; note("workers");} }
+$("tCycle").onclick=()=>{ if($("tAlarm").hidden){ say("Alarm call unlocks when your ants meet the rival."); fx.push({k:"ring",x:colonies[0].nest.x,y:colonies[0].nest.y,t:0}); return; } setTool(tool==="trail"?"alarm":"trail"); };
 $("tTrail").onclick=()=>setTool("trail"); $("tAlarm").onclick=()=>setTool("alarm");
 $("eForage").onclick=()=>setEmph("forage"); $("eBrood").onclick=()=>setEmph("brood"); $("eMuster").onclick=()=>setEmph("muster");
-$("bPause").onclick=()=>{ paused=!paused; $("bPause").setAttribute("aria-pressed",paused); $("bPause").textContent=paused?"Resume":"Pause"; };
+const PAUSE_SVG=$("bPause").innerHTML, PLAY_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg>';
+$("bPause").onclick=()=>{ paused=!paused; $("bPause").setAttribute("aria-pressed",paused); $("bPause").innerHTML=paused?PLAY_SVG:PAUSE_SVG; $("bPause").setAttribute("aria-label",paused?"Resume the game":"Pause the game"); };
+const EMPH=["forage","brood","muster"], EMN={forage:"Forage",brood:"Brood",muster:"Muster"};
+$("eCycle").onclick=()=>setEmph(EMPH[(EMPH.indexOf(colonies[0].emph)+1)%3]);
+$("bNotes2").onclick=()=>openNotes(null);
 $("bNotes").onclick=()=>openNotes(null);
 $("sheetBtn").onclick=()=>closeSheet();
 
@@ -278,11 +297,13 @@ document.addEventListener("keydown",e=>{
 /* ---------------- NOTES UI ---------------- */
 let noteTimer=0;
 function note(id){ if(seen.has(id)||!NOTES[id]) return; seen.add(id); queue.push(id); if(!$("note").classList.contains("show")) nextNote(); }
-function nextNote(){ const id=queue.shift(); if(!id){ $("note").classList.remove("show"); return; }
+function nextNote(){ $("note").firstChild.textContent="Field note: "; const id=queue.shift(); if(!id){ $("note").classList.remove("show"); return; }
   noteId=id; $("noteH").textContent=NOTES[id].h; $("note").setAttribute("aria-label","New field note: "+NOTES[id].h+". Open it.");
   $("note").classList.add("show"); noteTimer=12; say("New field note: "+NOTES[id].h+"."); }
 let noteId=null;
-$("note").onclick=()=>{ noteTimer=0; $("note").classList.remove("show"); openNotes(noteId); };
+const tiny=()=>{ try{return matchMedia("(max-width:340px)").matches;}catch(e){return false;} };
+function showBriefTab(){ if(!tiny()) return; noteId="__brief"; $("noteH").textContent=""; $("note").firstChild.textContent="Tap the ground."; $("note").classList.add("show"); noteTimer=0; }
+$("note").onclick=()=>{ noteTimer=0; $("note").classList.remove("show"); if(noteId==="__brief"){ noteId=null; if(queue.length) nextNote(); return; } openNotes(noteId); };
 function openNotes(first){ const b=$("sheetBody"); b.innerHTML="";
   let ids=Object.keys(NOTES).filter(k=>seen.has(k)); if(first&&seen.has(first)) ids=[first].concat(ids.filter(k=>k!==first));
   const p=document.createElement("p"); p.textContent=ids.length+" of "+Object.keys(NOTES).length+" notes found. Play on to find the rest."; b.appendChild(p);
@@ -602,7 +623,8 @@ function fit(){
   cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
   scale=Math.min(r.width/W,r.height/H); ox=(r.width-W*scale)/2; oy=(r.height-H*scale)/2;
 }
-new ResizeObserver(()=>fit()).observe(stage);
+new ResizeObserver(()=>{ const r=stage.getBoundingClientRect(); const a=r.height/Math.max(1,r.width), wa=H/W;
+  if(day===1 && time<6 && Math.abs(a-wa)/wa>0.06 && colonies.length){ newGame(); } else fit(); }).observe(stage);
 function render(){
   if(bgDirty) buildBG();
   const g=ctx; g.setTransform(1,0,0,1,0,0); g.fillStyle="#1d1810"; g.fillRect(0,0,cv.width,cv.height);
@@ -665,7 +687,7 @@ function hud(){
   $("stats").innerHTML="<span>Day <b>"+Math.min(day,DAYS)+"/"+DAYS+"</b>"+(rainT>0?" rain":"")+"</span>"+
     "<span>Garden <b>"+(hold===0?"yours":hold===1?"rival":"open")+"</b></span>"+
     "<span class=\"st-x\">Ground <b>"+Math.round(share()*100)+"%</b></span>"+
-    "<span>Food <b>"+Math.round(me.food)+"</b></span>"+
+    "<span class=\"st-food\">Food <b>"+Math.round(me.food)+"</b></span>"+
     "<span class=\"st-x\">Ants <b>"+(total(me)*20).toLocaleString()+"</b> v <b>"+(total(th)*20).toLocaleString()+"</b></span>";
 }
 
