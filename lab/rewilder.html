@@ -3,9 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.2</title>
+<title>Rewilder v0.3</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.2 | LAB | 2026-11-09
+<!-- TSP build: Rewilder v0.3 | LAB | 2026-11-09
+     v0.3 (founder: "Rewilder is sysyphian right now. I understand player can't destroy steel, but should
+     be able to push unobstructed steel blocks to use as barricade to reenforcements/ rebuilders. Also, let
+     player dig down to make pits that trap vehicles etc. Add funky soundtrack" ... "Change movement arrows
+     to classic Nintendo joystick directional"):
+     Steel is never destroyed. Free steel shoves out of the frame and drops as a crate. Crates push along
+     the ground, stop pave crews, and block the base of a repair lift. Welders cannot put shoved steel
+     back. Hold Down and smash on open ground to dig a pit; a crew that drives into a deep pit is stuck.
+     A funk loop plays under the game and gains parts as sites finish. Touch controls are a cross D-pad
+     and a round Smash button.
      v0.2 (founder: "1 rec works to try. Let's get more amusement and joy out of the art ... Breaking has to
      be more challenging. Higher. More resistance. More complicated."):
      BREAKING. Structures are grids of blocks, up to ten floors. Panels break with a tap. Steel holds the
@@ -70,15 +79,21 @@ body.playing #title{display:none}
 #lens p{margin:0 0 6px}
 #lens p:last-child{margin:0}
 #lens b{color:var(--accent)}
-body.lensOn #toast{top:auto;bottom:calc(112px + env(safe-area-inset-bottom))}
+body.lensOn #toast{top:auto;bottom:calc(196px + env(safe-area-inset-bottom))}
 #startBtn{position:fixed;z-index:3;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom));font-size:22px;min-height:60px;padding:10px 30px;border-radius:30px;white-space:nowrap;background:#2f6b3a;color:#fffdf6;border:3px solid #fffdf6;box-shadow:0 4px 0 rgba(0,0,0,.4)}
 body.playing #startBtn{display:none}
 #pad{position:fixed;z-index:3;left:0;right:0;bottom:0;display:none;justify-content:space-between;padding:8px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));pointer-events:none}
 body.playing.touch #pad{display:flex}
-#pad .grp{display:flex;gap:8px;pointer-events:auto}
-#pad button{width:min(72px,17vw);height:72px;min-width:0;border-radius:20px;flex-direction:column;gap:0;font-size:18px;padding:2px;touch-action:none;user-select:none;-webkit-user-select:none;background:var(--chrome);opacity:.92}
-#pad button svg{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-#pad button.on{background:var(--line);color:var(--online)}
+#pad{align-items:flex-end}
+#dpad{width:156px;height:156px;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+#dpad svg{width:100%;height:100%;display:block}
+#dpad .arm{fill:#1c1c22;stroke:#d6d6dc;stroke-width:3;stroke-linejoin:round}
+#dpad .tri{fill:#d6d6dc}
+#dpad .hit{fill:#ffd23f;opacity:0}
+#dpad.l .hl,#dpad.r .hr,#dpad.u .hu,#dpad.d .hd{opacity:.9}
+#dpad.l .tl,#dpad.r .tr,#dpad.u .tu,#dpad.d .td{fill:#1c1c22}
+#smashBtn{pointer-events:auto;width:104px;height:104px;min-width:0;border-radius:52px;background:#b3261e;color:#fffdf6;border:4px solid #fffdf6;font-size:20px;font-weight:800;box-shadow:0 5px 0 rgba(0,0,0,.45);touch-action:none;user-select:none;-webkit-user-select:none;margin:0 6px 22px 0}
+#smashBtn.on{background:#7a1a12;transform:translateY(4px);box-shadow:0 1px 0 rgba(0,0,0,.45)}
 .sheet{position:fixed;z-index:7;inset:0;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(10,6,16,.55)}
 .sheet.open{display:flex}
 .paperCard{background:#fbf3dc;color:#1b1328;border:3px solid #1b1328;border-radius:16px;box-shadow:0 6px 0 rgba(0,0,0,.35);padding:18px 20px;max-width:560px;width:100%;max-height:86vh;overflow:auto;box-sizing:border-box}
@@ -109,12 +124,12 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.2</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.3</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
   <button id="menuClose" type="button">Close menu</button>
-  <p>Keys: arrows or WASD move, Up climbs or jumps, Space smashes. Hold Space, then let go, for a tail slam that breaks steel. L opens the Lens.</p>
+  <p>Keys: arrows or WASD move, Up climbs or jumps, Space smashes. Hold Space, then let go, for a tail slam. Hold Down and smash on open ground to dig a pit. L opens the Lens.</p>
 </header>
 <div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Rewilder, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div><button id="lensBtn" type="button" aria-pressed="false">Lens</button><button id="soundBtn" class="icon" type="button" aria-pressed="true" aria-label="Sound on"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 11h4l6-5v16l-6-5H5z"/><path class="wave" d="M19 10a5 5 0 0 1 0 8M22 7a9 9 0 0 1 0 14"/><path class="x" d="M19 11l6 6M25 11l-6 6"/></svg></button></div>
 
@@ -124,15 +139,13 @@ body.playing.touch #pad{display:flex}
 <button id="startBtn" type="button">Start smashing</button>
 
 <div id="pad" aria-hidden="true">
- <div class="grp">
-  <button type="button" data-k="l" tabindex="-1"><svg viewBox="0 0 30 30"><path d="M19 6 9 15l10 9"/></svg>Left</button>
-  <button type="button" data-k="r" tabindex="-1"><svg viewBox="0 0 30 30"><path d="M11 6l10 9-10 9"/></svg>Right</button>
- </div>
- <div class="grp">
-  <button type="button" data-k="d" tabindex="-1"><svg viewBox="0 0 30 30"><path d="M6 11l9 10 9-10"/></svg>Down</button>
-  <button type="button" data-k="u" tabindex="-1"><svg viewBox="0 0 30 30"><path d="M6 19l9-10 9 10"/></svg>Up</button>
-  <button type="button" data-k="s" tabindex="-1"><svg viewBox="0 0 30 30"><path d="M8 20l5-11 4 7 5-9"/><path d="M5 24h20"/></svg>Smash</button>
- </div>
+ <div id="dpad"><svg viewBox="0 0 156 156">
+  <path class="arm" d="M56 6h44a6 6 0 0 1 6 6v38h38a6 6 0 0 1 6 6v44a6 6 0 0 1-6 6h-38v38a6 6 0 0 1-6 6H56a6 6 0 0 1-6-6v-38H12a6 6 0 0 1-6-6V56a6 6 0 0 1 6-6h38V12a6 6 0 0 1 6-6z"/>
+  <rect class="hit hu" x="54" y="10" width="48" height="42" rx="4"/><rect class="hit hd" x="54" y="104" width="48" height="42" rx="4"/><rect class="hit hl" x="10" y="54" width="42" height="48" rx="4"/><rect class="hit hr" x="104" y="54" width="42" height="48" rx="4"/>
+  <path class="tri tu" d="M78 16l12 16H66z"/><path class="tri td" d="M78 140l12-16H66z"/><path class="tri tl" d="M16 78l16-12v24z"/><path class="tri tr" d="M140 78l-16-12v24z"/>
+  <circle cx="78" cy="78" r="13" fill="none" stroke="#d6d6dc" stroke-width="2.5"/>
+ </svg></div>
+ <button type="button" id="smashBtn" tabindex="-1">Smash</button>
 </div>
 
 <div class="sheet" id="cardSheet" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
@@ -209,7 +222,7 @@ const CAUSE={
  sediment:{title:'The dam let go of a century of mud',chain:'Dam falls, then a sediment surge, then young water sites buried.',text:'The dam held back mud as well as water. Growth that was well rooted held on. Downstream, the same mud is building a beach at the river mouth. The order you free things in matters.'},
  need:{title:'The crews are a symptom',chain:'Structure gone, then a need unmet, then pave crews, then pavement returns.',text:'People still need to get around and keep the lights on. Until something meets that need, crews keep coming. A transit hub, a tram, wind, or solar would meet it. Open the Lens to see which need is short.'}
 };
-const HP={g:1,c:3,s:4,v:3,a:3};
+const HP={g:1,c:3,s:2,v:3,a:3};
 const SITE_DEF=[
  {id:'garage',x:260,cols:5,cw:50,floors:8,fh:50,name:'parking garage',col:'#9a958e',cell:(c,f)=>c===0||c===4?'s':(c+f)%2?'c':'g'},
  {id:'highway',x:640,cols:8,cw:60,floors:4,fh:46,name:'elevated highway',col:'#b3ada2',cell:(c,f)=>f===3?'c':(c===1||c===4||c===6)?'s':null},
@@ -230,7 +243,7 @@ let W=0,H=0,DPR=1,S=1,OY=0,viewW=0,reserve=0,grain=null;
 function resize(){
  W=innerWidth;H=innerHeight;DPR=Math.min(2,devicePixelRatio||1);
  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
- reserve=document.body.classList.contains('touch')&&document.body.classList.contains('playing')?96:0;
+ reserve=document.body.classList.contains('touch')&&document.body.classList.contains('playing')?182:0;
  S=Math.min((H-reserve)/600,W/520);
  OY=H-reserve-600*S;viewW=W/S;
 }
@@ -280,12 +293,12 @@ const cam={x:0,y:0};
 const P={x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,walk:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0};
 const stats={hits:0,crews:0,paved:0,start:0,floods:0,boosts:0,lifts:0,floors:0};
 let F={hard:4,soak:0,tn:0,tm:0,pn:0,pm:0,unmet:0,links:0,haze:true};
-let crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0;
+let crates=[],pits=[],crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0;
 
 function buildSite(d,i){const rows=[];for(let f=0;f<d.floors;f++){const row=[];for(let c=0;c<d.cols;c++){const t=d.cell(c,f);row.push(t?{t,hp:HP[t],max:HP[t],seed:i*1000+f*17+c*3,stack:d.id==='coal'&&f>=7}:null)}
   row.stack=d.id==='coal'&&f>=7;row.deck=d.id==='highway'&&f===3;rows.push(row)}
  return {...d,i,w:d.cols*d.cw,cx:d.x+d.cols*d.cw/2,rows,state:'standing',g:0,t:0,paved:false,saved:0,seed:i*97+13,sprigT:6+i,choice:null,lift:null,liftT:10,dmgd:false,chainT:0,jet:null,jetT:5,why:[]}}
-function resetWorld(){sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];notes.clear();told.clear();
+function resetWorld(){sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];crates=[];pits=[];notes.clear();told.clear();
  Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0});
  Object.assign(stats,{hits:0,crews:0,paved:0,start:T,floods:0,boosts:0,lifts:0,floors:0});
  crewT=14;stormT=26;rain=0;flood=0;rainbow=0;sed=null;beach=0;gardeners=0;crewSeen=0}
@@ -317,12 +330,33 @@ const SFX={
  pick(){tone(440,.1,'sine',.12);tone(660,.16,'sine',.12,0,.09)}
 };
 
+/* ---------- funk loop: bass and drums, then stabs and a lead as sites finish ---------- */
+let mus=null;
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const M_BASS=[40,0,0,40,0,43,0,45,0,0,47,0,50,0,47,45,40,0,0,40,0,43,0,45,0,47,0,50,0,52,50,47];
+const M_KICK=[1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,1,0,0,0,0,1];
+const M_LEAD=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,76,0,79,76,0,74,71,0,74,0,71,69,0,71,0,0];
+function mNote(f,t,d,type,v,lp){const o=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter();o.type=type;o.frequency.value=f;fl.type='lowpass';fl.frequency.setValueAtTime(lp*3,t);fl.frequency.exponentialRampToValueAtTime(lp,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(fl).connect(g).connect(mus.g);o.start(t);o.stop(t+d+.02)}
+function mNoise(t,d,v,hp){const s=AC.createBufferSource(),g=AC.createGain(),fl=AC.createBiquadFilter();s.buffer=mus.nb;fl.type='highpass';fl.frequency.value=hp;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);s.connect(fl).connect(g).connect(mus.g);s.start(t,Math.random()*.5,d+.02)}
+function musStart(){const a=ac();if(!a||mus)return;const g=a.createGain();g.gain.value=.5;g.connect(a.destination);const n=a.sampleRate,b=a.createBuffer(1,n,n),c=b.getChannelData(0);for(let i=0;i<n;i++)c[i]=Math.random()*2-1;
+ mus={g,nb:b,next:a.currentTime+.1,step:0,id:setInterval(musTick,50)}}
+function musStop(){if(!mus)return;clearInterval(mus.id);try{mus.g.disconnect()}catch(e){}mus=null}
+function musTick(){if(!mus||!AC)return;const spb=60/104/4,grown=sites.filter(s=>s.state==='grown').length;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;
+ while(mus.next<AC.currentTime+.15){const i=mus.step%32,t=mus.next+(i%2?spb*.16:0);
+  if(M_BASS[i])mNote(mf(M_BASS[i]),t,spb*1.6,'sawtooth',.2,260);
+  if(M_KICK[i]){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g).connect(mus.g);o.start(t);o.stop(t+.2)}
+  if(i%8===4)mNoise(t,.14,.22,1500);
+  mNoise(t,i%4===2?.09:.03,i%2?.05:.09,7000);
+  if(grown>=1&&(i%16===3||i%16===6||i%16===11))(i<16?[64,67,71,74]:[69,73,76,79]).forEach(m=>mNote(mf(m),t,spb*.9,'square',.035,1800));
+  if(grown>=3&&M_LEAD[i])mNote(mf(M_LEAD[i]),t,spb*1.4,'triangle',.09,3000);
+  mus.step++;mus.next+=spb}}
+
 /* ---------- UI ---------- */
 const MODES=['dark','light','sharp'],MODE_NAME={dark:'Dark',light:'Light',sharp:'Sharp'};
 function applyMode(){document.documentElement.setAttribute('data-comfort',mode);const nx=MODES[(MODES.indexOf(mode)+1)%3];$('modeBtn').setAttribute('aria-label','Mode: '+MODE_NAME[mode]+'. Switch to '+MODE_NAME[nx]+'.')}
 $('modeBtn').onclick=()=>{mode=MODES[(MODES.indexOf(mode)+1)%3];store.set('mode',mode);applyMode()};
 function applySound(){$('soundBtn').setAttribute('aria-pressed',soundOn);$('soundBtn').setAttribute('aria-label',soundOn?'Sound on':'Sound off')}
-$('soundBtn').onclick=()=>{soundOn=!soundOn;store.set('sound',soundOn);applySound();if(soundOn)tone(660,.1,'sine',.12)};
+$('soundBtn').onclick=()=>{soundOn=!soundOn;store.set('sound',soundOn);applySound();if(soundOn){tone(660,.1,'sine',.12);if(state==='play')musStart()}else musStop()};
 function setMenu(o){menuOpen=o;$('topbar').classList.toggle('open',o);$('menuBtn').setAttribute('aria-expanded',o);if(o)$('menuClose').focus();else $('menuBtn').focus()}
 $('menuBtn').onclick=()=>setMenu(!menuOpen);$('menuClose').onclick=()=>setMenu(false);
 function say(t){$('say').textContent='';setTimeout(()=>{$('say').textContent=t},30)}
@@ -360,7 +394,7 @@ $('notesBtn').onclick=()=>openNotes(false);
 function setLens(o){lensOn=o;$('lensBtn').setAttribute('aria-pressed',o);$('lens').classList.toggle('on',o);document.body.classList.toggle('lensOn',o);lensT=0;if(o)once('lens2','The Lens slows time. Press it again to close it.',3)}
 $('lensBtn').onclick=()=>setLens(!lensOn);
 function finish(){if(state!=='play')return;state='end';setLens(false);document.body.classList.remove('playing');resize();SFX.grow();openNotes(true);$('startBtn').textContent='Play again'}
-function startGame(){resetWorld();state='play';ac();document.body.classList.add('playing');resize();hudKey='';hud();cam.x=0;
+function startGame(){resetWorld();state='play';ac();musStart();document.body.classList.add('playing');resize();hudKey='';hud();cam.x=0;
  toast('Walk in front of the garage and press Up to climb. Start near the top.',5)}
 $('startBtn').onclick=startGame;
 cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');if(state!=='play'&&!cardOpen&&!notesOpen&&!menuOpen)startGame()});
@@ -384,11 +418,17 @@ addEventListener('keydown',e=>{
  else if(e.code==='KeyL'){setLens(!lensOn)}});
 addEventListener('keyup',e=>{const k=KM[e.code];if(k)K[k]=0;else if(isSmash(e.code))sUp()});
 addEventListener('blur',()=>{K.l=K.r=K.u=K.d=0;sHeld=false});
-document.querySelectorAll('#pad button').forEach(b=>{const k=b.dataset.k;
- const on=e=>{e.preventDefault();b.setPointerCapture&&b.setPointerCapture(e.pointerId);b.classList.add('on');if(k==='s')sDown();else{if(k==='u'&&!K.u)upQ=true;K[k]=1}};
- const off=()=>{if(!b.classList.contains('on'))return;b.classList.remove('on');if(k==='s')sUp();else K[k]=0};
- b.addEventListener('pointerdown',on);b.addEventListener('pointerup',off);b.addEventListener('pointercancel',off);b.addEventListener('lostpointercapture',off);
- b.addEventListener('contextmenu',e=>e.preventDefault())});
+const dp=$('dpad'),sb=$('smashBtn');let dpId=null;
+function dpSet(e){const r=dp.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),ok=Math.hypot(dx,dy)>r.width*.1;
+ const l=ok&&dx<-Math.abs(dy)*.45,rt=ok&&dx>Math.abs(dy)*.45,u=ok&&dy<-Math.abs(dx)*.45,d=ok&&dy>Math.abs(dx)*.45;
+ if(u&&!K.u)upQ=true;K.l=+l;K.r=+rt;K.u=+u;K.d=+d;dp.className=(l?'l ':'')+(rt?'r ':'')+(u?'u ':'')+(d?'d':'')}
+function dpOff(e){if(e.pointerId!==dpId)return;dpId=null;K.l=K.r=K.u=K.d=0;dp.className=''}
+dp.addEventListener('pointerdown',e=>{e.preventDefault();dpId=e.pointerId;dp.setPointerCapture&&dp.setPointerCapture(e.pointerId);dpSet(e)});
+dp.addEventListener('pointermove',e=>{if(e.pointerId===dpId)dpSet(e)});
+['pointerup','pointercancel','lostpointercapture'].forEach(n=>dp.addEventListener(n,dpOff));
+sb.addEventListener('pointerdown',e=>{e.preventDefault();sb.setPointerCapture&&sb.setPointerCapture(e.pointerId);sb.classList.add('on');sDown()});
+['pointerup','pointercancel','lostpointercapture'].forEach(n=>sb.addEventListener(n,()=>{if(!sb.classList.contains('on'))return;sb.classList.remove('on');sUp()}));
+[dp,sb].forEach(el=>el.addEventListener('contextmenu',e=>e.preventDefault()));
 
 /* ---------- particles, props, words ---------- */
 function puff(x,y,o){if(parts.length>(RM?150:360))return;parts.push(Object.assign({x,y,vx:0,vy:0,r:4,gr:0,life:1,max:1,kind:'dust',c:'#8a8076',rot:0,vr:0,g:0},o))}
@@ -409,7 +449,7 @@ function braced(s,c,f){return alive(s,c-1,f)||alive(s,c+1,f)}
 function steelOpen(s,c,f){return loadOn(s,f)<=2&&!braced(s,c,f)}
 function cellXY(s,c,f){return[s.x+(c+.5)*s.cw,GY-(f+.5)*s.fh]}
 function siteColor(s,k){return s.paved||k.t==='a'?'#3a3a40':k.t==='s'?'#5b6b82':k.t==='g'?'#bcd6e0':s.col}
-function killCell(s,c,f){const k=s.rows[f][c];k.hp=0;const[x,y]=cellXY(s,c,f);debris(x,y,7,siteColor(s,k));
+function killCell(s,c,f){const k=s.rows[f][c];k.hp=0;const[x,y]=cellXY(s,c,f);if(k.t==='s'){crate(x,y,x<s.cx?-1:1);return}debris(x,y,7,siteColor(s,k));
  if(s.id==='garage'&&k.t==='g'&&props.length<10){props.push({x,y,vy:-120,c:['#c8342b','#3b6ea8','#e8c25a','#ece6dc','#5a7a4a'][Math.floor(hr(k.seed)*5)],state:'fall',t:0,dir:1,y0:y});}}
 function hitCell(s,c,f,power){const k=s.rows[f][c],[x,y]=cellXY(s,c,f);
  if(!s.dmgd){s.dmgd=true;for(let i=0;i<4;i++)puff(s.x+30+i*40,GY-s.rows.length*s.fh-8,{kind:'bird',vx:60+Math.random()*80,vy:-90-Math.random()*60,r:6,c:'#6d7684',life:3,max:3})}
@@ -417,8 +457,7 @@ function hitCell(s,c,f,power){const k=s.rows[f][c],[x,y]=cellXY(s,c,f);
  if(k.t==='s'){
   if(loadOn(s,f)>2){SFX.clang();sparks(x,y,6);word('CLANG',x,y-30);once('load','Too much weight sits on that steel. Bring down the floors above it first.');return}
   if(braced(s,c,f)){SFX.clang();sparks(x,y,6);word('CLANG',x,y-30);once('brace','That steel is braced. Break the panel beside it first.');return}
-  if(power<3){SFX.clang();sparks(x,y,6);word('CLANG',x,y-30);once('slam','Steel shrugs off a tap. Hold Smash, then let go, for a tail slam.',5);return}
-  dmg=2}
+  dmg=power>1?2:1;once('push','Free steel shoves out and drops as a crate. Push crates into the path of crews and repair lifts.',6)}
  k.hp-=dmg;stats.hits++;debris(x,y,power>1?12:6,siteColor(s,k));
  if(power>1){SFX.slam();shake=RM?0:9;word(['WHUMP','THWACK','KRAK'][Math.floor(Math.random()*3)],x,y-34,'#ffd23f');stars(x,y,5);
   [[c-1,f],[c+1,f],[c,f+1],[c,f-1]].forEach(n=>{const q=s.rows[n[1]]&&s.rows[n[1]][n[0]];if(q&&q.hp>0&&q.t!=='s'){q.hp-=1;if(q.hp<=0)killCell(s,n[0],n[1])}})}
@@ -432,7 +471,7 @@ function checkFails(s){for(let f=0;f<s.rows.length;f++){const row=s.rows[f];let 
 function failFloor(s,f){const row=s.rows[f],above=s.rows.length-1-f,y=GY-(f+.5)*s.fh;
  row.forEach((k,c)=>{if(k&&k.hp>0)killCell(s,c,f)});
  s.rows.splice(f,1);stats.floors++;SFX.floor();shake=RM?0:10;dust(s.cx,y+s.fh/2,14,s.w);word(above?'THOOM':'KRUNCH',s.cx,y-84,'#ffd23f');
- for(let i=f;i<s.rows.length;i++)s.rows[i].forEach((k,c)=>{if(k&&k.hp>0){k.hp-=2;if(k.hp<=0)killCell(s,c,i)}});
+ for(let i=f;i<s.rows.length;i++)s.rows[i].forEach((k,c)=>{if(k&&k.hp>0){k.hp-=k.t==='s'?1:2;if(k.hp<=0)killCell(s,c,i)}});
  if(colOf(s,P.x)>=0&&state==='play'&&(P.climb===s||P.support===s||P.support==='ground')){const pf=chestF(s);
   if(P.support==='ground'){if(f>0&&P.tumble<=0){hurt(8);once('debris','Falling rubble. Stand clear, or climb above the floor you are breaking.')}}
   else if(pf>f)P.y+=s.fh;
@@ -478,6 +517,7 @@ function lensText(){const d=F.hard-F.soak,next=d>1.5?'The next rain will flood y
 function target(s){const c=colOf(s,P.x),f=chestF(s),o=[[c,f],[c+P.face,f],[c,f+1],[c,f-1],[c-P.face,f]];for(const q of o)if(q[0]>=0&&alive(s,q[0],q[1]))return q;return null}
 function strike(power){P.punch=.26;P.cool=power>1?.45:.26;if(power>1){P.spin=.35;P.energy=Math.max(0,P.energy-5)}
  const rx=P.x+P.face*48;
+ if(K.d&&P.support==='ground'&&!P.climb){dig();return}
  if(!P.climb&&P.y>GY-130){const t=trucks.find(t=>t.state!=='tipped'&&Math.abs(t.x-rx)<64);if(t){tipTruck(t);return}}
  for(const s of sites){const L=s.lift;if(L&&L.state!=='leave'&&Math.abs(L.x-P.x)<95&&Math.abs(L.y-(P.y-40))<85){L.state='leave';stats.lifts++;SFX.tip();stars(L.x,L.y-20,6);word('BONK',L.x,L.y-50);once('lift','The repair crew rides down and clocks out.',3.5);return}}
  const s=sites.find(s=>s.state==='standing'&&colOf(s,P.x)>=0);
@@ -485,6 +525,11 @@ function strike(power){P.punch=.26;P.cool=power>1?.45:.26;if(power>1){P.spin=.35
  const g=sites.find(s=>s.state==='growing'&&P.x>=s.x-10&&P.x<=s.x+s.w+10&&P.y>GY-60);
  if(g){g.g=Math.max(0,g.g-.1);leaves(rx,GY-20,10);SFX.setback();once('setback','Go easy. That site is growing, and smashing sets it back.',4);return}
  SFX.whiff()}
+function dig(){if(sites.some(s=>P.x>s.x-36&&P.x<s.x+s.w+36)){once('digwhere','Dig on open ground, between the sites.',3.5);SFX.whiff();return}
+ const x=P.x+P.face*34;let p=pits.find(p=>Math.abs(p.x-x)<54);if(!p){if(pits.length>=5)pits.shift();p={x,d:0};pits.push(p)}
+ p.d=Math.min(3,p.d+1);debris(p.x,GY-4,9,'#6b4a30');SFX.hit();word(p.d>=2?'DEEP':'DIG',p.x,GY-60,'#e3cf9a');if(p.d===2)once('deep','That pit is deep enough to trap a crew.',3.5)}
+function crate(x,y,dir){if(crates.length>=10)crates.shift();crates.push({x,y,vx:dir*170,vy:-140,g:false,seed:Math.floor(x+y)});SFX.clang();word('SHOVE',x,y-34,'#c9d2de')}
+const fixable=k=>!!k&&k.hp<k.max&&!(k.t==='s'&&k.hp<=0);
 function tipTruck(t){t.state='tipped';t.t=0;stats.crews++;SFX.tip();shake=RM?0:4;debris(t.x,GY-14,6,'#e8a22a');word('BONK',t.x,GY-80);
  if(t.target&&t.target.paving===t)t.target.paving=null;
  const home=sites.find(s=>s.state==='grown'&&Math.abs(s.cx-t.x)<700);
@@ -494,6 +539,7 @@ function spawnTruck(){const grow=sites.filter(s=>s.state==='growing'&&!s.paving&
  const why=F.tu>0&&(F.pu<=0||Math.random()<.6)?'travel':F.pu>0?'power':'habit';
  trucks.push({x,dir:x<s.cx?1:-1,state:'drive',target:s,t:0,why});crewSeen++;
  toast(why==='travel'?'A pave crew is coming. People still need a way to get around.':why==='power'?'A crew is coming. The town still needs power.':'A pave crew is rolling in out of habit.',3.5);
+ if(crewSeen===1)setTimeout(()=>{if(state==='play')once('pit','Hold Down and press Smash on open ground to dig a pit in a crew\'s path. Steel crates stop crews too.',6)},3700);
  if(crewSeen>=2&&F.unmet>0)cause('need')}
 
 /* ---------- update ---------- */
@@ -509,6 +555,8 @@ function update(raw){const dt=(lensOn&&state==='play')?raw*.3:raw;T+=dt;
    if(state==='play'&&P.tumble<=0&&P.bump<=0&&P.y-40>c.y0+30&&Math.abs(c.x-P.x)<34&&c.y>P.y-130&&c.y<P.y-10){P.bump=.8;if(P.climb)knock(P.x<c.x?-1:1,6);else hurt(6);once('car','Cars drop out when a parking bay breaks. Stay out from under them.')}
    if(c.y>=GY-8){c.y=GY-8;c.state='drive';c.t=0;c.dir=c.x<P.x?-1:1;SFX.honk();dust(c.x,GY,3,20)}}
   else{c.x+=c.dir*230*dt;if(c.t>3.5)props.splice(i,1)}}
+ for(const c of crates){if(c.g)continue;c.vy+=1500*dt;c.x=clamp(c.x+c.vx*dt,30,WORLD-30);c.y+=c.vy*dt;
+  if(c.y>=GY-22){c.y=GY-22;c.g=true;dust(c.x,GY,5,40);shake=RM?0:5;SFX.bump();const t=trucks.find(t=>t.state!=='tipped'&&Math.abs(t.x-c.x)<46);if(t&&state==='play')tipTruck(t)}}
  sites.forEach(s=>{
   if(s.chainT>0&&s.state==='standing'){s.chainT-=dt;if(s.chainT<=0)checkFails(s)}
   if(s.state==='collapsing'){s.t+=dt;if(Math.random()<dt*20)dust(s.x+Math.random()*s.w,GY,1,10);
@@ -536,13 +584,15 @@ function update(raw){const dt=(lensOn&&state==='play')?raw*.3:raw;T+=dt;
  if(beach>0&&beach<1)beach=Math.min(1,beach+dt/8);
  if(sites.some(s=>s.state==='growing')){crewT-=dt*(.5+F.unmet);if(crewT<=0){if(trucks.filter(t=>t.state!=='tipped').length<3)spawnTruck();crewT=16}}
  for(let i=trucks.length-1;i>=0;i--){const t=trucks[i];t.t+=dt;
-  if(t.state==='drive'){const s=t.target;if(!s||s.state!=='growing'||s.paving){t.state='leave';t.dir=t.x<P.x?-1:1}else{t.x+=t.dir*82*dt;if(Math.abs(t.x-s.cx)<6){t.state='pave';t.t=0;s.paving=t;SFX.pave()}}}
+  if(t.state==='drive'){const s=t.target;if(!s||s.state!=='growing'||s.paving){t.state='leave';t.dir=t.x<P.x?-1:1}else if(crates.some(c=>c.g&&(c.x-t.x)*t.dir>0&&Math.abs(c.x-t.x)<62)){if(!t.wait){SFX.honk();t.wait=0}t.wait+=dt;if(t.wait>2.5){t.state='leave';t.dir=-t.dir;stats.crews++;once('barr','The crew gave up at your barricade and drove home.',4)}}
+   else{t.x+=t.dir*82*dt;if(Math.abs(t.x-s.cx)<6){t.state='pave';t.t=0;s.paving=t;SFX.pave()}}}
   else if(t.state==='pave'){const s=t.target;t.x+=Math.sin(t.t*3)*30*dt;if(Math.random()<dt*6)puff(t.x,GY-30,{kind:'smoke',vx:-6,vy:-20,r:4,gr:6,c:'#4a4440',life:1.4,max:1.4});
    if(t.t>=4.5){s.paving=null;s.saved=s.g;s.paved=true;s.state='standing';s.cols=6;s.cw=s.w/6;s.fh=26;s.dmgd=true;
     const row=[];for(let c=0;c<6;c++)row.push({t:'a',hp:3,max:3,seed:s.seed+c*5});s.rows=[row];stats.paved++;SFX.pave();
     toast('A crew paved over the growing '+CH[s.choice].short+'. Smash the new lot to free it.',4);t.state='leave';t.dir=t.x<WORLD/2?-1:1}}
   else if(t.state==='leave'){t.x+=t.dir*110*dt;if(t.x<-140||t.x>WORLD+140)trucks.splice(i,1)}
   else if(t.state==='tipped'){if(t.t>6)trucks.splice(i,1)}
+  if(t.state==='drive'||t.state==='leave'){const pi=pits.findIndex(p=>p.d>=2&&Math.abs(p.x-t.x)<24);if(pi>=0){pits.splice(pi,1);tipTruck(t);t.sunk=1;word('PLONK',t.x,GY-70,'#ffd23f');once('trap','That crew is stuck in your pit.',3.5)}}
   if((t.state==='drive'||t.state==='leave')&&P.support==='ground'&&!P.climb&&Math.abs(t.x-P.x)<38&&P.bump<=0){hurt(8);P.vx=(P.x<t.x?-1:1)*320;P.vy=-280;P.support=null;P.bump=.8}}
  for(let i=sprigs.length-1;i>=0;i--){const g=sprigs[i];if(Math.abs(g.x-P.x)<34&&Math.abs(g.y-(P.y-30))<60){sprigs.splice(i,1);P.energy=Math.min(100,P.energy+18);SFX.eat();leaves(g.x,g.y,6)}}
  P.energy=Math.min(100,P.energy+dt*1.2);
@@ -553,14 +603,16 @@ function update(raw){const dt=(lensOn&&state==='play')?raw*.3:raw;T+=dt;
 function hazards(dt){sites.forEach(s=>{if(s.state!=='standing'||s.paved)return;
   // repair lifts
   if(s.id!=='lot'){const L=s.lift;
-   if(!L){if(s.dmgd){s.liftT-=dt;if(s.liftT<=0){const side=P.x<s.cx?1:-1;s.lift={side,x:side<0?s.x-26:s.x+s.w+26,y:GY,state:'rise',t:0,n:0,f:0};once('liftcome','A repair lift is riding up to weld the damage shut. Smash it to send the crew home.',5)}}}
-   else if(L.state==='rise'){let tf=-1;for(let f=0;f<s.rows.length&&tf<0;f++)if(s.rows[f].some(k=>k&&k.hp<k.max))tf=f;
+   if(!L){if(s.dmgd){s.liftT-=dt;if(s.liftT<=0){const bx=d=>d<0?s.x-26:s.x+s.w+26,free=d=>!crates.some(c=>c.g&&Math.abs(c.x-bx(d))<52);let side=P.x<s.cx?1:-1;if(!free(side))side=-side;
+     if(!free(side)){s.liftT=8;once('liftblock','Your crates block the repair lift on both sides. Nothing gets welded here.',5)}
+     else{s.lift={side,x:bx(side),y:GY,state:'rise',t:0,n:0,f:0};once('liftcome','A repair lift is riding up to weld the damage shut. Smash it, or park a steel crate where it stands.',6)}}}}
+   else if(L.state==='rise'){let tf=-1;for(let f=0;f<s.rows.length&&tf<0;f++)if(s.rows[f].some(fixable))tf=f;
     if(tf<0)L.state='leave';else{const ty=GY-tf*s.fh-6;L.f=tf;const d=ty-L.y;L.y+=Math.sign(d)*Math.min(Math.abs(d),75*dt);if(Math.abs(d)<2){L.state='work';L.t=0}}}
    else if(L.state==='work'){L.t+=dt;if(Math.random()<dt*14)sparks(L.x-L.side*18,L.y-30,1,'#9fd0ff');
     if(L.t>=2.4){L.t=0;const row=s.rows[L.f];let fixed=false;if(row){const order=row.map((k,c)=>c);if(L.side>0)order.reverse();
-      for(const c of order){const k=row[c];if(k&&k.hp<k.max){k.hp=k.max;fixed=true;SFX.weld();const[x,y]=cellXY(s,c,L.f);sparks(x,y,10,'#9fd0ff');word('ZZT',x,y-24,'#9fd0ff');break}}}
+      for(const c of order){const k=row[c];if(fixable(k)){k.hp=k.max;fixed=true;SFX.weld();const[x,y]=cellXY(s,c,L.f);sparks(x,y,10,'#9fd0ff');word('ZZT',x,y-24,'#9fd0ff');break}}}
      L.n++;L.state=(!fixed||L.n>=3)?'leave':'rise'}}
-   else{L.y+=130*dt;if(L.y>=GY){s.lift=null;s.liftT=15}}}
+   else{L.y+=130*dt;if(L.y>=GY){s.lift=null;s.liftT=22}}}
   // highway traffic on an unbroken deck
   if(s.id==='highway'){const top=s.rows[s.rows.length-1];s.traffic=!!top&&top.deck&&top.filter(k=>k&&k.hp>0).length>=6;
    if(s.traffic&&P.support===s&&P.bump<=0)for(let i=0;i<4;i++){const cx=s.x+((T*110+i*130)%(s.w-30))+15;if(Math.abs(cx-P.x)<28){P.bump=.9;hurt(6);P.vx=260;P.vy=-260;P.support=null;SFX.honk();once('traffic','Traffic still runs on the deck. Hang underneath it, or break it up.',5);break}}}
@@ -590,8 +642,10 @@ function player(dt){tick(dt);P.walk+=dt;
    else if(!hold(s,P.x,P.y)){P.climb=null;P.support=null;P.vy=0;P.vx=0}}
   upQ=false;camFollow(dt);return}
  P.vx+=(dir*230-P.vx)*Math.min(1,dt*(P.support?14:4));if(dir)P.face=dir;
+ if(dir&&P.support==='ground')for(const c of crates){if(c.g&&(c.x-P.x)*dir>0&&Math.abs(c.x-P.x)<52){c.x=clamp(c.x+dir*150*dt,30,WORLD-30);P.vx=dir*150;
+   const pi=pits.findIndex(p=>Math.abs(p.x-c.x)<20);if(pi>=0){pits.splice(pi,1);crates.splice(crates.indexOf(c),1);word('THUNK',c.x,GY-50);dust(c.x,GY,5,30)}break}}
  const s=sites.find(s=>s.state==='standing'&&s.rows.length*s.fh>40&&hold(s,P.x,P.support==='ground'?GY-6:P.y));
- if((upQ||(K.d&&P.support&&P.support!=='ground'))&&P.support&&s&&P.tumble<=0){upQ=false;P.climb=s;P.support=null;P.vx=0;P.vy=0;if(P.y>GY-6)P.y=GY-6;once('climb','You are climbing. Smash hits the block in front of you. Steel needs a tail slam.',5);camFollow(dt);return}
+ if((upQ||(K.d&&P.support&&P.support!=='ground'))&&P.support&&s&&P.tumble<=0){upQ=false;P.climb=s;P.support=null;P.vx=0;P.vy=0;if(P.y>GY-6)P.y=GY-6;once('climb','You are climbing. Smash hits the block in front of you. Free steel glows; shove it out.',5);camFollow(dt);return}
  if(upQ){upQ=false;if(P.support){P.vy=-600;P.support=null}}
  gravity(dt);camFollow(dt)}
 function standOK(){const s=P.support;if(s==='ground')return P.y>=GY-1;if(!s||s.state!=='standing')return false;const c=colOf(s,P.x);if(c<0)return false;const f=Math.round((GY-P.y)/s.fh)-1;return alive(s,c,f)&&Math.abs(GY-(f+1)*s.fh-P.y)<2}
@@ -649,7 +703,9 @@ function render(){const hz=haze(),sk=SKY[mode]||SKY.dark,clear=1-hz;
  const gar=sites[0];if(gar.state==='standing'&&!gar.paved){shape(rectPts(gar.x-30,GY+16,gar.w+60,28,7),'#3b3a3d');for(let i=0;i<7;i++)line(gar.x-20+i*45,GY+18,gar.x-20+i*45,GY+42,'#232227',3)}
  shape(rectPts(cam.x-60,GY-6,viewW+120,10,3,1.6),mix('#7a6a4a','#4c7a3a',clear),{lw:2});
  if(beach>0){const b=ease(beach);shape([[-80,GY+6],[-80,GY-4-10*b],[60,GY-8-14*b],[180,GY-6],[230,GY+6]],'#e3cf9a',{lw:2});for(let i=0;i<3;i++)if(b>.5){const bx=20+i*50+Math.sin(T*2+i)*10;shape(ellPts(bx,GY-22,7,5,i),'#ece6dc',{lw:1.4});line(bx-2,GY-17,bx-2,GY-9,INK,1.4);line(bx+2,GY-17,bx+2,GY-9,INK,1.4);line(bx+6,GY-23,bx+13,GY-21,INK,1.6)}}
+ pits.forEach(p=>{const w=26+p.d*6,h=10+p.d*12;shape([[p.x-w,GY-5],[p.x+w,GY-5],[p.x+w*.7,GY-5+h],[p.x-w*.7,GY-5+h]],'#2a1c14',{lw:2});shape(blobPts(p.x-w-12,GY-8,12+p.d*3,5+p.d*2,p.x,8),'#6b4a30',{lw:1.6});shape(blobPts(p.x+w+12,GY-8,12+p.d*3,5+p.d*2,p.x+3,8),'#6b4a30',{lw:1.6})});
  sites.forEach(drawSite);
+ crates.forEach(c=>{const x=c.x-22,y=c.y-22;ctx.save();if(!c.g){ctx.translate(c.x,c.y);ctx.rotate(c.x*.03);ctx.translate(-c.x,-c.y)}shape(rectPts(x,y,44,44,c.seed,.6),'#5b6b82',{lw:2,sh:1});line(x+5,y+5,x+39,y+39,'#3d4a5e',3);line(x+39,y+5,x+5,y+39,'#3d4a5e',3);[[7,7],[37,7],[7,37],[37,37]].forEach(r=>dot(x+r[0],y+r[1],2.2,'#c9d2de'));ctx.restore()});
  props.forEach(c=>{ctx.save();ctx.translate(c.x,c.y);if(c.state==='fall')ctx.rotate(c.t*5);car(-13,5,c.c,1);ctx.restore()});
  sprigs.forEach(g=>{const y=g.y+Math.sin(T*3+g.x)*4;line(g.x-12,y+8,g.x+12,y-8,'#6b4a30',3);for(let k=0;k<4;k++)shape(ellPts(g.x-5+k*6,y+1-k*4,6,3,k+g.x),'#7cc35a',{lw:1.4})});
  trucks.forEach(drawTruck);
@@ -755,6 +811,7 @@ function drawSite(s){
 function drawTruck(t){ctx.save();
  if(t.state==='tipped'){const k=t.t;for(let i=0;i<2;i++)person(t.x+(t.dir>0?-1:1)*(30+k*40+i*14),GY-2,'#e8a22a',i,i===0);ctx.translate(t.x,GY-2);ctx.rotate(Math.PI/2*ease(t.t/.4)*(t.dir||1))}
  else ctx.translate(t.x,GY-2);
+ if(t.sunk)ctx.translate(0,16);
  ctx.scale(t.dir||1,1);
  shape(rectPts(-30,-30,40,20,1,.5),'#e8a22a',{lw:2,sh:1});shape(rectPts(-24,-50,20,20,2,.5),'#e8a22a',{lw:2});ctx.fillStyle='#bfe0ee';ctx.fillRect(-20,-46,12,10);
  line(-30,-48,-30,-58,'#3a3a40',4);shape(ellPts(22,-14,16,16,3),'#8f8a83',{lw:2});dot(22,-14,4,INK);shape(ellPts(-20,-8,9,9,4),'#3a3a40',{lw:2});line(10,-24,22,-14,'#e8a22a',5);
