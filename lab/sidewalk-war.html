@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sidewalk War v0.1: a pavement ant strategy game</title>
+<title>Sidewalk War v0.2: a pavement ant strategy game</title>
 <meta name="spec-source" content="claude/SPEC-SIDEWALK-WAR-2026-11-09.md">
 <meta name="audience" content="Curious players and students, about 12 and up, learning how real ant colonies forage, recognize strangers, and settle borders without a commander">
 <!--
   TSP BUILD BANNER
-  Sidewalk War v0.1, LAB, 2026-11-09
+  Sidewalk War v0.2, LAB, 2026-11-09
   A real-time strategy game about pavement ant colonies (Tetramorium immigrans)
   fighting for a garden edge. The player is the colony's chemistry, not its general:
   scent trails, alarm calls, and colony emphasis. Ants make their own choices.
@@ -49,20 +49,21 @@ html[data-light="dusk"],html[data-light="night"]{
 html,body{margin:0;padding:0;height:100%}
 body{font:20px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}
 .backdrop{position:fixed;inset:0;background:var(--paper);z-index:0}
-.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100dvh;height:100dvh}
+.app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100dvh}
 .se-chrome{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:6px 10px;background:var(--card);border-bottom:2px solid var(--line)}
 .se-brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
 .se-chrome a,.se-rail a{color:var(--ink);text-decoration:none;font-weight:700;font-size:18px;padding:10px 12px;min-height:44px;display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:10px;background:var(--btn)}
-h1{margin:0;font:700 20px/1.2 Georgia,"Iowan Old Style",serif;display:flex;align-items:center;gap:6px;flex-wrap:nowrap;white-space:nowrap;overflow:hidden}
+h1{margin:0;font:700 20px/1.2 Georgia,"Iowan Old Style",serif;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .ver,.tsp-labchip{font:700 18px/1 system-ui,sans-serif;padding:4px 7px;border:2px solid var(--ink);border-radius:8px;color:var(--ink);background:var(--card)}
-.modebtn{width:48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--btn);color:var(--btnInk);display:grid;place-items:center;cursor:pointer;flex:none}
+.modebtn{width:52px;height:52px;border-radius:50%;border:2px solid var(--line);background:var(--btn);color:var(--btnInk);display:grid;place-items:center;cursor:pointer;flex:none}
 .modebtn svg{width:28px;height:28px}
 .brief{margin:0;padding:8px 12px 4px;font-size:20px;color:var(--ink)}
-.stats{display:flex;flex-wrap:wrap;gap:4px 16px;padding:2px 12px 6px;font-size:18px;font-weight:600;color:var(--ink)}
+.stats{display:flex;flex-wrap:wrap;gap:2px 14px;padding:2px 12px 6px;font-size:18px;font-weight:600;color:var(--ink)}
 .stats b{font-weight:800}
-.stage{position:relative;flex:1;min-height:320px;overflow:hidden;background:#2a2318;touch-action:none}
+.stats span{white-space:nowrap}
+.stage{position:relative;flex:1 0 auto;min-height:max(60dvh,300px);overflow:hidden;background:#2a2318;touch-action:none}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
-.note{position:absolute;left:10px;right:10px;bottom:10px;max-width:640px;margin:0 auto;background:var(--card);color:var(--ink);border:2px solid var(--ink);border-radius:6px;padding:12px 56px 12px 14px;box-shadow:4px 5px 0 rgba(0,0,0,.35),9px 12px 18px rgba(0,0,0,.25);transform:rotate(-0.6deg);display:none}
+.note{position:absolute;left:8px;bottom:8px;max-width:calc(100% - 16px);background:var(--card);color:var(--ink);border:2px solid var(--ink);border-radius:6px;padding:6px 12px;min-height:48px;font:700 18px/1.25 system-ui,sans-serif;text-align:left;cursor:pointer;box-shadow:3px 4px 0 rgba(0,0,0,.35);display:none}
 .note.show{display:block}
 .note h2{margin:0 0 4px;font:700 20px/1.2 Georgia,serif}
 .note p{margin:0;font-size:18px;line-height:1.35}
@@ -70,7 +71,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:cro
 .note .x{position:absolute;top:6px;right:6px;width:44px;height:44px;border:2px solid var(--line);border-radius:8px;background:var(--btn);color:var(--btnInk);font-size:22px;font-weight:800;cursor:pointer}
 .controls{display:flex;flex-wrap:wrap;gap:8px;padding:8px 10px;background:var(--card);border-top:2px solid var(--line)}
 .grp{display:flex;gap:6px;flex-wrap:nowrap}
-.controls button{min-height:48px;min-width:48px;padding:8px 12px;font:700 18px/1.1 system-ui,sans-serif;color:var(--btnInk);background:var(--btn);border:2px solid var(--line);border-radius:10px;cursor:pointer}
+.controls button{min-height:52px;min-width:52px;padding:8px 12px;font:700 18px/1.1 system-ui,sans-serif;color:var(--btnInk);background:var(--btn);border:2px solid var(--line);border-radius:10px;cursor:pointer}
 .controls button[hidden]{display:none}
 .controls button{font-weight:500}
 .controls #tTrail[aria-pressed="true"],.controls #tAlarm[aria-pressed="true"]{font-weight:800}
@@ -87,8 +88,10 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offs
 .sheet .row{display:flex;gap:10px;justify-content:flex-end;margin-top:12px;position:sticky;bottom:-16px;background:var(--card);padding:8px 0}
 .sheet button{min-height:52px;padding:8px 16px;font:700 18px system-ui,sans-serif;background:var(--on);color:var(--onInk);border:2px solid var(--on);border-radius:10px;cursor:pointer}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.short{display:none}
-@media (max-width:560px){ .se-brand{flex-basis:100%} .se-chrome a{padding:8px 10px} .brief{font-size:18px;padding-top:6px} .long{display:none} .short{display:inline} .controls{gap:6px} .controls button{padding:8px 10px} .note .src{display:none} .note{padding:10px 54px 10px 12px} }
+.short{display:none} .vshort{display:none}
+@media (max-width:899px){ .long{display:none} .short{display:inline} }
+@media (max-width:560px){ .se-brand{flex-basis:100%} .se-chrome a{padding:8px 10px} .brief{font-size:18px;padding-top:6px} .long{display:none} .short{display:inline} .controls{gap:6px} .controls button{padding:8px 10px} }
+@media (max-width:340px){ .se-chrome{padding:4px 6px;gap:4px 6px} .se-brand{flex:1 1 140px;flex-basis:140px} .modebtn{order:1} .se-chrome a{order:2} h1{font-size:18px;gap:4px} .ver,.tsp-labchip{padding:3px 5px} .se-chrome a{padding:6px 8px} .brief{padding:4px 8px 2px} .stats{padding:0 8px 4px} .vshort{display:inline} .short{display:none} .st-x{display:none} .topline{display:flex;flex-wrap:wrap;align-items:baseline;padding:4px 8px} .topline .brief{padding:0;margin:0 12px 0 0} .topline .stats{display:contents} .topline .stats span{margin-right:12px} }
 </style>
 </head>
 <body>
@@ -96,7 +99,7 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offs
 <div class="app">
   <header class="se-chrome">
     <div class="se-brand">
-      <h1>Sidewalk War <span class="ver">v0.1</span><span class="tsp-labchip">LAB</span></h1>
+      <h1>Sidewalk War <span class="ver">v0.2</span><span class="tsp-labchip">LAB</span></h1>
     </div>
     <a href="../index.html">Studio</a>
     <a href="../arcade.html">Cabinet</a>
@@ -104,14 +107,11 @@ button:focus-visible,a:focus-visible{outline:4px solid var(--focus);outline-offs
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg>
     </button>
   </header>
-  <p class="brief" id="brief"><span class="long">Your pavement ant colony lives under the left sidewalk crack. Tap the ground to lay a scent trail to food, and hold the garden where the aphids live before the summer flight.</span><span class="short">Tap to lay scent. Win the aphid garden.</span></p>
-  <div class="stats" id="stats" aria-hidden="true"></div>
+  <div class="topline"><p class="brief" id="brief"><span class="long">Your pavement ant colony lives under the left sidewalk crack. Tap the ground to lay a scent trail to food, and hold the garden where the aphids live before the summer flight.</span><span class="short">Tap the ground to lay scent.</span><span class="vshort">Tap to lay scent.</span></p>
+  <div class="stats" id="stats" aria-hidden="true"></div></div>
   <div class="stage" id="stage" data-art-class="studio-cut">
     <canvas id="cv" role="img" aria-label="A garden bed above a concrete sidewalk and a strip of lawn. Two pavement ant colonies forage and fight across it."></canvas>
-    <div class="note" id="note" role="status" aria-live="polite">
-      <h2 id="noteH"></h2><p id="noteP"></p><p class="src" id="noteS"></p>
-      <button class="x" id="noteX" aria-label="Close field note">X</button>
-    </div>
+    <button class="note" id="note" aria-live="polite">Field note: <span id="noteH"></span></button>
     <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetH">
       <div class="panel"><h2 id="sheetH">Field notes</h2><div id="sheetBody"></div>
         <div class="row"><button id="sheetBtn">Back to the sidewalk</button></div></div>
@@ -213,7 +213,7 @@ function newGame(){
   for(const c of colonies){ for(let i=0;i<14;i++) spawn(c); }
   $("tAlarm").hidden=true; setTool("trail"); day=1; dayT=0; rainT=0; over=false; time=0; seen.clear(); queue.length=0; flags={};
   bgDirty=true; fit();
-  setTimeout(()=>note("colony"),2500); setTimeout(()=>note("scale"),12000);
+  setTimeout(()=>note("colony"),20000); setTimeout(()=>note("scale"),45000);
 }
 const world={gy:0,sy:0};
 let flags={};
@@ -258,7 +258,7 @@ function setEmph(e){ colonies[0].emph=e; for(const [id,v] of [["eForage","forage
 $("tTrail").onclick=()=>setTool("trail"); $("tAlarm").onclick=()=>setTool("alarm");
 $("eForage").onclick=()=>setEmph("forage"); $("eBrood").onclick=()=>setEmph("brood"); $("eMuster").onclick=()=>setEmph("muster");
 $("bPause").onclick=()=>{ paused=!paused; $("bPause").setAttribute("aria-pressed",paused); $("bPause").textContent=paused?"Resume":"Pause"; };
-$("bNotes").onclick=()=>openNotes();
+$("bNotes").onclick=()=>openNotes(null);
 $("sheetBtn").onclick=()=>closeSheet();
 
 function toWorld(e){ const r=cv.getBoundingClientRect(); return {x:(e.clientX-r.left-ox)/scale, y:(e.clientY-r.top-oy)/scale}; }
@@ -272,24 +272,25 @@ document.addEventListener("keydown",e=>{
   if(k===" " && document.activeElement===document.body){ $("bPause").click(); e.preventDefault(); }
   if(k==="t"||k==="T") setTool("trail"); if((k==="a"||k==="A") && !$("tAlarm").hidden) setTool("alarm");
   if(k==="1") setEmph("forage"); if(k==="2") setEmph("brood"); if(k==="3") setEmph("muster");
-  if(k==="n"||k==="N") openNotes();
+  if(k==="n"||k==="N") openNotes(null);
 });
 
 /* ---------------- NOTES UI ---------------- */
 let noteTimer=0;
 function note(id){ if(seen.has(id)||!NOTES[id]) return; seen.add(id); queue.push(id); if(!$("note").classList.contains("show")) nextNote(); }
 function nextNote(){ const id=queue.shift(); if(!id){ $("note").classList.remove("show"); return; }
-  const n=NOTES[id]; $("noteH").textContent=n.h; $("noteP").textContent=n.p; $("noteS").textContent="Source: "+n.s;
-  $("note").classList.add("show"); noteTimer=11; }
-$("noteX").onclick=()=>{ noteTimer=0; nextNote(); };
-function openNotes(){ const b=$("sheetBody"); b.innerHTML="";
-  const ids=Object.keys(NOTES).filter(k=>seen.has(k));
+  noteId=id; $("noteH").textContent=NOTES[id].h; $("note").setAttribute("aria-label","New field note: "+NOTES[id].h+". Open it.");
+  $("note").classList.add("show"); noteTimer=12; say("New field note: "+NOTES[id].h+"."); }
+let noteId=null;
+$("note").onclick=()=>{ noteTimer=0; $("note").classList.remove("show"); openNotes(noteId); };
+function openNotes(first){ const b=$("sheetBody"); b.innerHTML="";
+  let ids=Object.keys(NOTES).filter(k=>seen.has(k)); if(first&&seen.has(first)) ids=[first].concat(ids.filter(k=>k!==first));
   const p=document.createElement("p"); p.textContent=ids.length+" of "+Object.keys(NOTES).length+" notes found. Play on to find the rest."; b.appendChild(p);
   for(const k of ids){ const n=NOTES[k]; const h=document.createElement("h3"); h.textContent=n.h; const t=document.createElement("p"); t.textContent=n.p; const s=document.createElement("p"); s.className="src"; s.textContent="Source: "+n.s; b.append(h,t,s); }
   $("sheetH").textContent="Field notes"; $("sheetBtn").textContent="Back to the sidewalk"; $("sheetBtn").onclick=closeSheet;
   $("sheet").classList.add("show"); wasPaused=paused; paused=true; $("sheetBtn").focus(); }
 let wasPaused=false;
-function closeSheet(){ $("sheet").classList.remove("show"); paused=wasPaused; }
+function closeSheet(){ $("sheet").classList.remove("show"); paused=wasPaused; if(queue.length) nextNote(); }
 let lastSay=0;
 function say(t){ live.textContent=t; }
 
@@ -661,12 +662,11 @@ function hud(){
   const hold=gardenHolder();
   if(hold!==lastHolder && hold!==-1){ say("The aphid garden now belongs to "+(hold===0?"your colony":"the rival")+"."); }
   if(hold!==-1) lastHolder=hold;
-  $("stats").innerHTML="<span>Day <b>"+Math.min(day,DAYS)+"</b> of "+DAYS+(rainT>0?" (rain)":"")+"</span>"+
-    "<span>Workers <b>"+(total(me)*20).toLocaleString()+"</b></span>"+
-    "<span>Food <b>"+Math.round(me.food)+"</b></span>"+
-    "<span>Ground <b>"+Math.round(share()*100)+"%</b></span>"+
+  $("stats").innerHTML="<span>Day <b>"+Math.min(day,DAYS)+"/"+DAYS+"</b>"+(rainT>0?" rain":"")+"</span>"+
     "<span>Garden <b>"+(hold===0?"yours":hold===1?"rival":"open")+"</b></span>"+
-    "<span>Rival <b>"+(total(th)*20).toLocaleString()+"</b></span>";
+    "<span class=\"st-x\">Ground <b>"+Math.round(share()*100)+"%</b></span>"+
+    "<span>Food <b>"+Math.round(me.food)+"</b></span>"+
+    "<span class=\"st-x\">Ants <b>"+(total(me)*20).toLocaleString()+"</b> v <b>"+(total(th)*20).toLocaleString()+"</b></span>";
 }
 
 /* ---------------- LOOP ---------------- */
