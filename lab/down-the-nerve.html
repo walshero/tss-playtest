@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Signal Rider v0.14</title>
+<title>Signal Rider v0.15</title>
 <meta name="spec-source" content="claude/SPEC-DOWN-THE-NERVE-v0.8-AUDIO-2026-11-06.md">
 <meta name="audience" content="Founder playtest first. Audience ruling D4 still open (12 and up, mapped to OpenStax, recommended). Lab build.">
 <!-- tsp:source claude/SPEC-DOWN-THE-NERVE-2026-11-05.md; convening/DOWN-THE-NERVE-CONVENING.md (D12 Brainbow, S.T.U.N. Runner feel); Tight Spiral Studios -->
@@ -17,11 +17,15 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--ground)}
 .ui{position:fixed;z-index:3;color:var(--ink);font:20px/1.45 "Avenir Next","Segoe UI",system-ui,sans-serif}
 #bar{top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;background:linear-gradient(var(--ground),rgba(4,5,10,0))}
 #bar .title{font-weight:700;font-size:20px;margin-right:auto}
+#bar{flex-wrap:wrap;row-gap:6px}#bar>.btn,#bar .chip{flex-shrink:0;white-space:nowrap}#bar .title{display:flex;gap:6px;flex-wrap:wrap}
+.menucol{display:flex;flex-direction:column;gap:10px;margin:12px 0}.menucol .btn{width:100%;justify-content:flex-start;padding:0 16px}
 .chip{font-size:18px;border:1px solid var(--rule);background:var(--ground);border-radius:12px;padding:0 8px;margin-left:6px;font-weight:600}
 .btn{min-height:44px;min-width:44px;border-radius:22px;border:2px solid var(--inkfill);background:var(--panel);color:var(--ink);font:700 18px "Avenir Next","Segoe UI",system-ui,sans-serif;padding:0 11px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .btn.primary{background:var(--inkfill);color:var(--bg)}
 #hud{left:0;right:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:8px 12px calc(10px + env(safe-area-inset-bottom));pointer-events:none;background:linear-gradient(rgba(4,5,10,0),var(--ground))}
-#speed{text-align:right}
+#speed{text-align:right;flex-shrink:0}#speed .num{font-size:clamp(26px,11vw,44px)!important}#trip{min-width:0}#trip>div{max-width:100%;white-space:normal}.us{display:none}
+@media (max-width:340px){#legname,#tripv,.unit .ul{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;padding:0!important;margin:0!important}.unit .us{display:inline}#bal{width:72px}#hud{gap:6px;flex-wrap:wrap!important}#trip{order:-1!important;flex:1 1 100%!important;display:flex!important;justify-content:center!important}}
+#hits{flex-shrink:0;max-width:none!important}#hits svg{flex-shrink:0;min-width:26px}
 #speed .num{font-size:44px;font-weight:800;line-height:1}
 #speed .unit,#trip,#legname{font-size:18px}
 #trip>div,#speed>div{background:var(--ground);border-radius:10px;padding:1px 8px;width:max-content;margin:2px auto}#speed>div{margin:2px 0 2px auto}
@@ -62,7 +66,7 @@ a{color:#9cc8f2}
 @media (prefers-color-scheme: dark){:root{--bg:#04050a;--panel:#0d1220;--panel2:#141b2e;--ink:#eef2f6;--rule:#8f9bb0;--inkfill:#eef2f6;--ground:#04050a}}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 @media (max-width:560px){#bar .title .name{display:none}#bar{gap:6px;padding-left:6px;padding-right:6px}#bal{width:96px}#speed .unit{max-width:96px}}
-#msgs{position:fixed;z-index:4;left:0;right:0;top:calc(58px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 8px}#msgs.low{top:auto;bottom:calc(112px + env(safe-area-inset-bottom))}#msgs.sl,#msgs.sr{width:min(46vw,340px);align-items:stretch}#msgs.sl>*,#msgs.sr>*{width:auto!important;max-width:100%!important;white-space:normal!important}#msgs.sl{right:auto;left:8px}#msgs.sr{left:auto;right:8px}#msgs>*{position:static!important;transform:none!important;left:auto!important;top:auto!important;bottom:auto!important;max-width:min(560px,94vw)}#msgs #steerHint{pointer-events:auto}#replay{top:calc(52px + env(safe-area-inset-top));bottom:auto!important;background:linear-gradient(rgba(4,5,10,.96) 70%,rgba(4,5,10,0))!important;padding:10px 16px 18px!important}#cards .cath{grid-column:1/-1;margin:6px 0 0}#cards .cath h3{margin:4px 0;font-size:20px}
+#msgs{position:fixed;z-index:4;left:0;right:0;top:calc(var(--barb,58px) + 6px);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 8px}#msgs.low{top:auto;bottom:calc(var(--hudh,112px) + 6px)}#msgs.sl,#msgs.sr{width:min(46vw,340px);align-items:stretch}#msgs.sl>*,#msgs.sr>*{width:auto!important;max-width:100%!important;white-space:normal!important}#msgs.sl{right:auto;left:8px}#msgs.sr{left:auto;right:8px}#msgs>*{position:static!important;transform:none!important;left:auto!important;top:auto!important;bottom:auto!important;max-width:min(560px,94vw)}#msgs #steerHint{pointer-events:auto;white-space:normal;max-width:calc(100vw - 24px);text-align:center;line-height:1.25;padding:8px 18px;width:max-content}#replay{top:calc(52px + env(safe-area-inset-top));bottom:auto!important;background:linear-gradient(rgba(4,5,10,.96) 70%,rgba(4,5,10,0))!important;padding:10px 16px 18px!important}#cards .cath{grid-column:1/-1;margin:6px 0 0}#cards .cath h3{margin:4px 0;font-size:20px}
 .catnav{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 2px}.catnav .btn{min-height:52px;font-size:19px}.nextcat{flex:1 1 220px}.prog{grid-column:1/-1;margin:2px 0}#cards .cath p{margin:2px 0 4px;font-size:18px;line-height:1.4}.src{color:#c7cfdb;font-size:16px}.wk small{display:block;font-size:16px;font-weight:600;color:#c7cfdb}.wk span{display:block}#cards .back{grid-column:1/-1;justify-self:start;min-height:44px}#cards .info{grid-column:1/-1;background:#141b2e;border:2px solid #4a5568;border-radius:12px;padding:8px 12px}#cards .info h3{margin:2px 0 4px;font-size:20px}#cards .info .wt{font-size:16px;color:#c7cfdb;font-weight:600}#cards .info p{margin:4px 0;font-size:18px;line-height:1.45}#fxp{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 12px;font-size:18px;margin:6px 0}#fxp svg{vertical-align:middle}.howto{margin-top:10px}.howto summary{min-height:44px;display:flex;align-items:center;font-size:18px;font-weight:700;cursor:pointer}</style>
 </head>
 <body>
@@ -71,10 +75,8 @@ a{color:#9cc8f2}
 
 <header id="bar" class="ui">
   <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/lab/" aria-label="Studio home">Studio</a>
-  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.14</span><span class="chip tsp-labchip">LAB</span></span>
-  <button class="btn" id="bRestart" type="button" aria-label="Restart the ride">Back</button>
-  <button class="btn" id="bLib" type="button">Library</button>
-  <button class="btn" id="bComfort" type="button">Comfort</button>
+  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.15</span><span class="chip tsp-labchip">LAB</span></span>
+  <button class="btn" id="bMenu" type="button" aria-haspopup="dialog">Menu</button>
 </header>
 
 <div id="inset" class="ui" aria-live="polite"><div class="disc" id="insetPic"></div><div class="cap" id="insetCap"></div></div>
@@ -111,11 +113,20 @@ a{color:#9cc8f2}
       <g id="balL"></g><g id="balR"></g></g>
   </svg>
   <div id="trip"><div id="hits" aria-label="Hits: 0 of 3"></div><div id="legname" aria-live="polite">Fingertip to brainstem</div><div id="tripv">0.00 m · 0.0 ms</div></div>
-  <div id="speed"><div class="num" id="spd">0</div><div class="unit">meters per second</div></div>
+  <div id="speed"><div class="num" id="spd">0</div><div class="unit"><span class="ul">meters per second</span><span class="us" aria-hidden="true">m/s</span></div></div>
 </div>
 
+<div class="sheet" id="sMenu" role="dialog" aria-modal="true" aria-labelledby="hM"><div class="card">
+  <h2 id="hM">Menu</h2>
+  <div class="menucol">
+    <button class="btn" id="bRestart" type="button" aria-label="Restart the ride and load a week">Restart and load a week</button>
+    <button class="btn" id="bLib" type="button">Library</button>
+    <button class="btn" id="bComfort" type="button">Settings</button>
+  </div>
+  <div class="row"><button class="btn primary" data-close>Back to the ride</button></div>
+</div></div>
 <div class="sheet" id="sComfort" role="dialog" aria-modal="true" aria-labelledby="hC"><div class="card">
-  <h2 id="hC">Comfort</h2>
+  <h2 id="hC">Settings</h2>
   <h3>Speed</h3><div class="seg" data-k="speed"><button class="btn" data-v="0.6">Gentle</button><button class="btn" data-v="0.8">Easy</button><button class="btn" data-v="1">Normal</button><button class="btn" data-v="1.35">Fast</button></div>
   <h3>Glow</h3><div class="seg" data-k="glow"><button class="btn" data-v="0">Soft</button><button class="btn" data-v="1">Standard</button><button class="btn" data-v="2">Bright</button></div>
   <h3>View</h3><div class="seg" data-k="roll"><button class="btn" data-v="1">Tube turns with you</button><button class="btn" data-v="0">Tube stays still</button></div>
@@ -661,6 +672,8 @@ function quietBeacon(){try{beacon(false);}catch(e){}}
 function openSheet(id){var s=document.getElementById(id);s.style.display='flex';s.classList.add('open');paused=true;var b=s.querySelector('button');if(b)b.focus();}
 function closeSheets(){document.querySelectorAll('.sheet').forEach(function(s){s.style.display='none';s.classList.remove('open');});paused=false;last=performance.now();}
 document.querySelectorAll('[data-close]').forEach(function(b){b.addEventListener('click',closeSheets);});
+document.getElementById('bMenu').onclick=function(){openSheet('sMenu');};
+document.getElementById('sMenu').addEventListener('click',function(e){if(e.target.closest('.menucol button')){var m=document.getElementById('sMenu');m.style.display='none';m.classList.remove('open');}},true);
 document.getElementById('bLib').onclick=function(){openSheet('sLib');};
 document.getElementById('bCp').onclick=function(){closeSheets();restoreCp();};
 document.getElementById('bFadeWeek').onclick=function(){closeSheets();openTray();};
@@ -881,7 +894,11 @@ function update(dt){
 // left column, right column. Measured each frame; if none is clear, the toast (lowest priority,
 // also spoken) steps aside and the column away from the ball is used.
 var MS=null,msPos='';
-function placeMsgs(pp){if(!MS)MS=document.getElementById('msgs');if(!MS)return;
+function syncChrome(){var b=document.getElementById('bar'),h=document.getElementById('hud'),r=document.documentElement.style;
+  if(b)r.setProperty('--barb',Math.round(b.getBoundingClientRect().bottom)+'px');
+  if(h&&h.style.display!=='none'){var q=h.getBoundingClientRect();if(q.height)r.setProperty('--hudh',Math.round(innerHeight-q.top)+'px');}}
+addEventListener('resize',syncChrome);addEventListener('load',syncChrome);setTimeout(syncChrome,0);
+function placeMsgs(pp){if(!syncChrome.t||performance.now()-syncChrome.t>1000){syncChrome.t=performance.now();syncChrome();}if(!MS)MS=document.getElementById('msgs');if(!MS)return;
   var bx0=pp[0]-36,bx1=pp[0]+36,by0=pp[1]-36,by1=pp[1]+36;
   function fits(){var ok=true;for(var i=0;i<MS.children.length;i++){var el=MS.children[i];if(el.style.display==='none'||getComputedStyle(el).display==='none')continue;var q=el.getBoundingClientRect();if(!(q.bottom<by0||q.top>by1||q.right<bx0||q.left>bx1))ok=false;}return ok;}
   function use(c){if(c===msPos)return;if(msPos)MS.classList.remove(msPos);if(c)MS.classList.add(c);msPos=c;}
