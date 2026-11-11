@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Headwaters v0.4</title>
+<title>Headwaters v0.5</title>
 <meta name="spec-source" content="claude/SPEC-HEADWATERS-2026-11-10.md">
 <meta name="audience" content="Founder playtest first. Audience not yet ruled. Lab build.">
 <meta name="color-scheme" content="light dark">
-<!-- Headwaters v0.4 · LAB · Tight Spiral Studios
+<!-- Headwaters v0.5 · LAB · Tight Spiral Studios
      tsp:source founder spec in chat 2026-11-10 (Marble Madness feel, gondola catches instead of doom,
      smash dams and power plants, nature heals: a glimpse now, full bloom next run; three marbles,
      checkpoints, levers and magnets, win = every target down AND the rivers run top to bottom;
@@ -35,6 +35,8 @@ html[data-light="sharp"] .pill{background:#000;border:2px solid #fff}
 .marb{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 18%,#6f84ff 30%,#232a86 100%);border:2px solid #fff;display:inline-block}
 .marb.gone{background:none;border:2px dashed var(--rule)}
 #toast{position:fixed;left:50%;transform:translateX(-50%);z-index:6;max-width:94vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(20,24,29,.9);color:var(--ink);padding:6px 12px;border-radius:10px;font-size:18px;font-weight:600;line-height:1.3;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.low{top:auto!important;bottom:calc(env(safe-area-inset-bottom) + 70px)}
+#toast.away,#rollHint.away{visibility:hidden}
 html[data-light="sharp"] #toast{background:#000;border:2px solid #fff}
 #toast.on{opacity:1}
 .se-rail{position:fixed;left:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:5;display:flex;gap:6px}
@@ -69,7 +71,7 @@ html[data-light="sharp"] #toast{background:#000;border:2px solid #fff}
   <div class="se-brand">
     <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/" aria-label="Studio home">Studio</a>
     <a class="btn" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/arcade.html" aria-label="Cabinet">Cabinet</a>
-    <h1>Headwaters <span class="ver">v0.4</span><span class="tsp-labchip">LAB</span></h1>
+    <h1>Headwaters <span class="ver">v0.5</span><span class="tsp-labchip">LAB</span></h1>
   </div>
 </header>
 
@@ -113,7 +115,7 @@ html[data-light="sharp"] #toast{background:#000;border:2px solid #fff}
 <script>
 (()=>{
 'use strict';
-const VER='v0.4';
+const VER='v0.5';
 const cv=document.getElementById('game'),ctx=cv.getContext('2d');
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let VW=0,VH=0,DPR=1,Z=1,Zbase=1;
@@ -725,6 +727,22 @@ function drawParts(){for(const p of parts){const[sx,sy]=scr(p.x,p.y,p.z);const a
   else if(p.kind==='chip'){ctx.fillStyle=`rgba(120,116,108,${a})`;ctx.fillRect(sx-3*Z,sy-3*Z,6*Z,6*Z);}
   else{const s=(1-a)*22+8;ctx.fillStyle=mode==='dark'?`rgba(70,70,82,${a*.55})`:`rgba(96,92,90,${a*.45})`;ctx.beginPath();ctx.arc(sx,sy,s*Z,0,6.283);ctx.fill();}}}
 
+// ---------- messages never cover the moving character (founder rule, studio-wide, 2026-11-10) ----------
+function playerRect(){
+  if(ride&&(state==='ride'||state==='choose')){if(ride.ph==='cross'){const k=Zbase*.9;return{x:VW*.5-20*k,y:VH*.46-34*k,w:40*k,h:52*k};}const[sx,sy]=scr(ride.cx,ride.cy,ride.cz),k=Z*1.6;return{x:sx-18*k,y:sy-32*k,w:36*k,h:48*k};}
+  if(state==='over'||state==='win')return null;
+  const[sx,sy]=scr(ball.x,ball.y,ball.z+.35),r=15*Z;return{x:sx-r,y:sy-r,w:2*r,h:2*r};}
+function safeBand(){const hud=document.getElementById('hud').getBoundingClientRect(),tb=toastEl.classList.contains('low')?hud.bottom:Math.max(hud.bottom,parseFloat(toastEl.style.top||0)+toastEl.offsetHeight);
+  const rail=document.querySelector('.se-rail').getBoundingClientRect();return{top:tb+18,bottom:Math.min(rail.top,VH)-18};}
+function hitR(a,b,pad){return!(a.right+pad<b.x||a.left-pad>b.x+b.w||a.bottom+pad<b.y||a.top-pad>b.y+b.h);}
+function avoidOverlays(){
+  const pr=playerRect();if(!pr){toastEl.classList.remove('away');return;}
+  if(toastEl.classList.contains('on')){toastEl.classList.remove('away');
+    if(!toastEl.classList.contains('low')&&hitR(toastEl.getBoundingClientRect(),pr,28))toastEl.classList.add('low');
+    else if(toastEl.classList.contains('low')){toastEl.classList.remove('low');if(hitR(toastEl.getBoundingClientRect(),pr,28))toastEl.classList.add('low');}
+    if(hitR(toastEl.getBoundingClientRect(),pr,28))toastEl.classList.add('away');}
+  const hn=document.getElementById('rollHint');if(!hn.hidden)hn.classList.toggle('away',hitR(hn.getBoundingClientRect(),pr,28));
+}
 function drawCross(){
   // above the clouds: the cabin rides the cable across while cloud banks stream past
   const P=PAL[mode];ctx.fillStyle=mode==='dark'?'rgba(60,58,96,.55)':mode==='sharp'?'rgba(10,12,16,.6)':'rgba(255,250,240,.5)';
@@ -753,6 +771,9 @@ function draw(){
   if(riding&&ride.ph==='cross'){drawCross();return;}
   let p;if(riding)p=iso(ride.cx,ride.cy,ride.cz);else{const la=state==='play'||state==='pipe'?.32:0;p=iso(ball.x+ball.vx*la,ball.y+ball.vy*la,state==='play'||state==='pipe'?ball.z:H(M,ball.x,ball.y));}
   const f=riding?.2:state==='play'||state==='pipe'?.1:.04;cam.x+=(p[0]-cam.x)*f;cam.y+=(p[1]-cam.y)*f;
+  {// safe band: the character never slides under the bars or the message line
+    const pr=playerRect(),band=safeBand();if(pr){if(pr.y<band.top)cam.y-=(band.top-pr.y)/Z;else if(pr.y+pr.h>band.bottom)cam.y+=(pr.y+pr.h-band.bottom)/Z;
+      if(pr.x<24)cam.x-=(24-pr.x)/Z;else if(pr.x+pr.w>VW-24)cam.x+=(pr.x+pr.w-VW+24)/Z;}}
   const shx=shake?(Math.random()-.5)*shake:0,shy=shake?(Math.random()-.5)*shake:0;
   ctx.save();ctx.translate(shx,shy);
   if(cache){const dx=(-cacheOff.x-cam.x)*Z+VW/2,dy=(-cacheOff.y-cam.y)*Z+VH*.33;ctx.imageSmoothingEnabled=true;ctx.drawImage(cache,dx,dy,cache.width/cacheCS*Z,cache.height/cacheCS*Z);}
@@ -837,8 +858,17 @@ hint.addEventListener('click',()=>{au();dropHint();});
 addEventListener('keydown',e=>{if(e.key.startsWith('Arrow'))dropHint();});
 cv.addEventListener('pointerdown',dropHint);
 let last=performance.now();
-function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;timeT+=dt;if(hitStop>0){hitStop-=dt;}else{const n=3;for(let i=0;i<n;i++)step(dt/n);}draw();requestAnimationFrame(frame);}
+function frameAvoid(){try{avoidOverlays();}catch(e){}}
+function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;timeT+=dt;if(hitStop>0){hitStop-=dt;}else{const n=3;for(let i=0;i<n;i++)step(dt/n);}draw();frameAvoid();requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
+window.__tspPlayer=()=>playerRect();window.__tspToast=t=>toast(t,1500);
+window.__tspScenes=['chute','pipe','lower','ride'];
+window.__tspScene=n=>{document.querySelectorAll('.sheet').forEach(x=>x.classList.remove('on'));const m=M,b=ball;ride=null;state='play';zoomMul=1;
+  if(n==='chute'){const c=m.chutes[0].pts[0];b.x=c[0];b.y=c[1]+.5;b.vx=0;b.vy=9;}
+  if(n==='pipe'){const a=m.pipes[0].pts[0];b.x=a[0]+.2;b.y=a[1]-.3;b.vx=0;b.vy=2;}
+  if(n==='lower'){const c=m.checks[m.checks.length-2];b.x=c[0];b.y=c[1];b.vx=0;b.vy=8;}
+  if(n==='ride'){startRide('station');}
+  b.z=H(m,b.x,b.y);};
 window.__hw={refill(){balls=3;hud();},MOUNTS,ball,depth,startRide,get ride(){return ride;},get state(){return state;},get M(){return M;},step,hitTarget,found,openLines,go,newRun,setM(k){ride=null;state="play";zoomMul=1;M=MOUNTS[k];M.walk||prepGrid(M);const c=M.checks[0];place(c[0],c[1]);newRun();}};
 })();
 </script>
