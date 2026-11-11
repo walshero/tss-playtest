@@ -3,9 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.13</title>
+<title>Rewilder v0.13.1</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.13 | LAB | 2026-11-11
+<!-- TSP build: Rewilder v0.13.1 | LAB | 2026-11-11
+     v0.13.1 (founder: "Level 2 now seems impossible. The Data center is surrounded by steel with no way
+     over it or up it. Yes?"): he is right about over and up. The way is under, and the game did not
+     show it. Chalk arrows marked UNDER now point down on every steel plate and wall, and the Swim
+     button pulses once steel has stopped you.
      v0.13 (founder: "The “sea glow” will be replaced With an egg. There will be a new screen to the left
      only accessible by river that leads to the ocean. After the salmon eats food and plays with another
      salmon an egg appears that works like the sea glow. The salmon has to bring the egg to the far right.
@@ -192,6 +196,9 @@ body.playing #tagBtn.can{display:inline-flex}
 #swimBtn{margin-left:auto;border-radius:24px;display:none;background:var(--line);color:var(--online)}
 body.playing #swimBtn.can{display:inline-flex}
 #swimBtn.can + #tagBtn{margin-left:0}
+@keyframes swimhint{50%{transform:scale(1.14)}}
+#swimBtn.hint{animation:swimhint .9s ease-in-out infinite;outline:3px solid var(--online);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){#swimBtn.hint{animation:none}}
 #swimBtn.can ~ #lensBtn{margin-left:0}
 #lensBtn{margin-left:auto;border-radius:24px;display:none}
 #lensBtn[aria-pressed="true"]{background:var(--line);color:var(--online)}
@@ -275,7 +282,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.13</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.13.1</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -542,7 +549,7 @@ function toast(t,d){const el=$('toast');el.textContent=t;placeToast();el.classLi
 $('toast').onclick=()=>{toastT=0;$('toast').classList.remove('on')};
 function once(k,t,d){if(told.has(k))return false;told.add(k);toast(t,d||4.5);return true}
 let hudKey='';
-function hud(){const pips=Math.ceil(P.energy/20),freed=sites.filter(s=>s.state==='grown').length,ct=canTag(),su=Math.round(P.sup*8),cs=canSwim(),k=pips+'|'+freed+'|'+ct+'|'+su+'|'+level+'|'+cs+'|'+!!swim;if(k===hudKey)return;hudKey=k;{const b=$('swimBtn');b.classList.toggle('can',cs||!!swim);b.setAttribute('aria-pressed',!!swim);b.textContent=swim?'Land':'Swim';b.setAttribute('aria-label',swim?'Climb out of the river':'Dive into the river')}$('tagBtn').classList.toggle('can',ct);$('tagBtn').setAttribute('aria-label',who==='beaver'?'Tag in Mossback the turtle':'Tag in Big Gnaw the beaver');
+function hud(){const pips=Math.ceil(P.energy/20),freed=sites.filter(s=>s.state==='grown').length,ct=canTag(),su=Math.round(P.sup*8),cs=canSwim(),hn=level>1&&!told.has('dive2')&&(told.has('armor')||told.has('wall')),k=pips+'|'+freed+'|'+ct+'|'+su+'|'+level+'|'+cs+'|'+!!swim+'|'+hn;if(k===hudKey)return;hudKey=k;{const b=$('swimBtn');b.classList.toggle('can',cs||!!swim);b.classList.toggle('hint',hn&&!swim);b.setAttribute('aria-pressed',!!swim);b.textContent=swim?'Land':'Swim';b.setAttribute('aria-label',swim?'Climb out of the river':'Dive into the river')}$('tagBtn').classList.toggle('can',ct);$('tagBtn').setAttribute('aria-label',who==='beaver'?'Tag in Mossback the turtle':'Tag in Big Gnaw the beaver');
  let h='<span>Energy <span class="pips">';for(let i=0;i<5;i++)h+='<span class="pip'+(i<pips?' on':'')+'"></span>';h+='</span></span><span>Super <span class="bar'+(P.sup>=1?' full':'')+'"><i style="width:'+Math.round(P.sup*100)+'%"></i></span></span><span>'+(level>1?'Level '+level+' <b>'+freed+'</b>/5</span>':'Grown <b>'+freed+'</b>/5</span>');$('hud').innerHTML=h}
 function linkList(src){return src.map(s=>'<a href="'+s[1]+'" target="_blank" rel="noopener">'+s[0]+'</a>').join('<br>')}
 function openCard(lab,title,chain,text,srcHtml){cardOpen=true;$('cardLab').textContent=lab;$('cardTitle').textContent=title;$('cardChain').textContent=chain||'';$('cardChain').style.display=chain?'':'none';$('cardText').textContent=text;
@@ -635,7 +642,7 @@ function cellXY(s,c,f){return[s.x+(c+.5)*s.cw,GY-(f+.5)*s.fh]}
 function siteColor(s,k){return k.t==='k'?'#c9962e':k.t==='d'?'#1f2630':s.paved||k.t==='a'?'#3a3a40':k.t==='s'?'#5b6b82':k.t==='g'?'#bcd6e0':s.col}
 function killCell(s,c,f){const k=s.rows[f][c];k.hp=0;const[x,y]=cellXY(s,c,f);if(k.t==='k'){crate(x,y,x<s.cx?-1:1);return}debris(x,y,7,siteColor(s,k));
  if(s.id==='garage'&&!s.l2&&k.t==='g'&&props.length<10){props.push({x,y,vy:-120,c:['#c8342b','#3b6ea8','#e8c25a','#ece6dc','#5a7a4a'][Math.floor(hr(k.seed)*5)],state:'fall',t:0,dir:1,y0:y});}}
-function hitCell(s,c,f,power){if(s.arm&&f<2){SFX.clang();word('STEEL',P.x+P.face*50,P.y-110,'#c9d2de');once('armor','Steel plate guards the bottom of this building, and nothing on land breaks it. Its footings stand in the river. Press Swim, go under, and break them.',8);return}
+function hitCell(s,c,f,power){if(s.arm&&f<2){SFX.clang();word('STEEL',P.x+P.face*50,P.y-110,'#c9d2de');hudKey='';once('armor','Steel plate guards the bottom of this building, and nothing on land breaks it. Its footings stand in the river. Press Swim, go under, and break them.',8);return}
  if(power>=4){s.dmgd=true;s.sway=3;for(let b=f-1;b<=f+1;b++)for(let a=c-1;a<=c+1;a++){const q=s.rows[b]&&s.rows[b][a];if(!q||q.hp<=0||(s.arm&&b<2))continue;stats.hits++;if(q.t==='k'){const[qx,qy]=cellXY(s,a,b);q.hp=0;crate(qx,qy,qx<s.cx?-1:1)}else{q.hp=0;killCell(s,a,b)}}checkFails(s);return}
  const k=s.rows[f]&&s.rows[f][c];if(!k||k.hp<=0)return;const[x,y]=cellXY(s,c,f);
  if(!s.dmgd){s.dmgd=true;for(let i=0;i<4;i++)puff(s.x+30+i*40,GY-s.rows.length*s.fh-8,{kind:'bird',vx:60+Math.random()*80,vy:-90-Math.random()*60,r:6,c:'#6d7684',life:3,max:3})}
@@ -942,7 +949,7 @@ function drawLife(l){const x=l.x,g=GY-4,sd=l.seed;
 function tick(dt){if(P.support==='ground'&&(!trail.length||Math.abs(trail[trail.length-1]-P.x)>3)){trail.push(P.x);if(trail.length>90)trail.shift()}
  ['punch','cool','bump','spin','squash','dizzy','cheer','tumble','zap','stuck','singe'].forEach(k=>{if(P[k]>0)P[k]-=dt})}
 function player(dt){if(swim){P.walk+=dt;swimStep(dt);return}
- if(walls.length){const px=P.px===undefined?P.x:P.px,msg='The Baron walled off the street with steel. The river runs under the wall. Press Swim and go under, or break the wall anchor down there.';walls.forEach(wl=>{if(!wl.up||P.y<GY-262)return;if(px<=wl.x-30&&P.x>wl.x-30){P.x=wl.x-30;P.vx=0;once('wall',msg,8)}else if(px>=wl.x+30&&P.x<wl.x+30){P.x=wl.x+30;P.vx=0;once('wall',msg,8)}})}P.px=P.x;tick(dt);P.walk+=dt;
+ if(walls.length){const px=P.px===undefined?P.x:P.px,msg='The Baron walled off the street with steel. The river runs under the wall. Press Swim and go under, or break the wall anchor down there.';walls.forEach(wl=>{if(!wl.up||P.y<GY-262)return;if(px<=wl.x-30&&P.x>wl.x-30){P.x=wl.x-30;P.vx=0;hudKey='';once('wall',msg,8)}else if(px>=wl.x+30&&P.x<wl.x+30){P.x=wl.x+30;P.vx=0;hudKey='';once('wall',msg,8)}})}P.px=P.x;tick(dt);P.walk+=dt;
  if(P.nap>0){P.nap-=dt;if(P.nap<=0)P.energy=45;P.vx=0;gravity(dt);camFollow(dt);upQ=smashQ=slamQ=false;sHeld=false;P.charge=0;return}
  if(sHeld){sT+=dt;P.charge=clamp((sT-.12)/.33,0,1);if(P.charge>=1&&!P.chTold){P.chTold=1;SFX.pop()}}else{P.charge=0;P.chTold=0}
  P.sup=Math.min(1,P.sup+dt/10);$('smashBtn').classList.toggle('sup',P.sup>=1);if(P.sup>=1)once('sup','The Super bar is full. Hold Smash, then let go, to take out a three-by-three bite.',6);
@@ -1015,7 +1022,7 @@ function swimToggle(){dive(false)}
 function dive(fish){if(swim){surface();return}
  if(fish){if(!(state==='play'&&P.nap<=0&&!paused()))return;swim=fishSave||{fish:true,x:swimX(),y:WT+40,face:-1,carry:false,air:1,leap:0,t:0,hitT:0,hw:false,fall:0,fallT:0,spin:0};fishSave=null;
   once('fish','You are the salmon now. It cannot smash, and it never runs out of air. Its life runs the whole river: swim left, out to sea, to eat and find another salmon. Land puts you back.',9)}
- else{if(!canSwim())return;swim={fish:false,x:P.x,y:WT+26,face:P.face||1,carry:false,air:1,leap:0,t:0,hitT:0};
+ else{if(!canSwim())return;if(level>1)told.add('dive2');swim={fish:false,x:P.x,y:WT+26,face:P.face||1,carry:false,air:1,leap:0,t:0,hitT:0};
   once('dive','You are under the street. The pad swims you in every direction, and Smash still smashes. Watch your air: come up to the surface to breathe. At the surface, press Up again to climb out.',9)}
  P.vx=0;SFX.pop();hudKey=''}
 function surface(){const w=swim;if(!w.fish){if(w.x<24){once('shore','Swim back under the river bank before you climb out.',4);return}if(!waterOpen(w.x)){once('roof','A building sits on the bank above you. Swim out from under it and come up there.',5);return}P.x=clamp(w.x,40,WORLD-60);P.y=GY;P.vy=0;P.vx=0;P.support='ground';P.climb=null;P.px=P.x}
@@ -1144,7 +1151,7 @@ function drawDystopia(){const D=DY;
   shape(ellPts(x+sw,GY-149,22,11,b.i),'#fbf3dc',{lw:1.6});dot(x+sw+clamp(((swim?swim.x:P.x)-x)/40,-11,11),GY-149,6,'#c8342b');dot(x+sw+clamp(((swim?swim.x:P.x)-x)/40,-11,11),GY-149,2.4,INK);
   paperText(b.msg,x+sw,GY-114,22,'#ffd23f',0);
   if(b.hp<3)line(x-60+sw,GY-170,x-30+sw,GY-130,'#fbf3dc',2);if(b.hp<2)line(x+50+sw,GY-168,x+20+sw,GY-100,'#fbf3dc',2)});
- walls.forEach(wl=>{if(wl.up){shape(rectPts(wl.x-13,GY-262,26,262,wl.x,.8),'#4a5260',{lw:2.8,sh:1});for(let y=GY-250;y<GY-8;y+=30){dot(wl.x-7,y,2.6,'#c9d2de');dot(wl.x+7,y,2.6,'#c9d2de')}shape(rectPts(wl.x-17,GY-272,34,12,wl.x+1,.4),'#ffd23f',{lw:2});for(let q=0;q<3;q++)line(wl.x-13+q*10,GY-272,wl.x-7+q*10,GY-260,'#2b2a33',3)}
+ walls.forEach(wl=>{if(wl.up){shape(rectPts(wl.x-13,GY-262,26,262,wl.x,.8),'#4a5260',{lw:2.8,sh:1});for(let y=GY-250;y<GY-8;y+=30){dot(wl.x-7,y,2.6,'#c9d2de');dot(wl.x+7,y,2.6,'#c9d2de')}shape(rectPts(wl.x-17,GY-272,34,12,wl.x+1,.4),'#ffd23f',{lw:2});for(let q=0;q<3;q++)line(wl.x-13+q*10,GY-272,wl.x-7+q*10,GY-260,'#2b2a33',3);chalk(wl.x-52,GY-34);chalk(wl.x+52,GY-34)}
   else{const a=Math.max(0,1-wl.t/14);if(a>0){ctx.globalAlpha=a;shape(rectPts(wl.x-13,GY-16,262,14,wl.x,.8),'#4a5260',{lw:2.4});ctx.globalAlpha=1}}});
  // the Baron's statue stands on the new parking lot
  const lot=sites[3];if(l2up(lot)&&lot.state==='standing'){const top=GY-lot.rows.length*lot.fh,x=lot.cx;shape(rectPts(x-24,top-34,48,34,91,.5),'#55505f',{lw:2});line(x-14,top-17,x+14,top-17,'#ffd23f',4);
@@ -1211,9 +1218,11 @@ function drawTitle(){const L='Rewilder',n=L.length,low=H<520,tw=Math.min((W-(low
    if(g>.02){lf(-tw/2+2,-th/2+4,-2.2,tw/44,'#7cc35a');lf(tw/2-3,-th/2+3,-.9,tw/40,'#5fae50');if(u>.6){lf(tw/2-2,th/2-6,.5,tw/44,'#7cc35a');lf(-tw/2+3,th/2-4,2.6,tw/50,'#3f8443')}
     if(i===n-1){const fx=tw/2-4,fy=-th/2-2;for(let k=0;k<5;k++)dot(fx+Math.cos(k*1.257)*5*g,fy+Math.sin(k*1.257)*5*g,3.4*g,'#fbf6ea');dot(fx,fy,2.6*g,'#f0c030')}}}
   ctx.restore()}}
+function chalk(x,y){const c='#fbf3dc';line(x,y-30,x,y+14,c,5);line(x-13,y,x,y+16,c,5);line(x+13,y,x,y+16,c,5);paperText('UNDER',x,y-46,22,c,-.06)}
 function armorArt(s){if(!s.arm||s.rows.length<2)return;const y=GY-2*s.fh,w=s.w+10,x=s.x-5;shape(rectPts(x,y,w,2*s.fh,s.i+40,.8),'#4a5260',{lw:2.8,sh:1});
  for(let q=x+12;q<x+w-6;q+=26){dot(q,y+10,3,'#c9d2de');dot(q,GY-10,3,'#c9d2de')}line(x+4,y+s.fh,x+w-4,y+s.fh,'#2b2a33',3);
- for(let q=x+6;q<x+w-20;q+=34)shape([[q,y+s.fh-5],[q+14,y+s.fh-5],[q+22,y+s.fh+5],[q+8,y+s.fh+5]],'#ffd23f',{lw:1})}
+ for(let q=x+6;q<x+w-20;q+=34)shape([[q,y+s.fh-5],[q+14,y+s.fh-5],[q+22,y+s.fh+5],[q+8,y+s.fh+5]],'#ffd23f',{lw:1});
+ if(s.foot)s.foot.forEach(f=>{if(f.hp>0)chalk(f.x,GY-34)})}
 function vacFun(t){const b=vb,cl=(v)=>clamp(v,0,1);
  // kite on a thread from the turtle
  {const kx=452+Math.sin(T*.9)*22,ky=318+Math.cos(T*1.3)*14;line(392,548,kx,ky+18,'rgba(251,246,234,.8)',1.4);shape([[kx,ky-22],[kx+15,ky],[kx,ky+20],[kx-15,ky]],'#c8342b',{lw:2});line(kx,ky-22,kx,ky+20,INK,1.2);line(kx-15,ky,kx+15,ky,INK,1.2);for(let i=1;i<4;i++)dot(kx-i*7+Math.sin(T*3+i)*3,ky+20+i*11,3,i%2?'#ffd23f':'#2f8f8a')}
