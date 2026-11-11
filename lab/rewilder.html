@@ -3,9 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.10</title>
+<title>Rewilder v0.11</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.10 | LAB | 2026-11-11
+<!-- TSP build: Rewilder v0.11 | LAB | 2026-11-11
+     v0.11 (founder, with an iPhone 16 Pro screenshot: "The title of the game should be cooler looking
+     AND should be centered in the box"): the screenshot showed the cause of the "clipped" title. The
+     phone's serif font sits high in its line box, so the letters pressed against the top edge. The
+     title is now drawn on the stage: eight cut-paper tiles on threads, asphalt on the left and green
+     on the right, each letter centered by measuring its own ink. The h1 stays for screen readers.
      v0.10 (founder: "1.  The rewilder title at the start is clipped. Make sure studio Ian always checking
      to see what screen size a game is being played on to behave optimally. For example I have an iPhone
      16 pro and playtest primarily with that. But display should work optimally for everyone. 2. Some
@@ -180,7 +185,7 @@ body.playing #hud{display:flex}
 .ver{font-size:20px;color:var(--accent)}
 .tsp-labchip{font:800 18px/1 system-ui,sans-serif;padding:4px 8px;border:2px solid var(--line);border-radius:6px}
 .se-rail{display:flex;gap:6px}
-#title{position:fixed;z-index:2;left:50%;top:calc(70px + env(safe-area-inset-top));margin:0;transform:translateX(-50%) rotate(-2deg);background:#fbf3dc;color:#1b1328;border:3px solid #1b1328;border-radius:6px;padding:2px 22px 6px;font:900 clamp(44px,12vw,84px)/1.05 Rockwell,"Roboto Slab","Bookman Old Style",Georgia,serif;letter-spacing:-.01em;box-shadow:0 6px 0 rgba(0,0,0,.35);white-space:nowrap;pointer-events:none}
+#title{position:absolute;left:0;top:0;width:1px;height:1px;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 body.playing #title{display:none}
 #toast{position:fixed;z-index:3;left:8px;right:8px;margin:0 auto;width:fit-content;top:calc(64px + env(safe-area-inset-top));max-width:min(560px,calc(100vw - 16px));box-sizing:border-box;cursor:pointer;background:var(--chrome);color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:8px 14px;font-size:20px;font-weight:700;line-height:1.3;text-align:center;opacity:0;transition:opacity .25s ease;pointer-events:none}
 #toast.on{opacity:1;pointer-events:auto}
@@ -238,7 +243,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.10</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.11</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -368,7 +373,6 @@ addEventListener('resize',resize);addEventListener('orientationchange',()=>setTi
 // the game measures the screen it is on: nothing fixed may be wider than what the player can see
 function fitText(el,maxW,base,min){if(!el)return;el.style.fontSize=base+'px';const w=el.getBoundingClientRect().width;if(w>maxW)el.style.fontSize=Math.max(min,Math.floor(base*maxW/w))+'px'}
 function screenFit(){const vv=window.visualViewport,vw=Math.min(innerWidth,document.documentElement.clientWidth||innerWidth,vv?vv.width:innerWidth),vh=Math.min(innerHeight,vv?vv.height:innerHeight),t=document.getElementById('title'),b=document.getElementById('startBtn'),low=vh<520;
- if(t){t.style.top=low?'calc(8px + env(safe-area-inset-top))':'';fitText(t,vw-(low?150:30),Math.max(low?30:44,Math.min(84,vw*.12,low?vh*.15:999)),24)}
  fitText(b,vw-24,22,18)}
 function makeGrain(){const c=document.createElement('canvas');c.width=c.height=192;const g=c.getContext('2d'),d=g.createImageData(192,192);
  for(let i=0;i<d.data.length;i+=4){const v=Math.random();d.data[i]=d.data[i+1]=d.data[i+2]=v<.5?0:255;d.data[i+3]=Math.random()*26}
@@ -1055,6 +1059,23 @@ function vacAlt(t){const b=vb,sv=Object.assign({},P),w0=who,base={vx:0,vy:0,clim
   heroes(170,570,420,572);
   b.fw.forEach(f=>{const e=t-f.t0;if(e<0){const u=1+e/.5;dot(288+(f.x-288)*u,540+(f.y-540)*u,3.4,'#ffd23f')}else if(e<1.4){const r=ease(Math.min(1,e/.5))*64;ctx.globalAlpha=1-e/1.4;for(let k=0;k<12;k++){const a=k/12*6.283;line(f.x+Math.cos(a)*r*.4,f.y+Math.sin(a)*r*.4+e*e*10,f.x+Math.cos(a)*r,f.y+Math.sin(a)*r+e*e*16,f.c,3.6)}ctx.globalAlpha=1}});
   if(!vacEnd){if(b.n>1)paperText(''+b.n,110,150,60,'#ffd23f',-.08);paperText('Smash lights a firework. Up heads home.',260,318,24,'#fbf3dc',0)}}}
+/* the title: eight cut-paper tiles on threads. The road turns green from left to right.
+   Each letter is centered by measuring its ink, so no font can push it against an edge. */
+function drawTitle(){const L='Rewilder',n=L.length,low=H<520,tw=Math.min((W-(low?170:26))/(n+.5),low?H*.15:Math.max(84,Math.min(118,W*.065))),th=tw*1.3,gap=tw*.07,tot=n*tw+(n-1)*gap,x0=(W-tot)/2,cy=(low?10:W>700?14:Math.max(74,Math.min(H*.12,120)))+th/2+(low?0:8),fs=th*.86;
+ ctx.font=DISPLAY.replace('%',fs);ctx.textAlign='left';ctx.textBaseline='alphabetic';const cap=ctx.measureText('R').actualBoundingBoxAscent||fs*.7;
+ for(let i=0;i<n;i++){const u=i/(n-1),cx=x0+i*(tw+gap)+tw/2,drop=ease(clamp((T-.15-i*.09)/.5,0,1)),bob=RM?0:Math.sin(T*1.3+i*1.1)*2.2,rot=(hr(i+3)-.5)*.16+(RM?0:Math.sin(T*1.1+i*.8)*.025),y=cy+(i%2?5:-3)+bob-(1-drop)*(cy+th);
+  ctx.strokeStyle='rgba(251,246,234,.55)';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(cx-tw*.28,0);ctx.lineTo(cx-tw*.28,y-th*.42);ctx.moveTo(cx+tw*.28,0);ctx.lineTo(cx+tw*.28,y-th*.42);ctx.stroke();
+  ctx.save();ctx.translate(cx,y);ctx.rotate(rot);
+  const col=mix('#55505f','#2f6b3a',clamp((u-.25)/.5,0,1));shape(rectPts(-tw/2,-th/2,tw,th,i*7+2,1.2),col,{lw:2.6,sh:1});
+  if(u<.5){ctx.fillStyle='#ffd23f';for(let k=0;k<2;k++)ctx.fillRect(-tw*.34+k*tw*.42,th*.4,tw*.26,th*.04)}
+  if(u>.2&&u<.8){line(-tw*.2,-th/2+2,-tw*.05,-th*.2,INK,1.6);line(-tw*.05,-th*.2,-tw*.22,-th*.02,INK,1.6)}
+  ctx.font=DISPLAY.replace('%',fs);let ch=L[i],m=ctx.measureText(ch),iw=(m.actualBoundingBoxRight||m.width)+(m.actualBoundingBoxLeft||0),ih=(m.actualBoundingBoxAscent||cap)+(m.actualBoundingBoxDescent||0),z=Math.min(1,tw*.74/iw,th*.66/ih),f2=fs*z;ctx.font=DISPLAY.replace('%',f2);m=ctx.measureText(ch);
+  const gl=m.actualBoundingBoxLeft||0,gr=m.actualBoundingBoxRight||m.width,ga=m.actualBoundingBoxAscent||cap*z,gd=m.actualBoundingBoxDescent||0,tx=(gl-gr)/2,ty=(ga-gd)/2-th*.03;
+  ctx.textAlign='left';ctx.textBaseline='alphabetic';ctx.lineJoin='round';ctx.lineWidth=f2*.14;ctx.strokeStyle=INK;ctx.strokeText(ch,tx,ty);ctx.fillStyle=u<.5?'#fbf3dc':'#fff8dc';ctx.fillText(ch,tx,ty);
+  if(u>.3){const g=ease(clamp((T-1-i*.14)/.9,0,1))*clamp((u-.3)/.4,.4,1),lf=(lx,ly,a,z,c)=>{ctx.save();ctx.translate(lx,ly);ctx.rotate(a);ctx.scale(z*g,z*g);shape([[0,0],[7,-6],[17,-3],[9,4]],c,{lw:1.4});line(1,0,13,-2,INK,.8);ctx.restore()};
+   if(g>.02){lf(-tw/2+2,-th/2+4,-2.2,tw/44,'#7cc35a');lf(tw/2-3,-th/2+3,-.9,tw/40,'#5fae50');if(u>.6){lf(tw/2-2,th/2-6,.5,tw/44,'#7cc35a');lf(-tw/2+3,th/2-4,2.6,tw/50,'#3f8443')}
+    if(i===n-1){const fx=tw/2-4,fy=-th/2-2;for(let k=0;k<5;k++)dot(fx+Math.cos(k*1.257)*5*g,fy+Math.sin(k*1.257)*5*g,3.4*g,'#fbf6ea');dot(fx,fy,2.6*g,'#f0c030')}}}
+  ctx.restore()}}
 function braced(s){if(T-(s.brAt||-9)<1.6)return;s.brAt=T;s.sway=3;SFX.creak();word('BRACED',s.cx,GY-s.rows.length*s.fh-44,'#c9d2de');once('brace','Steel braces hold this building square. It cannot tip or buckle while one of them stands. Find the crossed steel plates and break them.',7)}
 function braceArt(s){const fh=s.fh,cw=s.cw;s.rows.forEach((row,f)=>row.forEach((k,c)=>{if(!k||!k.br||k.hp<=0)return;const x=s.x+c*cw,y=GY-(f+1)*fh;
   shape(rectPts(x+3,y+3,cw-6,fh-6,k.seed+5,.4),'#3d4654',{lw:2.4});line(x+8,y+8,x+cw-8,y+fh-8,INK,8);line(x+cw-8,y+8,x+8,y+fh-8,INK,8);line(x+8,y+8,x+cw-8,y+fh-8,'#c9d2de',4.4);line(x+cw-8,y+8,x+8,y+fh-8,'#c9d2de',4.4);
@@ -1189,6 +1210,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(lensOn&&state==='play')drawLens();
  // screen space: rain, paper grain, stage edge
  ctx.setTransform(DPR,0,0,DPR,0,0);
+ if(state==='title')drawTitle();
  if(DY>.15&&!RM){ctx.fillStyle='rgba(206,196,206,'+(.55*DY)+')';for(let i=0;i<20+28*sv;i++){const ax=((hr(i+200)*W+Math.sin(T*.6+i)*30+T*14)%W+W)%W,ay=(hr(i+300)*H+T*(26+hr(i)*30))%H;ctx.fillRect(ax,ay,2.6,2.6)}}
  if(sv>=3&&DY>.3&&!RM&&(T%9)<.1){ctx.fillStyle='rgba(210,255,190,.22)';ctx.fillRect(0,0,W,H)}
  if(rain>0){ctx.strokeStyle='rgba(190,220,240,.75)';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<70;i++){const x=(hr(i)*W+T*80)%W,y=(hr(i+70)*H+T*900)%H;ctx.moveTo(x,y);ctx.lineTo(x-6,y+20)}ctx.stroke()}
