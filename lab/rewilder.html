@@ -3,9 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.8.1</title>
+<title>Rewilder v0.9</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.8.1 | LAB | 2026-11-11
+<!-- TSP build: Rewilder v0.9 | LAB | 2026-11-11
+     v0.9 (founder: "Okay. I like it. Improve on graphics, add a little something fun to vacation screen,
+     and change world more dramatically and intricately. This is dystopia we are returning to."):
+     "I like it" approves the salmon role proposed the turn before. A salmon swims the river once the dam
+     is down. It cannot smash. It carries a glow from the sea to a site that is growing or grown.
+     Source for the salmon field note: Quinn, Helfield, Austin, Hovel, Bunn (2018), Ecology,
+     DOI 10.1002/ecy.2453. The culvert rule and the feeding amounts are studio inventions.
+     Level 2 is a dystopia that lifts as Baron buildings fall: skyline, pipes, watching billboards,
+     drones, ash, a gray river, gray people. The vacation card has a beach ball, a crab, a kite and a
+     sandcastle, and it lasts until you press Up. The art pass adds soil layers, roots, sun rays,
+     fireflies, a deeper river and a shadow under the hero.
      v0.8.1 (founder: "You don't need to say nope to hitting people and bicycles. It just doesn't do
      anything."): swinging at people, bikes, dogs or carts does nothing, with no word and no message.
      v0.8 (founder: "The building collapse stages need to stop acting like trees falling over. More
@@ -128,6 +138,10 @@ button[aria-pressed="false"] svg .x{display:inline}
 #tagBtn{margin-left:auto;border-radius:24px;display:none;background:var(--line);color:var(--online)}
 body.playing #tagBtn.can{display:inline-flex}
 #tagBtn.can + #lensBtn{margin-left:0}
+#swimBtn{margin-left:auto;display:none;background:var(--line);color:var(--online)}
+body.playing #swimBtn.can{display:inline-flex}
+#swimBtn.can + #tagBtn{margin-left:0}
+#swimBtn.can ~ #lensBtn{margin-left:0}
 #lensBtn{margin-left:auto;border-radius:24px;display:none}
 #lensBtn[aria-pressed="true"]{background:var(--line);color:var(--online)}
 body.playing #lensBtn{display:inline-flex}
@@ -208,14 +222,14 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.8.1</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.9</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
   <button id="menuClose" type="button">Close menu</button>
   <p>Keys: arrows or WASD move, Up climbs or jumps, Space smashes. When the Super bar is full, hold Space and let go for a three-by-three bite. Hold Down and smash on open ground to dig a pit. L opens the Lens. T tags in your friend. Hold Down and smash on a wall to dive.</p>
 </header>
-<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Rewilder, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div><button id="tagBtn" type="button">Tag</button><button id="lensBtn" type="button" aria-pressed="false">Lens</button><button id="soundBtn" class="icon" type="button" aria-pressed="true" aria-label="Sound on"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 11h4l6-5v16l-6-5H5z"/><path class="wave" d="M19 10a5 5 0 0 1 0 8M22 7a9 9 0 0 1 0 14"/><path class="x" d="M19 11l6 6M25 11l-6 6"/></svg></button></div>
+<div id="corner"><button id="menuBtn" class="icon" type="button" aria-expanded="false" aria-controls="topbar" aria-label="Menu: Rewilder, Lab build"><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M5 8h16M5 13h16M5 18h16"/></svg></button><div id="hud" aria-hidden="true"></div><button id="swimBtn" class="icon" type="button" aria-pressed="false" aria-label="Swim the river as a salmon"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M3 14c4-6 12-6 16 0c-4 6-12 6-16 0zM19 14l6-5v10z"/></svg></button><button id="tagBtn" type="button">Tag</button><button id="lensBtn" type="button" aria-pressed="false">Lens</button><button id="soundBtn" class="icon" type="button" aria-pressed="true" aria-label="Sound on"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M5 11h4l6-5v16l-6-5H5z"/><path class="wave" d="M19 10a5 5 0 0 1 0 8M22 7a9 9 0 0 1 0 14"/><path class="x" d="M19 11l6 6M25 11l-6 6"/></svg></button></div>
 
 <div id="toast" aria-hidden="true"></div>
 <div id="lens" role="region" aria-label="Flow lens" aria-live="polite"></div>
@@ -285,7 +299,10 @@ const NOTES={
   src:[['Depave','https://depave.org/'],['Streetsblog USA: Depaving paradise','https://usa.streetsblog.org/2019/06/12/depaving-paradise-grassroots-portland-group-dismantles-parking-lots-by-hand']]},
  dam:{title:'What the Elwha did without its dams',lab:'Field note: Elwha River, Washington',
   text:'Two dams blocked salmon on the Elwha River for about a century. Crews took both down, the last in 2014. That September, Chinook salmon swam above the old Glines Canyon dam site for the first time in 102 years. The sediment the dams had held back washed down and built new shoreline at the river mouth.',
-  src:[['National Park Service: First salmon return to the Upper Elwha in 102 years','https://www.nps.gov/olym/learn/news/three-chinook-spotted-above-glines-canyon.htm'],['Rewilding Institute: Ten years after dam removal on the Elwha','https://rewilding.org/what-the-river-teaches-ten-years-after-dam-removal-on-the-elwha-river/']]}
+  src:[['National Park Service: First salmon return to the Upper Elwha in 102 years','https://www.nps.gov/olym/learn/news/three-chinook-spotted-above-glines-canyon.htm'],['Rewilding Institute: Ten years after dam removal on the Elwha','https://rewilding.org/what-the-river-teaches-ten-years-after-dam-removal-on-the-elwha-river/']]},
+ salmon:{title:'What salmon did for the spruce at Hansen Creek',lab:'Field note: Hansen Creek, Alaska',
+  text:'For twenty years, researchers at Hansen Creek moved the dead sockeye salmon they counted onto one bank of the stream. White spruce on that bank took nitrogen from the sea into their new growth. Those trees had grown slower than the trees across the water before the experiment, and the gap narrowed. In this game the salmon carries a glow; in the creek, the fish itself is the food.',
+  src:[['Quinn, Helfield, Austin, Hovel, Bunn (2018), Ecology: salmon carcasses and tree growth','https://doi.org/10.1002/ecy.2453'],['habitat.fisheries.org: Salmon carcasses enrich tree habitat','https://habitat.fisheries.org/?p=2162']]},
 };
 /* ---------- what can grow: the flow model is a simplified studio invention ---------- */
 const CH={
@@ -377,12 +394,12 @@ const cam={x:0,y:0};
 const P={x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,walk:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,singe:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0,sup:0};
 const stats={hits:0,crews:0,paved:0,start:0,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0};
 let F={hard:4,soak:0,tn:0,tm:0,pn:0,pm:0,unmet:0,links:0,haze:true};
-let level=1,vacT=0,life=[],lifeT=14,lifeI=0,done=false,hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0;
+let level=1,vacT=0,life=[],lifeT=14,lifeI=0,done=false,hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0,swim=null,bills=[],drones=[],vb=null,vacEnd=0,DY=0;
 
 function buildSite(d,i){const rows=[];for(let f=0;f<d.floors;f++){const row=[];for(let c=0;c<d.cols;c++){let t=d.cell(c,f);if(KB[d.id]&&KB[d.id][0]===c&&KB[d.id][1]===f)t='k';const hp=t?HP[t]+(f<2&&t!=='k'&&d.floors>2?3:0):0;row.push(t?{t,hp,max:hp,seed:i*1000+f*17+c*3,stack:d.id==='coal'&&f>=7}:null)}
   row.stack=d.id==='coal'&&f>=7;row.deck=d.id==='highway'&&f===4;rows.push(row)}
  return {...d,i,w:d.cols*d.cw,cx:d.x+d.cols*d.cw/2,rows,state:'standing',g:0,t:0,paved:false,saved:0,seed:i*97+13,sprigT:6+i,choice:null,lift:null,liftT:10,dmgd:false,chainT:0,jet:null,jetT:5,why:[],sway:0,cars:d.id==='highway'?[0,1,2,3,4,5,6].map(i=>({x:d.x+30+i*96,c:CARC[i%5],dead:0,v:30+hr(i)*16})):[],trolley:d.id==='highway'?{x:d.x+60,dir:1}:null}}
-function resetWorld(){sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];crates=[];pits=[];notes.clear();told.clear();
+function resetWorld(){sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];crates=[];pits=[];swim=null;bills=[];drones=[];notes.clear();told.clear();
  Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,singe:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0,sup:0});level=1;vacT=0;life=[];lifeT=14;lifeI=0;done=false;baron=null;baronT=40;baronHp=3;barrels=[];tar=[];who='beaver';rest={energy:100};
  folk=[0,1,2,3,4,5].map(i=>({x:560+i*290+hr(i)*120,dir:i%2?1:-1,v:i%2?70+hr(i)*30:24+hr(i)*14,bike:i%2===1,c:['#c8342b','#3b6ea8','#e8c25a','#7a1a12','#2f8f8a','#b06ad0'][i],hop:0,seed:i}));
  Object.assign(stats,{hits:0,crews:0,paved:0,start:T,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0});
@@ -465,8 +482,8 @@ function toast(t,d){const el=$('toast');el.textContent=t;placeToast();el.classLi
 $('toast').onclick=()=>{toastT=0;$('toast').classList.remove('on')};
 function once(k,t,d){if(told.has(k))return false;told.add(k);toast(t,d||4.5);return true}
 let hudKey='';
-function hud(){const pips=Math.ceil(P.energy/20),freed=sites.filter(s=>s.state==='grown').length,ct=canTag(),su=Math.round(P.sup*8),k=pips+'|'+freed+'|'+ct+'|'+su+'|'+level;if(k===hudKey)return;hudKey=k;$('tagBtn').classList.toggle('can',ct);$('tagBtn').setAttribute('aria-label',who==='beaver'?'Tag in Mossback the turtle':'Tag in Big Gnaw the beaver');
- let h='<span>Energy <span class="pips">';for(let i=0;i<5;i++)h+='<span class="pip'+(i<pips?' on':'')+'"></span>';h+='</span></span><span>Super <span class="bar'+(P.sup>=1?' full':'')+'"><i style="width:'+Math.round(P.sup*100)+'%"></i></span></span><span>'+(level>1?'L'+level+' ':'')+'Grown <b>'+freed+'</b>/5</span>';$('hud').innerHTML=h}
+function hud(){const pips=Math.ceil(P.energy/20),freed=sites.filter(s=>s.state==='grown').length,ct=canTag(),su=Math.round(P.sup*8),cs=canSwim(),k=pips+'|'+freed+'|'+ct+'|'+su+'|'+level+'|'+cs+'|'+!!swim;if(k===hudKey)return;hudKey=k;{const b=$('swimBtn');b.classList.toggle('can',cs||!!swim);b.setAttribute('aria-pressed',!!swim);b.setAttribute('aria-label',swim?'Climb out of the river':'Swim the river as a salmon')}$('tagBtn').classList.toggle('can',ct);$('tagBtn').setAttribute('aria-label',who==='beaver'?'Tag in Mossback the turtle':'Tag in Big Gnaw the beaver');
+ let h='<span>Energy <span class="pips">';for(let i=0;i<5;i++)h+='<span class="pip'+(i<pips?' on':'')+'"></span>';h+='</span></span><span>Super <span class="bar'+(P.sup>=1?' full':'')+'"><i style="width:'+Math.round(P.sup*100)+'%"></i></span></span><span>'+(level>1?'Level '+level+' <b>'+freed+'</b>/5</span>':'Grown <b>'+freed+'</b>/5</span>');$('hud').innerHTML=h}
 function linkList(src){return src.map(s=>'<a href="'+s[1]+'" target="_blank" rel="noopener">'+s[0]+'</a>').join('<br>')}
 function openCard(lab,title,chain,text,srcHtml){cardOpen=true;$('cardLab').textContent=lab;$('cardTitle').textContent=title;$('cardChain').textContent=chain||'';$('cardChain').style.display=chain?'':'none';$('cardText').textContent=text;
  $('cardSrc').innerHTML=srcHtml||'';$('cardSrc').style.display=srcHtml?'':'none';$('cardSheet').classList.add('open');$('cardBtn').focus({preventScroll:true});$('cardSheet').querySelector('.paperCard').scrollTop=0}
@@ -479,6 +496,7 @@ function openPick(s,re){pickOpen=true;$('pickLab').textContent=re?'Replant the '
  $('pickSheet').classList.add('open');b.querySelector('button').focus({preventScroll:true})}
 function renderNotes(end){const list=$('notesList');list.innerHTML='';list.style.display=end?'none':'';
  SITE_DEF.forEach(d=>{const li=document.createElement('li');if(notes.has(d.id)){const n=NOTES[d.id];li.innerHTML='<b>'+n.title+'.</b> '+n.text+'<br><span class="src">Sources:<br>'+linkList(n.src)+'</span>'}else li.textContent='Locked: bring down the '+d.name+' and let something finish growing there.';list.appendChild(li)});
+ {const li=document.createElement('li');if(notes.has('salmon')){const n=NOTES.salmon;li.innerHTML='<b>'+n.title+'.</b> '+n.text+'<br><span class="src">Sources:<br>'+linkList(n.src)+'</span>'}else li.textContent='Locked: free the river, swim it as the salmon, and feed a place that grows.';list.appendChild(li)}
  const b=$('notesBtns');b.innerHTML='';
  if(end){const again=document.createElement('button');again.type='button';const keep=document.createElement('button');keep.type='button';keep.textContent='Keep playing';keep.onclick=()=>{closeNotes();toast('The city is yours. Hold Down and smash on a grown site to replant it, or walk past the VACATION sign at the far right.',8)};b.appendChild(keep);again.textContent='Start over';again.onclick=()=>{closeNotes();startGame()};b.appendChild(again);
   const back=document.createElement('a');back.className='nav';back.href='./index.html';back.textContent='Back to the lab';b.appendChild(back)}
@@ -495,12 +513,12 @@ function closeNotes(){notesOpen=false;$('notesSheet').classList.remove('open');$
 $('notesBtn').onclick=()=>openNotes(false);
 function setLens(o){lensOn=o;$('lensBtn').setAttribute('aria-pressed',o);$('lens').classList.toggle('on',o);document.body.classList.toggle('lensOn',o);lensT=0;if(o)once('lens2','The Lens slows time. Press it again to close it.',3)}
 $('lensBtn').onclick=()=>setLens(!lensOn);
-$('tagBtn').onclick=()=>{if(canTag())tagOut()};
+$('tagBtn').onclick=()=>{if(canTag())tagOut()};$('swimBtn').onclick=()=>swimToggle();
 function finish(){if(state!=='play'||done)return;done=true;setLens(false);SFX.grow();openNotes(true)}
 function startGame(){resetWorld();state='play';ac();musStart();document.body.classList.add('playing');resize();hudKey='';hud();cam.x=0;
  toast('Smash anything. A building stands while its weight sits over what is left underneath. Cut out one side, low down, and the whole thing comes down.',5)}
 $('startBtn').onclick=startGame;
-cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');if(state!=='play'&&!cardOpen&&!notesOpen&&!menuOpen)startGame();
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');if(state==='vacation'){smashQ=true;return}if(state!=='play'&&!cardOpen&&!notesOpen&&!menuOpen)startGame();
  else if(state==='play'){const wx=e.clientX/S+cam.x,wy=(e.clientY-OY)/S+cam.y;if(Math.abs(wx-FRX)<95&&wy>GY-160&&wy<GY+30&&canTag())tagOut()}});
 addEventListener('touchstart',()=>{if(!document.body.classList.contains('touch')){document.body.classList.add('touch');resize()}},{passive:true});
 if(matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
@@ -619,7 +637,7 @@ function collapse(s){s.state='collapsing';s.t=0;s.lift=null;s.jet=null;SFX.colla
  if(P.climb===s){P.climb=null;P.support=null}if(P.support===s)P.support=null;
  if(state==='play'){P.cheer=1.4;if(s.id==='dam')startSediment()}}
 function startSediment(){sed={x:sites[4].x};}
-function hurt(n){if(who==='turtle'){word('TINK',P.x,P.y-150,'#c9d2de');SFX.clang();return}P.energy=Math.max(0,P.energy-n);P.dizzy=1;SFX.bump()}
+function hurt(n){if(swim)return;if(who==='turtle'){word('TINK',P.x,P.y-150,'#c9d2de');SFX.clang();return}P.energy=Math.max(0,P.energy-n);P.dizzy=1;SFX.bump()}
 function knock(dir,n){if(who==='turtle'){hurt(n);return}hurt(n);P.climb=null;P.support=null;P.vx=dir*340;P.vy=-240;P.tumble=.7;stars(P.x,P.y-90,4)}
 
 /* ---------- flows ---------- */
@@ -651,7 +669,7 @@ function lensText(){const d=F.hard-F.soak,next=d>1.5?'The next rain will flood y
 
 /* ---------- actions ---------- */
 function target(s){const c=colOf(s,P.x),f=chestF(s),o=[[c,f],[c+P.face,f],[c,f+1],[c,f-1],[c-P.face,f]];for(const q of o)if(q[0]>=0&&alive(s,q[0],q[1]))return q;return null}
-function strike(power){const tu=who==='turtle';if(tu&&power<3)power=3;P.punch=.26;P.cool=tu?.6:power>1?.45:.26;if(power>=4){P.spin=.5;const rx0=P.x+P.face*48;trucks.forEach(t=>{if(t.state!=='tipped'&&Math.abs(t.x-rx0)<150&&P.y>GY-160)tipTruck(t)});stars(rx0,P.y-60,10);shake=RM?0:14;hitstop=.12;word('KABOOM',rx0,P.y-150,'#ffd23f');SFX.slam();SFX.collapse()}
+function strike(power){billHit(power);const tu=who==='turtle';if(tu&&power<3)power=3;P.punch=.26;P.cool=tu?.6:power>1?.45:.26;if(power>=4){P.spin=.5;const rx0=P.x+P.face*48;trucks.forEach(t=>{if(t.state!=='tipped'&&Math.abs(t.x-rx0)<150&&P.y>GY-160)tipTruck(t)});stars(rx0,P.y-60,10);shake=RM?0:14;hitstop=.12;word('KABOOM',rx0,P.y-150,'#ffd23f');SFX.slam();SFX.collapse()}
  if(power===1){P.cmb=(T-P.cmbT<.9)?P.cmb+1:1;P.cmbT=T;if(P.cmb>=3){power=2;P.cmb=0}}
  const rx=P.x+P.face*48;
  if(!P.climb&&P.y>GY-10&&Math.abs(P.x-FRX)<100){tagOut();return}
@@ -675,7 +693,7 @@ function strike(power){const tu=who==='turtle';if(tu&&power<3)power=3;P.punch=.2
  SFX.whiff()}
 function crunch(x,y,c){debris(x,y,14,c);stars(x,y,5);word('CRUNCH',x,y-40,'#ffd23f');SFX.crunch();shake=RM?0:6;stats.cars++}
 function zap(){P.energy=Math.max(0,P.energy-20);P.zap=.9;P.singe=2.4;P.dizzy=1.2;P.vx=-P.face*260;P.vy=-220;P.support=null;sparks(P.x+P.face*50,P.y-50,18,'#9fd0ff');word('ZZZAP',P.x,P.y-170,'#9fd0ff');SFX.zap();shake=RM?0:8;hudKey='';once('zap','Anything electric bites back: trolleys, trams, turbines, solar. Leave them be.',5)}
-function canTag(){return state==='play'&&P.nap<=0&&!paused()}
+function canTag(){return state==='play'&&!swim&&P.nap<=0&&!paused()}
 function tagOut(){const e=P.energy;P.energy=rest.energy;rest.energy=e;who=who==='beaver'?'turtle':'beaver';P.dizzy=0;P.zap=0;P.cheer=.9;SFX.tag();word('TAG',P.x,P.y-175,'#ffd23f');dust(P.x,P.y,8,60);hudKey='';
  toast(who==='turtle'?'Mossback tags in. She is slow, her bite is heavy, and rubble bounces off her shell.':'Big Gnaw tags back in, rested.',5)}
 function spawnBaron(){const x=P.x<WORLD/2?cam.x+viewW+220:cam.x-220;baron={x,y:GY-310,hp:baronHp,state:'fly',life:0,hold:0,drop:1.2,snag:0,snagged:[],jolt:0,t:0,tx:null,dir:1};SFX.blimp();
@@ -710,7 +728,7 @@ function spawnTruck(){const grow=sites.filter(s=>s.state==='growing'&&!s.paving&
  if(crewSeen>=2&&F.unmet>0)cause('need')}
 
 /* ---------- update ---------- */
-function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;if(vacT>6.6||(vacT>1.2&&(smashQ||upQ))){smashQ=upQ=false;startLevel()}return}
+function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return}
  if(hitstop>0){hitstop-=raw;return}const dt=(lensOn&&state==='play')?raw*.3:raw;T+=dt;sites.forEach(s=>{if(s.sway>0)s.sway*=Math.pow(.015,dt)});
  if(toastT>0){toastT-=raw;placeToast();if(toastT<=0)$('toast').classList.remove('on')}
  const coal=sites[2];
@@ -754,6 +772,7 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;if(vacT>6.6||(vacT>
    if(s.state==='growing'&&CH[s.choice].water&&s.g<.6){s.g*=.4;dust(s.cx,GY,12,s.w);toast('Mud from the dam buried the young '+CH[s.choice].short+'.',4);cause('sediment')}}});
   if(sed.x<-100){sed=null;beach=.01}}
  if(beach>0&&beach<1)beach=Math.min(1,beach+dt/8);
+ bills.forEach(b=>{if(b.hp<=0)b.t+=dt;if(b.jolt>0)b.jolt-=dt});dronesStep(dt);
  if(baron)baronStep(dt);else if(sites.some(s=>s.state==='growing'||s.state==='grown')){baronT-=dt;if(baronT<=0)spawnBaron()}
  for(let i=barrels.length-1;i>=0;i--){const q=barrels[i];q.vy+=700*dt;q.y+=q.vy*dt;
   if(Math.abs(q.x-P.x)<36&&q.y>P.y-125&&q.y<P.y-5&&P.tumble<=0){barrels.splice(i,1);hurt(8);P.stuck=1.4;SFX.splat();word('SPLAT',P.x,P.y-150);continue}
@@ -849,7 +868,7 @@ function drawLife(l){const x=l.x,g=GY-4,sd=l.seed;
   shape(ellPts(x,y-28,52,44,sd),'rgba(0,0,0,0)',{lw:2.2});line(x-14,y+44,x-8,y+62,INK,1.2);line(x+14,y+44,x+8,y+62,INK,1.2);shape(rectPts(x-10,y+62,20,13,sd,.4),'#8a5a34',{lw:1.6});dot(x,y+60,4,'#c08a5a')}}
 function tick(dt){if(P.support==='ground'&&(!trail.length||Math.abs(trail[trail.length-1]-P.x)>3)){trail.push(P.x);if(trail.length>90)trail.shift()}
  ['punch','cool','bump','spin','squash','dizzy','cheer','tumble','zap','stuck','singe'].forEach(k=>{if(P[k]>0)P[k]-=dt})}
-function player(dt){tick(dt);P.walk+=dt;
+function player(dt){if(swim){P.walk+=dt;swimStep(dt);return}tick(dt);P.walk+=dt;
  if(P.nap>0){P.nap-=dt;if(P.nap<=0)P.energy=45;P.vx=0;gravity(dt);camFollow(dt);upQ=smashQ=slamQ=false;sHeld=false;P.charge=0;return}
  if(sHeld){sT+=dt;P.charge=clamp((sT-.12)/.33,0,1);if(P.charge>=1&&!P.chTold){P.chTold=1;SFX.pop()}}else{P.charge=0;P.chTold=0}
  P.sup=Math.min(1,P.sup+dt/10);$('smashBtn').classList.toggle('sup',P.sup>=1);if(P.sup>=1)once('sup','The Super bar is full. Hold Smash, then let go, to take out a three-by-three bite.',6);
@@ -886,7 +905,7 @@ function gravity(dt){const prevY=P.y;if(P.support&&!standOK())P.support=null;
      if(P.support==='ground'){SFX.slam();trucks.forEach(t=>{if(t.state!=='tipped'&&Math.abs(t.x-P.x)<95)tipTruck(t)})}
      else hitCell(P.support,P.sc,P.sf,who==='turtle'?3:2)}}}}
  P.x=clamp(P.x+P.vx*dt,40,WORLD-40);if(P.support&&Math.abs(P.vx)<5)P.vx=0}
-function camFollow(dt){const target=clamp(P.x-viewW*.45,0,Math.max(0,WORLD-viewW));cam.x+=(target-cam.x)*Math.min(1,dt*5);if(WORLD<viewW)cam.x=(WORLD-viewW)/2;
+function camFollow(dt){const target=clamp((swim?swim.x:P.x)-viewW*.45,0,Math.max(0,WORLD-viewW));cam.x+=(target-cam.x)*Math.min(1,dt*5);if(WORLD<viewW)cam.x=(WORLD-viewW)/2;
  const ty=Math.min(0,P.y-270+OY/S);cam.y+=(ty-cam.y)*Math.min(1,dt*4)}
 
 /* ---------- splash: the beaver shows the verb on beats ---------- */
@@ -902,11 +921,107 @@ function demo(dt){demoT+=dt;const g=sites[0];
 
 /* ---------- render ---------- */
 const L2={garage:{floors:10,name:'Blacktop Tower',col:'#2b2a33',cell:(c,f)=>(c+f)%3?'g':'c'},highway:{name:'toll expressway'},coal:{floors:7,name:'data center',col:'#39424e',cell:(c,f)=>((c===2&&f%2===1)||(c===4&&f%2===0))?'v':(c+f)%4===0?'c':'d'},lot:{name:'new parking lot'},dam:{name:'rebuilt dam'}};
-function beginVacation(){state='vacation';vacT=0;setLens(false);K.l=K.r=K.u=K.d=0;$('toast').classList.remove('on');toastT=0;SFX.grow()}
-function startLevel(){level++;sites=sites.map(o=>{const s=buildSite(Object.assign({},SITE_DEF[o.i],L2[o.id]),o.i);s.choice=o.choice;s.restore=true;s.l2=true;return s});
+/* ---------- v0.9: the salmon, the dystopia, the beach ball ---------- */
+function l2up(s){return !!s.l2&&(s.state==='standing'||s.state==='toppling'||s.state==='collapsing')}
+function dys(){if(level<2)return 0;let n=0;sites.forEach(s=>{if(l2up(s))n++});return n/sites.length}
+function riverFree(){const d=sites[4];return !(d.state==='standing'&&!d.paved)&&d.state!=='collapsing'&&d.state!=='toppling'}
+function canSwim(){return state==='play'&&!swim&&riverFree()&&P.support==='ground'&&P.nap<=0&&!paused()}
+function swimToggle(){if(swim){swim=null;SFX.pop();word('SPLASH',P.x,GY-60,'#9fd8ee');hudKey='';return}
+ if(!canSwim())return;swim={x:clamp(P.x,40,WORLD-360),face:P.face||1,carry:false,leap:0,t:0};P.vx=0;SFX.pop();hudKey='';
+ once('swim','You are the salmon now. A salmon cannot smash. Swim left to the sea, press Smash to pick up its glow, and carry the glow upstream to a place that grows. The fish button puts you back on land.',9)}
+function swimStep(dt){const w=swim;w.t+=dt;P.vx=0;
+ if(!riverFree()){swim=null;hudKey='';toast('The river stopped running, so the salmon left.',4);return}
+ const dir=(K.r?1:0)-(K.l?1:0);if(dir)w.face=dir;let nx=w.x+dir*230*dt;
+ const g=sites[0];if(g.state==='standing'&&!g.paved){const a=g.x-36,b=g.x+g.w+36,msg='A culvert squeezes the river into a pipe under this building. The salmon cannot get through until the building comes down.';
+  if(w.x<=a&&nx>a){nx=a;once('culvert',msg,6)}else if(w.x>=b&&nx<b){nx=b;once('culvert',msg,6)}}
+ w.x=clamp(nx,-30,WORLD-360);
+ if(w.leap>0)w.leap-=dt;if(upQ){upQ=false;if(w.leap<=0){w.leap=.6;SFX.pop()}}
+ if(smashQ){smashQ=false;sHeld=false;
+  if(!w.carry){if(w.x<210){w.carry=true;SFX.pick();word('SEA GLOW',w.x,GY-30,'#9fd8ee');once('glow','The salmon carries food from the sea. Swim it upstream and press Smash beside a place that grows.',6)}else once('sea','The glow comes from the sea, at the far left end of the river.',4)}
+  else{const s=sites.find(q=>(q.state==='growing'||q.state==='grown')&&w.x>q.x-30&&w.x<q.x+q.w+30);
+   if(s){w.carry=false;if(s.state==='growing')s.g=Math.min(.99,s.g+.3);else s.fed=Math.min(6,(s.fed||0)+1);leaves(w.x,GY-10,16);SFX.grow();word('FED',w.x,GY-60,'#7cc35a');
+    if(!notes.has('salmon')){notes.add('salmon');toast('The trees here took in food from the sea. A new field note waits in the menu.',6)}}
+   else once('feed','Carry the glow to a place where something grows, then press Smash.',4)}}
+ camFollow(dt)}
+function drawSalmon(){const w=swim,u=w.leap>0?1-w.leap/.6:0,lp=w.leap>0?Math.sin(u*Math.PI):0,y=GY+37-lp*58;
+ if(w.carry){ctx.globalAlpha=.3+.12*Math.sin(T*6);dot(w.x,y,30,'#9fd8ee');ctx.globalAlpha=1}
+ if(!lp){line(w.x-30,GY+25,w.x-12,GY+25,'rgba(255,255,255,.7)',2);line(w.x+10,GY+25,w.x+30,GY+25,'rgba(255,255,255,.7)',2)}
+ ctx.save();ctx.translate(w.x,y);ctx.scale(w.face,1);ctx.rotate(w.leap>0?-.9+1.8*u:Math.sin(T*8)*.06);const wag=Math.sin(T*14)*4;
+ shape([[-22,0],[-38,-11+wag],[-33,0],[-38,11+wag]],'#c8584a',{lw:1.8});
+ shape([[-24,0],[-12,-9],[6,-10],[20,-6],[28,0],[20,6],[4,9],[-12,7]],'#e07d6e',{lw:2.2,sh:1});
+ shape([[-18,-5],[-12,-9],[6,-10],[18,-6],[4,-4]],'#56806a',{lw:1});
+ shape([[-8,-9],[1,-17],[6,-10]],'#c8584a',{lw:1.6});shape([[-2,8],[4,14],[8,8]],'#c8584a',{lw:1.4});
+ dot(19,-2,3,'#fbf6ea');dot(19.6,-2,1.5,INK);line(23,3,27,2,INK,1.6);
+ if(w.carry){dot(34,-3,6,'#eaf8ff');dot(34,-3,3,'#9fd8ee')}
+ ctx.restore()}
+function billHit(power){if(!bills.length)return;const rx=P.x+P.face*44,b=bills.find(b=>b.hp>0&&Math.abs(b.x-rx)<86&&P.y>GY-190);if(!b)return;
+ b.hp-=power>=3?3:1;b.jolt=.25;SFX.hit();debris(b.x,GY-130,6,'#1b1328');shake=RM?0:4;
+ if(b.hp<=0){b.hp=0;b.t=0;SFX.collapse();debris(b.x,GY-130,18,'#1b1328');stars(b.x,GY-130,8);word('TIMBER',b.x,GY-190,'#ffd23f');const d=drones.find(d=>d.b===b);if(d&&!d.dead)d.dead=.01;
+  once('bill','That billboard fed a watcher drone. The drone falls with it, and a tree takes the spot.',5)}}
+function dronesStep(dt){for(let i=drones.length-1;i>=0;i--){const d=drones[i];
+  if(d.dead){d.dead+=dt;d.y+=520*d.dead*dt;if(d.y>GY-8){dust(d.x,GY,4,30);SFX.bump();drones.splice(i,1)}continue}
+  d.x=d.b.x+Math.sin(T*.5+d.ph)*170;d.y=GY-236+Math.sin(T*1.3+d.ph)*14;
+  if(state==='play'&&!swim&&Math.abs(P.x-d.x)<46&&P.y>GY-200&&d.spot>=0){d.spot+=dt;if(d.spot>1.1){d.spot=-5;word('SPOTTED',d.x,d.y-24,'#ff8a7a');SFX.beeps();if(!baron)baronT=Math.min(baronT,2.5);once('drone','A drone spotted you and called the Baron. Smash the billboard it circles and the drone comes down.',6)}}
+  else if(d.spot>0)d.spot=Math.max(0,d.spot-dt*2);else if(d.spot<0)d.spot=Math.min(0,d.spot+dt)}}
+function drawDystopia(){const D=DY;
+ // pipes between Baron buildings: they pulse while both ends stand
+ for(let i=0;i<4;i++){const a=sites[i],b=sites[i+1],x0=a.x+a.w+(a.id==='highway'?300:0)+6,x1=b.x-58,py=GY-22,ua=l2up(a),ub=l2up(b);if(x1-x0<40||(!ua&&!ub))continue;
+  const seg=(p,q)=>{for(let x=p+18;x<q;x+=84)shape(rectPts(x-4,py+5,8,15,x,.3),'#3a3a40',{lw:1.4});shape(rectPts(p,py-6,q-p,12,i+70,.5),ua&&ub?'#55505f':'#3d3944',{lw:2});for(let x=p+30;x<q-6;x+=60)line(x,py-6,x,py+6,'#2b2a33',3)};
+  if(ua&&ub){seg(x0,x1);for(let k=0;k<4;k++){const px=x0+((T*90+k*(x1-x0)/4)%(x1-x0));dot(px,py,3.4,'#ffd23f')}}
+  else{const L=(x1-x0)*.3;if(ua){seg(x0,x0+L);if(Math.sin(T*23+i)>.5)dot(x0+L+4,py,4.5,'#ffd23f')}if(ub){seg(x1-L,x1);if(Math.sin(T*19+i)>.5)dot(x1-L-4,py,4.5,'#ffd23f')}}}
+ // billboards with an eye that follows you
+ bills.forEach(b=>{const x=b.x;if(b.hp<=0){line(x-34,GY,x-36,GY-20,'#3a3a40',6);line(x+34,GY,x+37,GY-13,'#3a3a40',6);pine(x,GY-2,.8,b.i+50,Math.min(1,b.t/6));return}
+  const sw=b.jolt>0?Math.sin(T*60)*4:0;line(x-34,GY,x-34+sw,GY-96,'#3a3a40',6);line(x+34,GY,x+34+sw,GY-96,'#3a3a40',6);line(x-34,GY-40,x+34+sw,GY-96,'#3a3a40',2.4);
+  shape(rectPts(x-76+sw,GY-176,152,84,b.i+90,.8),'#1b1328',{lw:2.6,sh:1,st:'#ffd23f'});
+  shape(ellPts(x+sw,GY-149,22,11,b.i),'#fbf3dc',{lw:1.6});dot(x+sw+clamp(((swim?swim.x:P.x)-x)/40,-11,11),GY-149,6,'#c8342b');dot(x+sw+clamp(((swim?swim.x:P.x)-x)/40,-11,11),GY-149,2.4,INK);
+  paperText(b.msg,x+sw,GY-114,22,'#ffd23f',0);
+  if(b.hp<3)line(x-60+sw,GY-170,x-30+sw,GY-130,'#fbf3dc',2);if(b.hp<2)line(x+50+sw,GY-168,x+20+sw,GY-100,'#fbf3dc',2)});
+ // the Baron's statue stands on the new parking lot
+ const lot=sites[3];if(l2up(lot)&&lot.state==='standing'){const top=GY-lot.rows.length*lot.fh,x=lot.cx;shape(rectPts(x-24,top-34,48,34,91,.5),'#55505f',{lw:2});line(x-14,top-17,x+14,top-17,'#ffd23f',4);
+  shape([[x-13,top-34],[x-9,top-78],[x+9,top-78],[x+13,top-34]],'#2b2a33',{lw:2});dot(x,top-86,9,'#2b2a33');shape(rectPts(x-10,top-110,20,17,92,.3),'#2b2a33',{lw:1.6});line(x-15,top-94,x+15,top-94,'#2b2a33',4);line(x+9,top-70,x+26,top-98,'#2b2a33',5);dot(x+27,top-101,4.5,'#ffd23f')}
+ // watcher drones
+ drones.forEach(d=>{const hot=d.spot>0;if(!d.dead){ctx.fillStyle=hot?'rgba(255,90,74,'+(.14+.2*Math.min(1,d.spot))+')':'rgba(255,210,63,.13)';ctx.beginPath();ctx.moveTo(d.x,d.y+8);ctx.lineTo(d.x-46,GY-2);ctx.lineTo(d.x+46,GY-2);ctx.closePath();ctx.fill()}
+  ctx.save();ctx.translate(d.x,d.y);if(d.dead)ctx.rotate(d.dead*6);shape(ellPts(0,0,17,8,d.ph),'#2b2a33',{lw:1.8});line(-22,-6,-8,-6,INK,2.4);line(8,-6,22,-6,INK,2.4);
+  if(!d.dead){const r=Math.sin(T*40)*11;line(-15-r,-9,-15+r,-9,'#c9d2de',2);line(15-r,-9,15+r,-9,'#c9d2de',2)}dot(0,3,4,hot?'#ff5a4a':'#ffd23f');ctx.restore()})}
+function drawSoil(clear){const x0=cam.x-60,x1=cam.x+viewW+60;
+ [[58,'#4a3826','#57391f'],[122,'#3b2c1e','#452c18']].forEach((L,j)=>{const pts=[];for(let x=Math.floor(x0/50)*50;x<=x1+50;x+=50)pts.push([x,GY+L[0]+hr(x*.37+j*9)*16]);pts.push([x1+50,GY+900],[x0-50,GY+900]);shape(pts,mix(L[1],L[2],clear),{lw:1.6})});
+ for(let x=Math.floor(x0/90)*90;x<x1;x+=90){const n=x/90,k=hr(n*5.3+1),px=x+hr(n)*70,py=GY+66+hr(n+3)*96;
+  if(k<.42)shape(blobPts(px,py,7+hr(n+1)*9,5+hr(n+2)*5,n,7),'#7a6a58',{lw:1.4});
+  else if(k<.52){line(px-9,py,px+9,py,'#e6dcc4',4);dot(px-10,py-2.5,3,'#e6dcc4');dot(px-10,py+2.5,3,'#e6dcc4');dot(px+10,py-2.5,3,'#e6dcc4');dot(px+10,py+2.5,3,'#e6dcc4')}
+  else if(k<.6){ctx.beginPath();for(let q=0;q<=14;q++){const wx=px-14+q*2,wy=py+Math.sin(q*.9+T*3+n)*3;q?ctx.lineTo(wx,wy):ctx.moveTo(wx,wy)}ctx.strokeStyle='#d98a8a';ctx.lineWidth=3.4;ctx.lineCap='round';ctx.stroke()}}
+ sites.forEach(s=>{if(s.state==='grown'||s.state==='growing'){const g=s.state==='grown'?1:s.g;for(let i=0;i<5;i++){const rx=s.x+s.w*(.1+i*.2),len=(44+hr(s.seed+i)*56)*g,dx=(hr(s.seed+i*3)-.5)*30;line(rx,GY+52,rx+dx,GY+52+len,'#9a7650',3);line(rx+dx*.5,GY+52+len*.5,rx+dx*.5+(hr(s.seed+i*7)-.5)*54,GY+52+len*.85,'#9a7650',2)}}
+  else if(s.state==='standing'&&s.w>120){const y=GY+74;line(s.x+20,y,s.x+s.w-20,y,'#5a5a64',8);line(s.x+20,y,s.x+20,GY+54,'#5a5a64',8);line(s.x+s.w-20,y,s.x+s.w-20,y+50,'#5a5a64',8);dot(s.x+20,y,6,'#3a3a40');dot(s.x+s.w-20,y,6,'#3a3a40')}})}
+function vacStep(dt){const b=vb;
+ if(!vacEnd){if(upQ||vacT>20){upQ=smashQ=false;vacEnd=vacT;SFX.blimp();return}
+  if(smashQ){smashQ=false;sHeld=false;if(vacT>.5&&b.vy>=0&&b.y>330){const left=b.x<268;b.vy=-470;b.vx=(left?1:-1)*(96+Math.random()*34);b.n++;b.hop=left?1:2;b.hopT=.4;SFX.pop();if(b.n===5)SFX.grow()}}
+  b.vy+=640*dt;b.x+=b.vx*dt;b.y+=b.vy*dt;b.rot+=b.vx*dt*.04;if(b.hopT>0)b.hopT-=dt;
+  if(b.y>548){b.y=548;if(b.vy>70){b.vy*=-.42;if(b.n){b.best=Math.max(b.best,b.n);b.n=0;SFX.bump()}}else b.vy=0;b.vx*=.75}
+  if(b.x<112||b.x>408){b.vx*=-1;b.x=clamp(b.x,112,408)}}
+ else{upQ=smashQ=false;if(vacT-vacEnd>3.4)startLevel()}}
+function vacFun(t){const b=vb,cl=(v)=>clamp(v,0,1);
+ // kite on a thread from the turtle
+ {const kx=452+Math.sin(T*.9)*22,ky=318+Math.cos(T*1.3)*14;line(392,548,kx,ky+18,'rgba(251,246,234,.8)',1.4);shape([[kx,ky-22],[kx+15,ky],[kx,ky+20],[kx-15,ky]],'#c8342b',{lw:2});line(kx,ky-22,kx,ky+20,INK,1.2);line(kx-15,ky,kx+15,ky,INK,1.2);for(let i=1;i<4;i++)dot(kx-i*7+Math.sin(T*3+i)*3,ky+20+i*11,3,i%2?'#ffd23f':'#2f8f8a')}
+ // a sandcastle, and the wave that takes it
+ {const m=ease(cl((t-9)/1.2)),h=1-.82*m,x=456,y=636;ctx.save();ctx.translate(x,y);ctx.scale(1+.3*m,h);shape(rectPts(-30,-22,60,22,31,.6),'#d8bf85',{lw:2});shape(rectPts(-34,-40,16,20,32,.4),'#d8bf85',{lw:1.8});shape(rectPts(18,-40,16,20,33,.4),'#d8bf85',{lw:1.8});shape(rectPts(-9,-50,18,30,34,.4),'#d8bf85',{lw:1.8});line(0,-50,0,-68,INK,1.6);shape([[0,-68],[13,-63],[0,-58]],'#c8342b',{lw:1.2});ctx.restore();
+  const wv=Math.sin(cl((t-8.2)/2.6)*Math.PI);if(wv>0){ctx.globalAlpha=.85*wv;shape(blobPts(560-wv*120,634,120,20,35,12),'#eaf6fb',{lw:1.6});ctx.globalAlpha=1}}
+ // a crab walks in, lifts the drink and leaves with it
+ {const got=t>=5,cx=t<1.5?580:t<5?580-(t-1.5)/3.5*296:284-(t-5)/5*360,cy=594,lg=Math.sin(T*16)*4;
+  if(!got){shape(rectPts(262,548,16,22,6,.4),'#c8584a',{lw:1.6});line(270,548,276,530,'#fbf6ea',2.4)}
+  if(cx>-50){for(let i=-1;i<=1;i++){line(cx-12,cy+i*3,cx-24,cy+6+i*4+lg*(i?1:-1),'#b8443c',2.4);line(cx+12,cy+i*3,cx+24,cy+6+i*4-lg*(i?1:-1),'#b8443c',2.4)}
+   shape(ellPts(cx,cy,17,10,41),'#d9534a',{lw:2});line(cx-6,cy-8,cx-7,cy-17,INK,1.6);line(cx+6,cy-8,cx+7,cy-17,INK,1.6);dot(cx-7,cy-18,3,'#fbf6ea');dot(cx+7,cy-18,3,'#fbf6ea');dot(cx-7,cy-18,1.4,INK);dot(cx+7,cy-18,1.4,INK);
+   const sn=Math.abs(Math.sin(T*7))*5;shape([[cx-18,cy-6],[cx-30,cy-16-sn],[cx-24,cy-10],[cx-30,cy-8+sn*.4]],'#d9534a',{lw:1.6});shape([[cx+18,cy-6],[cx+30,cy-16-sn],[cx+24,cy-10],[cx+30,cy-8+sn*.4]],'#d9534a',{lw:1.6});
+   if(got){shape(rectPts(cx-8,cy-44,16,22,6,.4),'#c8584a',{lw:1.6});line(cx,cy-44,cx+6,cy-62,'#fbf6ea',2.4)}}}
+ // the beach ball
+ {const hgt=cl((548-b.y)/260);ctx.globalAlpha=.3*(1-hgt*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(b.x,566,18*(1-hgt*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1;
+  ctx.save();ctx.translate(b.x,b.y-16);ctx.rotate(b.rot);shape(ellPts(0,0,17,17,2),'#fbf3dc',{lw:2.2});['#c8342b','#2f8f8a','#e8a22a'].forEach((c,i)=>{ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,15.5,i*2.094,i*2.094+1.05);ctx.closePath();ctx.fillStyle=c;ctx.fill()});dot(0,0,3,'#fbf3dc');ctx.restore();
+  if(b.n>1)paperText(''+b.n,120,150,60,'#ffd23f',-.08);else if(b.best>1&&!vacEnd)paperText('Best '+b.best,120,150,30,'#fbf3dc',-.08)}
+ if(!vacEnd)paperText('Smash bops the ball. Up heads home.',260,318,26,'#fbf3dc',0)}
+function beginVacation(){state='vacation';vacT=0;vacEnd=0;swim=null;$('swimBtn').classList.remove('can');$('tagBtn').classList.remove('can');vb={x:268,y:548,vx:0,vy:0,rot:0,n:0,best:0,hop:0,hopT:0};setLens(false);K.l=K.r=K.u=K.d=0;$('toast').classList.remove('on');toastT=0;SFX.grow()}
+function startLevel(){level++;sites=sites.map(o=>{const s=buildSite(Object.assign({},SITE_DEF[o.i],L2[o.id]),o.i);s.choice=o.choice;s.fed=o.fed;s.restore=true;s.l2=true;return s});
+ swim=null;bills=[0,1,2,3].map(i=>{const a=sites[i],b=sites[i+1];return{x:(a.x+a.w+(a.id==='highway'?300:0)+b.x)/2-10,hp:3,t:0,jolt:0,i,msg:['OBEY','PARK HERE','MORE TAR','NO TREES'][i]}});drones=bills.map((b,i)=>({b,x:b.x,y:GY-240,ph:i*1.7,spot:0,dead:0}));
  trucks=[];props=[];crates=[];pits=[];life=[];barrels=[];tar=[];words=[];baron=null;baronT=18;baronHp=Math.min(6,2+level);done=false;sed=null;rain=0;stormT=26;crewT=14;
  Object.assign(P,{x:WORLD-130,y:GY,vx:0,vy:0,face:-1,support:'ground',climb:null,slide:null,dive:false,nap:0,energy:100,sup:0});rest.energy=100;stats.start=T;state='play';hudKey='';cam.x=WORLD;
- toast('Level '+level+'. Baron Blacktop built on everything while you were away. Bring his buildings down and your crew puts back what you grew.',8)}
+ toast('Level '+level+'. Baron Blacktop paved the valley while you were away. Pipes feed his buildings, his billboards watch the street, and the river runs gray. Bring his buildings down and your crew puts back what you grew.',9)}
 function drawVacation(){const t=vacT;ctx.setTransform(DPR,0,0,DPR,0,0);const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#4a9be0');g.addColorStop(.55,'#cdeef6');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
  const k=Math.min(W/520,H/700);ctx.setTransform(DPR*k,0,0,DPR*k,(W-520*k)/2*DPR,(H-700*k)/2*DPR);
  shape(ellPts(400,120,46,46,5),'#fff1b8',{lw:2.4});for(let i=0;i<10;i++){const a=i/10*6.283+T*.2;line(400+Math.cos(a)*56,120+Math.sin(a)*56,400+Math.cos(a)*72,120+Math.sin(a)*72,'#fff1b8',5)}
@@ -916,17 +1031,18 @@ function drawVacation(){const t=vacT;ctx.setTransform(DPR,0,0,DPR,0,0);const g=c
  line(150,560,170,330,'#5b3a24',6);for(let i=0;i<6;i++)shape([[170,330],[60+i*38,372+Math.abs(i-2.5)*6],[98+i*38,372+Math.abs(i-1.5)*6]],i%2?'#fbf3dc':'#c8342b',{lw:2});
  shape(rectPts(90,560,150,16,3,1),'#2f8f8a',{lw:2});shape(rectPts(300,566,150,16,4,1),'#e8a22a',{lw:2});
  const sv=Object.assign({},P),w0=who,base={vx:0,vy:0,climb:null,support:'ground',punch:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0};
- Object.assign(P,base,{x:165,y:566,face:1,nap:1});who='beaver';drawHero();Object.assign(P,base,{x:372,y:570,face:-1,nap:1});who='turtle';drawHero();who=w0;Object.assign(P,sv);
- shape(rectPts(262,548,16,22,6,.4),'#c8584a',{lw:1.6});line(270,548,276,530,'#fbf6ea',2.4);
+ {const h=vb&&vb.hopT>0?Math.sin(vb.hopT/.4*Math.PI)*30:0,L=vb&&vb.hop===1,R=vb&&vb.hop===2;Object.assign(P,base,{x:165,y:566-(L?h:0),face:1,nap:0,cheer:L&&h?1:0});who='beaver';drawHero();Object.assign(P,base,{x:372,y:570-(R?h:0),face:-1,nap:0,cheer:R&&h?1:0});who='turtle';drawHero();who=w0;Object.assign(P,sv)}
+ if(vb)vacFun(t);
  paperText('VACATION',260,250,64,'#fbf3dc',-.05);
- if(t>3.2){const a=Math.min(1,(t-3.2)/.6);ctx.globalAlpha=a;ctx.fillStyle='rgba(18,12,30,.72)';ctx.fillRect(-400,-200,1400,1200);const bx=-160+(t-3.2)*150;shape(ellPts(bx,330,120,44,3),'#3a3a40',{lw:2.6});shape(ellPts(bx,332,108,14,5),'#ffd23f',{lw:1.8});shape([[bx-100,322],[bx-146,290],[bx-134,330],[bx-146,372],[bx-100,338]],'#c8342b',{lw:2.2});
+ if(vacEnd){const te=t-vacEnd,a=Math.min(1,te/.6);ctx.globalAlpha=a;ctx.fillStyle='rgba(18,12,30,.8)';ctx.fillRect(-400,-200,1400,1200);for(let i=0;i<10;i++){const th=ease(clamp((te-.3-i*.12)/1.6,0,1))*(150+hr(i+3)*230),tx=-30+i*60;shape(rectPts(tx,720-th,46,th+40,i+11,.5),'#1d1626',{lw:2,st:'#3a3040'});for(let r=0;r<Math.floor(th/26);r++)for(let c=0;c<3;c++)if(hr(i*17+r*5+c)<.4){ctx.fillStyle='#e8b23a';ctx.fillRect(tx+7+c*13,728-th+r*26,6,9)}}const bx=-160+te*150;shape(ellPts(bx,330,120,44,3),'#3a3a40',{lw:2.6});shape(ellPts(bx,332,108,14,5),'#ffd23f',{lw:1.8});shape([[bx-100,322],[bx-146,290],[bx-134,330],[bx-146,372],[bx-100,338]],'#c8342b',{lw:2.2});
   paperText('Meanwhile, back home',260,180,34,'#fbf3dc',0);ctx.globalAlpha=1}}
 const SKY={dark:{hz:['#2a2027','#6a4a36'],cl:['#0f2a4a','#3d7f93'],sun:'#f2c46a'},light:{hz:['#8c7a62','#d6b98c'],cl:['#4a9be0','#cdeef6'],sun:'#fff1b8'},sharp:{hz:['#1a1416','#5a3a26'],cl:['#06203f','#2f7f9a'],sun:'#ffe066'}};
 function haze(){let h=0;sites.forEach(s=>{h+=s.state==='grown'?0:s.state==='growing'?1-s.g*.8:1});return h/sites.length}
 function render(){if(state==='vacation'){drawVacation();return}
- const hz=haze(),sk=SKY[mode]||SKY.dark,clear=1-hz;
+ const hz=haze(),sk=SKY[mode]||SKY.dark,clear=1-hz,D=DY=dys();
  ctx.setTransform(DPR,0,0,DPR,0,0);
  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,mix(sk.hz[0],sk.cl[0],clear));g.addColorStop(1,mix(sk.hz[1],sk.cl[1],clear));ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ if(D>0){const g2=ctx.createLinearGradient(0,0,0,H);g2.addColorStop(0,'rgba(34,12,48,'+(.66*D)+')');g2.addColorStop(.62,'rgba(128,52,22,'+(.5*D)+')');g2.addColorStop(1,'rgba(150,138,30,'+(.3*D)+')');ctx.fillStyle=g2;ctx.fillRect(0,0,W,H)}
  shX=(shake>0&&!RM)?(Math.random()-.5)*shake:0;shY=(shake>0&&!RM)?(Math.random()-.5)*shake:0;shake=Math.max(0,shake-.6);
  // sun and clouds hang on threads, like a toy theater
  setWorld(.1);const sx=cam.x*.1+viewW*.74,sy=cam.y*.1+80-OY/S*.5;line(sx,sy-900,sx,sy,'rgba(251,246,234,.5)',1.2);ctx.globalAlpha=.4+.6*clear;shape(ellPts(sx,sy,34,34,5),sk.sun,{lw:2.4});
@@ -934,10 +1050,20 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(clear>.7){shape(rectPts(sx-25,sy-11,21,14,1,.3),INK,{lw:1});shape(rectPts(sx+4,sy-11,21,14,2,.3),INK,{lw:1});line(sx-5,sy-7,sx+5,sy-7,INK,2.6);ctx.beginPath();ctx.arc(sx,sy+5,14,.15*Math.PI,.85*Math.PI);ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke()}
  else{const dr=clear<.35;dot(sx-11,sy-4,3.2,INK);dot(sx+11,sy-4,3.2,INK);line(sx-18,sy-(dr?9:14),sx-6,sy-(dr?14:11),INK,2.4);line(sx+18,sy-(dr?9:14),sx+6,sy-(dr?14:11),INK,2.4);ctx.beginPath();if(dr)ctx.arc(sx,sy+20,10,1.15*Math.PI,1.85*Math.PI);else{ctx.moveTo(sx-8,sy+13);ctx.lineTo(sx+8,sy+13)}ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke();if(dr&&(T%5)<.6)dot(sx+24+(T%5)*34,sy+14-(T%5)*8,5+(T%5)*6,'rgba(110,100,92,.6)')}
  if(rainbow>0){ctx.globalAlpha=Math.min(1,rainbow/2)*.8;['#c8584a','#f0a830','#e8d25a','#5fae50','#3f8fb6'].forEach((c,i)=>{ctx.beginPath();ctx.arc(cam.x*.1+viewW*.4,cam.y*.1+420,300-i*14,Math.PI,Math.PI*2);ctx.strokeStyle=c;ctx.lineWidth=13;ctx.stroke()});ctx.globalAlpha=1}
- setWorld(.3);const cc=mix('#8a7a6a','#fbf6ea',clear);
+ if(clear>.6&&D===0&&!RM){ctx.globalAlpha=.09*(clear-.6)/.4;ctx.fillStyle=sk.sun;for(let k=0;k<5;k++){ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx-620+k*210+Math.sin(T*.3+k)*20,sy+900);ctx.lineTo(sx-520+k*210+Math.sin(T*.3+k)*20,sy+900);ctx.closePath();ctx.fill()}ctx.globalAlpha=1}
+ setWorld(.3);const cc=mix(mix('#8a7a6a','#fbf6ea',clear),'#3a2f3e',D*.7);
  for(let i=0;i<9;i++){const cx=i*330+((T*6)%330)-200+hr(i)*90,cy=cam.y*.3+40+hr(i+9)*110-OY/S*.6,w=60+hr(i+3)*50+(rain>0?30:0);line(cx,cy-900,cx,cy-10,'rgba(251,246,234,.45)',1.2);
   shape([[cx-w,cy+12],[cx-w*.8,cy-6],[cx-w*.45,cy-10],[cx-w*.3,cy-26],[cx+w*.1,cy-30],[cx+w*.3,cy-14],[cx+w*.7,cy-12],[cx+w,cy+12]],rain>0?mix(cc,'#5a6170',.6):cc,{lw:2,sh:1});
   if(rain>0){dot(cx-12,cy-5,3,INK);dot(cx+8,cy-5,3,INK);shape(ellPts(cx-2,cy+4,4,5,i),INK,{lw:1})}else{ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx-12,cy-6,4,0,Math.PI);ctx.moveTo(cx+12,cy-6);ctx.arc(cx+8,cy-6,4,0,Math.PI);ctx.stroke()}}
+ if(D>0){setWorld(.18);ctx.globalAlpha=Math.min(1,D*1.5);const kx=cam.x*.18-40,yo=cam.y*.18*.4,by=yo+420;
+  for(let i=Math.floor(kx/70);i*70<kx+viewW+140;i++){const bx=i*70+hr(i)*20,bw=36+hr(i+5)*30,bh=80+hr(i+9)*200,top=by-bh;
+   shape(rectPts(bx,top,bw,bh+300,i,.5),'#1d1626',{lw:1.6});
+   for(let r=0;r<Math.floor(bh/22);r++)for(let c=0;c<Math.floor((bw-6)/12);c++)if(hr(i*31+r*7+c)<.34&&Math.sin(T*.7+i+r*c)>-.6){ctx.fillStyle='#e8b23a';ctx.fillRect(bx+5+c*12,top+8+r*22,5,8)}
+   const q=hr(i+2);
+   if(q<.3){line(bx+bw*.5,top,bx+bw*.5,top-42,'#1d1626',8);for(let k=0;k<3;k++)shape(blobPts(bx+bw*.5+k*13+Math.sin(T+k+i)*4,top-54-k*17,10+k*5,7+k*3,i+k,8),'#3a3040',{lw:1})}
+   else if(q<.5){const mx=bx+bw*.3;line(mx,top,mx,top-70,'#1d1626',4);line(mx-22,top-64,mx+62,top-64,'#1d1626',4);line(mx,top-70,mx+62,top-64,'#1d1626',2);const hk=mx+30+Math.sin(T*.4+i)*22;line(hk,top-64,hk,top-34,'#1d1626',1.6);shape(rectPts(hk-5,top-36,10,8,i,.2),'#1d1626',{lw:1})}
+   if(hr(i+4)<.4&&Math.sin(T*3+i)>0)dot(bx+bw/2,top-4,3.2,'#ff5a4a')}
+  ctx.globalAlpha=1}
  // hills: two paper layers
  [[.25,330,'#4c5d48','#6b5d48',3],[.5,390,'#3d5a3b','#5e5040',7]].forEach(L=>{setWorld(L[0]);const x0=cam.x*L[0]-40,x1=x0+viewW+80,pts=[],yo=cam.y*L[0]*.4;
   for(let x=Math.floor(x0/40)*40;x<=x1+40;x+=40)pts.push([x,yo+L[1]-Math.sin(x*.004+L[4])*34-Math.sin(x*.011+L[4]*2)*14-hr(Math.floor(x/40)+L[4]*100)*6]);
@@ -949,20 +1075,28 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(damUp||dam.state==='collapsing'){const wl=damUp?GY-dam.rows.length*dam.fh*.92:GY-20+ease(dam.t/1.3)*20;ctx.fillStyle=mix('#5b6a62','#3f7fa6',clear);ctx.fillRect(dam.x+dam.w-4,wl,WORLD-330-dam.x-dam.w+4,GY-wl+20);shape([[WORLD-336,wl-8],[WORLD-300,wl-8],[WORLD-232,GY],[WORLD-336,GY]],mix('#5a4632','#6b4a30',clear),{lw:2});
   for(let i=0;i<6;i++){const xx=dam.x+dam.w+20+i*80+Math.sin(T+i)*8;line(xx,wl+12,xx+30,wl+12,'rgba(255,255,255,.35)',2)}}
  // ground, then the stream that ties the sites together
- ctx.fillStyle=mix('#5a4632','#6b4a30',clear);ctx.fillRect(cam.x-50,GY,viewW+100,900);
- const full=!damUp&&dam.state!=='collapsing',sh=full?14:5,sx0=full?cam.x-60:Math.max(cam.x-60,-60),sx1=full?cam.x+viewW+60:dam.x+20;
- ctx.fillStyle=full?'#3f8fb6':'#56707a';ctx.fillRect(sx0,GY+24,Math.max(0,Math.min(sx1,cam.x+viewW+60)-sx0),sh);
+ ctx.fillStyle=mix('#5a4632','#6b4a30',clear);ctx.fillRect(cam.x-50,GY,viewW+100,900);drawSoil(clear);
+ const full=!damUp&&dam.state!=='collapsing',sh=full?24:5,sx0=full?cam.x-60:Math.max(cam.x-60,-60),sx1=full?cam.x+viewW+60:dam.x+20;
+ ctx.fillStyle=mix(full?'#3f8fb6':'#56707a','#4a3a52',D*.9);ctx.fillRect(sx0,GY+24,Math.max(0,Math.min(sx1,cam.x+viewW+60)-sx0),sh);
  if(full)for(let i=0;i<14;i++){const xx=cam.x+((i*97-T*60)%(viewW+100)+viewW+100)%(viewW+100)-50;line(xx,GY+29,xx+18,GY+29,'rgba(255,255,255,.5)',2)}
+ if(full&&D===0){for(let x=Math.floor((cam.x-60)/260)*260;x<cam.x+viewW+60;x+=260){const px=x+hr(x*.11)*180;if(hr(x*.07)<.6){shape(ellPts(px,GY+27,11,4,x),'#4c9a4a',{lw:1.2});if(hr(x*.05)<.5)dot(px+3,GY+24,3,'#f3b6c8')}}
+  ctx.globalAlpha=.4;for(let i=0;i<3;i++){const fx=cam.x+((i*330+T*46)%(viewW+140))-70;shape([[fx-12,GY+38+i*2],[fx,GY+34+i*2],[fx+11,GY+38+i*2],[fx,GY+42+i*2]],'#1d3f55',{lw:.8});shape([[fx-12,GY+38+i*2],[fx-19,GY+34+i*2],[fx-19,GY+42+i*2]],'#1d3f55',{lw:.8})}ctx.globalAlpha=1
+  ctx.globalAlpha=.5+.3*Math.sin(T*4);dot(70,GY+36,15,'#9fd8ee');ctx.globalAlpha=1;dot(70,GY+36,6,'#eaf8ff')}
+ if(D>.2){for(let i=0;i<5;i++){const ox=cam.x+((i*210-T*14)%(viewW+100)+viewW+100)%(viewW+100)-50;if(ox<sx1)line(ox,GY+26,ox+26,GY+26,'#8a6aa8',2)}}
  if(sed){shape(blobPts(sed.x,GY+26,90,20,3,12),'#8a6a48',{lw:2})}
  const gar=sites[0];if(gar.state==='standing'&&!gar.paved){shape(rectPts(gar.x-30,GY+16,gar.w+60,28,7),'#3b3a3d');for(let i=0;i<7;i++)line(gar.x-20+i*45,GY+18,gar.x-20+i*45,GY+42,'#232227',3)}
- shape(rectPts(cam.x-60,GY-6,viewW+120,10,3,1.6),mix('#7a6a4a','#4c7a3a',clear),{lw:2});
+ shape(rectPts(cam.x-60,GY-6,viewW+120,10,3,1.6),mix(mix('#7a6a4a','#4c7a3a',clear),'#2b2a33',D),{lw:2});
+ if(D>0){ctx.globalAlpha=D;ctx.fillStyle='#ffd23f';for(let x=Math.floor((cam.x-60)/70)*70;x<cam.x+viewW+60;x+=70)ctx.fillRect(x,GY-3,30,3);ctx.globalAlpha=1}
  if(beach>0){const b=ease(beach);shape([[-80,GY+6],[-80,GY-4-10*b],[60,GY-8-14*b],[180,GY-6],[230,GY+6]],'#e3cf9a',{lw:2});for(let i=0;i<3;i++)if(b>.5){const bx=20+i*50+Math.sin(T*2+i)*10;shape(ellPts(bx,GY-22,7,5,i),'#ece6dc',{lw:1.4});line(bx-2,GY-17,bx-2,GY-9,INK,1.4);line(bx+2,GY-17,bx+2,GY-9,INK,1.4);line(bx+6,GY-23,bx+13,GY-21,INK,1.6)}}
  pits.forEach(p=>{const w=26+p.d*6,h=10+p.d*12;shape([[p.x-w,GY-5],[p.x+w,GY-5],[p.x+w*.7,GY-5+h],[p.x-w*.7,GY-5+h]],'#2a1c14',{lw:2});shape(blobPts(p.x-w-12,GY-8,12+p.d*3,5+p.d*2,p.x,8),'#6b4a30',{lw:1.6});shape(blobPts(p.x+w+12,GY-8,12+p.d*3,5+p.d*2,p.x+3,8),'#6b4a30',{lw:1.6})});
+ if(level>1)drawDystopia();
  sites.forEach(drawSite);
+ sites.forEach(s=>{if(s.state!=='grown')return;for(let i=0;i<(s.fed||0);i++){const k=Math.floor(i/2);pine(i%2?s.x+s.w+22+k*26:s.x-22-k*26,GY-2,.75+hr(s.seed+i)*.35,s.seed+i*3,1)}
+  if(clear>.75&&!RM)for(let i=0;i<5;i++){ctx.globalAlpha=.35+.65*Math.max(0,Math.sin(T*2.2+i*1.9+s.seed));dot(s.cx+Math.sin(T*.7+i*2+s.seed)*s.w*.5,GY-36-hr(i+s.seed)*90+Math.sin(T*1.1+i)*12,2.4,'#f6ee8a')}ctx.globalAlpha=1});
  crates.forEach(c=>{const x=c.x-22,y=c.y-22;ctx.save();if(!c.g){ctx.translate(c.x,c.y);ctx.rotate(c.x*.03);ctx.translate(-c.x,-c.y)}blockArt(c.x,c.y,44,c.seed);ctx.restore()});
  props.forEach(c=>{ctx.save();ctx.translate(c.x,c.y);if(c.state==='fall')ctx.rotate(c.t*5);car(-13,5,c.c,1);ctx.restore()});
  sprigs.forEach(g=>{const y=g.y+Math.sin(T*3+g.x)*4;line(g.x-12,y+8,g.x+12,y-8,'#6b4a30',3);for(let k=0;k<4;k++)shape(ellPts(g.x-5+k*6,y+1-k*4,6,3,k+g.x),'#7cc35a',{lw:1.4})});
- folk.forEach(f=>{if(f.bike)bike(f.x,GY-2,f.c,f.seed,f.hop);else{ctx.save();if(f.hop>0)ctx.translate(0,-Math.sin(f.hop/.5*Math.PI)*14);person(f.x,GY-4,f.c,f.seed,f.hop>0);ctx.restore()}});
+ folk.forEach(f=>{const fc=DY>0&&/^#[0-9a-f]{6}$/i.test(f.c)?mix(f.c,'#5e5a66',DY*.85):f.c;if(f.bike)bike(f.x,GY-2,fc,f.seed,f.hop);else{ctx.save();if(f.hop>0)ctx.translate(0,-Math.sin(f.hop/.5*Math.PI)*14);person(f.x,GY-4,fc,f.seed,f.hop>0);ctx.restore()}});
  life.forEach(drawLife);
  if(done){const vx=WORLD-66;line(vx,GY,vx,GY-120,'#5b3a24',5);shape([[vx-58,GY-150],[vx+34,GY-150],[vx+58,GY-132],[vx+34,GY-114],[vx-58,GY-114]],'#fbf3dc',{lw:2.4,sh:1});ctx.font='800 '+Math.max(18,16/S)+'px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=INK;ctx.fillText('VACATION',vx-6,GY-132)}
  sites.forEach(q=>{if(q.crew&&q.state==='growing')for(let i=0;i<3;i++){const px=q.x+30+i*(q.w-60)/2,hop=Math.abs(Math.sin(T*7+i*2))*8;ctx.save();ctx.translate(0,-hop);person(px,GY-4,'#e8a22a',i+40,i===1);shape([[px-5,GY-30],[px,GY-36],[px+5,GY-30]],'#5fae50',{lw:1.2});ctx.restore();line(px+5,GY-18-hop,px+13,GY-26-hop+Math.sin(T*14+i)*5,'#5b3a24',2.6)}});
@@ -975,13 +1109,15 @@ function render(){if(state==='vacation'){drawVacation();return}
   if(state!=='title'){drawHero();line(FRX-104,GY,FRX-104,GY-92,'#5b3a24',4);shape(rectPts(FRX-137,GY-126,66,36,4,.7),'#1b1328',{lw:2.2,sh:1,st:'#ffd23f'});paperText('TAG',FRX-104,GY-107,22,'#ffd23f',0)}
   who=w0;Object.assign(P,sv)}
  if(state==='play'&&P.y>GY-12&&sites.some(q=>q.state==='grown'&&['river','free','wet','rain'].includes(q.choice)))for(let i=1;i<=3;i++){const tx=trail[trail.length-1-i*13];if(tx!==undefined)duck(tx,GY-9-Math.abs(Math.sin(T*9+i))*3,i+20,P.face)}
- drawHero();
+ {const hh=clamp((GY-P.y)/300,0,1);if(state!=='title'||P.y<=GY){ctx.globalAlpha=.3*(1-hh*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(P.x,GY-1,24*(1-hh*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1}}
+ drawHero();if(swim)drawSalmon();
  parts.forEach(drawPart);
  words.forEach(w=>{const a=clamp(w.life/.9,0,1),pop=1+.5*Math.sin(Math.min(1,(1-a)*5)*Math.PI);ctx.globalAlpha=Math.min(1,a*3);if(w.c==='#ffd23f'){const z=Math.max(30,22/S)*pop,R=z*(.7+w.t.length*.3),pts=[];for(let i=0;i<16;i++){const r=i%2?R*.74:R,an=i/16*6.283+w.rot;pts.push([w.x+Math.cos(an)*r,w.y-(1-a)*40+Math.sin(an)*r*.6])}shape(pts,'#c8342b',{lw:2.4})}paperText(w.t,w.x,w.y-(1-a)*40,Math.max(30,22/S)*pop,w.c,w.rot);ctx.globalAlpha=1});
  if(flood>0){ctx.globalAlpha=Math.min(1,flood)*.55;ctx.fillStyle='#3f8fb6';const fy=GY-10-Math.sin(Math.min(1,flood/3.5)*Math.PI)*16;ctx.fillRect(cam.x-50,fy,viewW+100,60);ctx.globalAlpha=1}
  if(lensOn&&state==='play')drawLens();
  // screen space: rain, paper grain, stage edge
  ctx.setTransform(DPR,0,0,DPR,0,0);
+ if(DY>.15&&!RM){ctx.fillStyle='rgba(206,196,206,'+(.55*DY)+')';for(let i=0;i<46;i++){const ax=((hr(i+200)*W+Math.sin(T*.6+i)*30+T*14)%W+W)%W,ay=(hr(i+300)*H+T*(26+hr(i)*30))%H;ctx.fillRect(ax,ay,2.6,2.6)}}
  if(rain>0){ctx.strokeStyle='rgba(190,220,240,.75)';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<70;i++){const x=(hr(i)*W+T*80)%W,y=(hr(i+70)*H+T*900)%H;ctx.moveTo(x,y);ctx.lineTo(x-6,y+20)}ctx.stroke()}
  if(grain){ctx.fillStyle=grain;ctx.fillRect(0,0,W,H)}
  const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.45,W/2,H/2,Math.max(W,H)*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(10,6,16,.38)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H)}
@@ -1013,8 +1149,8 @@ function drawStanding(s){const n=s.rows.length,top=GY-n*s.fh;
  if(s.id==='garage'||s.id==='coal'){const body=s.rows.filter(r=>!r.stack).length,bt=GY-body*s.fh;ctx.fillStyle='rgba(20,10,24,.3)';ctx.fillRect(s.x+9,bt+9,s.w,body*s.fh-9);shape(rectPts(s.x+3,bt+3,s.w-6,body*s.fh-3,s.seed,.6),'#231c26',{lw:2})}
  if(s.id==='highway'){const t=s.rows[n-1],dk=t&&t.deck;
   if(dk){ctx.fillStyle='rgba(15,10,20,.3)';ctx.fillRect(s.x,top+s.fh,s.w,GY-top-s.fh);
-   const rx0=s.x+s.w,RL=300;[100,200].forEach((o,i)=>{const yy=top+(GY-top)*o/RL;shape(rectPts(rx0+o-9,yy+24,18,GY-yy-24,i+60,.6),'#4f7a5c',{lw:2});line(rx0+o-5,yy+30,rx0+o+5,GY-6,'#35573f',2.4)});
-   shape([[rx0-2,top+12],[rx0+RL,GY-10],[rx0+RL,GY],[rx0+RL-44,GY],[rx0-2,top+s.fh]],'#4f7a5c',{lw:2,sh:1});
+   const rx0=s.x+s.w,RL=300;[100,200].forEach((o,i)=>{const yy=top+(GY-top)*o/RL;shape(rectPts(rx0+o-9,yy+24,18,GY-yy-24,i+60,.6),s.l2?'#3a3a40':'#4f7a5c',{lw:2});line(rx0+o-5,yy+30,rx0+o+5,GY-6,'#35573f',2.4)});
+   shape([[rx0-2,top+12],[rx0+RL,GY-10],[rx0+RL,GY],[rx0+RL-44,GY],[rx0-2,top+s.fh]],s.l2?'#3a3a40':'#4f7a5c',{lw:2,sh:1});
    shape([[rx0-2,top+2],[rx0+RL,GY-20],[rx0+RL,GY-9],[rx0-2,top+13]],'#b3ada2',{lw:1.6});
    for(let i=0;i<=6;i++){const o=i*RL/6,yy=top+(GY-22-top)*o/RL;line(rx0+o,yy+2,rx0+o,yy-9,'#6d7684',2.4)}line(rx0,top-9,rx0+RL,GY-31,'#6d7684',2.4);
    if(s.traffic){s.cars.forEach(c=>{if(c.dead>0)return;if(c.x>s.x+s.w){const o=c.x-s.x-s.w;ctx.save();ctx.translate(c.x,top+3+(GY-22-top)*o/300);ctx.rotate(Math.atan2(GY-22-top,300));car(-13,0,c.c,1);ctx.restore()}else car(c.x-13,top+3,c.c,1)});
