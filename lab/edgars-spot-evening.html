@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" data-mode="light">
 <!--
-  EDGAR'S SPOT: THE EVENING v0.2 (LAB). Tight Spiral Productions, 2026-11-08; v0.2 2026-11-11
+  EDGAR'S SPOT: THE EVENING v0.3 (LAB). v0.3 2026-11-11: spec turned to build (founder
+  "Turn spec to build"). Thursday one you watch the regulars arrive; Thursday two the
+  clock stops before each arrival and you set their usual from memory.
+  Earlier: Tight Spiral Productions, 2026-11-08; v0.2 2026-11-11
   (founder "revise as planned": a crowded 8:30, light that moves from late sun to table
   lamps, objects large enough to read in the wide shots).
   Art direction animatic for the Edgar's Spot opening (founder 2026-11-08: "Edgar's spot
@@ -24,7 +27,7 @@
 <meta name="description" content="Art direction animatic for Edgar's Spot: one evening at a small cafe, seen from above, filling table by table as the regulars arrive.">
 <meta name="spec-source" content="claude/CHOREOGRAPHED-CHAOS-ART-SPEC-2026-09-29.md">
 <meta name="audience" content="The Wallers and Damianos (art direction review), then restaurant staff and readers of Choreographed Chaos">
-<title>Edgar's Spot: The Evening v0.2</title>
+<title>Edgar's Spot: The Evening v0.3</title>
 <style>
 :root{
   --field:#F70201; --wall:#680202; --kraft:#E0C1A3; --wood:#8C5842; --wood-dk:#5E3A2B;
@@ -77,6 +80,11 @@ main{ max-width:1100px; margin:0 auto; padding:10px 10px 18px; display:grid; gap
 .row{ display:flex; flex-wrap:wrap; gap:8px; margin:8px 0; }
 .stamp{ min-height:var(--tap); padding:10px 14px; font:700 20px/1.2 var(--sans); color:var(--ink); background:var(--ticket);
   border:3px solid var(--rule-line); border-radius:4px; cursor:pointer; }
+body.set .stage{ position:sticky; z-index:3; background:var(--field); }
+body.set .stage svg{ max-height:42vh; }
+#beat:empty,#askQ:empty{ display:none; }
+.stamp.go{ background:var(--fill-yellow); color:#231F20; border-color:#231F20; }
+.stamp.opt{ flex:1 1 100%; text-align:left; }
 .stamp[aria-pressed="true"]{ background:var(--fill-yellow); color:#231F20; border-color:#231F20; }
 table{ border-collapse:collapse; width:100%; font-size:18px; display:block; overflow-x:auto; }
 th,td{ border:1px solid var(--rule-line); padding:6px 8px; text-align:left; vertical-align:top; color:var(--ink); }
@@ -100,7 +108,7 @@ tr.lit td{ background:var(--fill-yellow); color:#231F20; }
   <button class="tab" id="modeBtn" type="button" aria-label="Mode: Light. Next: Dark.">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/></svg>
   </button>
-  <h1>Edgar's Spot: The Evening <span class="ver">v0.2</span></h1>
+  <h1>Edgar's Spot: The Evening <span class="ver">v0.3</span></h1>
 </header>
 
 <main>
@@ -149,15 +157,17 @@ tr.lit td{ background:var(--fill-yellow); color:#231F20; }
 
   <section class="ticket" aria-live="polite">
     <p class="clock" id="clock">4:58</p>
-    <p class="beat" id="beat">Before the doors. Set the high-top from memory.</p>
+    <p class="beat" id="beat">Thursday one. Before the doors, the bread plate goes on the high-top.</p>
     <div class="row">
       <button class="stamp" id="playBtn" type="button" aria-pressed="false">Pause</button>
     </div>
+    <div class="row" id="nextRow" hidden><button class="stamp go" id="nextBtn" type="button">Next Thursday: set it from memory</button></div>
+    <div id="ask" hidden><p class="beat" id="askQ"></p><div class="row" id="askOpts"></div></div>
     <hr class="rule">
     <h2>The direction</h2>
     <p>Open tight on one table. The room widens only when a regular walks in, so the player meets the cafe one person at a time and never sees the whole floor until it is full.</p>
     <p>The room is a tabletop diorama: real tableware on the cover's red, shot from straight above, one soft light from the upper left. Hands only, no faces. The light tells the time: low sun through the window at five, dusk by seven-thirty, a lamp pooling over every table by nine.</p>
-    <p>Every usual is set down a beat before its guest arrives. That is the game's verb on the first screen: you remember, and the room answers.</p>
+    <p>Every usual is set down a beat before its guest arrives. That is the game's verb: you remember, and the room answers. Thursday one you watch. Thursday two the clock stops five minutes before each regular, and you set it from memory.</p>
     <h2>Photo slots</h2>
     <div class="row" id="tools" hidden>
       <button class="stamp" id="shotBtn" type="button" aria-pressed="false">Show photo slots</button>
@@ -217,7 +227,7 @@ var W=400,H=506,cam={cx:120,cy:405,w:170},target={cx:120,cy:405,w:170};
 function setView(c){ var h=c.w*H/W; svg.setAttribute("viewBox",(c.cx-c.w/2).toFixed(1)+" "+(c.cy-h/2).toFixed(1)+" "+c.w.toFixed(1)+" "+h.toFixed(1)); }
 
 var BEATS=[
-  {t:"4:58",line:"Before the doors. Set the high-top from memory.",cam:{cx:120,cy:405,w:170},L:[.55,0,0],
+  {t:"4:58",line:"Thursday one. Before the doors, the bread plate goes on the high-top.",cam:{cx:120,cy:405,w:170},L:[.55,0,0],
    act:function(){ var g=group("12"); el("circle",{cx:110,cy:390,r:15,fill:"var(--porcelain)",stroke:"var(--stroke)","stroke-width":1.3},g);
      el("ellipse",{cx:107,cy:387,rx:8,ry:5.5,fill:"var(--kraft)"},g); el("ellipse",{cx:115,cy:394,rx:7,ry:5,fill:"var(--kraft)"},g); return g; }},
   {t:"5:30",line:"Alan. Five-thirty, like always. His stool is already out.",cam:{cx:120,cy:405,w:170},L:[.45,.05,0],
@@ -266,12 +276,41 @@ function moveCam(){ clearInterval(stepT); var from={cx:cam.cx,cy:cam.cy,w:cam.w}
 function show(n){ var b=BEATS[n]; clock.textContent=b.t; beatEl.textContent=b.line; setLight(b.L);
   target=b.cam; moveCam(); var node=b.act(); dropIn(node); if(n===5) setTimeout(tipPepper, reduce?0:1400); applyTags(); }
 function reset(){ cur=[.55,0,0]; sun.setAttribute("opacity",".55"); night.setAttribute("opacity","0"); lamps.setAttribute("opacity","0"); objs.innerHTML=""; document.getElementById("alanStool").removeAttribute("transform"); i=0; cam={cx:120,cy:405,w:170}; setView(cam); }
-function tick(){ i++; if(i>=BEATS.length){ playing=false; syncPlay(); return; } show(i); schedule(); }
+function tick(){ i++; if(i>=BEATS.length){ playing=false; syncPlay(); if(mode==="watch") document.getElementById("nextRow").hidden=false; return; } show(i); schedule(); }
 function schedule(){ clearTimeout(timer); if(playing) timer=setTimeout(tick, i===5?4200:3400); }
 function syncPlay(){ if(!playing) document.getElementById("tools").hidden=false;  playBtn.textContent=playing?"Pause":(i>=BEATS.length-1?"Play again":"Play"); playBtn.setAttribute("aria-pressed",playing?"false":"true"); }
 playBtn.addEventListener("click",function(){ if(i>=BEATS.length-1&&!playing){ reset(); show(0); playing=true; } else playing=!playing; syncPlay(); schedule(); });
-document.getElementById("againBtn").addEventListener("click",function(){ reset(); show(0); playing=true; syncPlay(); schedule(); });
-svg.addEventListener("click",function(){ if(!playing&&i<BEATS.length-1){ tick(); } });
+document.getElementById("againBtn").addEventListener("click",function(){ setLayout(false); mode="watch"; askEl.hidden=true; nextRow.hidden=true; playRow.hidden=false; reset(); show(0); playing=true; syncPlay(); schedule(); });
+svg.addEventListener("click",function(){ if(mode==="watch"&&!playing&&i<BEATS.length-1){ tick(); } });
+
+/* ---- Thursday two: the clock stops before each arrival; set the usual from memory ---- */
+var mode="watch", misses=[], askEl=document.getElementById("ask"), askQ=document.getElementById("askQ"), askOpts=document.getElementById("askOpts"),
+    playRow=playBtn.parentNode, nextRow=document.getElementById("nextRow");
+var ASK=[
+  {t:"4:55",q:"Thursday two. Before the doors: what goes on the high-top?",opts:["The bread plate","A coffee cup","Two glasses of red"],a:0,miss:"The high-top gets the bread plate."},
+  {t:"5:25",q:"Alan is five minutes out. What do you do?",opts:["Set a menu at the high-top","Pull out his stool","Pour him a coffee"],a:1,miss:"Alan's stool is out before he walks in."},
+  {t:"6:10",q:"Trudy is on her way. Her usual?",opts:["A glass of white","An iced tea","A glass of red and a sparkling water"],a:2,miss:"Trudy: a glass of red, and a sparkling water beside it."},
+  {t:"6:55",q:"Rick is on his way. His usual?",opts:["Coffee, black","Coffee with cream","A glass of red"],a:0,miss:"Rick takes his coffee black."},
+  {t:"7:35",q:"Edie and Hal are on their way. Where do you set them?",opts:["The four-top","The window two-top","Two seats at the bar"],a:2,miss:"Edie and Hal sit at the bar, never the dining room."}
+];
+function shake(){ if(reduce) return; var f=0, xs=[3,-3,2,-2,1,0]; var t=setInterval(function(){ svg.style.transform="translateX("+xs[f]+"px)"; f++; if(f>=xs.length){ clearInterval(t); svg.style.transform=""; } },1000/12); }
+function button(label,fn,cls){ var b=document.createElement("button"); b.type="button"; b.className="stamp "+(cls||"opt"); b.textContent=label; b.addEventListener("click",fn); askOpts.appendChild(b); return b; }
+function askBeat(n){ var A=ASK[n]; clock.textContent=A.t; beatEl.textContent=""; askQ.textContent=A.q; askOpts.innerHTML="";
+  A.opts.forEach(function(o,k){ button(o,function(){ choose(n,k); }); }); askEl.hidden=false; }
+function choose(n,k){ var A=ASK[n]; askEl.hidden=true; askOpts.innerHTML=""; var right=(k===A.a); if(!right){ misses.push(A.miss); shake(); }
+  show(n); beatEl.textContent=(right?"Right. ":"Not that. ")+BEATS[n].line;
+  setTimeout(function(){ if(n<4) askBeat(n+1); else rush(); }, right?2600:3600); }
+function rush(){ show(5); beatEl.textContent=BEATS[5].line;
+  setTimeout(function(){ askQ.textContent="The pepper went over on the four-top."; askOpts.innerHTML=""; askEl.hidden=false;
+    button("Right the pepper and sweep the spill",function(){ askEl.hidden=true; askOpts.innerHTML=""; var p=document.getElementById("pepper"); if(p) p.setAttribute("transform","rotate(0 225.5 222)");
+      var sp=document.getElementById("spill"); if(sp) sp.remove(); beatEl.textContent="Fixed before anyone asked."; setTimeout(close, 2000); }); }, reduce?400:2400); }
+function close(){ show(6); setTimeout(function(){
+    beatEl.textContent = misses.length? "Close of Thursday two. To remember for next week: "+misses.join(" ") : "Close of Thursday two. Every usual was waiting before its regular walked in.";
+    askQ.textContent=""; askOpts.innerHTML=""; button("Another Thursday",startSet,"go"); button("Watch Thursday one again",function(){ setLayout(false); askEl.hidden=true; mode="watch"; playRow.hidden=false; reset(); show(0); playing=true; syncPlay(); schedule(); },"");
+    askEl.hidden=false; document.getElementById("tools").hidden=false; }, 2600); }
+function setLayout(on){ document.body.classList.toggle("set",on); if(on) document.querySelector(".stage").style.top=document.querySelector(".se-chrome").offsetHeight+"px"; }
+function startSet(){ setLayout(true); mode="set"; misses=[]; playing=false; clearTimeout(timer); nextRow.hidden=true; playRow.hidden=true; askEl.hidden=true; reset(); setLight([.55,0,0]); target={cx:120,cy:405,w:170}; moveCam(); askBeat(0); }
+document.getElementById("nextBtn").addEventListener("click",startSet);
 
 var tagged=false;
 function applyTags(){ Array.prototype.forEach.call(document.querySelectorAll("#room .slot"),function(s){ s.classList.toggle("tag",tagged); }); }
