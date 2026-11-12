@@ -3,9 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.24</title>
+<title>Rewilder v0.25</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.24 | LAB | 2026-11-12
+<!-- TSP build: Rewilder v0.25 | LAB | 2026-11-12
+     v0.25 (founder: "In level 1 there’s still a key in the dam. Remove it. Also when the beaver goes to
+     break the waterway for the salmon, the salmon is no longer there to switch to to complete the
+     salmon mission. Make the salmon follow the player above ground. Also, let a swimming player on
+     land when they swim up to a portal. Don’t make them touch a button to get out."): level 1 has
+     no keystone, so the tire jam is gone with it. The salmon swims in the river under the player
+     and stops at whatever blocks her; tap her there to become her. The fixed SWIM sign is removed.
+     A beaver or turtle that swims up to a ladder climbs out without a second press.
      v0.24 (founder: "1. Remove Gary from game entirely. 2. Remove the lock on the dam and make the stones
      breakable again. 3. Make the cars look real going up and down ramps. Now it’s weird. 4. Make sure
      music doesn’t overlap. In Level 2 I heard overlap. 5. Cars don’t honk audibly unless you’re on top
@@ -382,7 +389,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.24</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.25</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -813,7 +820,7 @@ function openPlots(){plotsOpen=true;const n=sites.length-5,add=PLOTS.slice(n,n+2
  add.forEach(d=>{const q=buildSite(d,sites.length);q.was='standing';sites.push(q);dust(q.cx,GY,10,q.w);word('NEW GROUND',q.cx,GY-120,'#7cc35a')});hudKey='';SFX.grow();
  setTimeout(()=>toast('Your land is back. Two empty lots opened. Break the pavement and grow something new.',7),80);return true}
 /* the keystone: one block a level that only the turtle's beak lunge cracks */
-function keyInit(){sites.forEach(q=>{q.key=null});const q=level===1?sites[4]:level===2?sites[2]:sites[1],c=level===1?2:level===2?3:7,k=q.rows[0]&&q.rows[0][c];if(k){k.key=true;k.hp=k.max=2;q.key={c}}}
+function keyInit(){sites.forEach(q=>{q.key=null});if(level<2)return;const q=level===2?sites[2]:sites[1],c=level===2?3:7,k=q.rows[0]&&q.rows[0][c];if(k){k.key=true;k.hp=k.max=2;q.key={c}}}
 function keyAlive(q){return !!q.key&&q.state==='standing'&&!q.paved&&q.rows.some(r=>r.some(k=>k&&k.key&&k.hp>0))}
 function keyCell(q){for(let f=0;f<q.rows.length;f++)for(let c=0;c<q.rows[f].length;c++){const k=q.rows[f][c];if(k&&k.key&&k.hp>0)return[c,f,k]}return null}
 function keyHit(q,c,f){const K=keyCell(q),hw=q.id==='highway',near=hw?c===q.key.c:(c===K[0]&&f===K[1])||(lungeOn&&Math.abs(c-K[0])<=1&&Math.abs(f-K[1])<=1);if(!near)return false;
@@ -991,7 +998,7 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return
   if(sed.x<-100){sed=null;beach=.01}}
  if(beach>0&&beach<1)beach=Math.min(1,beach+dt/8);
  viaStep(dt);bills.forEach(b=>{if(b.hp<=0)b.t+=dt;if(b.jolt>0)b.jolt-=dt});dronesStep(dt);
- if(riverOn&&!swim&&!told.has('swimsign')&&toastT<=0)once('swimsign','Tap the salmon at the SWIM sign to become it.',8);
+ if(riverOn&&!swim&&!told.has('swimsign')&&toastT<=0)once('swimsign','Tap the salmon in the river to become her.',8);
  if(riverOn&&!swim&&!told.has('river')&&told.has('swimsign')&&toastT<=0)once('river','Blue ladders lead down to a buried river.',8);
  walls.forEach(wl=>{if(!wl.up)wl.t+=dt});if(fort)fortStep(dt);
  sites.forEach(s=>{if(s.tinkT>0){s.tinkT-=dt;if(s.tinkT<=0){const ty=GY-s.rows.length*s.fh;puff(s.cx+s.w*.2,ty,{kind:'chunk',vx:20,vy:-40,g:700,r:5,c:'#b3ada2',life:1.4,max:1.4,vr:6});word('tink',s.cx+s.w*.2,ty-30,'#fbf3dc');SFX.clang()}}
@@ -1100,7 +1107,7 @@ function player(dt){if(swim){P.walk+=dt;swimStep(dt);return}
  P.sup=Math.min(1,P.sup+dt/10);$('smashBtn').classList.toggle('sup',P.sup>=1);if(P.sup>=1)once('sup','Super is full. Hold Smash, then let go.',6);
  if(slamQ){slamQ=false;smashQ=false;if(P.sup>=1){P.sup=0;hudKey='';strike(4)}else once('supwait','Super is still charging.',3.5)}
  else if(smashQ&&P.cool<=0)strike(1,K.u?'up':(K.l||K.r)?'fwd':'');smashQ=false;
- if(P.lunge>0)P.lunge-=dt;if(!tireJam&&restX!==FRX){const dd=FRX-restX;restX+=Math.sign(dd)*Math.min(Math.abs(dd),170*dt)}const dir=(K.r?1:0)-(K.l?1:0);P.idle=(dir||K.u||K.d||P.punch>0||sHeld)?0:P.idle+dt;
+ if(P.lunge>0)P.lunge-=dt;fishFollow(dt);if(!tireJam&&restX!==FRX){const dd=FRX-restX;restX+=Math.sign(dd)*Math.min(Math.abs(dd),170*dt)}const dir=(K.r?1:0)-(K.l?1:0);P.idle=(dir||K.u||K.d||P.punch>0||sHeld)?0:P.idle+dt;
  if(P.climb){const s=P.climb;
   if(s.state!=='standing'){P.climb=null;P.support=null}
   else{if(dir)P.face=dir;const cc=colOf(s,P.x),cf=chestF(s),ck=cc>=0&&s.rows[cf]?s.rows[cf][cc]:null,ct=ck&&ck.hp>0?ck.t:'',sl=(who==='turtle'?.62:1)*(ct==='s'||ct==='k'?1.25:1);
@@ -1153,7 +1160,11 @@ function dys(){if(level<2)return 0;let n=0;sites.forEach(s=>{if(l2up(s))n++});re
 function riverFree(){const d=sites[4];return !(d.state==='standing'&&!d.paved)&&d.state!=='collapsing'&&d.state!=='toppling'}
 function waterOpen(x){return !sites.some(s=>(s.state==='standing'||s.state==='toppling'||s.state==='collapsing')&&x>s.x-4&&x<s.x+s.w+4)}
 function canSwim(){return riverOn&&state==='play'&&!swim&&P.support==='ground'&&P.nap<=0&&!paused()&&waterOpen(P.x)}
-function swimX(){return 130}
+function swimX(){return fishSave?fishSave.x:130}
+function fishFollow(dt){if(!riverOn||(swim&&swim.fish))return;if(!fishSave)fishSave={fish:true,x:130,y:WT+40,face:-1,carry:false,air:1,leap:0,t:0,hitT:0,reg:0,fly:false,vx:0,vy:0,spin:0};
+ const w=fishSave;if(w.reg||w.fly||!run||(run.phase!=='adult'&&run.phase!=='fry'))return;
+ let lo=60,hi=damUp()?sites[4].x-30:fallX()-14;const blk=bx=>{if(w.x<bx)hi=Math.min(hi,bx-26);else lo=Math.max(lo,bx+26)};if(plug.hp>0)blk(plug.x);walls.forEach(wl=>{if(wl.up)blk(wl.x)});
+ const px=swim?swim.x:P.x,tx=clamp(px-(swim?swim.face:P.face)*56,lo,hi),d=tx-w.x;if(Math.abs(d)>3){w.x+=Math.sign(d)*Math.min(Math.abs(d),210*dt);w.face=Math.sign(d)}w.x=clamp(w.x,lo,hi);w.y+=(WT+46+Math.sin(T*2)*6-w.y)*Math.min(1,dt*4)}
 function nearDock(x){return riverOn&&docks.some(d=>Math.abs(d-x)<32)}
 function newRun(gen){return{gen,fed:0,mated:false,phase:'adult',t:0,age:1,dance:0,fedBank:false,body:null,laid:false,kids:[],nymph:[],krill:[0,1,2,3,4,5].map(i=>({x:OC0+260+i*150+hr(i+gen)*70,y:WT+70+hr(i+3+gen)*250,on:true}))}}
 function damUp(){const d=sites[4];return d.state==='standing'||d.state==='toppling'||d.state==='collapsing'}
@@ -1176,7 +1187,7 @@ function dive(fish){if(swim){surface();return}
  if(fish){if(!(riverOn&&state==='play'&&P.nap<=0&&!paused()))return;swim=fishSave||{fish:true,x:swimX(),y:WT+40,face:-1,carry:false,air:1,leap:0,t:0,hitT:0,reg:0,fly:false,vx:0,vy:0,spin:0};fishSave=null;
   once('fish','You are the salmon. Swim left to the sea.',9)}
  else{if(!canSwim()||!nearDock(P.x))return;if(level>2)told.add('dive2');swim={fish:false,x:P.x,y:WT+26,face:P.face||1,carry:false,air:1,leap:0,t:0,hitT:0};
-  once('dive','Watch your air. At the surface, Up climbs out.',9)}
+  once('dive','Watch your air. Swim up to a ladder to climb out.',9)}
  P.vx=0;SFX.pop();hudKey=''}
 function surface(){const w=swim;if(!w.fish){if(w.x<24){once('shore','Swim back under the bank first.',4);return}if(!waterOpen(w.x)){once('roof','A building sits above you. Swim clear.',5);return}P.x=clamp(w.x,40,WORLD-60);P.y=GY;P.vy=0;P.vx=0;P.support='ground';P.climb=null;P.px=P.x}
  else fishSave=w;
@@ -1208,6 +1219,7 @@ function swimStep(dt){const w=swim;w.t+=dt;P.vx=0;if(w.hitT>0)w.hitT-=dt;if(w.le
   else if(nx>fallX()-30){nx=fallX()-30;if(w.fish)once('fall','Press Up near the surface to leap the falls.',8);else once('fallD','Only a salmon can leap the falls.',5)}
   nx=Math.max(nx,OC0+40)}
  w.x=nx;w.y=clamp(w.y+dy*sp*.85*dt,WT+12,WB-22+clamp((-60-w.x)/200,0,1)*182);
+ if(!w.fish&&K.u&&w.y<WT+20&&w.t>.9&&docks.some(d=>Math.abs(d-w.x)<56)&&waterOpen(w.x)&&w.x>=24){upQ=false;surface();return}
  if(upQ){upQ=false;if(!w.fish&&wasTop){surface();return}if(w.fish&&w.y<WT+54){w.fly=true;w.vy=jv;w.vx=(dx||w.face)*170;w.y=WT+6;SFX.pop()}}
  if(!w.fish){if(w.y<WT+30&&waterOpen(w.x))w.air=Math.min(1,w.air+dt*1.6);else{w.air-=dt/(who==='turtle'?32:15);if(w.air<.3)once('air','Air is low. Swim up.',4)}
   if(w.air<=0){w.air=.4;P.energy=Math.max(0,P.energy-15);hudKey='';word('AIR',w.x,w.y-70,'#eaf8ff');SFX.bump()}}
@@ -1570,7 +1582,7 @@ function render(){if(state==='vacation'){drawVacation();return}
   if(state!=='title'){drawHero();if(!tireJam){line(FRX-104,GY,FRX-104,GY-92,'#5b3a24',4);shape(rectPts(FRX-137,GY-126,66,36,4,.7),'#1b1328',{lw:2.2,sh:1,st:'#ffd23f'});paperText('TAG',FRX-104,GY-107,22,'#ffd23f',0)}}
   who=w0;Object.assign(P,sv)}
  if(state==='play'&&P.y>GY-12&&sites.some(q=>q.state==='grown'&&['river','free','wet','rain'].includes(q.choice)))for(let i=1;i<=3;i++){const tx=trail[trail.length-1-i*13];if(tx!==undefined)duck(tx,GY-9-Math.abs(Math.sin(T*9+i))*3,i+20,P.face)}
- if(riverOn&&state==='play'&&!(swim&&swim.fish)){const q=swimX();line(q+62,GY,q+62,GY-92,'#5b3a24',4);shape(rectPts(q+22,GY-126,80,36,5,.7),'#1b1328',{lw:2.2,sh:1,st:'#9fd8ee'});paperText('SWIM',q+62,GY-107,22,'#9fd8ee',0);const ph=T%2.2;if(!fishSave)drawSalmon({x:q,face:-1,carry:false,leap:ph<.6?.6-ph:0})}
+ if(riverOn&&state==='play'&&!(swim&&swim.fish)&&fishSave&&!fishSave.reg){const fry=run&&run.phase==='fry',ph=T%3.2;drawSalmon(Object.assign({},fishSave,{leap:!swim&&ph<.6&&!told.has('fish')?.6-ph:0,z:fry?.42+.58*run.age:1,dead:run&&run.phase==='dying'}))}
  {const hh=clamp((GY-P.y)/300,0,1);if(state!=='title'||P.y<=GY){ctx.globalAlpha=.3*(1-hh*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(P.x,GY-1,24*(1-hh*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1}}
  if(!swim||swim.fish)drawHero();if(swim)drawSwimmer();
  parts.forEach(drawPart);
