@@ -3,9 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.23</title>
+<title>Rewilder v0.24</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.23 | LAB | 2026-11-12
+<!-- TSP build: Rewilder v0.24 | LAB | 2026-11-12
+     v0.24 (founder: "1. Remove Gary from game entirely. 2. Remove the lock on the dam and make the stones
+     breakable again. 3. Make the cars look real going up and down ramps. Now it’s weird. 4. Make sure
+     music doesn’t overlap. In Level 2 I heard overlap. 5. Cars don’t honk audibly unless you’re on top
+     of the expressway. But change the honk sound to be less annoying."): Gary is gone from the street
+     and the vacations. A keystone is one block again; every other stone breaks as before. Cars on the
+     ramps stay level, narrow as they turn, and show their backs or fronts when they drive away from
+     or toward the viewer. Each music voice now stops a note before its next one starts, and the
+     dark and bright tunes change only on a bar line. The horn sounds only while the player stands
+     on the 93, and it is a soft two-note triangle tone.
      v0.23, from a voice call with the founder (his words, as transcribed): "the turtle's move of just
      going forward like a beak, like a hungry, hungry hippo. When when done as a power move, that can be
      really effective to take out um, critical points. So there should be like one point on each level
@@ -373,7 +382,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.23</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.24</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -605,7 +614,7 @@ const SFX={
  setback(){tone(300,.25,'triangle',.12,-140)},
  bump(){tone(140,.15,'square',.08,-60)},
  weld(){noise(.2,.1,4000);tone(1500,.1,'square',.03)},
- honk(){tone(392,.12,'square',.05);tone(494,.14,'square',.05,0,.02)},
+ honk(){if(!(P.support&&P.support.id==='highway'))return;const k=.95+Math.random()*.1;tone(349*k,.2,'triangle',.07);tone(440*k,.2,'triangle',.055,0,.015)},
  hiss(){noise(.4,.05,5000)},
  creak(){tone(95,.9,'sawtooth',.1,45);tone(61,.9,'square',.05,20)},
  rain(){noise(2.5,.08,2500)},
@@ -626,16 +635,17 @@ function mNoise(t,d,v,hp){const s=AC.createBufferSource(),g=AC.createGain(),fl=A
 function musStart(){const a=ac();if(!a||mus)return;const g=a.createGain();g.gain.value=.5;g.connect(a.destination);const n=a.sampleRate,b=a.createBuffer(1,n,n),c=b.getChannelData(0);for(let i=0;i<n;i++)c[i]=Math.random()*2-1;
  mus={g,nb:b,next:a.currentTime+.1,step:0,id:setInterval(musTick,50)}}
 function musStop(){if(!mus)return;clearInterval(mus.id);try{mus.g.disconnect()}catch(e){}mus=null}
-function musTick(){if(!mus||!AC)return;const dark=level>1&&dys()>.2,spb=60/(dark?92:104)/4,grown=sites.filter(s=>s.state==='grown').length;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;
+function mGap(p,i,max){for(let k=1;k<=max;k++)if(p[(i+k)%32])return k;return max}
+function musTick(){if(!mus||!AC)return;if(mus.dark===undefined||mus.step%16===0)mus.dark=level>1&&dys()>.2;const dark=mus.dark,spb=60/(dark?92:104)/4,grown=sites.filter(s=>s.state==='grown').length;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;
  while(mus.next<AC.currentTime+.15){const i=mus.step%32,t=mus.next+(i%2?spb*.16:0);
-  {const bs=dark?M_DBASS[i]:M_BASS[i];if(bs)mNote(mf(bs),t,spb*1.6,dark?'square':'sawtooth',dark?.16:.2,dark?210:260)}
-  if(dark&&i%2===1)mNote(mf(52),t,.05,'square',.03,i%8<4?700:1500);if(dark&&M_DLEAD[i])mNote(mf(M_DLEAD[i]),t,spb*1.9,'sawtooth',.05,900);
+  {const pb=dark?M_DBASS:M_BASS,bs=pb[i];if(bs)mNote(mf(bs),t,spb*Math.min(1.6,mGap(pb,i,2)*.9),dark?'triangle':'sawtooth',dark?.2:.2,dark?260:260)}
+  if(dark&&i%2===1)mNote(mf(52),t,.05,'square',.03,i%8<4?700:1500);if(dark&&M_DLEAD[i])mNote(mf(M_DLEAD[i]),t,spb*Math.min(1.9,mGap(M_DLEAD,i,2)*.9),'sawtooth',.05,900);
   if(M_KICK[i]){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g).connect(mus.g);o.start(t);o.stop(t+.2)}
   if(i%8===4){mNote(330,t,.07,'triangle',.2,2400);mNote(196,t,.09,'sine',.18,1200)}
   if(i%4===2||i%16===15)mNote(1760,t,.03,'sine',.045,6000);
   if(i%16===3||i%16===6||i%16===11)(dark?(i<16?[64,67,70]:[65,68,72]):i<16?[64,67,71,74]:[69,73,76,79]).forEach(m=>mNote(mf(m),t,spb*.9,'square',grown?.036:.024,1800));
   if(grown>=1&&i%16===14)mNote(mf(64),t,spb,'triangle',.07,2500);
-  if(!dark&&grown>=3&&M_LEAD[i])mNote(mf(M_LEAD[i]),t,spb*1.4,'triangle',.09,3000);
+  if(!dark&&grown>=3&&M_LEAD[i])mNote(mf(M_LEAD[i]),t,spb*Math.min(1.4,mGap(M_LEAD,i,2)*.9),'triangle',.09,3000);
   mus.step++;mus.next+=spb}}
 
 /* ---------- UI ---------- */
@@ -806,11 +816,11 @@ function openPlots(){plotsOpen=true;const n=sites.length-5,add=PLOTS.slice(n,n+2
 function keyInit(){sites.forEach(q=>{q.key=null});const q=level===1?sites[4]:level===2?sites[2]:sites[1],c=level===1?2:level===2?3:7,k=q.rows[0]&&q.rows[0][c];if(k){k.key=true;k.hp=k.max=2;q.key={c}}}
 function keyAlive(q){return !!q.key&&q.state==='standing'&&!q.paved&&q.rows.some(r=>r.some(k=>k&&k.key&&k.hp>0))}
 function keyCell(q){for(let f=0;f<q.rows.length;f++)for(let c=0;c<q.rows[f].length;c++){const k=q.rows[f][c];if(k&&k.key&&k.hp>0)return[c,f,k]}return null}
-function keyHit(q,c,f){const K=keyCell(q),hw=q.id==='highway',near=hw?c===q.key.c:Math.abs(c-K[0])<=1&&Math.abs(f-K[1])<=1;if(hw&&!near)return false;
- if(!(lungeOn&&near)){SFX.clang();word('KEYSTONE',P.x+P.face*50,P.y-110,'#c9d2de');once('keystone','A keystone locks this. Only the turtle cracks it: hold a direction and Smash.',8);return true}
+function keyHit(q,c,f){const K=keyCell(q),hw=q.id==='highway',near=hw?c===q.key.c:(c===K[0]&&f===K[1])||(lungeOn&&Math.abs(c-K[0])<=1&&Math.abs(f-K[1])<=1);if(!near)return false;
+ if(!(lungeOn&&near)){SFX.clang();word('KEYSTONE',P.x+P.face*50,P.y-110,'#c9d2de');once('keystone','Only the turtle cracks a keystone: hold a direction and Smash.',8);return true}
  if(level===1&&!told.has('tirejam')){told.add('tirejam');jamTurtle();return true}
  K[2].hp-=1;stats.hits++;SFX.steel();shake=RM?0:8;hitstop=.08;const[x,y]=cellXY(q,K[0],K[1]);debris(x,y,10,'#2f3a4a');
- if(K[2].hp<=0){killCell(q,K[0],K[1]);SFX.collapse();word('CRACK',x,y-60,'#ffd23f');stars(x,y,8);toast(hw?'The keystone leg is cut.':'The keystone is out. Now it can break.',5);checkFails(q)}return true}
+ if(K[2].hp<=0){killCell(q,K[0],K[1]);SFX.collapse();word('CRACK',x,y-60,'#ffd23f');stars(x,y,8);toast(hw?'The keystone leg is cut.':'The keystone is out.',5);checkFails(q)}return true}
 function jamTurtle(){tireJam={x:P.x,face:P.face};restX=P.x;SFX.pop();word('STUCK',P.x,P.y-170,'#ffd23f');tagOut();Object.assign(P,{x:FRX,y:GY,vx:0,vy:0,face:-1,support:'ground',climb:null,slide:null});P.px=P.x;
  setTimeout(()=>toast('She is stuck in a tire. Walk the beaver over and smash it off.',7),80)}
 function crush(s,f,above){const y=GY-(f+.5)*s.fh;s.rows[f].forEach((k,c)=>{if(k&&k.hp>0)killCell(s,c,f)});stats.floors++;s.sway=2.6;hitstop=.09;SFX.floor();shake=RM?0:10;dust(s.cx,y+s.fh/2,14,s.w);word('KRUNCH',s.cx,y-84,'#ffd23f');s.chainT=.12;
@@ -985,8 +995,7 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return
  if(riverOn&&!swim&&!told.has('river')&&told.has('swimsign')&&toastT<=0)once('river','Blue ladders lead down to a buried river.',8);
  walls.forEach(wl=>{if(!wl.up)wl.t+=dt});if(fort)fortStep(dt);
  sites.forEach(s=>{if(s.tinkT>0){s.tinkT-=dt;if(s.tinkT<=0){const ty=GY-s.rows.length*s.fh;puff(s.cx+s.w*.2,ty,{kind:'chunk',vx:20,vy:-40,g:700,r:5,c:'#b3ada2',life:1.4,max:1.4,vr:6});word('tink',s.cx+s.w*.2,ty-30,'#fbf3dc');SFX.clang()}}
-  if(s.garyT>0)s.garyT-=dt;
-  if(s.was&&s.was!==s.state){if((s.was==='collapsing'||s.was==='toppling')&&s.state!=='standing'){word(pick(['hm.','Tidy.','Oops.','That will do.','Huh.']),P.x,P.y-170,'#fbf3dc');s.garyT=10;
+  if(s.was&&s.was!==s.state){if((s.was==='collapsing'||s.was==='toppling')&&s.state!=='standing'){word(pick(['hm.','Tidy.','Oops.','That will do.','Huh.']),P.x,P.y-170,'#fbf3dc');
      if(s.id==='dam'&&!riverOn){riverOn=true;SFX.grow()}once('story2','The river reaches the sea again.',6)}
    if(s.state==='grown'&&level===1)once('story1','',5)}
   s.was=s.state});
@@ -1034,10 +1043,10 @@ function hazards(dt){sites.forEach(s=>{if(s.state!=='standing'||s.paved)return;
    const jam=.3+.7*Math.max(0,Math.sin(T*.9)),drop=c=>{if(c.al>.5&&props.length<12)props.push({x:c.x,y:c.y-8,vy:-60,c:c.c,state:'fall',t:0,dir:1,y0:c.y-8});c.dead=5+Math.random()*4;c.on=false};
    s.cars.forEach(c=>{if(c.dead>0){c.dead-=dt;c.on=false;if(c.dead<=0){if(dk)c.u=0;else c.dead=1}return}
     if(!dk){drop(c);return}
-    c.on=c.u>=LR&&c.u<LR+VL;c.u+=c.v*(c.on?jam:2.6)*dt;const q=rampPos(s,c.u,ty);c.x=q[0];c.y=q[1];c.a=q[2];c.al=q[3];c.z=q[4]||1;c.bk=!!q[5];
+    c.on=c.u>=LR&&c.u<LR+VL;c.u+=c.v*(c.on?jam:2.6)*dt;const q=rampPos(s,c.u,ty);c.x=q[0];c.y=q[1];c.a=q[2];c.al=q[3];c.z=q[4]||1;c.bk=!!q[5];c.vw=q[6]||0;c.sx=q[7]||1;
     if(c.on){const col=Math.floor((c.x-s.x)/s.cw);if(col>=0&&col<s.cols&&!(top[col]&&top[col].hp>0))drop(c)}else if(c.u>=LR+VL+560){c.dead=1+Math.random()*3}
     if(c.on&&c.dead<=0&&P.support===s&&P.bump<=0&&Math.abs(c.x-P.x)<28){P.bump=.9;hurt(6);P.vx=-260;P.vy=-260;P.support=null;SFX.honk();once('traffic','Traffic. Cut the legs to drop the road.',6)}});
-   if(s.traffic&&state==='play'&&Math.random()<dt*.3){const c=s.cars[Math.floor(Math.random()*s.cars.length)];if(c.dead<=0&&c.on&&Math.abs(c.x-P.x)<viewW)word('HONK',c.x,GY-s.rows.length*s.fh-34,'#fbf3dc')}
+   if(s.traffic&&state==='play'&&Math.random()<dt*.2){const c=s.cars[Math.floor(Math.random()*s.cars.length)];if(c.dead<=0&&c.on&&Math.abs(c.x-P.x)<viewW&&P.support===s){SFX.honk();word('HONK',c.x,GY-s.rows.length*s.fh-34,'#fbf3dc')}}
    const tr=s.trolley;tr.x+=tr.dir*46*dt;if(tr.x>s.x+s.w-150)tr.dir=-1;if(tr.x<s.x+30)tr.dir=1}
   // coal steam vents and stack smoke
   if(s.id==='coal'){s.rows.forEach((row,f)=>row.forEach((k,c)=>{if(!k||k.hp<=0||k.t!=='v')return;const ph=(T+hr(k.seed)*5.5)%5.5;k.glow=ph>4.4;const was=k.blast;k.blast=ph>5.1;
@@ -1249,7 +1258,6 @@ function drawSwimmer(){const w=swim;if(w.fish){const fry=run.phase==='fry';drawS
  Object.assign(P,{x:0,y:42,face:w.face,vx:0,vy:0,climb:null,support:'ground',punch:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,nap:0,sw:true});drawHero();ctx.restore();ctx.globalAlpha=1;Object.assign(P,sv);
  for(let i=0;i<3;i++){const a=(T*.9+i*.33)%1;ctx.globalAlpha=1-a;ctx.strokeStyle='#eaf8ff';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(w.x+w.face*30+Math.sin(T*3+i)*5,w.y-10-a*60,3+i,0,7);ctx.stroke()}ctx.globalAlpha=1;
  for(let i=0;i<5;i++){const on=w.air>i/5;ctx.beginPath();ctx.arc(w.x-28+i*14,w.y-74,5,0,7);ctx.fillStyle=on?(w.air<.3?'#ff8a7a':'#eaf8ff'):'rgba(18,12,30,.6)';ctx.fill();ctx.strokeStyle=INK;ctx.lineWidth=1.6;ctx.stroke()}}
-function gary(x,y,z,face){ctx.save();ctx.translate(x,y);ctx.scale((face||1)*(z||1),z||1);person(0,0,'#e8c25a',77,false);shape(rectPts(-7,-27,14,4,3,.3),'#5b3a24',{lw:1.2});shape(rectPts(-4,-33,8,7,4,.3),'#5b3a24',{lw:1.2});shape(rectPts(6,-17,5,7,5,.2),'#fbf6ea',{lw:1.2});if(!RM){ctx.globalAlpha=.6;dot(9,-22-((T*8)%8),1.6,'#fbf6ea');ctx.globalAlpha=1}ctx.restore()}
 function drawTerrace(clear){const f=fallX(),R=regs(),wet=!damUp(),x0=cam.x-60,x1=cam.x+viewW+60;if(x1<f-40)return;
  const T0=R[1].top,T1=R[2].top,T2=R[3].top,rock=mix(mix('#5c5a60','#77757c',clear),'#3a3644',DY*.7),rock2=mix(mix('#4a484e','#5f5d66',clear),'#2e2a36',DY*.7),water=mix('#3f8fb6','#4a3a52',DY*.8);
  shape([[f-16,GY+10],[f+4,GY-40],[f+20,T0-10],[f+166,T0-10],[f+172,T1-10],[f+316,T1-10],[f+322,T2-10],[R[3].x1+220,T2-10],[R[3].x1+220,GY+10]],rock,{lw:2.8,sh:1});
@@ -1264,7 +1272,7 @@ function drawTerrace(clear){const f=fallX(),R=regs(),wet=!damUp(),x0=cam.x-60,x1
   if(run.body){ctx.globalAlpha=.55;drawSalmon({x:run.body.x,y:run.body.y,face:-1,leap:0,dead:true});ctx.globalAlpha=1}
   run.nymph.forEach(n=>{if(n.t>0)return;const nx=n.x+Math.sin(T*3+n.x)*5,ny=n.y+Math.cos(T*2.3+n.x)*5;line(nx-6,ny,nx+6,ny,'#7cc35a',4);line(nx+6,ny,nx+11,ny-3,'#7cc35a',1.6);line(nx+6,ny,nx+11,ny+3,'#7cc35a',1.6)});
   run.kids.forEach(k=>drawSalmon({x:k.x,y:k.y,face:k.f||1,leap:0,z:run.phase==='fry'?.42+.58*run.age:.42}));
-  gary(r.x1-26,r.top-8,1.25,-1);line(r.x1-36,r.top-34,r.x1-70,r.top-52,INK,1.6);line(r.x1-70,r.top-52,r.x1-74,r.top+18+Math.sin(T*2)*3,'rgba(251,246,234,.8)',1.2);dot(r.x1-74,r.top+20+Math.sin(T*2)*3,3,'#c8342b')}
+  }
  if(wet){const fall=(xa,ya,xb,yb,i)=>{shape([[xa-4,ya],[xa+22,ya],[xb+26,yb],[xb-18,yb]],'#bfe3f2',{lw:1.8});if(!RM)for(let k=0;k<6;k++){const a=(T*1.5+k/6+i*.2)%1;line(xa+2+k*3+(xb-xa)*a,ya+(yb-ya)*a,xa+2+k*3+(xb-xa)*(a+.09),ya+(yb-ya)*(a+.09),'#ffffff',2.4)}for(let k=0;k<5;k++){ctx.globalAlpha=.6;dot(xb-14+k*10+Math.sin(T*5+k+i)*4,yb-3-Math.abs(Math.sin(T*3+k+i))*12,4+k%3,'#eaf8ff')}ctx.globalAlpha=1};
   fall(R[3].x0+2,T2,R[2].x1-34,T1+2,0);fall(R[2].x0+2,T1,R[1].x1-34,T0+2,1);fall(R[1].x0+2,T0,f-44,GY+6,2)}}
 function drawSeaAndGravel(clear){const x0=cam.x-60,x1=cam.x+viewW+60;
@@ -1274,7 +1282,6 @@ function drawSeaAndGravel(clear){const x0=cam.x-60,x1=cam.x+viewW+60;
   const bed=x=>WB-14+clamp((-60-x)/200,0,1)*182;{const pts=[];for(let x=r+30;x>=x0-60;x-=60)pts.push([x,bed(x)-hr(x*.21)*14]);pts.push([x0-60,WB+420],[r+30,WB+420]);shape(pts,'#3a3324',{lw:2})}
   for(let x=Math.floor(x0/110)*110;x<r-40;x+=110){const kx=x+hr(x*.3)*70,by=bed(kx)-6,q=hr(x*.19);if(q<.55)for(let k=0;k<3;k++){ctx.beginPath();for(let j=0;j<=8;j++){const px=kx+k*9+Math.sin(T*1.2+j*.7+x)*(j*1.6),py=by-j*(14+hr(x+k)*8);j?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.strokeStyle='#2f6b3a';ctx.lineWidth=5;ctx.lineCap='round';ctx.stroke()}
    else if(q<.8){shape(blobPts(kx,by-10,20,14,x,9),q<.68?'#e07d6e':'#f0a830',{lw:1.8});shape(blobPts(kx+16,by-6,11,9,x+1,7),'#c8584a',{lw:1.4})}}
-  {const gx=OC0+470+Math.sin(T*.3)*30,gy=GY+2+Math.sin(T*1.7)*2;shape(ellPts(gx,gy+2,24,8,9),'#e8a22a',{lw:2});gary(gx,gy+4,1.25,1)}
   if(run.phase==='adult'){run.krill.forEach(k=>{if(!k.on)return;for(let j=0;j<9;j++)dot(k.x+Math.sin(T*2.4+j*1.3)*18+Math.cos(j*2.1)*10,k.y+Math.cos(T*2+j*1.7)*12+Math.sin(j)*8,2.6,'#f3b6c8')});
    if(run.fed>=4&&!run.mated){const m=mateXY(),a=(2.6-run.dance)*5.2;if(run.dance>0)drawSalmon({x:run.dx-Math.cos(a)*36,y:run.dy-Math.sin(a)*24,face:Math.sin(a)>0?1:-1,leap:0});else drawSalmon({x:m[0],y:m[1],face:Math.cos(T*.5)>0?1:-1,leap:0})}}}
 }
@@ -1356,7 +1363,7 @@ function vacAlt(t){const b=vb,sv=Object.assign({},P),w0=who,base={vx:0,vy:0,clim
   shape([[-400,420],[40,336],[200,402],[380,326],[1000,420]],'#3d5a3b',{lw:2.4});for(let i=0;i<7;i++)pine(-10+i*84+hr(i)*30,404-Math.abs(Math.sin(i*1.7))*40,.7+hr(i+4)*.5,i,1);
   ctx.fillStyle='#3f7fa6';ctx.fillRect(-400,410,1400,500);for(let i=0;i<8;i++){const x=((i*110+T*14)%900)-200;line(x,440+(i%4)*40,x+36,440+(i%4)*40,'rgba(255,255,255,.45)',3)}
   line(60,580,60,700,'#5b3a24',9);line(210,580,210,700,'#5b3a24',9);shape(rectPts(-400,566,646,22,3,1),'#8a6a48',{lw:2.4});for(let x=-380;x<240;x+=44)line(x,568,x,586,'#5b3a24',2);
-  heroes(34,566,178,566);gary(226,566,2,1);
+  heroes(34,566,178,566);
   if(b.st){const e=t-b.st.t0,n=b.st.n,h=Math.floor(e/.28),fr=e/.28-h;
    for(let j=0;j<Math.min(h,n);j++){const a=e-(j+1)*.28;if(a<1.2){ctx.globalAlpha=1-a/1.2;ctx.strokeStyle='#eaf6fb';ctx.lineWidth=2.4;ctx.beginPath();ctx.ellipse(262+(j+1)*34,528-j*9,8+a*30,(8+a*30)*.3,0,0,7);ctx.stroke();ctx.globalAlpha=1}}
    if(h<n){const x=262+(h+fr)*34,y=528-h*9-Math.sin(fr*Math.PI)*(46*(1-h/n*.6));shape(ellPts(x,y,7,4,3),'#6a6a70',{lw:1.6})}
@@ -1371,7 +1378,7 @@ function vacAlt(t){const b=vb,sv=Object.assign({},P),w0=who,base={vx:0,vy:0,clim
   shape([[-6,548],[52,446],[112,548]],'#c8342b',{lw:2.4});shape([[40,548],[52,480],[66,548]],'#1b1328',{lw:1.6});
   ctx.globalAlpha=.16+.05*Math.sin(T*9);dot(288,560,84,'#f0a830');ctx.globalAlpha=1;line(264,574,312,562,'#5b3a24',7);line(266,562,312,574,'#5b3a24',7);
   [['#c8342b',18,46],['#f0a830',12,36],['#ffd23f',7,24]].forEach((f,i)=>{const fl=Math.sin(T*(11+i*3)+i)*4;shape([[288-f[1],566],[288-f[1]*.4+fl,566-f[2]*.6],[288+fl*1.5,566-f[2]-Math.abs(fl)*2],[288+f[1]*.5+fl,566-f[2]*.5],[288+f[1],566]],f[0],{lw:1.4})});
-  heroes(170,570,420,572);gary(84,560,2,1);
+  heroes(170,570,420,572);
   b.fw.forEach(f=>{const e=t-f.t0;if(e<0){const u=1+e/.5;dot(288+(f.x-288)*u,540+(f.y-540)*u,3.4,'#ffd23f')}else if(e<1.4){const r=ease(Math.min(1,e/.5))*64;ctx.globalAlpha=1-e/1.4;for(let k=0;k<12;k++){const a=k/12*6.283;line(f.x+Math.cos(a)*r*.4,f.y+Math.sin(a)*r*.4+e*e*10,f.x+Math.cos(a)*r,f.y+Math.sin(a)*r+e*e*16,f.c,3.6)}ctx.globalAlpha=1}});
   if(!vacEnd){if(b.n>1)paperText(''+b.n,110,150,60,'#ffd23f',-.08);paperText('Smash lights a firework. Up heads home.',260,318,24,'#fbf3dc',0)}}}
 /* the title: eight cut-paper tiles on threads. The road turns green from left to right.
@@ -1476,7 +1483,7 @@ function drawVacation(){const t=vacT;ctx.setTransform(DPR,0,0,DPR,0,0);const g=c
  shape(rectPts(90,560,150,16,3,1),'#2f8f8a',{lw:2});shape(rectPts(300,566,150,16,4,1),'#e8a22a',{lw:2});
  const sv=Object.assign({},P),w0=who,base={vx:0,vy:0,climb:null,support:'ground',punch:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0};
  {const h=vb&&vb.hopT>0?Math.sin(vb.hopT/.4*Math.PI)*30:0,L=vb&&vb.hop===1,R=vb&&vb.hop===2;Object.assign(P,base,{x:165,y:566-(L?h:0),face:1,nap:0,cheer:L&&h?1:0});who='beaver';drawHero();Object.assign(P,base,{x:372,y:570-(R?h:0),face:-1,nap:0,cheer:R&&h?1:0});who='turtle';drawHero();who=w0;Object.assign(P,sv)}
- if(vb){vacFun(t);gary(486,566,2.1,-1)}}
+ if(vb){vacFun(t)}}
  paperText('VACATION',260,250,64,'#fbf3dc',-.05);
  if(vacEnd){const te=t-vacEnd,a=Math.min(1,te/.6);ctx.globalAlpha=a;ctx.fillStyle='rgba(18,12,30,.8)';ctx.fillRect(-400,-200,1400,1200);for(let i=0;i<10;i++){const th=ease(clamp((te-.3-i*.12)/1.6,0,1))*(150+hr(i+3)*230),tx=-30+i*60;shape(rectPts(tx,720-th,46,th+40,i+11,.5),'#1d1626',{lw:2,st:'#3a3040'});for(let r=0;r<Math.floor(th/26);r++)for(let c=0;c<3;c++)if(hr(i*17+r*5+c)<.4){ctx.fillStyle='#e8b23a';ctx.fillRect(tx+7+c*13,728-th+r*26,6,9)}}const bx=-160+te*150;shape(ellPts(bx,330,120,44,3),'#3a3a40',{lw:2.6});shape(ellPts(bx,332,108,14,5),'#ffd23f',{lw:1.8});shape([[bx-100,322],[bx-146,290],[bx-134,330],[bx-146,372],[bx-100,338]],'#c8342b',{lw:2.2});
   paperText('Meanwhile, back home',260,180,34,'#fbf3dc',0);ctx.globalAlpha=1}}
@@ -1540,7 +1547,6 @@ function render(){if(state==='vacation'){drawVacation();return}
  drawVia();sites.forEach(drawSite);
  if(riverOn&&plug.seen&&plug.hp>0&&!swim)chalk(plug.x,GY-58);
  drawTowerDrones();
- sites.forEach(s=>{if(s.garyT>0){const u=1-s.garyT/10,stop=u>.3&&u<.72,gx=s.cx-110+(u<.3?u/.3*110:u<.72?110:110+(u-.72)/.28*130),fc=stop?(P.x<gx?-1:1):1;ctx.globalAlpha=Math.min(1,s.garyT*1.5,u*8);gary(gx,GY-4,2.1,fc);ctx.globalAlpha=1;if(stop){shape(rectPts(gx-66,GY-152,132,36,9,.6),'#fbf3dc',{lw:2.2,sh:1});paperText('Morning.',gx,GY-133,24,'#1b1328',0)}}});
  docks.forEach((d,i)=>{if(!riverOn||d<cam.x-80||d>cam.x+viewW+80)return;const on=state==='play'&&!swim&&nearDock(P.x)&&Math.abs(P.x-d)<36;
   ctx.fillStyle=mix('#3f8fb6','#4a3a52',DY*.9);ctx.fillRect(d-26,GY-7,52,32);shape(rectPts(d-30,GY-9,8,34,i+3,.4),'#8a6a48',{lw:1.8});shape(rectPts(d+22,GY-9,8,34,i+4,.4),'#8a6a48',{lw:1.8});
   for(let q=0;q<3;q++)line(d-22,GY-2+q*9,d+22,GY-2+q*9,'#c9a26a',3.4);line(d-12,GY+3+Math.sin(T*3+i)*1.5,d+12,GY+3+Math.sin(T*3+i)*1.5,'rgba(255,255,255,.7)',2);
@@ -1588,10 +1594,17 @@ const CKX=72,CKR=66,CKY=12;
 function corkPt(ty,u){const y0=ty+3,H=GY-3-y0,a=Math.PI/2+u*4*Math.PI,f=u<.1?u*u/.19:(u-.05)/.95;return[VX1+CKX-CKR*Math.cos(a),y0+H*f+CKY*(Math.sin(a)-1),Math.sin(a)<-.02]}
 function corkAt(ty,t){if(t<.07)return[VX1+CKX*t/.07,ty+3,false];return corkPt(ty,(t-.07)/.93)}
 function rampPos(s,u,ty){const A=330,B=560,VL=VX1-VX0;
- if(u<A){const t=1-u/A,G=flyGeo(ty),m=flyMid(G,t),n=flyMid(G,Math.max(0,t-.02));return[m[0],m[1]-9*(1-t)*(1-t)+4*t,Math.atan2(n[1]-m[1],n[0]-m[0])*.55,Math.min(1,(u/A)*7),1+t*1.15,false]}
- if(u<A+VL)return[VX0+u-A,ty+3,0,1,1,false];
- const t=Math.min(1,(u-A-VL)/B),q=corkAt(ty,t),r=corkAt(ty,Math.min(1,t+.004));return[q[0],q[1],t>=1?0:Math.atan2(r[1]-q[1],r[0]-q[0]),Math.min(1,(1-t)*7),1,q[2]]}
-function drawCar(c){ctx.save();ctx.globalAlpha=c.al;ctx.translate(c.x,c.y);const z=c.z||1;ctx.scale(z,z);if(Math.cos(c.a)<0){ctx.scale(-1,1);ctx.rotate(Math.PI-c.a)}else ctx.rotate(c.a);car(-13,0,c.c,1);ctx.restore()}
+ // returns x, y, tilt, alpha, size, behind-the-posts, view (0 side, 1 back, 2 front), side-view width
+ if(u<A){const t=1-u/A,G=flyGeo(ty),m=flyMid(G,t),n=flyMid(G,Math.max(0,t-.02)),k=clamp((t-.1)/.2,0,1),end=k>.5;
+  return[m[0],m[1]-9*(1-t)*(1-t)+4*t,end?clamp((n[0]-m[0])*.03,-.14,.14):clamp(Math.atan2(n[1]-m[1],n[0]-m[0]),-.3,.3),Math.min(1,(u/A)*7),1+t*1.15,false,end?1:0,end?1:1-k*.9]}
+ if(u<A+VL)return[VX0+u-A,ty+3,0,1,1,false,0,1];
+ const t=Math.min(1,(u-A-VL)/B),q=corkAt(ty,t),al=Math.min(1,(1-t)*7);if(t<.07)return[q[0],q[1],0,al,1,false,0,1];
+ const a=Math.PI/2+((t-.07)/.93)*4*Math.PI,sn=Math.sin(a),cs=Math.cos(a),end=Math.abs(sn)<.36,r=corkAt(ty,Math.min(1,t+.004)),tilt=clamp(Math.atan2(r[1]-q[1],Math.abs(r[0]-q[0])+.5),0,.26);
+ return[q[0],q[1],end?0:sn>0?tilt:Math.PI-tilt,al,q[2]?.86:1,q[2],end?(cs>0?2:1):0,end?1:Math.max(.5,Math.abs(sn))]}
+function carEnd(col,rear){shape(rectPts(-10,-12,20,12,3,.4),col,{lw:1.6});shape(rectPts(-7,-18,14,7,4,.3),col,{lw:1.4});ctx.fillStyle='#2a2a33';ctx.fillRect(-5,-16.6,10,4.2);ctx.fillStyle=INK;ctx.fillRect(-10,-1.6,5,3.2);ctx.fillRect(5,-1.6,5,3.2);
+ if(rear){dot(-6.5,-6,2.2,'#e0453a');dot(6.5,-6,2.2,'#e0453a');ctx.fillStyle='#fbf6ea';ctx.fillRect(-3,-5,6,2.6)}else{dot(-6,-7,2.8,'#fbf6ea');dot(6,-7,2.8,'#fbf6ea');dot(-6,-7,1.4,INK);dot(6,-7,1.4,INK);line(-3,-3,3,-3,INK,1.4)}}
+function drawCar(c){ctx.save();ctx.globalAlpha=c.al;ctx.translate(c.x,c.y);const z=c.z||1;ctx.scale(z,z);
+ if(c.vw){ctx.rotate(c.a||0);carEnd(c.c,c.vw===1)}else{if(Math.cos(c.a)<0){ctx.scale(-1,1);ctx.rotate(Math.PI-c.a)}else ctx.rotate(c.a);ctx.scale(c.sx||1,1);car(-13,0,c.c,1)}ctx.restore()}
 function drawRamp(s,ty,right){if(right)drawCork(s,ty);else drawFly(s,ty)}
 function drawFly(s,ty){const col=s.l2?'#3a3a40':'#4f7a5c',sd=s.l2?'#ffd23f':'#35573f',G=flyGeo(ty);
  [.3,.55,.8].forEach((t,i)=>{const m=flyMid(G,t);shape(rectPts(m[0]-9,m[1],18,GY-m[1],i+50,.5),col,{lw:2});shape(rectPts(m[0]-m[2]*.42,m[1]-2,m[2]*.84,12,i+53,.4),col,{lw:2});for(let y=m[1]+24;y<GY-26;y+=40)line(m[0]-6,y,m[0]+6,y+14,sd,2.2)});
