@@ -3,9 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.25</title>
+<title>Rewilder v0.26</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.25 | LAB | 2026-11-12
+<!-- TSP build: Rewilder v0.26 | LAB | 2026-11-12
+     v0.26 (founder: "You should be able to tag with any player on screen, not just the one you started
+     with. I’ll be playing salmon by the waterfall and can’t switch to beaver next to the tag sign.
+     Please fix."): a tap on the animal resting at the TAG sign makes the player that animal, there,
+     from the salmon as well as from land. The animal left behind walks home to the sign.
      v0.25 (founder: "In level 1 there’s still a key in the dam. Remove it. Also when the beaver goes to
      break the waterway for the salmon, the salmon is no longer there to switch to to complete the
      salmon mission. Make the salmon follow the player above ground. Also, let a swimming player on
@@ -389,7 +393,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.25</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.26</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -706,7 +710,7 @@ function startGame(){state='play';resetWorld();ac();musStart();document.body.cla
  toast('Smash the buildings. Cut low on one side and they fall.',11)}
 $('startBtn').onclick=startGame;
 cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');if(state==='vacation'){smashQ=true;return}if(state!=='play'&&!cardOpen&&!notesOpen&&!menuOpen)startGame();
- else if(state==='play'){const wx=e.clientX/S+cam.x,wy=(e.clientY-OY)/S+cam.y;if(Math.abs(wx-restX)<95&&wy>GY-160&&wy<GY+30&&canTag()&&restX===FRX)tagOut();else if(!swim&&Math.abs(wx-swimX())<95&&wy>GY-150&&wy<GY+80)dive(true);else if(swim&&swim.fish&&Math.abs(wx-P.x)<60&&wy>GY-130&&wy<GY+10)surface()}});
+ else if(state==='play'){const wx=e.clientX/S+cam.x,wy=(e.clientY-OY)/S+cam.y;if(Math.abs(wx-restX)<95&&wy>GY-160&&wy<GY+30&&restX===FRX&&!tireJam&&P.nap<=0&&!paused()&&(!swim||swim.fish)){if(swim)surface();tagSwap()}else if(!swim&&Math.abs(wx-swimX())<95&&wy>GY-150&&wy<GY+80)dive(true);else if(swim&&swim.fish&&Math.abs(wx-P.x)<60&&wy>GY-130&&wy<GY+10)surface()}});
 addEventListener('touchstart',()=>{if(!document.body.classList.contains('touch')){document.body.classList.add('touch');resize()}},{passive:true});
 if(matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
 
@@ -924,6 +928,8 @@ function zap(){P.energy=Math.max(0,P.energy-20);P.zap=.9;P.singe=2.4;P.dizzy=1.2
 function canTag(){return state==='play'&&!swim&&P.nap<=0&&!paused()&&!tireJam}
 function tagOut(){const e=P.energy;P.energy=rest.energy;rest.energy=e;who=who==='beaver'?'turtle':'beaver';P.dizzy=0;P.zap=0;P.cheer=.9;SFX.tag();word('TAG',P.x,P.y-175,'#ffd23f');dust(P.x,P.y,8,60);hudKey='';
  toast(who==='turtle'?'Mossback tags in. Rubble bounces off her shell.':'Big Gnaw tags back in.',5)}
+/* a tap on the resting animal: become it where it stands; the other one walks home */
+function tagSwap(){const ox=P.x;tagOut();Object.assign(P,{x:restX,y:GY,vx:0,vy:0,support:'ground',climb:null,slide:null,face:-1});P.px=P.x;restX=ox}
 function spawnBaron(){const x=P.x<WORLD/2?cam.x+viewW+220:cam.x-220;baron={x,y:GY-310,hp:baronHp,state:'fly',life:0,hold:0,drop:1.2,snag:0,snagged:[],jolt:0,t:0,tx:null,dir:1};SFX.blimp();word(pick(['BEHOLD: PARKING','PROGRESS','ALL MINE']),clamp(x,cam.x+90,cam.x+viewW-90),GY-250,'#ffd23f');
  toast('The Baron is coming. Smash his anchor '+baronHp+' times.',4)}
 function yank(){const b=baron;b.hp--;b.jolt=.5;b.hat=1.6;word(b.hp<=0?'I MEANT TO DO THAT':pick(['MY HAT','UNHAND MY BLIMP','I SAY']),b.x,b.y-70,'#fbf3dc');puff(b.x,b.y+24,{kind:'chunk',vx:(Math.random()-.5)*220,vy:-300,g:700,r:8,c:'#1b1328',life:1.5,max:1.5,vr:9});SFX.slam();hitstop=.06;stars(b.x,GY-110,6);word('YANK',b.x,GY-170,'#ffd23f');shake=RM?0:7;
@@ -1107,7 +1113,7 @@ function player(dt){if(swim){P.walk+=dt;swimStep(dt);return}
  P.sup=Math.min(1,P.sup+dt/10);$('smashBtn').classList.toggle('sup',P.sup>=1);if(P.sup>=1)once('sup','Super is full. Hold Smash, then let go.',6);
  if(slamQ){slamQ=false;smashQ=false;if(P.sup>=1){P.sup=0;hudKey='';strike(4)}else once('supwait','Super is still charging.',3.5)}
  else if(smashQ&&P.cool<=0)strike(1,K.u?'up':(K.l||K.r)?'fwd':'');smashQ=false;
- if(P.lunge>0)P.lunge-=dt;fishFollow(dt);if(!tireJam&&restX!==FRX){const dd=FRX-restX;restX+=Math.sign(dd)*Math.min(Math.abs(dd),170*dt)}const dir=(K.r?1:0)-(K.l?1:0);P.idle=(dir||K.u||K.d||P.punch>0||sHeld)?0:P.idle+dt;
+ if(P.lunge>0)P.lunge-=dt;fishFollow(dt);if(!tireJam&&restX!==FRX){const dd=FRX-restX;restX+=Math.sign(dd)*Math.min(Math.abs(dd),(Math.abs(restX-(swim?swim.x:P.x))>viewW*1.1?1400:170)*dt)}const dir=(K.r?1:0)-(K.l?1:0);P.idle=(dir||K.u||K.d||P.punch>0||sHeld)?0:P.idle+dt;
  if(P.climb){const s=P.climb;
   if(s.state!=='standing'){P.climb=null;P.support=null}
   else{if(dir)P.face=dir;const cc=colOf(s,P.x),cf=chestF(s),ck=cc>=0&&s.rows[cf]?s.rows[cf][cc]:null,ct=ck&&ck.hp>0?ck.t:'',sl=(who==='turtle'?.62:1)*(ct==='s'||ct==='k'?1.25:1);
