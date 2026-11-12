@@ -3,9 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.17</title>
+<title>Rewilder v0.18</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.17 | LAB | 2026-11-11
+<!-- TSP build: Rewilder v0.18 | LAB | 2026-11-11
+     v0.18 (founder: "When the beaver is under water the tail smashes things like a propellor. Make green
+     blocks 2/3 as hard to break. The salmon and river underground  shouldn’t be visible in game until
+     you break the dam."): the beaver's tail spins as a propeller underwater; on a strike the beaver turns tail-first and the blades hit.
+     Green highway steel has two thirds of its old strength. The buried river, its ladders, and the
+     salmon stay hidden until the dam first falls; from level 2 on they are known.
      v0.17 (founder: "There is way too much text in the game. Let’s get rid of what we don’t need, like
      the first two sentences of the intro. Also, put text at the very top of the game covering the
      dashboard and not gameplay"): about ninety messages were cut to one short line each, and fifteen
@@ -328,7 +333,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.17</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.18</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -505,12 +510,12 @@ const cam={x:0,y:0};
 const P={x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,walk:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,singe:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0,sup:0};
 const stats={hits:0,crews:0,paved:0,start:0,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0};
 let F={hard:4,soak:0,tn:0,tm:0,pn:0,pm:0,unmet:0,links:0,haze:true};
-let level=1,vacT=0,life=[],lifeT=14,lifeI=0,done=false,hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0,swim=null,bills=[],drones=[],fort=null,tdr=[],fishSave=null,run=null,REDX=3500,docks=[],junk=[],grate={x:0,hp:0,max:1},eels=[],walls=[],vb=null,vacEnd=0,DY=0;
+let level=1,vacT=0,life=[],lifeT=14,lifeI=0,done=false,hitstop=0,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0,swim=null,bills=[],drones=[],fort=null,tdr=[],riverOn=false,fishSave=null,run=null,REDX=3500,docks=[],junk=[],grate={x:0,hp:0,max:1},eels=[],walls=[],vb=null,vacEnd=0,DY=0;
 
-function buildSite(d,i){const rows=[];for(let f=0;f<d.floors;f++){const row=[];for(let c=0;c<d.cols;c++){let t=d.cell(c,f);if(KB[d.id]&&KB[d.id][0]===c&&KB[d.id][1]===f)t='k';const hp=t?HP[t]+(f<2&&t!=='k'&&d.floors>2?3:0)+(t!=='k'?(d.hpx||0):0):0;row.push(t?{t,hp,max:hp,seed:i*1000+f*17+c*3,stack:d.id==='coal'&&f>=7}:null)}
+function buildSite(d,i){const rows=[];for(let f=0;f<d.floors;f++){const row=[];for(let c=0;c<d.cols;c++){let t=d.cell(c,f);if(KB[d.id]&&KB[d.id][0]===c&&KB[d.id][1]===f)t='k';const hp=t?Math.max(1,Math.round((HP[t]+(f<2&&t!=='k'&&d.floors>2?3:0)+(t!=='k'?(d.hpx||0):0))*(t==='s'?2/3:1))):0;row.push(t?{t,hp,max:hp,seed:i*1000+f*17+c*3,stack:d.id==='coal'&&f>=7}:null)}
   row.stack=d.id==='coal'&&f>=7;row.deck=d.id==='highway'&&f===4;rows.push(row)}
  return {...d,i,w:d.cols*d.cw,cx:d.x+d.cols*d.cw/2,rows,state:'standing',g:0,t:0,paved:false,saved:0,seed:i*97+13,sprigT:6+i,choice:null,lift:null,liftT:10,dmgd:false,chainT:0,jet:null,jetT:5,why:[],sway:0,cars:d.id==='highway'?[0,1,2,3,4,5,6].map(i=>({u:i*197,x:d.x,y:0,a:0,al:1,on:false,c:CARC[i%5],dead:0,v:30+hr(i)*16})):[],rL:true,rR:true,trolley:d.id==='highway'?{x:d.x+60,dir:1}:null}}
-function resetWorld(){level=1;sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];crates=[];pits=[];swim=null;fishSave=null;run=newRun(1);bills=[];drones=[];waterInit();notes.clear();told.clear();
+function resetWorld(){level=1;riverOn=false;sites=SITE_DEF.map(buildSite);trucks=[];parts=[];sprigs=[];props=[];words=[];crates=[];pits=[];swim=null;fishSave=null;run=newRun(1);bills=[];drones=[];waterInit();notes.clear();told.clear();
  Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,singe:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0,sup:0});level=1;vacT=0;life=[];lifeT=14;lifeI=0;done=false;baron=null;baronT=40;baronHp=3;barrels=[];tar=[];who='beaver';rest={energy:100};
  folk=[0,1,2,3,4,5].map(i=>({x:560+i*290+hr(i)*120,dir:i%2?1:-1,v:i%2?70+hr(i)*30:24+hr(i)*14,bike:i%2===1,c:['#c8342b','#3b6ea8','#e8c25a','#7a1a12','#2f8f8a','#b06ad0'][i],hop:0,seed:i}));
  Object.assign(stats,{hits:0,crews:0,paved:0,start:T,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0,junk:0});
@@ -892,13 +897,13 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return
   if(sed.x<-100){sed=null;beach=.01}}
  if(beach>0&&beach<1)beach=Math.min(1,beach+dt/8);
  bills.forEach(b=>{if(b.hp<=0)b.t+=dt;if(b.jolt>0)b.jolt-=dt});dronesStep(dt);
- if(!swim&&!told.has('swimsign')&&stats.hits>4&&toastT<=0)once('swimsign','Tap the salmon at the SWIM sign to become it.',8);
- if(!swim&&!told.has('river')&&stats.hits>12&&toastT<=0&&canSwim())once('river','Blue ladders lead down to a buried river.',8);
+ if(riverOn&&!swim&&!told.has('swimsign')&&toastT<=0)once('swimsign','Tap the salmon at the SWIM sign to become it.',8);
+ if(riverOn&&!swim&&!told.has('river')&&told.has('swimsign')&&toastT<=0)once('river','Blue ladders lead down to a buried river.',8);
  walls.forEach(wl=>{if(!wl.up)wl.t+=dt});if(fort)fortStep(dt);
  sites.forEach(s=>{if(s.tinkT>0){s.tinkT-=dt;if(s.tinkT<=0){const ty=GY-s.rows.length*s.fh;puff(s.cx+s.w*.2,ty,{kind:'chunk',vx:20,vy:-40,g:700,r:5,c:'#b3ada2',life:1.4,max:1.4,vr:6});word('tink',s.cx+s.w*.2,ty-30,'#fbf3dc');SFX.clang()}}
   if(s.garyT>0)s.garyT-=dt;
   if(s.was&&s.was!==s.state){if((s.was==='collapsing'||s.was==='toppling')&&s.state!=='standing'){word(pick(['hm.','Tidy.','Oops.','That will do.','Huh.']),P.x,P.y-170,'#fbf3dc');s.garyT=6;
-     if(s.id==='dam')once('story2','The river reaches the sea again.',6)}
+     if(s.id==='dam'&&!riverOn){riverOn=true;SFX.grow()}once('story2','The river reaches the sea again.',6)}
    if(s.state==='grown'&&level===1)once('story1','',5)}
   s.was=s.state});
  if(baron)baronStep(dt);else if(sites.some(s=>s.state==='growing'||s.state==='grown')){baronT-=dt;if(baronT<=0)spawnBaron()}
@@ -1060,9 +1065,9 @@ function l2up(s){return !!s.l2&&(s.state==='standing'||s.state==='toppling'||s.s
 function dys(){if(level<2)return 0;let n=0;sites.forEach(s=>{if(l2up(s))n++});return n/sites.length}
 function riverFree(){const d=sites[4];return !(d.state==='standing'&&!d.paved)&&d.state!=='collapsing'&&d.state!=='toppling'}
 function waterOpen(x){return !sites.some(s=>(s.state==='standing'||s.state==='toppling'||s.state==='collapsing')&&x>s.x-4&&x<s.x+s.w+4)}
-function canSwim(){return state==='play'&&!swim&&P.support==='ground'&&P.nap<=0&&!paused()&&waterOpen(P.x)}
+function canSwim(){return riverOn&&state==='play'&&!swim&&P.support==='ground'&&P.nap<=0&&!paused()&&waterOpen(P.x)}
 function swimX(){return 130}
-function nearDock(x){return docks.some(d=>Math.abs(d-x)<32)}
+function nearDock(x){return riverOn&&docks.some(d=>Math.abs(d-x)<32)}
 function newRun(gen){return{gen,fed:0,mated:false,phase:'adult',t:0,age:1,dance:0,fedBank:false,body:null,laid:false,kids:[],nymph:[],krill:[0,1,2,3,4,5].map(i=>({x:OC0+260+i*150+hr(i+gen)*70,y:WT+70+hr(i+3+gen)*250,on:true}))}}
 function damUp(){const d=sites[4];return d.state==='standing'||d.state==='toppling'||d.state==='collapsing'}
 function fallX(){return sites[4].x+sites[4].w+10}
@@ -1081,7 +1086,7 @@ function waterInit(){junk=[];for(let i=0;i<7;i++)junk.push({x:360+i*330+hr(i+lev
 function swimToggle(){dive(false)}
 function jumpLevel(n){setMenu(false);startGame();if(n>1){sites.forEach(s=>{s.rows=[];s.state='grown';s.g=1;s.choice=PICK[s.id][0];s.was='grown'});level=n-1;startLevel()}}
 function dive(fish){if(swim){surface();return}
- if(fish){if(!(state==='play'&&P.nap<=0&&!paused()))return;swim=fishSave||{fish:true,x:swimX(),y:WT+40,face:-1,carry:false,air:1,leap:0,t:0,hitT:0,reg:0,fly:false,vx:0,vy:0,spin:0};fishSave=null;
+ if(fish){if(!(riverOn&&state==='play'&&P.nap<=0&&!paused()))return;swim=fishSave||{fish:true,x:swimX(),y:WT+40,face:-1,carry:false,air:1,leap:0,t:0,hitT:0,reg:0,fly:false,vx:0,vy:0,spin:0};fishSave=null;
   once('fish','You are the salmon. Swim left to the sea.',9)}
  else{if(!canSwim()||!nearDock(P.x))return;if(level>1)told.add('dive2');swim={fish:false,x:P.x,y:WT+26,face:P.face||1,carry:false,air:1,leap:0,t:0,hitT:0};
   once('dive','Watch your air. At the surface, Up climbs out.',9)}
@@ -1138,7 +1143,7 @@ function salmonLife(w,dt){
   toast('The eggs hatch. You are one of the young.',9)}}
 function fishAct(w){if(w.reg===3&&w.carry&&Math.abs(w.x-REDX)<90){w.carry=false;run.laid=true;run.phase='dying';run.t=0;SFX.pick();word('EGGS LAID',REDX,regs()[3].top-30,'#f08a3c');toast('A salmon spawns once, and then it dies.',6);return}
  w.spin=.5;SFX.pop();if(w.carry)once('carryhint','Your eggs belong in the pond, far right.',5);else if(run.phase==='adult')once('seahint','The sea lies at the far left.',5)}
-function waterStrike(w){const rx=w.x+w.face*36,pw=who==='turtle'?2:1,bub=(x,y)=>{for(let i=0;i<6;i++)puff(x,y,{kind:'dust',vx:(Math.random()-.5)*70,vy:-40-Math.random()*70,g:-60,r:3+Math.random()*4,c:'#eaf8ff',life:.9,max:.9})};w.punch=.18;
+function waterStrike(w){const rx=w.x+w.face*36,pw=2,bub=(x,y)=>{for(let i=0;i<6;i++)puff(x,y,{kind:'dust',vx:(Math.random()-.5)*70,vy:-40-Math.random()*70,g:-60,r:3+Math.random()*4,c:'#eaf8ff',life:.9,max:.9})};w.punch=.18;w.prop=.42;
  const g=sites[0];if(grate.hp>0&&g.state==='standing'&&Math.abs(grate.x-rx)<54){grate.hp-=pw;SFX.clang();bub(grate.x,w.y);if(grate.hp<=0){grate.hp=0;SFX.collapse();word('OPEN',grate.x,w.y-60,'#9fd8ee');once('grateopen','The culvert is open.',5)}return}
  for(const s of sites){if(!s.foot)continue;const f=s.foot.find(f=>f.hp>0&&Math.abs(f.x-rx)<46&&w.y<WT+130);if(!f)continue;f.hp-=pw;SFX.hit();bub(f.x,w.y);s.sway=2;
   if(f.hp<=0){f.hp=0;SFX.crunch();word('CRACK',f.x,w.y-60,'#ffd23f');if(!s.foot.some(q=>q.hp>0)){s.foot=null;s.arm=false;if(s.state==='standing'){topple(s,1);once('sink','',6)}}}return}
@@ -1156,7 +1161,11 @@ function drawSalmon(w){w=w||swim;const u=w.leap>0?1-w.leap/.6:0,lp=w.leap>0?Math
  if(w.carry)[[-6,8],[0,10],[6,9],[-2,5],[4,5]].forEach(q=>{dot(q[0],q[1]+2,3.4,'#f08a3c');dot(q[0]-1,q[1]+1,1.1,'#ffd9a8')});
  ctx.restore()}
 function drawSwimmer(){const w=swim;if(w.fish){const fry=run.phase==='fry';drawSalmon(Object.assign({},w,{leap:0,z:fry?.42+.58*run.age:1,dead:run.phase==='dying'}));return}
- const sv=Object.assign({},P);ctx.save();ctx.translate(w.x,w.y);ctx.rotate(w.face*1.12+Math.sin(T*6)*.07);if(w.hitT>0&&Math.sin(T*40)>0)ctx.globalAlpha=.5;
+ if(w.prop>0)w.prop-=1/60;const bv=who!=='turtle',whip=bv&&w.prop>0?Math.sin((1-w.prop/.42)*3.1416)*3.1416*w.face:0;
+ if(bv){const tx=w.x-w.face*46,ty=w.y+8,sp=T*(w.prop>0?46:16);ctx.save();ctx.translate(w.x,w.y);ctx.rotate(whip);ctx.translate(tx-w.x,ty-w.y);if(w.prop>0){ctx.scale(1.55,1.55);ctx.globalAlpha=.3;dot(0,0,27,'#dff1f7');ctx.globalAlpha=1}for(let k=0;k<3;k++){ctx.save();ctx.rotate(sp+k*2.094);shape([[0,-3],[9,-7],[24,-4],[26,0],[24,4],[9,7],[0,3]],'#5b3a24',{lw:1.6});line(6,0,22,0,'#3d2616',1.2);ctx.restore()}dot(0,0,4.5,'#3d2616');ctx.restore();
+  for(let k=0;k<4;k++){const a=(T*1.8+k*.25)%1;ctx.globalAlpha=(1-a)*.8;ctx.strokeStyle='#eaf8ff';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(tx-w.face*a*46,ty+Math.sin(T*5+k)*8,2+k,0,7);ctx.stroke()}ctx.globalAlpha=1;
+  if(w.prop>0){ctx.globalAlpha=.5*w.prop/.42;ctx.strokeStyle='#eaf8ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(w.x,w.y,52,0,7);ctx.stroke();ctx.globalAlpha=1}}
+ const sv=Object.assign({},P);ctx.save();ctx.translate(w.x,w.y);ctx.rotate(whip+w.face*1.12+Math.sin(T*6)*.07);if(w.hitT>0&&Math.sin(T*40)>0)ctx.globalAlpha=.5;
  Object.assign(P,{x:0,y:42,face:w.face,vx:0,vy:0,climb:null,support:'ground',punch:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,nap:0});drawHero();ctx.restore();ctx.globalAlpha=1;Object.assign(P,sv);
  for(let i=0;i<3;i++){const a=(T*.9+i*.33)%1;ctx.globalAlpha=1-a;ctx.strokeStyle='#eaf8ff';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(w.x+w.face*30+Math.sin(T*3+i)*5,w.y-10-a*60,3+i,0,7);ctx.stroke()}ctx.globalAlpha=1;
  for(let i=0;i<5;i++){const on=w.air>i/5;ctx.beginPath();ctx.arc(w.x-28+i*14,w.y-74,5,0,7);ctx.fillStyle=on?(w.air<.3?'#ff8a7a':'#eaf8ff'):'rgba(18,12,30,.6)';ctx.fill();ctx.strokeStyle=INK;ctx.lineWidth=1.6;ctx.stroke()}}
@@ -1370,7 +1379,7 @@ function drawOil(D){setWorld(.5);const base=cam.y*.5*.4+396,x0=cam.x*.5-80;ctx.g
   else{shape(rectPts(x-9,base-120,18,120,i+3,.5),'#16111c',{lw:1.6});for(let k=0;k<5;k++)shape(blobPts(x+k*10+Math.sin(T*.8+k+i)*6,base-132-k*26,14+k*7,10+k*5,i+k,9),'#2a2230',{lw:1})}}
  ctx.globalAlpha=1;setWorld(1)}
 function beginVacation(){state='vacation';vacT=0;vacEnd=0;swim=null;upQ=smashQ=false;K.u=0;$('swimBtn').classList.remove('can');$('tagBtn').classList.remove('can');vb={x:268,y:548,vx:0,vy:0,rot:0,n:0,best:0,hop:0,hopT:0,kind:[0,0,1,2][(level-1)%4],sal:(level-1)%4===1,toSea:false,side:0,sl:0,st:null,fw:[]};setLens(false);K.l=K.r=K.u=K.d=0;$('toast').classList.remove('on');toastT=0;SFX.grow()}
-function startLevel(){level++;sites=sites.map(o=>{const d=Object.assign({},SITE_DEF[o.i],L2[o.id]);if(o.id==='garage'||o.id==='dam')d.floors=Math.min(13,d.floors+level-2);if(o.id==='garage'&&level>=3){d.floors=Math.min(48,36+(level-3)*6);d.name='fortress'}d.hpx=Math.min(3,level-2);const s=buildSite(d,o.i);s.choice=o.choice;s.fed=o.fed;s.restore=true;s.l2=true;return s});
+function startLevel(){level++;riverOn=true;sites=sites.map(o=>{const d=Object.assign({},SITE_DEF[o.i],L2[o.id]);if(o.id==='garage'||o.id==='dam')d.floors=Math.min(13,d.floors+level-2);if(o.id==='garage'&&level>=3){d.floors=Math.min(48,36+(level-3)*6);d.name='fortress'}d.hpx=Math.min(3,level-2);const s=buildSite(d,o.i);s.choice=o.choice;s.fed=o.fed;s.restore=true;s.l2=true;return s});
  swim=null;waterInit();bills=[0,1,2,3].map(i=>{const a=sites[i],b=sites[i+1];return{x:(a.x+a.w+(a.id==='highway'?300:0)+b.x)/2-10,hp:1+level,t:0,jolt:0,i,msg:['TAR-RIFIC','LOT TO LOVE','PAVE DAY','ROAD RULES'][i]}});drones=[];bills.forEach((b,i)=>{for(let q=0;q<(level>=3?2:1);q++)drones.push({b,x:b.x,y:GY-240,ph:i*1.7+q*3.1,spot:0,dead:0})});if(level>=3)bills.forEach((b,i)=>drones.push({b,x:b.x,y:GY-300,ph:i*2.3+1,spot:0,dead:0,wide:520}));
  trucks=[];props=[];crates=[];pits=[];life=[];barrels=[];tar=[];words=[];baron=null;baronT=Math.max(8,26-level*4);baronHp=Math.min(8,2+level);done=false;sed=null;rain=0;stormT=26;crewT=14;
  Object.assign(P,{x:WORLD-130,y:GY,vx:0,vy:0,face:-1,support:'ground',climb:null,slide:null,dive:false,nap:0,energy:100,sup:0});rest.energy=100;stats.start=T;state='play';hudKey='';cam.x=WORLD;
@@ -1434,12 +1443,12 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(sv>=2&&D>0)drawOil(D);
  ctx.fillStyle=mix('#5a4632','#6b4a30',clear);ctx.fillRect(cam.x-50,GY,viewW+100,1400);drawSoil(clear);
  const full=!damUp&&dam.state!=='collapsing',sh=RD,sx0=full?cam.x-60:Math.max(cam.x-60,-60),sx1=full?cam.x+viewW+60:dam.x+20;
- ctx.fillStyle=mix(full?'#3f8fb6':'#56707a',sv>=2?'#17121c':'#4a3a52',D*.9);ctx.fillRect(sx0,GY+24,Math.max(0,Math.min(sx1,cam.x+viewW+60)-sx0),sh);
+ ctx.fillStyle=mix(full?'#3f8fb6':'#56707a',sv>=2?'#17121c':'#4a3a52',D*.9);if(riverOn)ctx.fillRect(sx0,GY+24,Math.max(0,Math.min(sx1,cam.x+viewW+60)-sx0),sh);
  if(full)for(let i=0;i<14;i++){const xx=cam.x+((i*97-T*60)%(viewW+100)+viewW+100)%(viewW+100)-50;line(xx,GY+29,xx+18,GY+29,'rgba(255,255,255,.5)',2)}
  if(full&&D===0){for(let x=Math.floor((cam.x-60)/260)*260;x<cam.x+viewW+60;x+=260){const px=x+hr(x*.11)*180;if(hr(x*.07)<.6){shape(ellPts(px,GY+27,11,4,x),'#4c9a4a',{lw:1.2});if(hr(x*.05)<.5)dot(px+3,GY+24,3,'#f3b6c8')}}
   }
  if(D>.2){for(let i=0;i<5;i++){const ox=cam.x+((i*210-T*14)%(viewW+100)+viewW+100)%(viewW+100)-50;if(ox<sx1)line(ox,GY+26,ox+26,GY+26,'#8a6aa8',2)}}
- drawWater(clear,full);
+ if(riverOn)drawWater(clear,full);
  if(sed){shape(blobPts(sed.x,GY+26,90,20,3,12),'#8a6a48',{lw:2})}
  const gar=sites[0];if(gar.state==='standing'&&!gar.paved){shape(rectPts(gar.x-30,GY+16,gar.w+60,28,7),'#3b3a3d');for(let i=0;i<7;i++)line(gar.x-20+i*45,GY+18,gar.x-20+i*45,GY+42,'#232227',3)}
  shape(rectPts(Math.max(cam.x-60,-30),GY-6,cam.x+viewW+60-Math.max(cam.x-60,-30),10,3,1.6),mix(mix('#7a6a4a','#4c7a3a',clear),'#2b2a33',D),{lw:2});
@@ -1450,7 +1459,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  sites.forEach(drawSite);
  drawTowerDrones();
  sites.forEach(s=>{if(s.garyT>0){const u=1-s.garyT/6,gx=s.cx-30+u*120;ctx.globalAlpha=Math.min(1,s.garyT*2,u*8);gary(gx,GY-4,1.25,1);ctx.globalAlpha=1;if(u>.12&&u<.5)paperText('Morning.',gx,GY-66,20,'#fbf3dc',0)}});
- docks.forEach((d,i)=>{if(d<cam.x-80||d>cam.x+viewW+80)return;const on=state==='play'&&!swim&&nearDock(P.x)&&Math.abs(P.x-d)<36;
+ docks.forEach((d,i)=>{if(!riverOn||d<cam.x-80||d>cam.x+viewW+80)return;const on=state==='play'&&!swim&&nearDock(P.x)&&Math.abs(P.x-d)<36;
   ctx.fillStyle=mix('#3f8fb6','#4a3a52',DY*.9);ctx.fillRect(d-26,GY-7,52,32);shape(rectPts(d-30,GY-9,8,34,i+3,.4),'#8a6a48',{lw:1.8});shape(rectPts(d+22,GY-9,8,34,i+4,.4),'#8a6a48',{lw:1.8});
   for(let q=0;q<3;q++)line(d-22,GY-2+q*9,d+22,GY-2+q*9,'#c9a26a',3.4);line(d-12,GY+3+Math.sin(T*3+i)*1.5,d+12,GY+3+Math.sin(T*3+i)*1.5,'rgba(255,255,255,.7)',2);
   line(d+34,GY,d+34,GY-74,'#5b3a24',4);shape(rectPts(d+4,GY-104,62,32,i+9,.6),'#1f5f86',{lw:2.2,sh:1,st:on?'#ffd23f':'#eaf8ff'});paperText('DIVE',d+35,GY-87,20,'#eaf8ff',0);
@@ -1473,7 +1482,7 @@ function render(){if(state==='vacation'){drawVacation();return}
   if(state!=='title'){drawHero();line(FRX-104,GY,FRX-104,GY-92,'#5b3a24',4);shape(rectPts(FRX-137,GY-126,66,36,4,.7),'#1b1328',{lw:2.2,sh:1,st:'#ffd23f'});paperText('TAG',FRX-104,GY-107,22,'#ffd23f',0)}
   who=w0;Object.assign(P,sv)}
  if(state==='play'&&P.y>GY-12&&sites.some(q=>q.state==='grown'&&['river','free','wet','rain'].includes(q.choice)))for(let i=1;i<=3;i++){const tx=trail[trail.length-1-i*13];if(tx!==undefined)duck(tx,GY-9-Math.abs(Math.sin(T*9+i))*3,i+20,P.face)}
- if(state==='play'&&!(swim&&swim.fish)){const q=swimX();line(q+62,GY,q+62,GY-92,'#5b3a24',4);shape(rectPts(q+22,GY-126,80,36,5,.7),'#1b1328',{lw:2.2,sh:1,st:'#9fd8ee'});paperText('SWIM',q+62,GY-107,22,'#9fd8ee',0);const ph=T%2.2;if(!fishSave)drawSalmon({x:q,face:-1,carry:false,leap:ph<.6?.6-ph:0})}
+ if(riverOn&&state==='play'&&!(swim&&swim.fish)){const q=swimX();line(q+62,GY,q+62,GY-92,'#5b3a24',4);shape(rectPts(q+22,GY-126,80,36,5,.7),'#1b1328',{lw:2.2,sh:1,st:'#9fd8ee'});paperText('SWIM',q+62,GY-107,22,'#9fd8ee',0);const ph=T%2.2;if(!fishSave)drawSalmon({x:q,face:-1,carry:false,leap:ph<.6?.6-ph:0})}
  {const hh=clamp((GY-P.y)/300,0,1);if(state!=='title'||P.y<=GY){ctx.globalAlpha=.3*(1-hh*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(P.x,GY-1,24*(1-hh*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1}}
  if(!swim||swim.fish)drawHero();if(swim)drawSwimmer();
  parts.forEach(drawPart);
