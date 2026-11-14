@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Signal Rider v0.21</title>
+<title>Signal Rider v0.22</title>
 <meta name="spec-source" content="claude/SPEC-DOWN-THE-NERVE-v0.8-AUDIO-2026-11-06.md">
 <meta name="audience" content="Founder playtest first. Audience ruling D4 still open (12 and up, mapped to OpenStax, recommended). Lab build.">
 <!-- tsp:source claude/SPEC-DOWN-THE-NERVE-2026-11-05.md; convening/DOWN-THE-NERVE-CONVENING.md (D12 Brainbow, S.T.U.N. Runner feel); Tight Spiral Studios -->
@@ -52,6 +52,8 @@ a{color:#9cc8f2}
 .wk.red[aria-pressed=true]{border-color:#ff4fa3}.wk.grn[aria-pressed=true]{border-color:#6dff8a}
 #preview{width:150px;height:96px}
 #effect{top:calc(62px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);width:max-content;max-width:92vw;display:none;border-radius:14px;padding:8px 16px;font-weight:800;font-size:22px;border:3px solid var(--inkfill);text-align:center}
+#passed{width:max-content;max-width:92vw;display:none;border-radius:14px;padding:6px 14px;font-weight:700;font-size:20px;background:#0d1220;border:2px solid #8f9bb0;color:#eef2f6;text-align:center}
+#passed b{color:#ffd1ec}#passed b.g{color:#b9ffc9}
 #effect.bad{background:#3a1420}#effect.good{background:#12341f}
 #effect small{display:block;font-size:18px;font-weight:600}
 #steerHint{position:fixed;left:50%;transform:translateX(-50%);top:70%;min-height:48px;padding:0 18px;font-size:20px;white-space:nowrap;display:none}
@@ -81,7 +83,7 @@ a{color:#9cc8f2}
 
 <header id="bar" class="ui">
   <a class="btn" id="bStudio" href="https://walshero.github.io/TIGHT-SPIRAL-STUDIOS/lab/" aria-label="Studio home">Studio</a>
-  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.21</span><span class="chip tsp-labchip">LAB</span></span>
+  <span class="title"><span class="name">Signal Rider</span><span class="chip">v0.22</span><span class="chip tsp-labchip">LAB</span></span>
   <button class="btn" id="bMute" type="button" aria-label="Sound on. Tap to mute." style="min-width:48px;padding:0 10px"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z" fill="#eef2f6"/><path id="muteWave" d="M15 8c2 2 2 6 0 8M18 5c4 4 4 10 0 14" stroke="#eef2f6" stroke-width="2" fill="none"/><path id="muteX" d="M15 9l6 6M21 9l-6 6" stroke="#eef2f6" stroke-width="2.4" style="display:none"/></svg></button>
   <button class="btn" id="bMenu" type="button" aria-haspopup="dialog">Menu</button>
 </header>
@@ -89,6 +91,7 @@ a{color:#9cc8f2}
 <div id="inset" class="ui" aria-live="polite"><div class="disc" id="insetPic"></div><div class="cap" id="insetCap"></div></div>
 <div id="msgs"><div id="toast" class="ui" role="status" aria-live="polite"></div>
 <div id="effect" class="ui" role="status" aria-live="assertive"></div>
+<div id="passed" class="ui" role="status" aria-live="polite"></div>
 <button id="steerHint" class="btn primary ui" type="button">Hold the left or right side to steer</button></div>
 <div id="replay" class="ui" role="region" aria-label="Checkpoint replay"><div class="rtag">REPLAY</div><p id="replayCap" aria-live="polite"></p><button class="btn" id="bSkipReplay" type="button">Skip replay</button></div>
 
@@ -110,7 +113,7 @@ a{color:#9cc8f2}
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M3 5 l23 -2 l2 23 l-24 2 z" fill="#ff4fa3" stroke="#eef2f6" stroke-width="2"/></svg>Pink cubes are load from your week: they slow you and widen the frayed bands, but load never ends the ride. Hits come from frayed bands and gaps that do not fire. Three hits and the signal fades.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="2" width="26" height="26" rx="9" fill="#6dff8a" stroke="#eef2f6" stroke-width="2"/></svg>Greens: steer into them for a speed surge, and the frayed bands get narrower. Greens in a row surge harder.</div>
     <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="11" fill="none" stroke="#ffd23f" stroke-width="3"/><circle cx="15" cy="15" r="6" fill="none" stroke="#ffd23f" stroke-width="3"/></svg>Yellow double rings are checkpoints.</div>
-    <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="5" fill="#ffffff"/><circle cx="15" cy="15" r="11" fill="none" stroke="#ffffff" stroke-width="2.5"/></svg>At each gap, match the shape: steer onto the spine with the shape in the center before its ring closes. The next shape waits beside it. Two good landings fire the next neuron. Too few and it costs a hit.</div>
+    <div><svg viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="5" fill="#ffffff"/><circle cx="15" cy="15" r="11" fill="none" stroke="#ffffff" stroke-width="2.5"/></svg>At each gap, match the shape: steer onto the spine with the shape in the center before its ring closes. The next shape waits beside it. Three good landings fire the next neuron. Too few and it costs a hit.</div>
   </div>
   </details>
 </div>
@@ -303,7 +306,7 @@ function effect(good,title,icon){
     e.className='ui good';e.innerHTML=ic+title;forestReact(true);var ch=(tAll-(run.lastGoodAt||-9)<3.5)?(run.chain||0)+1:0;run.chain=ch;run.lastGoodAt=tAll;run.floatTxt=ch?'chain x'+(ch+1):'+ clear path';sfxGood(ch);musGood();run.surgeT=2.0;run.surgeMul=Math.min(1.7,SURGE+0.1*ch);run.v*=1.15;run.boostT=Math.max(run.boostT,0.35);}
   else{run.bandT=Math.min(BANDMAX,run.bandT+0.32);run.v=Math.max(1.5*S.speed,run.v*0.45);run.slowT=0.9;run.flash=0.6;run.flashCol='#ff4fa3';
     e.className='ui bad';e.innerHTML=ic+title;forestReact(false);run.lastBadAt=tAll;run.floatTxt='- speed';sfxBad();}
-  run.bandPulse=1;run.floatT=1.2;e.style.display='block';effectT=2.2;
+  run.bandPulse=1;run.floatT=1.2;e.style.display='block';effectT=2.2;passedT=0;document.getElementById('passed').style.display='none';
   if(!run.said)run.said={};if(!run.said[title]){run.said[title]=1;callout(spoken(title));}logEvent(good,title);
 }
 var effectT=0;
@@ -340,6 +343,16 @@ function buildWarmup(){buildRun(null);run.warm=true;feats=[];checkpoints=[];run.
   pickups=[{s:30,a:Math.PI/2,good:true,hit:false,card:gc,warm:'Supports narrow the frayed bands.'},{s:52,a:Math.PI/2,good:false,hit:false,card:rc,warm:'Stress widens the frayed bands.'}];
   run.warmEnd=76;}
 function endWarmup(){warmDone=true;var fi=run.firstInput;run.warm=false;speak('Now load a week.',false);buildRun(null);run.firstInput=fi;openTray();}
+var passedT=0;
+function nameMissed(){ // v0.22: a group that goes by unhit is still named, so every block teaches
+  if(!run.named)run.named={};var G={};
+  pickups.forEach(function(p){if(p.grp===undefined||run.named[p.grp]||p.s>run.s+0.5||p.s<run.s-30)return;(G[p.grp]=G[p.grp]||[]).push(p);});
+  Object.keys(G).forEach(function(k){var ps=pickups.filter(function(p){return p.grp==k;});if(ps.some(function(p){return p.s>run.s-0.4;}))return;
+    run.named[k]=1;if(run.grpHit&&run.grpHit[k])return;var miss=ps.filter(function(p){return !p.hit;});if(!miss.length)return;
+    var good=miss[0].good,labs=[];miss.forEach(function(p){if(labs.indexOf(p.card.label)<0)labs.push(p.card.label);});
+    var el=document.getElementById('passed');el.innerHTML=(good?'Missed: ':'Dodged: ')+labs.map(function(l){return '<b class="'+(good?'g':'')+'">'+l+'</b>';}).join(', ');el.style.display='block';passedT=2.4;
+    if(!run.said)run.said={};var fresh=miss.filter(function(p){return !run.said[p.card.cap];});
+    if(fresh.length){fresh.forEach(function(p){run.said[p.card.cap]=1;});speak((good?'Missed ':'Dodged ')+fresh.map(function(p){return p.card.label;}).join(', '),true);}});}
 function addLoad(title,icon){run.load=(run.load||0)+1;run.lastBadAt=tAll;run.assist=Math.max(0.72,(run.assist||1)-0.06);effect(false,title,icon);drawHits();}
 function hit(title,icon){
   run.lastHit='band';run.lastBadAt=tAll;run.frayT=1.2;run.hits++;run.assist=Math.max(0.72,(run.assist||1)-0.1);drawHits();effect(false,title,icon);
@@ -789,17 +802,16 @@ var BURST=[],RING=null,BEAT=1.0;
 function startLanding(sy){
   BEAT=[1.1,1.0,0.95,0.9][run.leg]||0.9;musLandStart();MUS.mi=0;
   if(!sy.rshape){var sh=SHAPES.slice();for(var q=sh.length-1;q>0;q--){var j=Math.floor(Math.random()*(q+1));var t=sh[q];sh[q]=sh[j];sh[j]=t;}sy.rshape=sy.pads.map(function(p,i){return sh[i%sh.length];});}
-  var beats=sy.practice?2:sy.last?(sy.stressed?6:4):3;
-  run.lm={t:0,k:0,beats:beats,max:sy.practice?3:sy.last?(sy.stressed?8:6):5,tgt:reachPick(sy.pads,run.theta,true),a0:run.s,hits:0};
+  var beats=sy.practice?2:sy.last?(sy.stressed?6:4):4;
+  run.lm={t:0,k:0,beats:beats,max:sy.practice?3:sy.last?(sy.stressed?8:6):6,tgt:reachPick(sy.pads,run.theta,true),a0:run.s,hits:0};
   RING={fill:sy.last?Math.min(1,sy.fill/sy.need):0,t:0,col:'#ff4fa3',hold:true};sfxSlowIn();run.lm.nxt=nextTarget(sy,run.lm.tgt);
 }
 function layPads(sy){var n=sy.pads.length,b=sy.base;if(b===null)return;if(n===2){sy.pads=[b-0.7,b+0.95];return;}for(var p=0;p<n;p++)sy.pads[p]=b-1.2+p*2.4/(n-1);}
-function reachPick(pads,from,skip){var reach=2.7*BEAT*0.92,ok=pads.filter(function(p){var d=Math.abs(angDiff(p,from));return d<=reach&&!(skip&&d<0.05);});
+function reachPick(pads,from,skip){var reach=2.7*BEAT*0.6,ok=pads.filter(function(p){var d=Math.abs(angDiff(p,from));return d<=reach&&!(skip&&d<0.05);});
   if(!ok.length){var near=pads.slice().sort(function(a,b){return Math.abs(angDiff(a,from))-Math.abs(angDiff(b,from));});if(skip){var far=near[1];if(far!==undefined&&run.lm&&run.lm.k%3===0&&Math.abs(angDiff(far,from))<=2.7*BEAT)return far;} return near[0];} // nothing in easy reach: hold, and every third beat jump if a full beat can cover it
   if(Math.random()<0.6){ok.sort(function(a,b){return Math.abs(angDiff(b,from))-Math.abs(angDiff(a,from));});return ok[0];}
   return ok[Math.floor(Math.random()*ok.length)];}
 function nextTarget(sy,from){from=from===undefined?run.theta:from;if(sy.pads.length<2)return sy.pads[0];
-  if(sy.stressed&&Math.random()<0.6){var far=sy.pads.filter(function(p){return Math.abs(angDiff(p,from))>0.05;}).sort(function(a,b){return Math.abs(angDiff(b,run.alarm))-Math.abs(angDiff(a,run.alarm));})[0];if(far!==undefined)return far;}
   return reachPick(sy.pads,from,true);
   var pads=sy.pads,cur=run.lm.tgt,best=null,bd=9;
   pads.forEach(function(p){var d=Math.abs(angDiff(p,cur));if(d>0.05&&d<bd){bd=d;best=p;}});
@@ -826,7 +838,7 @@ function landingBeat(sy){
   if(onAlarm&&sy.stressed){sy.afill++;sfxBeat(-1);if(sy.afill>=2){endLanding();RING={fill:1,t:0,col:'#ff4f7a'};sy.done=true;alarmFinish();return;}}
   else if(full||half){var add=(full?1:0.5)*(sy.last?sy.w:1);sy.fill+=add;lm.hits+=full?1:0.5;if(!musMatch(full))sfxBeat(sy.last?Math.min(1,sy.fill/sy.need):1);}
   else sfxBeat(0);
-  var done=sy.last?sy.fill>=sy.need:lm.hits>=(sy.practice?1:2);
+  var done=sy.last?sy.fill>=sy.need:lm.hits>=(sy.practice?1:3);
   if(RING)RING.fill=sy.last?Math.min(1,sy.fill/sy.need):(done?1:0);
   if(done){fireRelay(sy,true);return;}
   if(lm.k>=lm.max){missLanding(sy);return;}
@@ -887,7 +899,7 @@ function drawLeap(sy,zf){
     if(lm.nxt!==undefined){var nk=keyOf(sy,lm.nxt),nr=kr*0.42,nx=cxv-nr*1.4,ny=Math.max(104,ky-kr*5.2);cx.fillStyle='#04050a';cx.globalAlpha=0.9;cx.beginPath();cx.arc(nx,ny,nr*1.7,0,TAU);cx.fill();cx.globalAlpha=0.8;cx.fillStyle='#ffe066';shapePath(cx,nx,ny,nr,nk);cx.fill();cx.globalAlpha=1;
       cx.font='700 '+Math.max(15,Math.round(nr*0.95))+'px "Avenir Next","Segoe UI",system-ui,sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle='#eef2f6';cx.textAlign='left';cx.fillText('next',nx+nr*2.1,ny);cx.textAlign='center';}
     // progress toward firing: a green arc that fills with each landing
-    var prog=sy.last?Math.min(1,sy.fill/sy.need):Math.min(1,lm.hits/2);
+    var prog=sy.last?Math.min(1,sy.fill/sy.need):Math.min(1,lm.hits/(sy.practice?1:3));
     cx.strokeStyle='#26313e';cx.lineWidth=7;cx.beginPath();cx.arc(kx,ky,kr*1.32,0,TAU);cx.stroke();
     if(prog>0){cx.strokeStyle='#7cfc9a';cx.shadowColor='#7cfc9a';cx.shadowBlur=blur();cx.beginPath();cx.arc(kx,ky,kr*1.32,-Math.PI/2,-Math.PI/2+TAU*prog);cx.stroke();cx.shadowBlur=0;}
     sy.pads.forEach(function(pa,i){var p=proj(pa,zf,1.0);cx.fillStyle='#04050a';cx.globalAlpha=0.85;cx.beginPath();cx.arc(p[0],p[1],rs*1.35,0,TAU);cx.fill();cx.globalAlpha=1;
@@ -993,6 +1005,7 @@ function update(dt){
   if(run.assist===undefined)run.assist=1;run.assist=Math.min(1,run.assist+dt*0.004);var cruise=6.5*S.speed*run.assist*rampF(),vmax=16*S.speed;
   run.band+=(run.bandT-run.band)*Math.min(1,dt*3);if(!run.warm&&tAll-(run.lastBadAt||0)>4&&run.bandT>(run.bandBase||0.7))run.bandT=Math.max(run.bandBase||0.7,run.bandT-0.05*dt);run.bandPulse=Math.max(0,run.bandPulse-dt*1.2);run.floatT=Math.max(0,run.floatT-dt);
   if(effectT>0){effectT-=dt;if(effectT<=0)document.getElementById('effect').style.display='none';}
+  if(passedT>0){passedT-=dt;if(passedT<=0)document.getElementById('passed').style.display='none';}
   // steer
   var steer=(keyL?-1:0)+(keyR?1:0);if(ptr&&!ptr.moved)steer+=ptr.side;
   run.theta-=steer*2.7*dt; // v0.21: same sign as drag
@@ -1028,6 +1041,7 @@ function update(dt){
       else if(!p.good&&sy4.pads.length>2){run.rec.lost++;sy4.pads.pop();layPads(sy4);sy4.w=Math.max(0.3,sy4.w-0.1);}}}});
   if(run.warm){pickups.forEach(function(p){if(!p.hit&&!p.told&&run.s>p.s+1){p.told=true;speak(p.good?'You passed a support. Steer into greens.':'You dodged a stress cube.',true);}});}
   pickups.forEach(function(p){if(p.good&&!p.hit&&!p.passed&&run.s>p.s+0.6){p.passed=true;if(!run.warm&&AC&&S.sound)tone(560,0.18,'sine',0.035,400,panOf(p.a,1.2));}});
+  if(!run.warm)nameMissed();
   if(run.warm&&run.s>=run.warmEnd){endWarmup();return;}
   if(!run.warm)audioCues(dt);
   checkpoints.forEach(function(c){if(!c.passed&&prev<c.s&&run.s>=c.s){c.passed=true;saveCp();sfxCheck();
