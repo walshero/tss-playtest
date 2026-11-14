@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.46</title>
+<title>Rewilder v0.47</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.46 | LAB | 2026-11-14
+<!-- TSP build: Rewilder v0.47 | LAB | 2026-11-14
+     v0.47 (founder, choosing from the ranked list of five: "1 and 2.")
      v0.46 (founder: "I do think the
 Sound could include more
 Variation. Other Improvements? Osterweil and Horvath lead analysis")
@@ -471,7 +472,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.46</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.47</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -1235,8 +1236,10 @@ function drawLife(l){const x=l.x,g=GY-4,sd=l.seed;
  else if(l.kind==='balloon'){const y=GY-430+Math.sin(T*.5+sd)*14;for(let i=0;i<5;i++){const a0=-1.3+i*.52;shape([[x,y+46],[x+Math.sin(a0)*52,y-Math.cos(a0)*6-10],[x+Math.sin(a0+.26)*56,y-44],[x+Math.sin(a0+.52)*52,y-Math.cos(a0+.52)*6-10]],i%2?'#fbf3dc':'#e8a22a',{lw:1.6})}
   shape(ellPts(x,y-28,52,44,sd),'rgba(0,0,0,0)',{lw:2.2});line(x-14,y+44,x-8,y+62,INK,1.2);line(x+14,y+44,x+8,y+62,INK,1.2);shape(rectPts(x-10,y+62,20,13,sd,.4),'#8a5a34',{lw:1.6});dot(x,y+60,4,'#c08a5a')}}
 let ambT=4;
+let metT=0,metP=null;
+function metWatch(){if(!F||state!=='play')return;const now=(F.tn>0&&F.tu<=0&&F.tm>0?1:0)+(F.pn>0&&F.pu<=0&&F.pm>0?2:0);if(metP!==null&&(now&~metP)){folk.forEach((f,i)=>{f.hop=.5+(i%3)*.08;if(Math.abs(f.x-P.x)<500)stars(f.x,GY-40,2)});SFX.tag()}metP=now}
 function ambient(dt){if(state!=='play'||rain>0||flood>0)return;ambT-=dt;if(ambT>0)return;ambT=2.2+Math.random()*4;const gr=sites.slice(0,5).filter(q=>q.state==='grown'&&CH[q.choice]&&CH[q.choice].hab),near=gr.filter(q=>Math.abs(q.cx-P.x)<520);if(!near.length)return;if(Math.random()<.25+gr.length*.15){if(near.some(q=>CH[q.choice].water||q.choice==='wet'||q.choice==='free')&&Math.random()<.35)SFX.frog();else SFX.bird()}}
-function tick(dt){ambient(dt);if(P.support==='ground'&&(!trail.length||Math.abs(trail[trail.length-1]-P.x)>3)){trail.push(P.x);if(trail.length>90)trail.shift()}
+function tick(dt){ambient(dt);metWatch();if(P.support==='ground'&&(!trail.length||Math.abs(trail[trail.length-1]-P.x)>3)){trail.push(P.x);if(trail.length>90)trail.shift()}
  ['punch','cool','bump','spin','squash','dizzy','cheer','tumble','zap','stuck','singe'].forEach(k=>{if(P[k]>0)P[k]-=dt})}
 function player(dt){if(swim){P.walk+=dt;swimStep(dt);return}
  if(walls.length){const px=P.px===undefined?P.x:P.px,msg='A steel wall. Dive at a blue ladder and go under.';walls.forEach(wl=>{if(!wl.up||P.y<GY-262)return;if(px<=wl.x-30&&P.x>wl.x-30){P.x=wl.x-30;P.vx=0;hudKey='';once('wall',msg,8)}else if(px>=wl.x+30&&P.x<wl.x+30){P.x=wl.x+30;P.vx=0;hudKey='';once('wall',msg,8)}})}P.px=P.x;if(K.d&&!P.dWas&&!P.climb&&P.support==='ground'&&nearDock(P.x)&&canSwim()){P.dWas=true;dive(false);return}P.dWas=!!K.d;if(nearDock(P.x)&&toastT<=0)once('dock','Press Dive or Down.',6);tick(dt);P.walk+=dt;
@@ -1717,7 +1720,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(beach>0){const b=ease(beach);shape([[-80,GY+6],[-80,GY-4-10*b],[60,GY-8-14*b],[180,GY-6],[230,GY+6]],'#e3cf9a',{lw:2});for(let i=0;i<3;i++)if(b>.5){const bx=20+i*50+Math.sin(T*2+i)*10;shape(ellPts(bx,GY-22,7,5,i),'#ece6dc',{lw:1.4});line(bx-2,GY-17,bx-2,GY-9,INK,1.4);line(bx+2,GY-17,bx+2,GY-9,INK,1.4);line(bx+6,GY-23,bx+13,GY-21,INK,1.6)}}
  pits.forEach(p=>{const w=26+p.d*6,h=10+p.d*12;shape([[p.x-w,GY-5],[p.x+w,GY-5],[p.x+w*.7,GY-5+h],[p.x-w*.7,GY-5+h]],'#2a1c14',{lw:2});shape(blobPts(p.x-w-12,GY-8,12+p.d*3,5+p.d*2,p.x,8),'#6b4a30',{lw:1.6});shape(blobPts(p.x+w+12,GY-8,12+p.d*3,5+p.d*2,p.x+3,8),'#6b4a30',{lw:1.6})});
  if(level>1)drawDystopia();
- if(isle)drawIsle();drawPit();drawVia();sites.forEach(q=>{if(q.state!=='grown')drawSite(q)});if(drawBillsLater){drawBillsLater=false;drawBills()}sites.forEach(q=>{if(q.state==='grown')drawSite(q)});drawRainFlow();drawNeighbors();if(isle)drawIsleFront();drawDepot();
+ if(isle)drawIsle();drawPit();drawVia();sites.forEach(q=>{if(q.state!=='grown')drawSite(q)});if(drawBillsLater){drawBillsLater=false;drawBills()}sites.forEach(q=>{if(q.state==='grown')drawSite(q)});drawRainFlow();drawNeighbors();drawGauges();if(isle)drawIsleFront();drawDepot();
  if(riverOn&&plug.seen&&plug.hp>0&&!swim)chalk(plug.x,GY-58);
  drawTowerDrones();
  docks.forEach((d,i)=>{if(!riverOn||d<cam.x-80||d>cam.x+viewW+80)return;const on=state==='play'&&!swim&&nearDock(P.x)&&Math.abs(P.x-d)<36;
@@ -1731,7 +1734,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  props.forEach(c=>{ctx.save();ctx.translate(c.x,c.y);if(c.state==='fall')ctx.rotate(c.t*5);car(-13,5,c.c,1);ctx.restore()});
  sprigs.forEach(g=>{const y=g.y+Math.sin(T*3+g.x)*4;line(g.x-12,y+8,g.x+12,y-8,'#6b4a30',3);for(let k=0;k<4;k++)shape(ellPts(g.x-5+k*6,y+1-k*4,6,3,k+g.x),'#7cc35a',{lw:1.4})});
  folk.forEach((f,fi)=>{if(level>=3&&DY>0&&fi%3!==0){robot(f.x,GY-2,fi*7+1,f.hop);return}const fc=DY>0&&/^#[0-9a-f]{6}$/i.test(f.c)?mix(f.c,'#5e5a66',DY*.85):f.c;if(f.bike)bike(f.x,GY-2,fc,f.seed,f.hop);else{ctx.save();if(f.hop>0)ctx.translate(0,-Math.sin(f.hop/.5*Math.PI)*14);person(f.x,GY-4,fc,f.seed,f.hop>0);ctx.restore()}
-  if(fi%3===0&&F&&state==='play'){const kind=flood>0?'wave':F.tu>0&&(fi%2===0||F.pu<=0)?'bus':F.pu>0?'bulb':done&&!lopsided()?'leaf':'';if(kind)needIcon(f.x+10,GY-72+Math.sin(T*2+fi)*2,kind)}});
+  if(fi%3===0&&F&&state==='play'){const kind=flood>0?'wave':F.tu>0&&(fi%2===0||F.pu<=0)?'bus':F.pu>0?'bulb':F.tm>0&&F.tn>0&&fi%6===0?'busok':F.pm>0&&F.pn>0&&fi%6===3?'bulbok':done&&!lopsided()?'leaf':'';if(kind)needIcon(f.x+10,GY-72+Math.sin(T*2+fi)*2,kind)}});
  life.forEach(drawLife);
  if(done){const vx=WORLD-66;line(vx,GY,vx,GY-120,'#5b3a24',5);shape([[vx-58,GY-150],[vx+34,GY-150],[vx+58,GY-132],[vx+34,GY-114],[vx-58,GY-114]],'#fbf3dc',{lw:2.4,sh:1});ctx.font='800 '+Math.max(18,16/S)+'px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=INK;ctx.fillText('VACATION',vx-6,GY-132)}
  sites.forEach(q=>{if(q.crew&&q.state==='growing')for(let i=0;i<3;i++){const px=q.x+30+i*(q.w-60)/2,hop=Math.abs(Math.sin(T*7+i*2))*8;ctx.save();ctx.translate(0,-hop);person(px,GY-4,'#e8a22a',i+40,i===1);shape([[px-5,GY-30],[px,GY-36],[px+5,GY-30]],'#5fae50',{lw:1.2});ctx.restore();line(px+5,GY-18-hop,px+13,GY-26-hop+Math.sin(T*14+i)*5,'#5b3a24',2.6)}});
@@ -2088,6 +2091,17 @@ function drawIsle(){const line=cutLine,dot=cutDot;const a=cam.x-80,b=cam.x+viewW
 function drawRainFlow(){if(rain<=0&&flood<=0)return;const a=cam.x-60,b=cam.x+viewW+60,k=rain>0?Math.min(1,(5-rain)/1.2):flood/3.5;sites.slice(0,5).forEach((s,i)=>{if(s.x+s.w<a||s.x>b)return;const hard=(s.state==='standing'||s.state==='toppling')&&(s.id!=='dam'||s.paved),c=CH[s.choice],soak=!hard&&c&&(s.state==='grown'||s.state==='growing')&&c.soak>=1;
   if(hard){ctx.globalAlpha=.85*k;for(let r=0;r<3;r++){ctx.strokeStyle=r?'#8a6a48':'#6b4a30';ctx.lineWidth=3-r*.6;ctx.beginPath();for(let x=s.x-70;x<=s.x+s.w+70;x+=10){const y=GY-3+r*3+Math.sin(x*.09+T*7+r)*1.6;x===s.x-70?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.stroke()}[-1,1].forEach(d=>{const ex=d<0?s.x:s.x+s.w,top=GY-s.rows.length*s.fh;for(let q=0;q<5;q++){const u=(T*1.6+q/5)%1;dot(ex+d*(6+u*26),top+u*(GY-top),3,'#8a6a48')}for(let q=0;q<4;q++){const u=(T*.9+q/4)%1;shape([[ex+d*(40+u*90),GY-9],[ex+d*(52+u*90),GY-5],[ex+d*(40+u*90),GY-1]],'#8a6a48',{ln:false})}});ctx.globalAlpha=1}
   else if(soak){ctx.globalAlpha=k;for(let q=0;q<9;q++){const u=(T*.9+q/9)%1,x=s.x+16+hr(i*9+q)*(s.w-32);dot(x,GY+2+u*34,3.2*(1-u*.6),'#4aa3d6');if(u>.8){line(x,GY-4,x-3,GY-14,'#5fae50',2);line(x,GY-4,x+3,GY-15,'#7cc35a',2)}}ctx.globalAlpha=1}})}
+// flood gauge posts: the float shows how high the next rain will reach; the red half is a flood
+let gaugeV=.6;
+function drawGauges(){if(!F||state!=='play')return;const d=F.hard-F.soak,tg=clamp((d+2)/7,0,1);gaugeV+=(tg-gaugeV)*.04;const a=cam.x-40,b=cam.x+viewW+40,H=132,bad=d>1.5,k=rain>0?Math.min(1,(5-rain)/1.2):flood>0?flood/3.5:0;
+ [585,1600,2085,2600].forEach((x,i)=>{if(x<a||x>b)return;const y0=GY-4,fy=y0-8-gaugeV*(H-16);
+  shape(rectPts(x-9,y0-H,18,H,i+900,.4),'#fbf3dc',{lw:2.2,sh:1});shape(rectPts(x-9,y0-H,18,H/2,i+904,.3),'#f2c4bc',{lw:1.6});
+  for(let m=0;m<11;m++){const yy=y0-6-m*12;shape(rectPts(x-9,yy-3,m%2?7:11,3.4,m,.1),m>=5?'#b3261e':INK,{ln:false})}
+  shape(rectPts(x-13,y0-H/2-2.5,26,5,i+908,.3),'#b3261e',{lw:1.3});shape(arcPts(x,y0-H,12,9,Math.PI,2*Math.PI,8),'#3a3a40',{lw:1.6});
+  // during rain the water climbs the post to the float
+  if(k>0){const wh=(y0-fy)*k;ctx.globalAlpha=.8;shape(rectPts(x-7,y0-wh,14,wh,i+912,.2),bad?'#8a6a48':'#4aa3d6',{ln:false});ctx.globalAlpha=1}
+  // the float
+  {const bob=Math.sin(T*2.4+i)*(bad?2.6:1.2),c=bad?'#d9534a':'#3f8fb6';shape([[x+10,fy+bob],[x+24,fy-10+bob],[x+40,fy-10+bob],[x+40,fy+10+bob],[x+24,fy+10+bob]],c,{lw:2,sh:1});ctx.strokeStyle='#fbf6ea';ctx.lineWidth=2.4;ctx.lineCap='round';ctx.beginPath();for(let q=0;q<=4;q++){const xx=x+24+q*3.4,yy=fy+bob+Math.sin(q*1.6+T*3)*3;q?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke()}})}
 // what each site does to the one beside it, shown instead of said: heat, seeds, crossings, haze
 function drawNeighbors(){if(!F||state!=='play')return;const a=cam.x-80,b=cam.x+viewW+80,o=sites.slice(0,5).sort((p,q)=>p.x-q.x),hard=s=>s.state==='standing'&&(s.id!=='dam'||s.paved),hab=s=>s.state==='grown'&&CH[s.choice]&&CH[s.choice].hab,young=s=>s.state==='growing';
  for(let i=0;i<o.length-1;i++){const L=o[i],R=o[i+1],x0=L.x+L.w,x1=R.x;if(x1<a||x0>b)continue;
@@ -2104,7 +2118,8 @@ function drawNeighbors(){if(!F||state!=='play')return;const a=cam.x-80,b=cam.x+v
  // coal haze drifts over anything still growing
  if(F.haze)o.forEach((s,i)=>{if(!young(s)||s.x+s.w<a||s.x>b)return;const d=s.x<sites[2].x?-1:1;for(let q=0;q<6;q++){const u=(T*.1+q/6)%1;ctx.globalAlpha=.55*Math.sin(u*Math.PI);shape(blobPts(s.x+s.w/2-d*(s.w/2+40)+d*u*(s.w+80),GY-70-q*20,48,17,q+i*9+80,10),'#2b2628',{ln:false})}ctx.globalAlpha=1})}
 function needIcon(x,y,kind){ctx.save();ctx.translate(x,y+13);ctx.scale(1.5,1.5);ctx.translate(-x,-y-13);shape(ellPts(x,y,16,13,3),'#fbf6ea',{lw:1.8,sh:1});shape([[x-5,y+11],[x-9,y+21],[x+2,y+12]],'#fbf6ea',{lw:1.4});
- if(kind==='bus'){shape(rectPts(x-10,y-6,20,10,1,.2),'#e8a22a',{lw:1.4});dot(x-5,y+5,2.6,INK);dot(x+5,y+5,2.6,INK);line(x-7,y-3,x+7,y-3,'#9fd8ee',2.4)}
+ if(kind==='busok'||kind==='bulbok'){if(kind==='busok'){shape(rectPts(x-11,y-7,20,10,1,.2),'#e8a22a',{lw:1.4});dot(x-6,y+4,2.6,INK);dot(x+4,y+4,2.6,INK);line(x-8,y-4,x+6,y-4,'#9fd8ee',2.4)}else{for(let r=0;r<6;r++){const an=r*1.047+T;line(x-2+Math.cos(an)*8,y-2+Math.sin(an)*8,x-2+Math.cos(an)*11,y-2+Math.sin(an)*11,'#e8a22a',1.6)}dot(x-2,y-2,6,'#ffd23f');shape(rectPts(x-5,y+3,6,4,2,.2),'#8a8a90',{lw:1})}shape(ellPts(x+9,y+6,6,6,4),'#3f8443',{lw:1.2});ctx.strokeStyle='#fbf6ea';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x+6,y+6);ctx.lineTo(x+8.4,y+8.6);ctx.lineTo(x+12,y+3.6);ctx.stroke()}
+ else if(kind==='bus'){shape(rectPts(x-10,y-6,20,10,1,.2),'#e8a22a',{lw:1.4});dot(x-5,y+5,2.6,INK);dot(x+5,y+5,2.6,INK);line(x-7,y-3,x+7,y-3,'#9fd8ee',2.4)}
  else if(kind==='bulb'){dot(x,y-2,6.4,'#52525a');shape(rectPts(x-3,y+3,6,5,2,.2),'#8a8a90',{lw:1});line(x-6,y-8,x+6,y+4,'#c8342b',2)}
  else if(kind==='wave'){for(let r=0;r<2;r++){ctx.strokeStyle='#3f8fb6';ctx.lineWidth=2.4;ctx.beginPath();for(let q=-9;q<=9;q+=3)q===-9?ctx.moveTo(x+q,y-3+r*6+Math.sin(q*.7)*2.4):ctx.lineTo(x+q,y-3+r*6+Math.sin(q*.7)*2.4);ctx.stroke()}}
  else{shape([[x-7,y+4],[x,y-8],[x+7,y+4],[x,y+7]],'#5fae50',{lw:1.4});line(x,y+6,x,y-5,'#3f8443',1.4)}ctx.restore()}
