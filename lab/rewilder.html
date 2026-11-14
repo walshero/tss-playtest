@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.45</title>
+<title>Rewilder v0.46</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.45 | LAB | 2026-11-13
+<!-- TSP build: Rewilder v0.46 | LAB | 2026-11-14
+     v0.46 (founder: "I do think the
+Sound could include more
+Variation. Other Improvements? Osterweil and Horvath lead analysis")
      v0.45 (founder, on the island: "Does the island even have anything? Is it worth it or is it a distraction from the main game?" then, to the plan to freeze the island and work on the mainland: "Ok go")
      v0.44 (founder, with a photo of a bubble house: "Ok, good, but the end island art still 3/10. In composition and finish.the main house should be asymmetrical gaudi esque but distinct and when it breaks apart it creates 10/10 art homes")
      v0.43 (founder, with a phone screenshot of the two top bars: "The top two bars needs to be one bar. Use icons net words.")
@@ -468,7 +471,7 @@ body.playing.touch #pad{display:flex}
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.45</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.46</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -688,10 +691,10 @@ function nz(d,v,ft,f,q,delay){const a=ac();if(!a)return;const t=a.currentTime+(d
 const SFX={
  // three layers per the impact-sound research: a click for snap, a body knock, a low thump; short tail; small pitch changes
  hit(){combo=(T-comboT<1.3)?Math.min(combo+1,7):0;comboT=T;const k=(1+[0,2,4,7,9,12,14,16][combo]/60)*(.95+Math.random()*.1);
-  nz(.012,.45,'highpass',3500,.7);tone(190*k,.11,'triangle',.3,-125*k);tone(92*k,.16,'sine',.42,-52*k);nz(.09,.24,'bandpass',1100*k,1.2,.004)},
+  const v=SFX.hv=((SFX.hv||0)+1)%3;nz(.012,.45,'highpass',3500,.7);tone(190*k*[1,.84,1.19][v],.11,['triangle','square','triangle'][v],v===1?.14:.3,-125*k);tone(92*k,.16,'sine',.42,-52*k);nz(.09,.24,'bandpass',1100*k*[1,.7,1.4][v],1.2,.004)},
  slam(){const k=.95+Math.random()*.1;nz(.015,.5,'highpass',3000,.7);tone(120*k,.3,'sine',.6,-85*k);tone(240*k,.14,'triangle',.32,-170*k);nz(.16,.34,'bandpass',700,1,.005);for(let i=0;i<5;i++)nz(.03,.12,'bandpass',900+Math.random()*1800,2,.08+i*.05+Math.random()*.03)},
  crunch(){nz(.012,.45,'highpass',4000,.7);nz(.18,.4,'bandpass',1800,1.5);tone(140,.18,'square',.1,-90);for(let i=0;i<4;i++)nz(.025,.14,'highpass',5000,.7,.06+i*.045)},
- zap(){tone(60,.5,'sawtooth',.22);tone(1900,.45,'square',.05,-1500);nz(.45,.18,'highpass',2500,.7)},
+ zap(){const k=.9+Math.random()*.2;tone(60*k,.5,'sawtooth',.22);tone(1900*k,.45,'square',.05,-1500*k);nz(.3+Math.random()*.25,.18,'highpass',2500,.7)},
  beeps(){for(let i=0;i<3;i++)tone(1050,.16,'square',.07,0,i*.36)},
  hammer(){nz(.02,.3,'bandpass',2200,3);tone(520,.08,'triangle',.12,-200)},
  construct(){for(let i=0;i<3;i++)tone(1050,.16,'square',.07,0,i*.36);for(let i=0;i<14;i++)nz(.035,.22,'bandpass',600+Math.random()*300,1.5,1.1+i*.06);for(let i=0;i<3;i++){nz(.02,.3,'bandpass',2200,3,2.1+i*.28);tone(520,.08,'triangle',.12,-200,2.1+i*.28)}},
@@ -703,21 +706,29 @@ const SFX={
  steel(){const k=(.93+Math.random()*.14)*[1,.89,1.12,.94][SFX.sv=((SFX.sv||0)+1)%4];nz(.014,.38,'highpass',3200,.7);tone(196*k,.2,'triangle',.26,-30*k);tone(541*k,.14,'sine',.1);tone(1058*k,.07,'sine',.04);tone(96,.15,'sine',.34,-48)},
  clang(){const k=.95+Math.random()*.1;nz(.012,.28,'highpass',3400,.7);tone(310*k,.16,'triangle',.16,-40*k);tone(856*k,.1,'sine',.05)},
  whiff(){noise(.08,.08,1800)},
- floor(){noise(.7,.5,420);tone(60,.6,'sawtooth',.14,-25)},
- collapse(){noise(1.4,.5,360);tone(55,1.1,'sawtooth',.14,-20)},
- grow(){[[196,2.6,.2],[392,2,.09],[541,1.6,.06],[1058,1.1,.035]].forEach(p=>tone(p[0],p[1],'sine',p[2]))},
+ floor(){const k=.88+Math.random()*.24;noise(.6+Math.random()*.25,.5,360+Math.random()*140);tone(60*k,.6,'sawtooth',.14,-25);for(let i=0;i<3;i++)nz(.025,.1,'bandpass',700+Math.random()*1400,2,.2+i*.1+Math.random()*.06)},
+ collapse(){const k=.86+Math.random()*.28,v=SFX.cv=((SFX.cv||0)+1)%3;noise(1.1+Math.random()*.6,.5,300+Math.random()*140);tone(55*k,1.1,'sawtooth',.14,-20);if(v===1)nz(.03,.4,'highpass',2600,.7);if(v===2)tone(82*k,.7,'triangle',.12,-40,.25);for(let i=0;i<4+v*2;i++)nz(.03,.1,'bandpass',500+Math.random()*1600,2,.3+i*.13+Math.random()*.08)},
+ grow(kind){const r=[196,220,262,294,330][SFX.gi=((SFX.gi===undefined?-1:SFX.gi)+1)%5]/196,iv=[[1,2,2.76,5.4],[1,1.5,2.5,4],[1,2,3,5]][Math.floor(Math.random()*3)];[[196,2.6,.2],[196,2,.09],[196,1.6,.06],[196,1.1,.035]].forEach((p,i)=>tone(p[0]*r*iv[i],p[1],'sine',p[2],0,i*.05*Math.random()));
+  const c=CH[kind];if(!c)return;
+  if(c.water||kind==='free'||kind==='wet')for(let i=0;i<7;i++)tone(700+Math.random()*900,.09,'sine',.05,300,.25+i*.11+Math.random()*.05);
+  else if(c.power)for(let i=0;i<3;i++)tone(880*r*(1+i*.5),.5,'triangle',.05,0,.2+i*.12);
+  else if(c.travel){tone(1175,.5,'sine',.09,0,.25);tone(1175,.6,'sine',.09,0,.55)}
+  else SFX.bird(.3)},
+ // three bird calls and a frog, used for growth and for the quiet between hits
+ bird(delay){const d=delay||0,f=1900+Math.random()*1500,v=.035;[()=>{for(let i=0;i<3;i++)tone(f,.07,'sine',v,500,d+i*.11)},()=>{tone(f,.16,'sine',v,-700,d);tone(f*.8,.2,'sine',v,600,d+.2)},()=>{for(let i=0;i<5;i++)tone(f*(1+(i%2)*.18),.045,'sine',v,0,d+i*.06)}][Math.floor(Math.random()*3)]()},
+ frog(){const f=150+Math.random()*60;for(let i=0;i<2;i++)tone(f,.11,'square',.03,40,i*.16)},
  tip(){tone(320,.18,'square',.07,-160);tone(240,.25,'triangle',.1,-120,.08)},
  pave(){noise(.6,.12,260)},
- eat(){tone(660,.08,'sine',.14);tone(990,.1,'sine',.12,0,.07)},
+ eat(){const k=.92+Math.random()*.16;tone(660*k,.08,'sine',.14);tone(990*k,.1,'sine',.12,0,.07)},
  setback(){tone(300,.25,'triangle',.12,-140)},
- bump(){tone(140,.15,'square',.08,-60)},
+ bump(){const k=.85+Math.random()*.3;tone(140*k,.15,'square',.08,-60*k)},
  weld(){noise(.2,.1,4000);tone(1500,.1,'square',.03)},
  honk(){if(!(P.support&&P.support.id==='highway'))return;const k=.95+Math.random()*.1;tone(349*k,.2,'triangle',.07);tone(440*k,.2,'triangle',.055,0,.015)},
  hiss(){noise(.4,.05,5000)},
  creak(){tone(95,.9,'sawtooth',.1,45);tone(61,.9,'square',.05,20)},
  rain(){noise(2.5,.08,2500)},
- pop(){tone(520,.08,'sine',.12,300)},
- pick(){tone(440,.1,'sine',.12);tone(660,.16,'sine',.12,0,.09)}
+ pop(){const f=[392,440,523,587,659,784][Math.floor(Math.random()*6)];tone(f,.08,'sine',.12,f*.55)},
+ pick(){const k=[1,1.122,1.26,1.5][Math.floor(Math.random()*4)];tone(440*k,.1,'sine',.12);tone(660*k,.16,'sine',.12,0,.09)}
 };
 
 /* ---------- funk loop: bass and drums, then stabs and a lead as sites finish ---------- */
@@ -1110,7 +1121,7 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return
  sites.forEach(s=>{
   if(s.state==='growing'&&!s.paving){const near=P.x>=s.x-30&&P.x<=s.x+s.w+30&&P.y>GY-140;s.tend=near;const m=rate(s);
    s.g+=dt/20*m*(near?2:1)*(s.crew?1.6:1)*(s.reopt?0:1);if(near&&Math.random()<dt*3)leaves(P.x+(Math.random()-.5)*60,GY-10,1);
-   if(s.g>=1){s.g=1;s.state='grown';built++;notes.add(s.id);SFX.grow();leaves(s.cx,GY-60,26);P.cheer=1.6;hudKey='';word('GROWN',s.cx,GY-170,'#7cc35a');folk.forEach(f=>f.cheer=3.5);
+   if(s.g>=1){s.g=1;s.state='grown';built++;notes.add(s.id);SFX.grow(s.choice);leaves(s.cx,GY-60,26);P.cheer=1.6;hudKey='';word('GROWN',s.cx,GY-170,'#7cc35a');folk.forEach(f=>f.cheer=3.5);
     if(levelClear()){if(done)toast('Everything is grown again.',5);else setTimeout(finish,2600)}else if(!plotsOpen||sites.length-5<1||s.plot!==undefined||!sites.slice(0,5).every(q=>q.state==='grown'))toast('The '+CH[s.choice].short+' is grown.'+(s.plot===undefined?' A field note waits in the menu.':''),5)}}
   if(s.state==='grown'){s.sprigT-=dt;if(s.sprigT<=0&&sprigs.length<4){s.sprigT=10+Math.random()*6;sprigs.push({x:s.x+20+Math.random()*(s.w-40),y:GY-24})}}});
  if(sites.some(s=>s.state==='growing'||s.state==='grown')){
@@ -1223,7 +1234,9 @@ function drawLife(l){const x=l.x,g=GY-4,sd=l.seed;
   for(let i=0;i<7;i++)dot(x-25+i*8.4,g-28,4,['#c8342b','#f0a830','#5fae50','#e8c25a'][i%4]);person(x,g-2,'#3b6ea8',sd)}
  else if(l.kind==='balloon'){const y=GY-430+Math.sin(T*.5+sd)*14;for(let i=0;i<5;i++){const a0=-1.3+i*.52;shape([[x,y+46],[x+Math.sin(a0)*52,y-Math.cos(a0)*6-10],[x+Math.sin(a0+.26)*56,y-44],[x+Math.sin(a0+.52)*52,y-Math.cos(a0+.52)*6-10]],i%2?'#fbf3dc':'#e8a22a',{lw:1.6})}
   shape(ellPts(x,y-28,52,44,sd),'rgba(0,0,0,0)',{lw:2.2});line(x-14,y+44,x-8,y+62,INK,1.2);line(x+14,y+44,x+8,y+62,INK,1.2);shape(rectPts(x-10,y+62,20,13,sd,.4),'#8a5a34',{lw:1.6});dot(x,y+60,4,'#c08a5a')}}
-function tick(dt){if(P.support==='ground'&&(!trail.length||Math.abs(trail[trail.length-1]-P.x)>3)){trail.push(P.x);if(trail.length>90)trail.shift()}
+let ambT=4;
+function ambient(dt){if(state!=='play'||rain>0||flood>0)return;ambT-=dt;if(ambT>0)return;ambT=2.2+Math.random()*4;const gr=sites.slice(0,5).filter(q=>q.state==='grown'&&CH[q.choice]&&CH[q.choice].hab),near=gr.filter(q=>Math.abs(q.cx-P.x)<520);if(!near.length)return;if(Math.random()<.25+gr.length*.15){if(near.some(q=>CH[q.choice].water||q.choice==='wet'||q.choice==='free')&&Math.random()<.35)SFX.frog();else SFX.bird()}}
+function tick(dt){ambient(dt);if(P.support==='ground'&&(!trail.length||Math.abs(trail[trail.length-1]-P.x)>3)){trail.push(P.x);if(trail.length>90)trail.shift()}
  ['punch','cool','bump','spin','squash','dizzy','cheer','tumble','zap','stuck','singe'].forEach(k=>{if(P[k]>0)P[k]-=dt})}
 function player(dt){if(swim){P.walk+=dt;swimStep(dt);return}
  if(walls.length){const px=P.px===undefined?P.x:P.px,msg='A steel wall. Dive at a blue ladder and go under.';walls.forEach(wl=>{if(!wl.up||P.y<GY-262)return;if(px<=wl.x-30&&P.x>wl.x-30){P.x=wl.x-30;P.vx=0;hudKey='';once('wall',msg,8)}else if(px>=wl.x+30&&P.x<wl.x+30){P.x=wl.x+30;P.vx=0;hudKey='';once('wall',msg,8)}})}P.px=P.x;if(K.d&&!P.dWas&&!P.climb&&P.support==='ground'&&nearDock(P.x)&&canSwim()){P.dWas=true;dive(false);return}P.dWas=!!K.d;if(nearDock(P.x)&&toastT<=0)once('dock','Press Dive or Down.',6);tick(dt);P.walk+=dt;
