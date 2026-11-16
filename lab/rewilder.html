@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.50</title>
+<title>Rewilder v0.51</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.50 | LAB | 2026-11-14
+<!-- TSP build: Rewilder v0.51 | LAB | 2026-11-16
+     v0.51 (founder: "Kill the link in the rewilder menu that says studio but goes to a cooking game. Keep the cabinet link." then: "And make the little houses into dorchester like triple deckers")
      v0.50 (founder: "When you’re playing salmon if you hit land instead of smash you miss the whole sequence. Remove land button. We don’t need it.")
      v0.49 (founder, with a phone screenshot of the orange glow beside the coal plant: "What are the heat waves?" then, to the proposal to cut the heat marks and the coal haze clouds: "Cut both." then: "Make the blimp fly around with the physics of a balloon let go, right now looks terrible. Remove heat marks from solar panel etc. Too." then: "Improve the art on the win state after you destroy tar factory. Also, the tar on the water can’t just fade like that. Show a crew vacuuming those oil drops up. Also the gas tanks by the right of the favored should explode and blow up the whole place. Turtle can survive unharmed spinning in shell. beaver can’t survive")
      v0.48 (founder: "1. After I’ve seen it, How can I get to tar pit WITHOUT going on vacation??
@@ -475,11 +476,10 @@ body.playing.touch #pad{display:flex}
 <h1 id="title">Rewilder</h1>
 
 <header class="se-chrome" id="topbar">
-  <a class="nav" href="../index.html">Studio</a>
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.50</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.51</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
-  <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a><a class="nav" href="../index.html">Home</a></nav>
+  <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button>
   <button id="menuClose" type="button">Close menu</button>
@@ -2126,11 +2126,31 @@ function drawRainFlow(){if(rain<=0&&flood<=0)return;const a=cam.x-60,b=cam.x+vie
   if(hard){ctx.globalAlpha=.85*k;for(let r=0;r<3;r++){ctx.strokeStyle=r?'#8a6a48':'#6b4a30';ctx.lineWidth=3-r*.6;ctx.beginPath();for(let x=s.x-70;x<=s.x+s.w+70;x+=10){const y=GY-3+r*3+Math.sin(x*.09+T*7+r)*1.6;x===s.x-70?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.stroke()}[-1,1].forEach(d=>{const ex=d<0?s.x:s.x+s.w,top=GY-s.rows.length*s.fh;for(let q=0;q<5;q++){const u=(T*1.6+q/5)%1;dot(ex+d*(6+u*26),top+u*(GY-top),3,'#8a6a48')}for(let q=0;q<4;q++){const u=(T*.9+q/4)%1;shape([[ex+d*(40+u*90),GY-9],[ex+d*(52+u*90),GY-5],[ex+d*(40+u*90),GY-1]],'#8a6a48',{ln:false})}});ctx.globalAlpha=1}
   else if(soak){ctx.globalAlpha=k;for(let q=0;q<9;q++){const u=(T*.9+q/9)%1,x=s.x+16+hr(i*9+q)*(s.w-32);dot(x,GY+2+u*34,3.2*(1-u*.6),'#4aa3d6');if(u>.8){line(x,GY-4,x-3,GY-14,'#5fae50',2);line(x,GY-4,x+3,GY-15,'#7cc35a',2)}}ctx.globalAlpha=1}})}
 function drawHomes(a,b){if(!F)return;const coal=sites[2].state==='standing'&&!sites[2].paved,tg=F.pu>0?0:coal?.5:F.pm>0?1:.5;lightV+=(tg-lightV)*.03;const v=lightV,wc=mix('#120c1c',tg<.75?'#d98a2a':'#fff1c4',clamp(v*1.15,0,1));
- [[1545,61],[2512,67]].forEach(([cx,sd])=>{if(cx+80<a||cx-80>b)return;
-  [[-54,34,80,'#d98a6a','#7a3a2a'],[-17,36,100,'#f1e3c4','#2f8f8a'],[22,33,72,'#9fb8c9','#5b3a6b']].forEach((h,i)=>{const x=cx+h[0],top=GY-4-h[2];shape(rectPts(x,top,h[1],h[2],sd+i,.6),cardTone(h[3],sd+i),{lw:2.2,sh:1});shape([[x-4,top],[x+h[1]/2,top-22],[x+h[1]+4,top]],h[4],{lw:2});
-   for(let wy=top+10;wy<GY-40;wy+=24)[x+5,x+h[1]-15].forEach((wx,m)=>{if(v>.25){ctx.globalAlpha=.22*v;ctx.fillStyle='#ffd98a';ctx.beginPath();ctx.arc(wx+5,wy+6,18,0,7);ctx.fill();ctx.globalAlpha=1}shape(rectPts(wx,wy,10,13,sd+i+m+wy,.2),wc,{lw:1.3});if(v<.2&&m===0&&wy===top+10&&i===1){ctx.fillStyle=Math.sin(T*11)>-.3?'#ffd98a':'#e8a22a';ctx.beginPath();ctx.arc(wx+5,wy+8,2.2,0,7);ctx.fill()}});
-   shape(rectPts(x+h[1]/2-6,GY-24,12,20,sd+i+9,.2),'#5b3a24',{lw:1.3})})});
- [575,1400,1668,2085,2440,2596].forEach((x,i)=>{if(x<a-60||x>b+60)return;strip(x,GY-4,x,GY-92,4.5,'#3a3a40',{lw:1});strip(x,GY-92,x+14,GY-96,3.5,'#3a3a40',{lw:1});if(v>.2){ctx.globalAlpha=.17*v;shape([[x+14,GY-90],[x-24,GY-4],[x+52,GY-4]],'#ffe9b0',{ln:false});ctx.globalAlpha=1}shape(ellPts(x+14,GY-93,8,5.5,i+940),mix('#52525a',tg<.75?'#e8a22a':'#ffe9b0',clamp(v*1.15,0,1)),{lw:1.5})})}
+ // triple-deckers, the three-family wooden houses of Dorchester: three stacked porches on one side, a full-height bay on the other, a flat roof with a bracketed cornice
+ [[1545,61],[2512,67]].forEach(([cx,sd])=>{if(cx+90<a||cx-90>b)return;
+  [[-78,'#e8dcc0','#7a3a2a'],[-25,'#8fae8a','#f1e9d6'],[28,'#7f9bb5','#f1e9d6']].forEach((h,i)=>{const x=cx+h[0],W=48,FH=34,base=GY-10,top=base-FH*3,col=cardTone(h[1],sd+i),trim=h[2],px=x+3,pw=24,bx=x+29,bw=17;
+   shape(rectPts(x-1,base,W+2,7,sd+i+20,.3),'#8a8478',{lw:1.4});
+   shape(rectPts(x,top,W,FH*3,sd+i,.5),col,{lw:2.2,sh:1});for(let yy=top+5;yy<base;yy+=5)line(x+2,yy,x+W-2,yy,'rgba(27,19,40,.12)',.9);
+   // the bay runs the full height, a window on every floor
+   shape(rectPts(bx,top,bw,FH*3,sd+i+1,.3),mix(col,'#ffffff',.14),{lw:1.6});
+   for(let f=0;f<3;f++){const fy=base-FH*(f+1),lit=v>.25;
+    // porch: a shaded recess, a door or window in it, a deck, a rail, two posts
+    shape(rectPts(px,fy+3,pw,FH-3,sd+i+f+2,.2),mix(col,'#1b1328',.32),{lw:1.2});
+    if(f===0)shape(rectPts(px+13,fy+9,8,FH-9,sd+i+3,.2),'#5b3a24',{lw:1.1});else shape(rectPts(px+13,fy+9,8,13,sd+i+f+4,.2),wc,{lw:1.1});
+    shape(rectPts(px+3,fy+9,7,13,sd+i+f+5,.2),wc,{lw:1.1});
+    if(f>0){strip(px-2,fy+FH-12,px+pw+1,fy+FH-12,2.6,trim,{lw:.8});for(let m=0;m<6;m++)line(px+m*4.4,fy+FH-12,px+m*4.4,fy+FH-1,trim,1.5)}
+    strip(px-3,fy+FH,px+pw+2,fy+FH,3.4,trim,{lw:.9});[px-1,px+pw].forEach(q=>strip(q,fy+3,q,fy+FH-1,2.8,trim,{lw:.8}));
+    // bay window
+    if(lit){ctx.globalAlpha=.2*v;ctx.fillStyle='#ffd98a';ctx.beginPath();ctx.arc(bx+bw/2,fy+15,17,0,7);ctx.fill();ctx.globalAlpha=1}
+    shape(rectPts(bx+3,fy+7,bw-6,17,sd+i+f+6,.2),wc,{lw:1.3});line(bx+3,fy+15,bx+bw-3,fy+15,trim,1.4);line(bx+bw/2,fy+7,bx+bw/2,fy+24,trim,1);
+    if(v<.2&&f===1&&i===1){ctx.fillStyle=Math.sin(T*11)>-.3?'#ffd98a':'#e8a22a';ctx.beginPath();ctx.arc(bx+bw/2,fy+19,2.2,0,7);ctx.fill()}
+    if(f<2)strip(bx-1,fy,bx+bw+1,fy,2.2,trim,{lw:.7})}
+   // front steps
+   shape(rectPts(px+10,base-1,16,4,sd+i+30,.2),'#b8b2a4',{lw:1});shape(rectPts(px+7,base+3,22,4,sd+i+31,.2),'#b8b2a4',{lw:1});
+   // the cornice: a deep flat overhang on brackets
+   shape(rectPts(x-5,top-8,W+10,9,sd+i+32,.3),trim,{lw:1.8,sh:1});for(let m=0;m<6;m++)shape([[x+2+m*9,top+1],[x+7+m*9,top+1],[x+2+m*9,top+7]],mix(trim,'#1b1328',.25),{lw:.8});
+   if(i===0){shape(rectPts(x+34,top-22,8,15,sd+33,.3),'#a8452e',{lw:1.3});if(Math.sin(T*.6+sd)>-.2)puffDraw(x+38,top-24)}})});
+ [575,1400,1668,2085,2420,2608].forEach((x,i)=>{if(x<a-60||x>b+60)return;strip(x,GY-4,x,GY-92,4.5,'#3a3a40',{lw:1});strip(x,GY-92,x+14,GY-96,3.5,'#3a3a40',{lw:1});if(v>.2){ctx.globalAlpha=.17*v;shape([[x+14,GY-90],[x-24,GY-4],[x+52,GY-4]],'#ffe9b0',{ln:false});ctx.globalAlpha=1}shape(ellPts(x+14,GY-93,8,5.5,i+940),mix('#52525a',tg<.75?'#e8a22a':'#ffe9b0',clamp(v*1.15,0,1)),{lw:1.5})})}
 // what each site does to the one beside it, shown instead of said: seeds and crossings
 function drawNeighbors(){if(!F||state!=='play')return;const a=cam.x-80,b=cam.x+viewW+80;drawHomes(a,b);const o=sites.slice(0,5).sort((p,q)=>p.x-q.x),hard=s=>s.state==='standing'&&(s.id!=='dam'||s.paved),hab=s=>s.state==='grown'&&CH[s.choice]&&CH[s.choice].hab,young=s=>s.state==='growing';
  for(let i=0;i<o.length-1;i++){const L=o[i],R=o[i+1],x0=L.x+L.w,x1=R.x;if(x1<a||x0>b)continue;
