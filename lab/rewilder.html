@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.57</title>
+<title>Rewilder v0.58</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.57 | LAB | 2026-11-17
+<!-- TSP build: Rewilder v0.58 | LAB | 2026-11-17
+     v0.58 (founder: "Vacation still shortcuts the tar go when you walk right. Vacation has to be to the far right of the tar co now. You can still leave the sign but don’t bypass tar co.")
      v0.57 (founder: "1. When you break the tractor, the yellow figures speech bubbles say “#*+?!&@!” Etc and they hop around mad for a few seconds before starting to repair the tractor (takes one minute to repair). 2. Before 93 comes crashing down, send a safety crew that escorts all vehicles from bridge. 3. Make smoke from trucks actually come from the smokestacks. 4. Make the hot air balloon look better when deflating. Research. Should be funny but also realistic pattern. 5. Remove the “found it” tag ambiguously associated with the underwater blockade. 6. Improve graphics of that blockade. 7 remove the yellow and white dots in the tar factory. 8. When vacuuming the lake add a line of red and white buoys across the edge of the receding oil. 9. In the cleaned lake, improve quality of all flying objects including flight pattern. No ovals as bees etc. 10. When the baby salmon are feeding just make the players salmon get bigger, not the others. 11. The TAR co should get larger and more challenging each level")
      v0.56 (founder: "1. Cut them. 2. Also, in level 3 this property never grows once cleared. 3. Make the oil vacuuming sequence much slower so we can see it. 4. There are weird bird or butterfly ovals in flight that don’t meet papercut standards. 5. Review the restored park scene for weirdness and add a small waterfall connecting the two bodies of water. 6. The balloon should spiral horizontally not vertically")
      v0.55 (founder: "The drones on level 3 attacking the last building are too hard to see. Add red lights to drones" then: "What’s with the papercut art request? For all the
@@ -490,7 +491,7 @@ body.playing.touch #pad{display:flex}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.57</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.58</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -1161,7 +1162,8 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return
   else if(s.state==='choose'&&state==='play'&&!pickOpen&&!cardOpen)openPick(s)});
  if(state==='title'){demo(dt);P.walk+=dt;tick(dt);camFollow(dt);return}
  if(state!=='play'||paused()){P.walk+=dt;tick(dt);camFollow(dt);return}
- if(done&&P.support==='ground'&&P.x>EAST()-52){beginVacation();return}
+ if(done&&depot&&!depot.seen)depot.seen=true; // the road east opens when the level is done, so the vacation always lies past TAR CO
+ if(done&&P.support==='ground'&&P.x>WORLD+1720-52){beginVacation();return}
  F=flows();
  hazards(dt);
  sites.forEach(s=>{
@@ -1832,7 +1834,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  folk.forEach((f,fi)=>{if(level>=3&&DY>0&&fi%3!==0){robot(f.x,GY-2,fi*7+1,f.hop);return}const fc=DY>0&&/^#[0-9a-f]{6}$/i.test(f.c)?mix(f.c,'#5e5a66',DY*.85):f.c;if(f.bike)bike(f.x,GY-2,fc,f.seed,f.hop);else{ctx.save();if(f.hop>0)ctx.translate(0,-Math.sin(f.hop/.5*Math.PI)*14);person(f.x,GY-4,fc,f.seed,f.hop>0);ctx.restore()}
   });
  life.forEach(drawLife);
- if(done){const vx=EAST()-66;line(vx,GY,vx,GY-120,'#5b3a24',5);shape([[vx-58,GY-150],[vx+34,GY-150],[vx+58,GY-132],[vx+34,GY-114],[vx-58,GY-114]],'#fbf3dc',{lw:2.4,sh:1});ctx.font='800 '+Math.max(18,16/S)+'px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=INK;ctx.fillText('VACATION',vx-6,GY-132)}
+ if(done)[WORLD-66,WORLD+1720-66].forEach(vx=>{line(vx,GY,vx,GY-120,'#5b3a24',5);shape([[vx-58,GY-150],[vx+34,GY-150],[vx+58,GY-132],[vx+34,GY-114],[vx-58,GY-114]],'#fbf3dc',{lw:2.4,sh:1});ctx.font='800 '+Math.max(18,16/S)+'px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=INK;ctx.fillText('VACATION',vx-6,GY-132)})
  sites.forEach(q=>{if(q.crew&&q.state==='growing')for(let i=0;i<3;i++){const px=q.x+30+i*(q.w-60)/2,hop=Math.abs(Math.sin(T*7+i*2))*8;ctx.save();ctx.translate(0,-hop);person(px,GY-4,'#e8a22a',i+40,i===1);shape([[px-5,GY-30],[px,GY-36],[px+5,GY-30]],'#5fae50',{lw:1.2});ctx.restore();line(px+5,GY-18-hop,px+13,GY-26-hop+Math.sin(T*14+i)*5,'#5b3a24',2.6)}});
  tar.forEach(q=>{ctx.globalAlpha=Math.min(1,q.t/2);shape(blobPts(q.x,GY-3,26,7,q.x,9),'#1b1328',{lw:1.4});ctx.globalAlpha=1});
  barrels.forEach(q=>{shape(rectPts(q.x-9,q.y-12,18,24,q.x,.4),'#1b1328',{lw:1.6});line(q.x-9,q.y-2,q.x+9,q.y-2,'#ffd23f',4)});
