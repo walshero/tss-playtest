@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.64</title>
+<title>Rewilder v0.65</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.64 | LAB | 2026-11-17
+<!-- TSP build: Rewilder v0.65 | LAB | 2026-11-17
+     v0.65 (founder: "Forget speech bubbles for workers too. Speech bubbles across the board look cheap and sloppy. Cut. Also the smog decor is too hard to see and doesn’t match game style. Rethink smog effect for the bridge in paper cut. Traffic should be bumper to bumper and the demolition safety crew should rush by the player, go properly up the ramp, and quickly sweep all traffic off. Whole thing less than 5 seconds.")
      v0.64 (founder: "Forget the middle finger and the honking. Remove both. And make the smog more artistic not a bunch of ovals")
      v0.63 (founder, on the list of built scenes still owed: "Why still owed? Build now!")
      v0.62 (founder: "The final island should be a higher tower, harder to defeat than the last tower of level 3. Requires timing and smarts. Then it breaks down into a connected village in a more architecturallly unique way than now tho the pods are good. Also, remove honks. Replace with bubbles of “!!!” And the occasional middle finger icon because this is Boston. Same with angry crews. I can’t read their speech bubbles. Make them !!!" then "Also, don’t let the
@@ -503,7 +504,7 @@ body.playing.touch #pad{display:flex}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.64</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.65</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -1005,10 +1006,10 @@ function checkFails(s){if(s.state!=='standing')return false;const R=s.rows;
  return moved>0}
 /* the 93: one road across the city, held up by legs */
 function viaInit(){const s=sites[1],hp=4,L=890+VX1-VX0;via={down:false,fall:false,n:s.rows.length,piers:VPX.filter(x=>!(level>=3&&x>sites[0].x-10&&x<sites[0].x+sites[0].w+10)).map((x,i)=>({x,hp,max:hp,seed:i*13+5,jolt:0}))};
- s.rows.forEach(r=>r.forEach(k=>{if(k&&k.t==='s')k.hp=k.max=4}));s.cars=[];for(let i=0;i<46;i++)s.cars.push({u:i*L/46,x:VX0,y:0,a:0,al:1,on:false,c:CARC[i%5],dead:0,v:15+hr(i)*9,rig:i%3===1})}
+ s.rows.forEach(r=>r.forEach(k=>{if(k&&k.t==='s')k.hp=k.max=4}));s.cars=[];{let u=0,i=0;while(u<L-50&&i<170){const rig=i%6===3;s.cars.push({u,x:VX0,y:0,a:0,al:1,on:false,c:CARC[i%5],dead:0,v:13,rig});u+=rig?104:38;i++}}}
 function legsLeft(){const s=sites[1];let n=via.piers.filter(p=>p.hp>0).length;if(s.state==='standing'&&!s.paved)for(let c=1;c<s.cols;c+=3)if(s.rows[0]&&s.rows[0][c]&&s.rows[0][c].hp>0)n++;return n}
 function legDown(x){SFX.collapse();shake=RM?0:8;dust(x,GY,10,70);stats.floors++;const n=legsLeft();if(n>0)word(n+(n===1?' LEG LEFT':' LEGS LEFT'),x,GY-250,'#ffd23f');else viaFall()}
-function viaFall(){if(!via||via.fall||via.down||via.evac)return;const s=sites[1];if(s.state==='standing'&&s.traffic&&s.cars&&s.cars.some(c=>c.dead<=0)){via.evac=T;honks.length=0}else viaDrop()}
+function viaFall(){if(!via||via.fall||via.down||via.evac)return;const s=sites[1];if(s.state==='standing'&&s.traffic&&s.cars&&s.cars.some(c=>c.dead<=0)){via.evac=T;via.ex0=P.x+viewW*.8;honks.length=0}else viaDrop()}
 function viaDrop(){if(!via||via.fall||via.down)return;via.evac=0;via.fall=true;const s=sites[1];if(s.state==='standing'){topple(s,0);word('93 DOWN',clamp(P.x,VX0,VX1),GY-300,'#ffd23f')}}
 // the gas tanks beside the tar factory: three good hits, a short hiss, then the whole place goes up
 function tankHit(power){const t=tarS(),d=depot;if(!t||!d||!tarUp()||d.fuse>0||d.boom||P.climb||P.y<GY-140)return false;const rx=P.x+P.face*44,tx=t.x+t.w+66;if(Math.abs(rx-tx)>66)return false;
@@ -1307,13 +1308,13 @@ function hazards(dt){sites.forEach(s=>{if(s.state!=='standing'||s.paved)return;
    else{L.y+=130*dt;if(L.y>=GY){s.lift=null;s.liftT=22}}}
   // highway traffic on an unbroken deck
   if(s.id==='highway'){const top=s.rows[s.rows.length-1],dk=!!top&&top.deck&&s.state==='standing'&&!via.down,LR=330,VL=VX1-VX0,ty=GY-s.rows.length*s.fh;s.traffic=dk;
-   const jam=.3+.7*Math.max(0,Math.sin(T*.9)),drop=c=>{if(c.al>.5&&props.length<12)props.push({x:c.x,y:c.y-8,vy:-60,c:c.c,state:'fall',t:0,dir:1,y0:c.y-8});c.dead=5+Math.random()*4;c.on=false};
-   if(via.evac&&(T-via.evac>11||(T-via.evac>8.4&&!s.cars.some(c=>c.dead<=0&&c.on))))viaDrop();
+   const jam=.15+.85*Math.max(0,Math.sin(T*.7)),drop=c=>{if(c.al>.5&&props.length<12)props.push({x:c.x,y:c.y-8,vy:-60,c:c.c,state:'fall',t:0,dir:1,y0:c.y-8});c.dead=5+Math.random()*4;c.on=false};
+   if(via.evac&&T-via.evac>3.9)viaDrop();
    s.cars.forEach(c=>{if(c.dead>0){c.dead-=dt;c.on=false;if(c.dead<=0){if(dk&&!via.evac)c.u=0;else c.dead=1}return}
     if(!dk){drop(c);return}
-    c.on=c.u>=LR&&c.u<LR+VL;c.u+=c.v*(via.evac?24:c.on?jam:2.6)*dt;const q=rampPos(s,c.u,ty);c.x=q[0];c.y=q[1];c.a=q[2];c.al=q[3];c.z=q[4]||1;c.bk=!!q[5];c.vw=q[6]||0;c.sx=q[7]||1;
+    c.on=c.u>=LR&&c.u<LR+VL;c.u+=(via.evac?(T-via.evac>.6?(LR+VL+560)/2.6:0):c.v*jam)*dt;const q=rampPos(s,c.u,ty);c.x=q[0];c.y=q[1];c.a=q[2];c.al=q[3];c.z=q[4]||1;c.bk=!!q[5];c.vw=q[6]||0;c.sx=q[7]||1;
     if(c.on&&c.rig&&Math.abs(c.x-P.x)<viewW&&Math.random()<dt*7)puff(c.x+12.8*(c.sx||1),c.y-40,{bk:1,kind:'smoke',vx:-18*(c.sx||1),vy:-34,r:3.6,gr:9,c:'#3a3432',life:1.6,max:1.6});
-    if(c.on){const col=Math.floor((c.x-s.x)/s.cw);if(col>=0&&col<s.cols&&!(top[col]&&top[col].hp>0))drop(c)}else if(c.u>=LR+VL+560){c.dead=1+Math.random()*3}
+    if(c.on){const col=Math.floor((c.x-s.x)/s.cw);if(col>=0&&col<s.cols&&!(top[col]&&top[col].hp>0))drop(c)}else if(c.u>=LR+VL+560){if(via.evac)c.dead=1;else c.u-=LR+VL+560}
     if(c.on&&c.dead<=0&&!via.evac&&P.support===s&&P.bump<=0&&Math.abs(c.x-P.x)<28){P.bump=.9;hurt(6);P.vx=-260;P.vy=-260;P.support=null;SFX.honk();once('traffic','Traffic. Cut the legs to drop the road.',6)}});
    if(false){const hd=Math.min(Math.abs(P.x-1545),Math.abs(P.x-2512)),loud=hd<300;if(Math.random()<dt*(loud?2.2:.9)&&honks.length<(loud?6:3)){const c=s.cars[Math.floor(Math.random()*s.cars.length)];if(c.dead<=0&&c.on&&Math.abs(c.x-P.x)<viewW*.9){SFX.honk(loud?1.7:.75);honks.push({x:c.x,y:c.y-30,t:0,big:loud,k:Math.floor(Math.random()*4)})}}}
    if(via.evac){const sn=Math.floor(T*2.8);if(sn!==via.sn){via.sn=sn;tone(sn%2?720:960,.32,'square',.035)}}
@@ -1900,7 +1901,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(beach>0){const b=ease(beach);shape([[-80,GY+6],[-80,GY-4-10*b],[60,GY-8-14*b],[180,GY-6],[230,GY+6]],'#e3cf9a',{lw:2});for(let i=0;i<3;i++)if(b>.5){const bx=20+i*50+Math.sin(T*2+i)*10;shape(ellPts(bx,GY-22,7,5,i),'#ece6dc',{lw:1.4});line(bx-2,GY-17,bx-2,GY-9,INK,1.4);line(bx+2,GY-17,bx+2,GY-9,INK,1.4);line(bx+6,GY-23,bx+13,GY-21,INK,1.6)}}
  pits.forEach(p=>{const w=26+p.d*6,h=10+p.d*12;shape([[p.x-w,GY-5],[p.x+w,GY-5],[p.x+w*.7,GY-5+h],[p.x-w*.7,GY-5+h]],'#2a1c14',{lw:2});shape(blobPts(p.x-w-12,GY-8,12+p.d*3,5+p.d*2,p.x,8),'#6b4a30',{lw:1.6});shape(blobPts(p.x+w+12,GY-8,12+p.d*3,5+p.d*2,p.x+3,8),'#6b4a30',{lw:1.6})});
  if(level>1)drawDystopia();
- if(isle)drawIsle();drawPit();drawVia();parts.forEach(q=>{if(q.bk)drawPart(q)});sites.forEach(q=>{if(q.state!=='grown')drawSite(q)});if(drawBillsLater){drawBillsLater=false;drawBills()}sites.forEach(q=>{if(q.state==='grown')drawSite(q)});drawRainFlow();drawNeighbors();if(isle){drawHatches();drawIsleFront()}drawDepot();
+ if(isle)drawIsle();drawPit();drawVia();parts.forEach(q=>{if(q.bk)drawPart(q)});sites.forEach(q=>{if(q.state!=='grown')drawSite(q)});if(drawBillsLater){drawBillsLater=false;drawBills()}sites.forEach(q=>{if(q.state==='grown')drawSite(q)});drawRainFlow();drawNeighbors();drawSirens();if(isle){drawHatches();drawIsleFront()}drawDepot();
  if(riverOn&&plug.seen&&plug.hp>0&&!swim)chalk(plug.x,GY-58);
  drawTowerDrones();
  docks.forEach((d,i)=>{if(!riverOn||d<cam.x-80||d>cam.x+viewW+80)return;const on=state==='play'&&!swim&&nearDock(P.x)&&Math.abs(P.x-d)<36;
@@ -2005,33 +2006,19 @@ function drawVia(){if(!via||via.down)return;const s=sites[1],n=s.rows.length;if(
  for(let x=VX0,i=0;x<VX1;x+=60,i++){if((x>=s.x&&x<s.x+s.w)||x+60<a||x>b)continue;deckBlock(x,top,60,fh,i*7+3,l2)}
  if(s.traffic)s.cars.forEach(c=>{if(c.dead>0||c.bk||c.x<a||c.x>b)return;drawCar(c)});
  if(s.traffic&&s.id==='highway'&&via.evac){const top=GY-s.rows.length*s.fh,e=T-via.evac;
-  // two yellow siren trucks sweep the deck and chase every car off before it falls
-  for(let k=0;k<2;k++){const tx=VX0-90-k*110+(VX1-VX0+260)*clamp((e-k*.5)/8,0,1);if(tx<a-80||tx>b+80)continue;const fl=RM?1:Math.floor(T*7+k)%2,bob=RM?0:Math.sin(T*18+k)*1;ctx.save();ctx.translate(tx,top+bob);
-   shape(smoothPts([[-34,-4],[-34,-30],[-30,-34],[10,-34],[14,-30],[32,-22],[36,-16],[36,-4]],1),'#ffd23f',{lw:2.2,sh:1});shape(rectPts(-34,-13,70,4,k+90,.2),'#1b1328',{ln:false});for(let m=0;m<6;m++)shape([[-32+m*12,-13],[-26+m*12,-13],[-30+m*12,-9],[-36+m*12,-9]],'#ffd23f',{ln:false});
-   shape([[14,-29],[24,-24],[30,-18],[14,-18]],'#cfeaf4',{lw:1});shape(rectPts(-28,-29,14,9,k+91,.2),'#cfeaf4',{lw:1});
-   shape(rectPts(-12,-40,18,6,k+92,.2),'#3a3644',{lw:1});shape(rectPts(-11,-39,8,4,k+93,.1),fl?'#ff3b2e':'#7a1a12',{ln:false});shape(rectPts(-3,-39,8,4,k+94,.1),fl?'#1d4a8a':'#4a9bff',{ln:false});
-   {ctx.save();ctx.globalCompositeOperation='lighter';const g2=ctx.createRadialGradient(-3,-38,0,-3,-38,46);g2.addColorStop(0,fl?'rgba(255,60,44,.5)':'rgba(74,155,255,.5)');g2.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g2;ctx.fillRect(-49,-84,92,92);ctx.restore()}
-   [-22,22].forEach(o=>{shape(ellPts(o,-3,6,6,o),'#1b1328',{lw:1.2});shape(ellPts(o,-3,2.2,2.2,o+1),'#b8b2a4',{ln:false})});
-   if(!RM)for(let m=0;m<2;m++){const u=(T*2.4+m*.5)%1;ctx.strokeStyle='rgba(255,210,63,'+(1-u).toFixed(2)+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(40,-22,8+u*18,-.7,.7);ctx.stroke()}
-   ctx.restore()}}
+  for(let k=0;k<2;k++){const q=sirenAt(k);if(q&&q.ph===2)sirenTruck(q)}}
  if(s.traffic&&s.id==='highway'){const top=GY-s.rows.length*s.fh;
   for(let x=Math.floor(Math.max(a,s.x)/46)*46;x<Math.min(b,s.x+s.w);x+=46){const h=hr(x*.53);if(h<.7){shape(blobPts(x+h*30,top+8+h*26,7+h*9,4+h*5,x,8),h<.35?'#a8522a':'#8a4424',{ln:false});if(h<.3)shape(blobPts(x+h*30+3,top+7+h*26,3+h*5,2+h*3,x+1,6),'#c8703a',{ln:false})}}
   for(let x=Math.floor(Math.max(a,s.x)/84)*84;x<Math.min(b,s.x+s.w);x+=84){const dx=x+hr(x*.9)*60,span=GY-top-22,u=((T*.55+hr(x*.4))%1),yy=top+20+u*u*span;if(u<.92){shape([[dx,yy-7],[dx+2.8,yy],[dx,yy+3.4],[dx-2.8,yy]],'#8a4a2a',{lw:.8})}else{const v=(u-.92)/.08;ctx.strokeStyle='rgba(138,74,42,'+(1-v).toFixed(2)+')';ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(dx,GY-3,4+v*12,1.4+v*3,0,0,6.2832);ctx.stroke()}shape(ellPts(dx,GY-2,9,2.4,x+2),'#6b3a22',{ln:false})}
   for(let x=Math.floor(Math.max(a,s.x)/38)*38;x<Math.min(b,s.x+s.w);x+=38){const h=hr(x*.37);if(h<.62){ctx.fillStyle='rgba(30,20,16,'+(.16+h*.2).toFixed(2)+')';ctx.fillRect(x+h*20,top+3,2.4+h*4,10+h*46)}}
-  {const x0=Math.max(a,VX0-40),x1=Math.min(b,VX1+40),fade=x=>clamp(Math.min(x-(VX0-40),VX1+40-x)/150,0,1),dr=RM?0:T;
-   // wisps first, so the bands sit over their tops
-   for(let x=Math.floor(x0/170)*170;x<x1;x+=170){const wx=x+hr(x*.3)*90,sw=RM?0:Math.sin(dr*.5+x)*10,f=fade(wx);if(f<=0)continue;ctx.globalAlpha=.34*f;ctx.strokeStyle='#8a7450';ctx.lineCap='round';[[7,0],[3.4,.5]].forEach(q=>{ctx.lineWidth=q[0];ctx.beginPath();ctx.moveTo(wx,top-8);ctx.bezierCurveTo(wx+16+sw,top-22,wx-18-sw,top-38,wx+6+sw,top-56-q[1]*14);ctx.stroke()});ctx.globalAlpha=1}
-   for(let k=0;k<3;k++){const y0=top-36-k*27,col=['#7a6648','#94805c','#b09a72'][k],sp=(k+1)*5,ph=k*2.1,up=x=>(12+7*Math.sin(x*.012+ph+dr*.08)+4*Math.sin(x*.034+ph*2-dr*.05)+3*Math.max(0,Math.sin(x*.006+ph+dr*.03))*5)*fade(x),dn=x=>(5+3*Math.sin(x*.017+ph+1))*fade(x),ox=RM?0:dr*sp;
-    ctx.beginPath();let st=1;for(let x=x0;x<=x1;x+=22){const yy=y0-up(x+ox);st?ctx.moveTo(x,yy):ctx.lineTo(x,yy);st=0}for(let x=x1;x>=x0;x-=22)ctx.lineTo(x,y0+dn(x-ox));ctx.closePath();
-    ctx.globalAlpha=.5-k*.08;ctx.fillStyle='rgba(18,8,24,.5)';ctx.save();ctx.translate(2,3);ctx.fill();ctx.restore();ctx.fillStyle=col;ctx.fill();
-    // the lit upper lip of the sheet
-    ctx.beginPath();st=1;for(let x=x0;x<=x1;x+=22){const yy=y0-up(x+ox)+1;st?ctx.moveTo(x,yy):ctx.lineTo(x,yy);st=0}ctx.strokeStyle=mix(col,'#fff6e0',.4);ctx.lineWidth=1.6;ctx.globalAlpha=.55-k*.08;ctx.stroke();
-    // scroll curls: a rolled end of the sheet, cut as one spiral
-    for(let x=Math.floor((x0+ox)/300)*300;x<x1+ox;x+=300){const cx2=x-ox+hr(x*.7+k)*120,f=fade(cx2);if(f<.3||cx2<x0||cx2>x1)continue;const cy2=y0-up(cx2+ox)-2,R=(9+hr(x+k)*5)*f;ctx.beginPath();for(let m=0;m<=22;m++){const t=m/22,a2=t*8.2,r=R*(1-t*.82),px=cx2+Math.cos(a2)*r,py=cy2-R+Math.sin(a2)*r;m?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.strokeStyle=col;ctx.lineWidth=4.4;ctx.lineCap='round';ctx.globalAlpha=.6-k*.08;ctx.stroke();ctx.strokeStyle=mix(col,'#fff6e0',.4);ctx.lineWidth=1.2;ctx.stroke()}
-    ctx.globalAlpha=1}}
-  // bubbles ride above the smog
-  honks.forEach(h=>{if(h.x<a||h.x>b)return;const u=h.t/1.5,sz=(h.big?1.5:1)*(u<.12?u/.12:1),txt='!!!',bw=64*sz,bh=15*sz,x0=h.x,y0=h.y-22-u*14-(h.big?10:0);ctx.globalAlpha=u>.8?(1-u)/.2:1;
-   shape([[x0-bw/2,y0-bh],[x0-bw*.2,y0-bh-5*sz],[x0+bw*.1,y0-bh],[x0+bw/2,y0-bh+2],[x0+bw/2+7*sz,y0],[x0+bw/2,y0+bh],[x0+10*sz,y0+bh],[x0+2,y0+bh+11*sz],[x0-6*sz,y0+bh],[x0-bw/2,y0+bh],[x0-bw/2-7*sz,y0]],h.big?'#ffd23f':'#fbf6ea',{lw:2,sh:1});paperText(txt,x0,y0+1,(h.big?32:24),h.big?'#7a1a12':'#1b1328',RM?0:Math.sin(T*20+h.x)*.05);ctx.globalAlpha=1});}
+  for(let k=1;k>=0;k--)for(let x=Math.floor((Math.max(a,VX0)-260)/270)*270;x<Math.min(b,VX1)+260;x+=270){const i=Math.round(x/270),cw=(150+hr(i*3.1+k)*60)*(k?.8:1),cx2=x+k*135+hr(i*1.7+k)*50+(RM?0:Math.sin(T*.25+i+k*2)*14),cy2=top-58-k*46-hr(i*2.3+k)*14+(RM?0:Math.sin(T*.6+i*1.3+k)*3),n=4+(i+k)%2,col=k?['#8f7c4e','#7d6c44'][i&1]:['#b39d5e','#a08a52'][i&1];
+   if(cx2<VX0-40||cx2>VX1+40||cx2+cw<a||cx2-cw>b)continue;
+   line(cx2-cw*.22,cy2-20,cx2-cw*.22,cam.y-20,'rgba(244,236,216,.5)',1);line(cx2+cw*.2,cy2-20,cx2+cw*.2,cam.y-20,'rgba(244,236,216,.5)',1);
+   const pts=[[cx2-cw/2,cy2+12],[cx2-cw/2-6,cy2+2]];for(let j=0;j<n;j++){const ax=cx2-cw/2+(j+.5)*cw/n,r=cw/n*.62,h=(18+hr(i+j*5+k)*16)*(j===0||j===n-1?.7:1);arcPts(ax,cy2-2,r,h,Math.PI*1.06,Math.PI*1.94,5).forEach(q=>pts.push(q))}pts.push([cx2+cw/2+6,cy2+2],[cx2+cw/2,cy2+12]);
+   shape(pts,col,{lw:2.2,sh:1});shape([[cx2-cw/2+6,cy2+12],[cx2+cw/2-6,cy2+12],[cx2+cw/2-12,cy2+6],[cx2-cw/2+12,cy2+6]],mix(col,'#1b1328',.22),{ln:false});
+   // a sour face, like the sky's clouds but cross
+   if(!k){const ex=cw*.12;[-1,1].forEach(d=>{line(cx2+d*ex-5,cy2-10-d*-0,cx2+d*ex+5,cy2-8+d*0,'#3a2e22',2.4);shape(ellPts(cx2+d*ex,cy2-4,2.4,2.4,i+d),'#3a2e22',{ln:false})});ctx.strokeStyle='#3a2e22';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.arc(cx2,cy2+9,6,Math.PI*1.2,Math.PI*1.8);ctx.stroke()}}
+  }
  ctx.restore()}
 function car(x,y,c,s){shape(rectPts(x,y-11*s,26*s,11*s,x,.5),c,{lw:1.6});shape(rectPts(x+5*s,y-17*s,14*s,7*s,x+1,.4),c,{lw:1.4});dot(x+6*s,y,3*s,INK);dot(x+20*s,y,3*s,INK);const lk=(P.x>x?1:-1)*s;dot(x+17*s,y-8*s,3*s,'#fbf6ea');dot(x+23.5*s,y-8*s,3*s,'#fbf6ea');dot(x+17*s+lk,y-8*s,1.5*s,INK);dot(x+23.5*s+lk,y-8*s,1.5*s,INK)}
 function blockArt(cx,cy,z,seed){const x=cx-z/2,y=cy-z/2;shape(rectPts(x,y,z,z,seed,.6),'#c9962e',{lw:2.4,sh:1});shape(rectPts(x+5,y+5,z-10,z-10,seed+1,.4),'#e8c25a',{lw:1.6});[[0,0],[1,0],[0,1],[1,1]].forEach(q=>shape(rectPts(x+q[0]*(z-10),y+q[1]*(z-10),10,10,seed+2,.2),'#7a5a1c',{lw:1.2}));ctx.strokeStyle='#7a5a1c';ctx.lineWidth=3;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(cx-8,cy-7);ctx.lineTo(cx,cy+1);ctx.lineTo(cx+8,cy-7);ctx.moveTo(cx-8,cy+1);ctx.lineTo(cx,cy+9);ctx.lineTo(cx+8,cy+1);ctx.stroke()}
@@ -2570,6 +2557,20 @@ function drawLinks(L){const g=L.g,cx=L.x,H=HOMES.map(h=>[cx+h[0],GY-15-h[1]-16*h
   for(let m=0;m<=N;m++){line(deck[m][0],deck[m][1],rail[m][0],rail[m][1],'#8a5a34',1);if(m%3===1){const lit=u>=1;shape(ellPts(rail[m][0],rail[m][1]+5,2.6,3.2,m+i),lit?['#ffd23f','#f3b6c8','#9fd8ee'][(m+i)%3]:'#8a809c',{lw:.7})}}
   [[x0,y0],[x1,y1]].forEach(q=>strip(q[0],q[1]+3,q[0],q[1]-17,3,'#6b4a30',{lw:.5}));
   if(u>=1&&i%2===0){const t=RM?.5:.5+.42*Math.sin(T*.35+i*1.7),q=pt(t);person(q[0],q[1]-1,['#d9534a','#3b6ea8','#8a5ac8','#2f8f6a'][i%4],80+i*3.7,false)}}}
+/* v0.65: the demolition safety crew. Two yellow siren trucks tear past on the street, climb the on-ramp the way the traffic does, and drive every vehicle off the deck. */
+function sirenAt(k){if(!via||!via.evac)return null;const s=sites[1],ty=GY-s.rows.length*s.fh,e=T-via.evac-k*.16,VL=VX1-VX0,R0=rampPos(s,0,ty);if(e<0)return null;
+ if(e<.9){const u=ease(e/.9),x=via.ex0+(R0[0]-via.ex0)*u;return{x,y:GY-2,a:0,d:R0[0]<via.ex0?-1:1,ph:0,k}}
+ if(e<1.4){const q=rampPos(s,330*((e-.9)/.5),ty);return{x:q[0],y:q[1],a:q[2],d:q[7]||1,ph:1,k,al:q[3]}}
+ const q=rampPos(s,330+(VL+300)*clamp((e-1.4)/2.2,0,1),ty);return{x:q[0],y:q[1],a:q[2],d:q[7]||1,ph:2,k,al:q[3]}}
+function sirenTruck(q){const fl=RM?1:Math.floor(T*9+q.k)%2,bob=RM?0:Math.sin(T*26+q.k)*1.2;ctx.save();ctx.translate(q.x,q.y+bob);ctx.rotate(q.a||0);ctx.scale(q.d,1);if(q.al!==undefined)ctx.globalAlpha=Math.max(.2,q.al);
+ if(!RM)for(let m=0;m<4;m++){ctx.fillStyle='rgba(251,246,234,'+(.5-m*.11).toFixed(2)+')';ctx.fillRect(-44-m*22,-26+m*5,18,2.4)}
+ shape(smoothPts([[-34,-4],[-34,-30],[-30,-34],[10,-34],[14,-30],[32,-22],[36,-16],[36,-4]],1),'#ffd23f',{lw:2.2,sh:1});shape(rectPts(-34,-13,70,4,q.k+90,.2),'#1b1328',{ln:false});for(let m=0;m<6;m++)shape([[-32+m*12,-13],[-26+m*12,-13],[-30+m*12,-9],[-36+m*12,-9]],'#ffd23f',{ln:false});
+ shape([[14,-29],[24,-24],[30,-18],[14,-18]],'#cfeaf4',{lw:1});shape(rectPts(-28,-29,14,9,q.k+91,.2),'#cfeaf4',{lw:1});
+ shape(rectPts(-12,-40,18,6,q.k+92,.2),'#3a3644',{lw:1});shape(rectPts(-11,-39,8,4,q.k+93,.1),fl?'#ff3b2e':'#7a1a12',{ln:false});shape(rectPts(-3,-39,8,4,q.k+94,.1),fl?'#1d4a8a':'#4a9bff',{ln:false});
+ {ctx.save();ctx.globalCompositeOperation='lighter';const g2=ctx.createRadialGradient(-3,-38,0,-3,-38,50);g2.addColorStop(0,fl?'rgba(255,60,44,.55)':'rgba(74,155,255,.55)');g2.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g2;ctx.fillRect(-53,-88,100,100);ctx.restore()}
+ [-22,22].forEach(o=>{shape(ellPts(o,-3,6,6,o),'#1b1328',{lw:1.2});shape(ellPts(o,-3,2.2,2.2,o+1),'#b8b2a4',{ln:false})});ctx.restore();
+ if(q.ph===0&&!RM&&Math.random()<.5)dust(q.x-q.d*40,GY-2,1,10)}
+function drawSirens(){for(let k=0;k<2;k++){const q=sirenAt(k);if(q&&q.ph<2)sirenTruck(q)}}
 function drawHatches(){const L=isle.lair;if(L.state==='village')drawLinks(L);if(L.state!=='up')return;const a=cam.x-120,b=cam.x+viewW+120;
  HATCH.forEach((o,i)=>{const x=L.x+o,y=GY-46;if(x<a||x>b)return;const lit=i===L.lit,j=L.jolt>0&&!RM?(Math.random()-.5)*4:0;
   shape(rectPts(x-40+j,GY-14,80,12,i+820,.4),'#52525a',{lw:2,sh:1});shape(ellPts(x+j,y,36,36,i+821),'#6b7a90',{lw:2.6,sh:1});for(let m=0;m<8;m++){const an=m*.785;shape(ellPts(x+j+Math.cos(an)*30,y+Math.sin(an)*30,2.4,2.4,m),'#c9d2de',{ln:false})}
@@ -3031,7 +3032,7 @@ function drawTruck(t){ctx.save();
  if(t.state==='tipped'){const k=t.t,sd=(t.dir>0?-1:1);
   if(t.sunk||t.gone){for(let i=0;i<2;i++)person(t.x+sd*(30+k*40+i*14),GY-2,'#e8a22a',i,i===0)}
   else if(k<4.6){const CUSS=['#*+?!&@!','@%&#!!','!#$*&?!'];for(let i=0;i<2;i++){const hx=t.x+(i?-1:1)*(46+i*8),hop=RM?0:Math.abs(Math.sin(T*11+i*1.7))*13,jx=RM?0:Math.sin(T*23+i)*3;person(hx+jx,GY-2-hop,'#e8a22a',i,true);shape(arcPts(hx+jx,GY-35-hop,7,6,Math.PI,2*Math.PI,7),'#ffd23f',{lw:1.2});
-    if(k>.3+i*.5){const by=GY-92-i*34-hop*.4,txt='!!!',bw=96;shape(smoothPts([[hx-bw/2,by-17],[hx+bw/2,by-17],[hx+bw/2+8,by],[hx+bw/2,by+17],[hx+8,by+17],[hx+jx+2,by+30],[hx-6,by+17],[hx-bw/2,by+17],[hx-bw/2-8,by]],2),'#fbf6ea',{lw:2,sh:1});paperText(txt,hx,by+2,34,'#b3261e',RM?0:Math.sin(T*18+i)*.05)}}}
+    }}
   else{const u=clamp((k-63.5)/1.5,0,1);for(let i=0;i<2;i++){const hx=t.x+(i?-1:1)*(40+i*6),sw=RM?0:Math.sin(T*7+i*2);person(hx,GY-2,'#e8a22a',i,false);shape(arcPts(hx,GY-35,7,6,Math.PI,2*Math.PI,7),'#ffd23f',{lw:1.2});const d2=i?1:-1;strip(hx+d2*6,GY-22,hx+d2*(16+sw*4),GY-30-sw*8,2.6,'#8a5a34',{lw:.6});shape(rectPts(hx+d2*(16+sw*4)-4,GY-36-sw*8,8,6,i+3,.2),'#8f8a83',{lw:1})}
    shape(rectPts(t.x-12,GY-12,24,10,4,.3),'#d9342a',{lw:1.4});shape(rectPts(t.x-5,GY-15,10,3,5,.2),'#8f8a83',{lw:.8});
    [-70,70].forEach(o=>{shape([[t.x+o-7,GY-2],[t.x+o-2,GY-20],[t.x+o+2,GY-20],[t.x+o+7,GY-2]],'#e8862a',{lw:1.3});shape([[t.x+o-4.4,GY-10],[t.x+o+4.4,GY-10],[t.x+o+3.4,GY-14],[t.x+o-3.4,GY-14]],'#fbf6ea',{ln:false})})}
