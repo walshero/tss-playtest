@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.59</title>
+<title>Rewilder v0.60</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.59 | LAB | 2026-11-17
+<!-- TSP build: Rewilder v0.60 | LAB | 2026-11-17
+     v0.60 (founder, after the report named the green tower, the hub and the tram as next: "Take those 2 now then")
      v0.59 (founder: "The flooding can be more artfully done and with more impact on the game. Is it worth distinguishing “good” bulldozers from bad ones?" then "What’s needed in terms of art if we want to try for award-winning?" then "Ok, let’s implement. 1-5 and 7 and I will provide human eye. Ready for next great build")
      v0.58 (founder: "Vacation still shortcuts the tar go when you walk right. Vacation has to be to the far right of the tar co now. You can still leave the sign but don’t bypass tar co.")
      v0.57 (founder: "1. When you break the tractor, the yellow figures speech bubbles say “#*+?!&@!” Etc and they hop around mad for a few seconds before starting to repair the tractor (takes one minute to repair). 2. Before 93 comes crashing down, send a safety crew that escorts all vehicles from bridge. 3. Make smoke from trucks actually come from the smokestacks. 4. Make the hot air balloon look better when deflating. Research. Should be funny but also realistic pattern. 5. Remove the “found it” tag ambiguously associated with the underwater blockade. 6. Improve graphics of that blockade. 7 remove the yellow and white dots in the tar factory. 8. When vacuuming the lake add a line of red and white buoys across the edge of the receding oil. 9. In the cleaned lake, improve quality of all flying objects including flight pattern. No ovals as bees etc. 10. When the baby salmon are feeding just make the players salmon get bigger, not the others. 11. The TAR co should get larger and more challenging each level")
@@ -494,7 +495,7 @@ body.playing.touch #pad{display:flex}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.59</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.60</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field notes</button>
@@ -2543,33 +2544,37 @@ const G={
   reeds(x+6,GY-2,44,seed,p);reeds(x+w-50,GY-2,44,seed+5,p);tree(x+28,GY-4,1.2,seed,p);tree(x+w-30,GY-4,1,seed+7,(g-.3)/.7);
   if(g>.6){ctx.beginPath();ctx.arc(s.cx,GY+22,66,Math.PI*1.18,Math.PI*1.82);ctx.strokeStyle='#8a5a34';ctx.lineWidth=8;ctx.stroke();ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.stroke()}
   if(g>=1){duck(s.cx-40+Math.sin(T*.5)*30,GY-4,1,1);duck(s.cx-58+Math.sin(T*.5)*30,GY-3,2,1);duck(s.cx-74+Math.sin(T*.5)*30,GY-3,3,1);frog(x+60,GY-6,seed)}},
- hub(s,g,p,x,w,seed){const line=cutLine,dot=cutDot,by=GY-4,q=k=>ease(clamp((g-k)/(1-k),0,1)),x0=x+38,x1=x+w-62,hw=x1-x0,H=60*p,bay=hw/3;
-  // a paved forecourt
-  shape(rectPts(x,by-2,w*p,8,seed,.6),'#c9bfa8',{lw:1.8});for(let k=1;k<w*p/24;k++)line(x+k*24,by-1,x+k*24,by+5,'rgba(27,19,40,.2)',1);
-  tree(x+18,by,.95,seed+8,(g-.3)/.7);
-  if(H>6){// the back wall of the hall: ticket windows, a departures board, a way through
-   shape(rectPts(x0+5,by-H*.8,hw-10,H*.8,seed+1,.5),cardTone('#e9dcc0',seed),{lw:2.2,sh:1});
-   if(g>.4){[0,1].forEach(k=>{const wx=x0+16+k*24;shape(rectPts(wx,by-H*.62,16,18,seed+k+2,.3),'#ffe9b0',{lw:1.4});shape(rectPts(wx-2,by-H*.62+18,20,4,seed+k+4,.2),'#8a5a34',{lw:1})});
-    shape(rectPts(x0+bay+10,by-H*.66,bay-20,20,seed+6,.3),'#1b1328',{lw:1.6});for(let r=0;r<3;r++)for(let c2=0;c2<5;c2++){ctx.fillStyle=(r+c2+Math.floor(T*.5))%4?'#e8a22a':'#7cc35a';ctx.fillRect(x0+bay+15+c2*((bay-30)/5),by-H*.66+4+r*5.4,(bay-30)/5-3,2.6)}
-    shape(arcPts(x0+bay*2.5,by-H*.36,bay*.3,H*.3,Math.PI,2*Math.PI,10).concat([[x0+bay*2.8,by-2],[x0+bay*2.2,by-2]]),'#2a2a33',{lw:1.8})}
-   // timber posts and a beam
-   for(let k=0;k<4;k++)strip(x0+k*bay,by,x0+k*bay,by-H,6,'#8a5a34',{lw:1.4});strip(x0-8,by-H,x1+8,by-H,8,'#6b5236',{lw:1.6,sh:1})}
-  if(g>.3){// three glass vaults, planted along the ridges
-   const rq=q(.3);for(let k=0;k<3;k++){const cx=x0+bay*(k+.5),ry=24*rq;shape(arcPts(cx,by-H-3,bay/2+3,ry,Math.PI,2*Math.PI,12),'#bfe3ee',{lw:2,sh:1});for(let m=1;m<5;m++){const an=Math.PI+m*Math.PI/5;line(cx,by-H-3,cx+Math.cos(an)*(bay/2+3),by-H-3+Math.sin(an)*ry,'#fbf6ea',1.6)}
-     if(rq>.8)for(let m=0;m<3;m++)shape(blobPts(cx-8+m*8,by-H-3-ry-1,6,4.6,seed+k*5+m,7),m%2?'#3f8443':'#5fae50',{lw:1.1})}
-   shape(rectPts(s.cx-25,by-H+5,50,19,seed+9,.4),'#2a3550',{lw:1.8,st:'#9fd8ee'});paperText('HUB',s.cx,by-H+15,18,'#fbf3dc',0)}
-  if(g>.4){// a brick clock tower
-   const th=104*q(.4),tx=x+w-40;shape(rectPts(tx-10,by-th,20,th,seed+11,.5),cardTone('#b9603f',seed+2),{lw:2.2,sh:1});for(let yy=by-8;yy>by-th+8;yy-=8)line(tx-9,yy,tx+9,yy,'rgba(27,19,40,.16)',1);
-   if(th>60){shape(ellPts(tx,by-th+18,8.4,8.4,seed+12),'#fbf3dc',{lw:1.7});line(tx,by-th+18,tx+Math.cos(T*.4)*5.6,by-th+18+Math.sin(T*.4)*5.6,INK,1.6);line(tx,by-th+18,tx+Math.cos(T*.033-1.4)*4,by-th+18+Math.sin(T*.033-1.4)*4,INK,2);
-    shape([[tx-14,by-th],[tx,by-th-22],[tx+14,by-th]],'#2f8f8a',{lw:2,sh:1});line(tx,by-th-22,tx,by-th-32,'#5b3a24',1.6);shape([[tx-7,by-th-31],[tx+6,by-th-34],[tx+6,by-th-28]],'#c9a84a',{lw:1.1});
-    shape(arcPts(tx,by-15,6,9,Math.PI,2*Math.PI,8).concat([[tx+6,by-2],[tx-6,by-2]]),'#5b3a24',{lw:1.3})}}
-  if(g>.6){// benches under the roof, bikes at the rack
-   [x0+bay*.5,x0+bay*1.5].forEach((bx,i)=>{strip(bx-14,by-10,bx+14,by-10,3.4,'#8a5a34',{lw:1});[bx-11,bx+11].forEach(o=>line(o,by-9,o,by-2,'#5b3a24',2.4));if(g>=1)person(bx-5+i*8,by-9,['#e8c25a','#9fd8ee'][i],i+31,false)});
-   [x0-20,x0-6].forEach((bx,i)=>{ctx.strokeStyle=INK;ctx.lineWidth=1.8;[-6,6].forEach(o=>{ctx.beginPath();ctx.arc(bx+o,by-6,5.4,0,7);ctx.stroke()});strip(bx-6,by-6,bx+1,by-15,2.4,['#d9534a','#2f8f8a'][i],{lw:.7});strip(bx+1,by-15,bx+6,by-6,2.4,['#d9534a','#2f8f8a'][i],{lw:.7})})}
-  if(g>.7){const bx=x+20+((T*40)%(w+60))-40;shape(smoothPts([[bx,by-2],[bx,by-22],[bx+5,by-28],[bx+58,by-28],[bx+64,by-20],[bx+64,by-2]],3),'#2f8f8a',{lw:2,sh:1});strip(bx+2,by-12,bx+62,by-12,3,'#fbf3dc',{lw:.8});for(let i=0;i<4;i++)shape(rectPts(bx+6+i*13,by-25,10,9,seed+i+20,.2),'#cfeef0',{lw:1});shape(ellPts(bx+13,by-2,5.4,5.4,seed+24),INK,{lw:1});shape(ellPts(bx+51,by-2,5.4,5.4,seed+25),INK,{lw:1});ctx.fillStyle='#ffe9b0';ctx.beginPath();ctx.arc(bx+62,by-8,2.4,0,7);ctx.fill()}
-  if(g>=1){for(let i=0;i<4;i++){const u=(T*.11+i/4)%1,px=x+w-8-u*(x+w-8-s.cx-18);ctx.globalAlpha=Math.min(1,u*8,(1-u)*5);person(px,GY-4,['#c8342b','#3b6ea8','#e8c25a','#7cc35a'][i],i+1,false);ctx.globalAlpha=1}}},
- /* v0.59: the park, redrawn by the rule of the ocean scene: few pieces, each large, one idea each.
-    Two lawns, one pond fed by one rill from one fountain, one great oak with one swing, one bandstand, one kite. */
+ /* v0.60: the transit hub by the rule: one hall under one great glass vault, one clock tower, one bus, one queue. */
+ hub(s,g,p,x,w,seed){const line=cutLine,dot=cutDot,by=GY-4,q=k=>ease(clamp((g-k)/(1-k),0,1)),full=g>=1,hx=x+26,hw=w-136,hc=hx+hw/2,wallH=38*q(.1),tx=x+w-70;
+  shape(rectPts(x,by-2,w*p,8,seed,.6),'#c9bfa8',{lw:1.8});for(let k=1;k<w*p/30;k++)line(x+k*30,by-1,x+k*30,by+5,'rgba(27,19,40,.16)',1);
+  // the vault: glass behind, ribs of card in front
+  if(g>.4){const u=q(.4),rx=hw/2-4,ry=62*u,vy=by-wallH;shape(arcPts(hc,vy,rx,ry,Math.PI,2*Math.PI,22),'#8fd3e6',{lw:2.4,sh:1});shape(arcPts(hc-rx*.2,vy,rx*.62,ry*.74,Math.PI,2*Math.PI,16),'#bfe6f2',{ln:false});
+   {ctx.save();ctx.globalCompositeOperation='lighter';const gg=ctx.createRadialGradient(hc,vy,0,hc,vy,rx);gg.addColorStop(0,'rgba(255,214,130,'+(.34*u).toFixed(2)+')');gg.addColorStop(1,'rgba(255,214,130,0)');ctx.fillStyle=gg;ctx.beginPath();ctx.ellipse(hc,vy,rx,ry,0,Math.PI,2*Math.PI);ctx.fill();ctx.restore()}
+   const rib=(fn,wd)=>{ctx.beginPath();fn();ctx.strokeStyle='rgba(18,8,24,.3)';ctx.lineWidth=wd+2.2;ctx.stroke();ctx.beginPath();fn();ctx.strokeStyle='#fbf6ea';ctx.lineWidth=wd;ctx.stroke()};
+   for(let m=1;m<8;m++){const a=Math.PI+m*Math.PI/8;rib(()=>{ctx.moveTo(hc+Math.cos(a)*rx*.22,vy+Math.sin(a)*ry*.22);ctx.lineTo(hc+Math.cos(a)*rx,vy+Math.sin(a)*ry)},3.4)}
+   rib(()=>ctx.ellipse(hc,vy,rx*.22,ry*.22,0,Math.PI,2*Math.PI),3.4);rib(()=>ctx.ellipse(hc,vy,rx*.62,ry*.62,0,Math.PI,2*Math.PI),3);rib(()=>ctx.ellipse(hc,vy,rx,ry,0,Math.PI,2*Math.PI),6);
+   shape(ellPts(hc,vy-ry-5,6,6,seed+1),'#ffd23f',{lw:1.4})}
+  // the hall wall with three lit arches
+  if(g>.1){shape(rectPts(hx,by-wallH,hw,wallH,seed+2,.5),'#f1e2bd',{lw:2.4,sh:1});shape(rectPts(hx-5,by-wallH-5,hw+10,7,seed+3,.3),'#e3cf9c',{lw:1.6,sh:1});
+   if(wallH>30)[.2,.5,.8].forEach((f,i)=>{const ax=hx+hw*f;shape(smoothPts([[ax-17,by],[ax-17,by-20],[ax-11,by-30],[ax,by-33],[ax+11,by-30],[ax+17,by-20],[ax+17,by]],3),'#c9a15a',{lw:1.6});shape(smoothPts([[ax-13,by],[ax-13,by-19],[ax-8,by-27],[ax,by-29],[ax+8,by-27],[ax+13,by-19],[ax+13,by]],3),'#ffd98a',{lw:1.1});strip(ax,by-29,ax,by,1.6,'#c9a15a',{lw:.3})})}
+  // the clock tower
+  if(g>.55){const u=q(.55),th=140*u;shape(rectPts(tx-17,by-th,34,th,seed+4,.5),'#c8553e',{lw:2.4,sh:1});for(let yy=by-th+10;yy<by-6;yy+=11)line(tx-17,yy,tx+17,yy,'rgba(27,19,40,.14)',1);
+   shape(rectPts(tx-21,by-th-4,42,7,seed+5,.3),'#f1e2bd',{lw:1.6,sh:1});shape([[tx-21,by-th-4],[tx,by-th-40*u],[tx+21,by-th-4]],'#2f8f8a',{lw:2.2,sh:1});shape([[tx-8,by-th-18*u],[tx,by-th-40*u],[tx+8,by-th-18*u],[tx,by-th-22*u]],'#57b0a8',{ln:false});
+   if(u>.9){strip(tx,by-th-40,tx,by-th-54,1.6,'#3a3a40',{lw:.3});shape([[tx-9,by-th-52],[tx+7,by-th-52],[tx+11,by-th-49],[tx+7,by-th-46],[tx-9,by-th-46]],'#ffd23f',{lw:1});
+    shape(ellPts(tx,by-th+26,14,14,seed+6),'#fbf6ea',{lw:2,sh:1});for(let m=0;m<12;m++){const a=m*.5236;line(tx+Math.cos(a)*10.4,by-th+26+Math.sin(a)*10.4,tx+Math.cos(a)*12.4,by-th+26+Math.sin(a)*12.4,'#1b1328',m%3?1:1.8)}
+    const ha=T*.02-1.57,ma=T*.24-1.57;strip(tx,by-th+26,tx+Math.cos(ha)*6.4,by-th+26+Math.sin(ha)*6.4,2.2,'#1b1328',{lw:.2});strip(tx,by-th+26,tx+Math.cos(ma)*10,by-th+26+Math.sin(ma)*10,1.5,'#1b1328',{lw:.2});shape(ellPts(tx,by-th+26,1.8,1.8,1),'#d9342a',{ln:false});
+    shape(smoothPts([[tx-8,by],[tx-8,by-16],[tx,by-23],[tx+8,by-16],[tx+8,by]],2),'#5b3a24',{lw:1.4});[58,84].forEach(o=>{shape(rectPts(tx-5,by-th+o,10,14,o,.2),'#ffd98a',{lw:1.2})})}}
+  // one great tree at the left corner
+  if(g>.3){const u=q(.3),ox=x+14;ctx.save();ctx.translate(ox,by);ctx.scale(u*.62,u*.62);shape(smoothPts([[-10,2],[-7,-50],[-22,-70],[-16,-78],[-2,-62],[2,-84],[10,-84],[10,-58],[24,-72],[30,-64],[12,-44],[11,2]],3),'#7a4a2c',{lw:2.4,sh:1});[[-26,-92,36,26,'#2f8a4a'],[26,-90,34,24,'#3f9e50'],[0,-116,44,28,'#57b25a'],[2,-138,26,16,'#8fd06a']].forEach((c,i)=>shape(blobPts(c[0]+(RM?0:Math.sin(T*.6+i)*2),c[1],c[2],c[3],seed+30+i,10),c[4],{lw:2.2,sh:i<2}));ctx.restore()}
+  // the bus comes, waits, takes the queue, and goes
+  if(full){const cyc=(T+seed)%16,stopX=hc-10,bx=cyc<2.5?stopX-260+260*ease(cyc/2.5):cyc<9?stopX:stopX+320*ease(Math.min(1,(cyc-9)/3)),open=cyc>3&&cyc<8.4,gone=cyc>=12;
+   [0,1,2,3].forEach(i=>{const t0=3.4+i*1.1,wx=stopX+70+i*16,st=cyc<t0?0:Math.min(1,(cyc-t0)/1);if(cyc>=t0+1&&!gone)return;if(gone&&cyc<12.5+i*.6)return;ctx.globalAlpha=1-st*.2;person(wx-(wx-stopX-22)*st,by-2,['#e8c25a','#9fd8ee','#d9534a','#8a5ac8'][i],seed+i*1.9+2,i===3&&cyc<2.5);ctx.globalAlpha=1});
+   if(!gone){ctx.save();ctx.translate(bx,by-2);shape(smoothPts([[-52,0],[-52,-30],[-46,-37],[44,-37],[52,-28],[52,0]],2),'#2f8f6a',{lw:2.4,sh:1});shape(rectPts(-52,-12,104,5,seed+40,.2),'#f1e2bd',{ln:false});
+    [-40,-20,0,20].forEach((o,i)=>{shape(rectPts(o-8,-31,16,15,i+41,.2),'#cfeaf4',{lw:1.1});if(i%2||cyc>5){shape(ellPts(o,-21,3.4,3.6,i),SKIN[(i+1)%5],{ln:false});shape(arcPts(o,-22,3.8,3.8,Math.PI,2*Math.PI,6),HAIR[i%6],{ln:false})}});
+    shape([[36,-31],[46,-31],[50,-25],[50,-16],[36,-16]],'#cfeaf4',{lw:1.1});shape(rectPts(26,-31,8,29,45,.2),open?'#1b1328':'#3fa37a',{lw:1.1});
+    [-32,30].forEach(o=>{shape(ellPts(o,-1,7.4,7.4,o),'#1b1328',{lw:1.4});shape(ellPts(o,-1,3,3,o+1),'#b8b2a4',{ln:false})});shape(ellPts(51,-8,2.4,2.4,2),'#ffd98a',{ln:false});ctx.restore()}
+   // the stop sign: a bus cut from card on a round sign
+   const sx=hc+52;strip(sx,by,sx,by-52,2.6,'#52525a',{lw:.5});shape(ellPts(sx,by-62,13,13,seed+50),'#3b6ea8',{lw:2,sh:1});shape(smoothPts([[sx-8,by-57],[sx-8,by-66],[sx-6,by-68],[sx+6,by-68],[sx+8,by-66],[sx+8,by-57]],1),'#fbf6ea',{ln:false});shape(rectPts(sx-6,by-66,12,4.4,51,.1),'#3b6ea8',{ln:false});[-4.6,4.6].forEach(o=>shape(ellPts(sx+o,by-56.4,1.8,1.8,o),'#fbf6ea',{ln:false}))}},
  park(s,g,p,x,w,seed){const line=cutLine,dot=cutDot,by=GY-6,q=k=>ease(clamp((g-k)/(1-k),0,1)),X=f=>x+f*w,full=g>=1;
   // two lawns and the path
   shape(smoothPts([[x,by+4],[x+10,by-18*p],[X(.2),by-40*p],[X(.42),by-30*p],[X(.6),by-52*p],[X(.82),by-44*p],[x+w-10,by-16*p],[x+w,by+4]],5),'#3f8f48',{lw:2.4,sh:1});
@@ -2609,26 +2614,36 @@ const G={
    shape([[X(.29)-16,by+1],[X(.29)+16,by+1],[X(.29)+20,by+6],[X(.29)-20,by+6]],'#d9534a',{lw:1.2});for(let m=-1;m<2;m++)shape(rectPts(X(.29)+m*10-2,by+1.6,4,4,m,.1),'#fbf6ea',{ln:false});
    {const kx=X(.47)+40+Math.sin(T*.8)*26,ky=by-150+Math.cos(T*1.1)*14;ctx.strokeStyle='rgba(251,246,234,.85)';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(X(.47)+6,by-24);ctx.quadraticCurveTo(X(.47)+30,by-70,kx,ky+18);ctx.stroke();shape([[kx,ky-22],[kx+15,ky],[kx,ky+19],[kx-15,ky]],'#e8553f',{lw:1.9,sh:1});shape([[kx,ky-22],[kx+15,ky],[kx,ky]],'#f07a5e',{ln:false});for(let m=1;m<4;m++)shape([[kx-3+Math.sin(T*3+m)*4,ky+19+m*9],[kx+3+Math.sin(T*3+m)*4,ky+16+m*9],[kx+Math.sin(T*3+m)*4,ky+24+m*9]],['#ffd23f','#9fd8ee','#fbf6ea'][m-1],{lw:.7})}
    bee(X(.52),by-40,seed);flutter(X(.25)+Math.sin(T*.7)*30,by-36+Math.sin(T*1.9)*10,'#ffd23f',1,1)}},
- tram(s,g,p,x,w,seed){const line=cutLine,dot=cutDot,q=k=>ease(clamp((g-k)/(1-k),0,1));
-  // a grassed track bed with sleepers and two rails
-  shape(rectPts(x,GY-10,w*p,9,seed,.8),'#7cb35a',{lw:2});for(let k=0;k<w*p/18;k++)shape(rectPts(x+4+k*18,GY-7,9,7,seed+k,.3),'#6b5236',{ln:false});strip(x,GY-6,x+w*p,GY-6,2.6,'#52525a',{lw:.7});strip(x,GY-1,x+w*p,GY-1,2.6,'#52525a',{lw:.7});
-  for(let k=0;k<w*p/30;k++){const fx=x+10+k*30+hr(seed+k)*12;line(fx,GY-10,fx,GY-16,'#3f8443',1.6);dot(fx,GY-18,3.4,['#ffd23f','#fbf6ea','#f3b6c8','#b06ad0'][k%4])}
-  [30,170,310,450].forEach((tx,i)=>tree(x+tx*w/480,GY-8,.85,seed+i*9,(g-i*.12)/(1-i*.12)));
-  if(g>.5){const k=q(.5);[100,240,380].forEach((qx,i)=>{const px=x+qx*w/480;
-    // a pole with a curved arm carrying the wire
-    strip(px,GY-6,px,GY-6-76*k,4,'#3a3a40',{lw:1});if(k>.9){ctx.strokeStyle='#3a3a40';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(px,GY-80);ctx.quadraticCurveTo(px+4,GY-90,px+24,GY-86);ctx.stroke();shape(ellPts(px+24,GY-84,3,3,seed+i),'#fbf3dc',{lw:1})}
-    // a glass shelter with a bench and a roof you can stand under
-    const sx=px+8,sh=38*k;shape(rectPts(sx,GY-8-sh,46,sh,seed+i+3,.3),'#bfe3ee',{lw:1.6});line(sx+15,GY-8-sh,sx+15,GY-8,'#fbf6ea',1.6);line(sx+31,GY-8-sh,sx+31,GY-8,'#fbf6ea',1.6);if(k>.8){shape(rectPts(sx-6,GY-14-sh,58,7,seed+i+6,.3),'#2f8f8a',{lw:1.8,sh:1});strip(sx+6,GY-17,sx+40,GY-17,3,'#8a5a34',{lw:.9});shape(ellPts(sx+50,GY-34,7,7,seed+i+9),'#2a3550',{lw:1.4,st:'#ffd23f'});shape(rectPts(sx+46,GY-36,8,5,seed+i+12,.2),'#ffd23f',{lw:.8})}});
-   line(x+60,GY-82,x+w-40,GY-82,INK,1.4)}
-  if(g>.75){const st=[100,240,380].map(q=>x+q*w/480-60),C=13,t=T%C;let tx=st[0];[[0,1.8,0,0],[1.8,4.2,0,1],[4.2,6,1,1],[6,8.4,1,2],[8.4,10.2,2,2],[10.2,13,2,0]].forEach(q=>{if(t>=q[0]&&t<q[1])tx=st[q[2]]+(st[q[3]]-st[q[2]])*ease((t-q[0])/(q[1]-q[0]))});
-   // people wait at each stop, step aboard when the tram halts, and others step off
-   if(g>=1)[0,4.2,8.4].forEach((t0,k)=>{const tt=((t-t0)%C+C)%C,sx=st[k]+60;if(tt>C-6)[14,28].forEach((o,m)=>person(sx+o,GY-4,['#e8c25a','#9fd8ee','#f3b6c8','#7cc35a','#d9534a','#ece6dc'][k*2+m],k*2+m+60,false));else if(tt<1.1)[14,28].forEach((o,m)=>{const u=ease(tt/1.1);ctx.globalAlpha=1-u*u;person(sx+o+(tx+48-sx-o)*u,GY-4,['#e8c25a','#9fd8ee','#f3b6c8','#7cc35a','#d9534a','#ece6dc'][k*2+m],k*2+m+60,false);ctx.globalAlpha=1});
-    if(tt>.5&&tt<3.2){const u=(tt-.5)/2.7;ctx.globalAlpha=Math.min(1,u*5,(1-u)*4);person(tx+30-u*70,GY-4,['#b06ad0','#e8a22a','#3b6ea8'][k],k+70,u>.6);ctx.globalAlpha=1}});
-   // the tram: rounded ends, a cream window band, doors, a lamp, a pantograph up to the wire
-   shape(smoothPts([[tx-2,GY-8],[tx-4,GY-30],[tx+4,GY-46],[tx+92,GY-46],[tx+100,GY-30],[tx+98,GY-8]],3),'#c8342b',{lw:2.2,sh:1});shape(smoothPts([[tx-3,GY-27],[tx+3,GY-43],[tx+93,GY-43],[tx+99,GY-27]],2),'#fbf3dc',{lw:1.4});strip(tx-1,GY-13,tx+97,GY-13,2.6,'#ffd23f',{lw:.6});
-   for(let i=0;i<5;i++){shape(rectPts(tx+7+i*17,GY-41,12,12,seed+i+30,.2),'#cfeef0',{lw:1});if(g>=1&&(i+Math.floor(T/C))%3!==1){ctx.fillStyle=['#c08a5a','#8a5a34','#e8c9a0','#5b3a24','#c08a5a'][i];ctx.beginPath();ctx.arc(tx+13+i*17,GY-34,3.6,0,7);ctx.fill();ctx.fillStyle=['#3b6ea8','#e8a22a','#7cc35a','#d9534a','#b06ad0'][i];ctx.fillRect(tx+9+i*17,GY-31,8,2.4)}}
-   shape(rectPts(tx+43,GY-27,10,19,seed+36,.2),'#8a1e18',{lw:1.1});ctx.fillStyle='#ffe9b0';ctx.beginPath();ctx.arc(tx+97,GY-18,2.6,0,7);ctx.fill();
-   strip(tx+40,GY-46,tx+48,GY-64,2.2,'#3a3a40',{lw:.6});strip(tx+48,GY-64,tx+56,GY-82,2.2,'#3a3a40',{lw:.6});strip(tx+48,GY-82,tx+64,GY-82,2.6,'#3a3a40',{lw:.6});shape(ellPts(tx+18,GY-6,5.4,5.4,seed+37),INK,{lw:1});shape(ellPts(tx+78,GY-6,5.4,5.4,seed+38),INK,{lw:1})}},
+ /* v0.60: the tram boulevard by the rule: one avenue of five great plane trees, one tram, one stop, one wire. */
+ tram(s,g,p,x,w,seed){const line=cutLine,dot=cutDot,q=k=>ease(clamp((g-k)/(1-k),0,1)),by=GY-8,full=g>=1;
+  // grassed track bed, sleepers, two rails
+  shape(rectPts(x,GY-10,w*p,9,seed,.8),'#7cb35a',{lw:2});for(let k=0;k<w*p/20;k++)shape(rectPts(x+4+k*20,GY-7,10,7,seed+k,.3),'#6b5236',{ln:false});strip(x,GY-6,x+w*p,GY-6,2.6,'#52525a',{lw:.7});strip(x,GY-1,x+w*p,GY-1,2.6,'#52525a',{lw:.7});
+  // the avenue: trunks pale and mottled, crowns that meet overhead
+  [.07,.26,.5,.74,.93].forEach((f,i)=>{const u=q(.12+i*.1);if(u<=0)return;const ox=x+w*f,sw=RM?0:Math.sin(T*.5+i*1.3)*2.4;ctx.save();ctx.translate(ox,by);ctx.scale(u,u);
+   shape(smoothPts([[-9,2],[-6,-60],[-20,-84],[-13,-91],[-1,-74],[3,-100],[10,-100],[10,-70],[24,-88],[30,-80],[12,-56],[10,2]],3),'#c9bfa8',{lw:2.2,sh:1});[[-3,-20,4,7],[3,-44,3.4,6],[-2,-62,3,5]].forEach(m=>shape(ellPts(m[0],m[1],m[2],m[3],i+m[1]),'#a89a7c',{ln:false}));
+   [[-34,-104,40,26,'#2f8a4a'],[34,-102,40,26,'#3a964c'],[0,-128,52,30,'#57b25a'],[-22,-146,30,18,'#6cc05a'],[24,-148,28,16,'#8fd06a']].forEach((c,k)=>shape(blobPts(c[0]+sw*(1+k*.15),c[1],c[2],c[3],seed+i*7+k,10),c[4],{lw:2.2,sh:k<2}));ctx.restore()});
+  // one wire on four bowed masts
+  if(g>.5){const u=q(.5),wy=by-58*u;[.16,.38,.62,.84].forEach((f,i)=>{const mx=x+w*f;ctx.beginPath();ctx.moveTo(mx-12,by);ctx.quadraticCurveTo(mx-12,wy-10,mx+6,wy-2);ctx.strokeStyle='rgba(18,8,24,.3)';ctx.lineWidth=5.4;ctx.stroke();ctx.beginPath();ctx.moveTo(mx-12,by);ctx.quadraticCurveTo(mx-12,wy-10,mx+6,wy-2);ctx.strokeStyle='#52525a';ctx.lineWidth=3.4;ctx.stroke();shape(ellPts(mx+6,wy-2,2.6,2.6,i),'#ffd98a',{lw:.8})});
+   ctx.strokeStyle='#2a2030';ctx.lineWidth=1.3;ctx.beginPath();ctx.moveTo(x+w*.04,wy+1);ctx.lineTo(x+w*.96,wy+1);ctx.stroke()}
+  // the one stop: a wave of roof on two posts, a bench, a round sign
+  const sx=x+w*.5;
+  if(g>.65){const u=q(.65);[-30,30].forEach(o=>shape(rectPts(sx+o-2,by-38*u,4,38*u,seed+o,.2),'#f1e2bd',{lw:1.2}));shape(smoothPts([[sx-46,by-36*u],[sx-24,by-46*u],[sx,by-40*u],[sx+24,by-46*u],[sx+46,by-36*u],[sx+44,by-32*u],[sx+24,by-40*u],[sx,by-34*u],[sx-24,by-40*u],[sx-44,by-32*u]],2),'#2f8f8a',{lw:2,sh:1});
+   shape(rectPts(sx-22,by-11,44,3.4,seed+60,.2),'#8a5a34',{lw:1});[-18,18].forEach(o=>shape(rectPts(sx+o-1.4,by-8,2.8,8,o,.1),'#6b4a30',{ln:false}))}
+  if(full){
+   // the tram: two cars, cream over red, gliding end to end and waiting at the stop
+   const cyc=(T*.9+seed)%34,span=w*.4,seg=cyc<7?[-1,0,cyc/7]:cyc<11?[0,0,0]:cyc<18?[0,1,(cyc-11)/7]:cyc<19?[1,1,0]:cyc<26?[1,0,(cyc-19)/7]:cyc<30?[0,0,0]:[0,-1,(cyc-30)/4*1],e=ease(clamp(seg[2],0,1)),tx=sx+(seg[0]+(seg[1]-seg[0])*e)*span,atStop=(cyc>=7&&cyc<11)||(cyc>=26&&cyc<30),dw=atStop?(cyc>=26?cyc-26:cyc-7):-1;
+   // people wait, and step aboard when the doors open
+   [[-16,'#e8c25a'],[2,'#d9534a'],[18,'#9fd8ee']].forEach((m,i)=>{const st=dw<0?0:clamp((dw-.6-i*.5)/.9,0,1),away=!atStop&&((cyc>=11&&cyc<15)||(cyc>=30)||(cyc<1));if(away||st>=1)return;ctx.globalAlpha=1-st*.3;person(sx+m[0]*(1-st),by-1-st*4,m[1],seed+i*2.7+5,dw<0&&i===1&&Math.abs(tx-sx)<170);ctx.globalAlpha=1});
+   ctx.save();ctx.translate(tx,by+1);
+   [-1,1].forEach(d=>{ctx.save();ctx.translate(d*42,0);shape(smoothPts([[-40,-6],[-40,-36],[-34,-42],[34,-42],[40,-36],[40,-6]],2),'#fbf3dc',{lw:2.4,sh:1});shape(rectPts(-40,-20,80,14,seed+70+d,.2),'#d9342a',{lw:1.2});shape(rectPts(-40,-8,80,3,seed+71+d,.1),'#8f8a83',{ln:false});
+    [-26,-8,10,28].forEach((o,i)=>{shape(rectPts(o-7,-38,14,15,i+72,.2),'#bfe6f2',{lw:1});if((i+d+2)%3||dw>2){shape(ellPts(o,-27.6,3.2,3.4,i),SKIN[(i+d+3)%5],{ln:false});shape(arcPts(o,-28.6,3.6,3.6,Math.PI,2*Math.PI,6),HAIR[(i+d+2)%6],{ln:false})}});
+    shape(rectPts(d*17-4.4,-38,8.8,31,74,.2),atStop&&dw>.4&&dw<3.6?'#1b1328':'#e8553f',{lw:1});[-24,24].forEach(o=>{shape(ellPts(o,-3,5.4,5.4,o),'#1b1328',{lw:1.2});shape(ellPts(o,-3,2,2,o+1),'#b8b2a4',{ln:false})});ctx.restore()});
+   shape(rectPts(-5,-36,10,28,75,.3),'#3a3644',{lw:1});for(let m=0;m<4;m++)line(-5,-33+m*7,5,-33+m*7,'#52525a',1);
+   shape([[-88,-30],[-82,-40],[-82,-10],[-88,-12]],'#fbf3dc',{lw:1.4});shape([[88,-30],[82,-40],[82,-10],[88,-12]],'#fbf3dc',{lw:1.4});shape(ellPts(-86,-13,2.2,2.2,1),'#ffd98a',{ln:false});shape(ellPts(86,-13,2.2,2.2,2),'#ffd98a',{ln:false});
+   strip(-42,-42,-30,-56,1.6,'#3a3a40',{lw:.3});strip(-30,-56,-18,-42,1.6,'#3a3a40',{lw:.3});strip(-36,-57,-24,-57,2,'#3a3a40',{lw:.3});
+   if(!atStop&&!RM&&Math.random()<.06)sparks(tx-30,by-57,1,'#bfe6f2');ctx.restore();
+   // a cyclist keeps pace under the trees
+   {const cx2=x+w*.5+Math.sin(T*.22+seed)*w*.4;bike(cx2,GY-12,'#3b6ea8',seed)}}},
  wind(s,g,p,x,w,seed){const line=cutLine,dot=cutDot,by=GY-4,q=k=>ease(clamp((g-k)/(1-k),0,1));
   // a meadow in two layers
   shape(arcPts(x+w*.62,by+2,w*.42,26*p,Math.PI,2*Math.PI,16),'#6fae52',{lw:1.8});shape(rectPts(x,GY-10,w*p,8,seed,.8),'#7cb35a',{lw:2});
