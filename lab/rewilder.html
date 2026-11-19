@@ -3,9 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.71</title>
+<title>Rewilder v0.72</title>
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.71 | LAB | 2026-11-18
+<!-- TSP build: Rewilder v0.72 | LAB | 2026-11-19
+     v0.72 (founder, to the changing-tower plan: "Yes. And rethink the mansion distribution because now it feels arbitrary and I really want
+       to emphasize redistribution of wealth through equitable systems")
+       The Baron's last tower is a puzzle that changes. Three breakers, each with its own colour and shape (circle, triangle, square) and a
+       cable that climbs the tower from a box at its foot, must be thrown in the order lit on a sign at the foot and on the roof. Each correct
+       throw makes him rewire: the wire gaps shift and the breakers still live move. A wrong one resets all three and reshuffles the tower.
+       Breakers no longer spring back. Then the switch on the roof. The tower is now his hotel: poured concrete, balconies with glass rails,
+       gaudy curtains, a glass lift core with gold trim, a neon BARON sign that dies with the last breaker; each section goes dark as its
+       breaker drops.
+       Redistribution: when the tower falls the seven rooms rise and line up over the island, then go out one by one, left to right, to the
+       terraces. The Baron's hoard (21 coins) lands at a new commons hall in the bottom terrace, under a ring of six neighbours holding hands.
+       From the hall three lanes run along the village paths and stairs to every home: water, power and money, three coins each. A home
+       lights up when its share arrives. Four rooms become homes; one a school (bell), one a clinic (flag with a heart), one a market.
      v0.71 (founder: "I actually don't mind most buildings. I like the dam as is. It's the eco house for example. And the island. The last
        tower needs to be more interesting and it needs to be a puzzle that changes. Work on items that are SVG not papercraft. Remember Lumino
        city is goal and we keep going til we get there")
@@ -604,7 +616,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.71</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.72</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -1235,7 +1247,7 @@ function bridgeUp(){return !!(isle&&isle.fin&&isle.ft>=1)}
 function xClamp(v,from,pad){return bridgeUp()?clamp(v,ISX0+40,EAST()-pad):from<0?clamp(v,ISX0+40,ISX1-16):clamp(v,40,EAST()-pad)}
 function salmonGen(){return clamp(level-1,0,2)+(isle&&isle.fin?1:0)}
 /* after level 3 the Baron runs to an island at the far left of the sea */
-function openIsland(){setTimeout(()=>{if(!isle||sites.some(q=>q.isle))return;const L=isle.lair,tw=buildSite({id:'spire',x:L.x-140,cols:5,cw:56,floors:34,fh:46,name:"the Baron's tower",col:'#5b4a78',cell:(c,f)=>'c',fix:'treat'},6);tw.was='standing';tw.isle=true;sites.push(tw);fortInit(tw)},0);isle={t:0,gr:0,bl:null,lt:0,fin:0,ft:0,rant:3,lair:{x:-2600,hp:6,max:6,state:'up',t:0,g:0,jolt:0,lit:1,lt:3,gap:0},mast:{x:-3050,hp:4,max:4,state:'up',t:0,jolt:0}};docks.push(ISDOCK);
+function openIsland(){setTimeout(()=>{if(!isle||sites.some(q=>q.isle))return;const L=isle.lair,tw=buildSite({id:'spire',x:L.x-140,cols:5,cw:56,floors:34,fh:46,name:"the Baron's tower",col:'#e6dac4',cell:(c,f)=>'c',fix:'treat'},6);tw.was='standing';tw.isle=true;sites.push(tw);fortInit(tw)},0);isle={t:0,gr:0,bl:null,lt:0,fin:0,ft:0,rant:3,lair:{x:-2600,hp:6,max:6,state:'up',t:0,g:0,jolt:0,lit:1,lt:3,gap:0},mast:{x:-3050,hp:4,max:4,state:'up',t:0,jolt:0}};docks.push(ISDOCK);
  hudKey='';SFX.blimp();baron=null;baronT=1e9;word('TO MY ISLAND',P.x,GY-260,'#ffd23f');setTimeout(()=>toast('The Baron ran for his island. Dive and swim left across the sea.',8),80)}
 function openPlots(){plotsOpen=true;const n=sites.length-5,add=PLOTS.slice(n,n+2);if(!add.length)return false;
  add.forEach(d=>{const q=buildSite(d,sites.length);q.was='standing';sites.push(q);dust(q.cx,GY,10,q.w);word('NEW GROUND',q.cx,GY-120,'#7cc35a')});hudKey='';SFX.grow();
@@ -1973,17 +1985,27 @@ function vacFun(t){const b=vb,cl=(v)=>clamp(v,0,1);
   else shape([[sx-6,sy],[sx,sy-9+Math.sin(T*3)*2],[sx+6,sy]],'#c8584a',{lw:1.4})}
  if(!vacEnd)paperText(b.sal?'Smash as the ball comes down. Up heads home.':'Smash bops the ball. Up heads home.',260,318,b.sal?24:26,'#fbf3dc',0)}
 /* ---------- level 3: the fortress is the leftmost building, climbed on the outside ---------- */
-function fortInit(s0){const s=s0||sites[0],Rn=s.rows.length,hd=!!s.isle,stp=hd?5:6;let sd=level*97+13;const rnd=()=>{sd=(sd*9301+49297)%233280;return sd/233280},spec=[];
+function fortSpec(s,sd0,skip){const Rn=s.rows.length,hd=!!s.isle,stp=hd?5:6;let sd=sd0;const rnd=()=>{sd=(sd*9301+49297)%233280;return sd/233280},spec=[];
  for(let f=0;f<Rn;f++){const z=f/Rn;spec[f]=null;if(f<4||f>Rn-3)continue;
   if(f%stp===3){if(z>=(hd?.82:.75))spec[f]={t:3,ph:rnd()};else{const gw=z<.5?3:2,g=Math.floor(rnd()*(s.cols-gw+1));spec[f]={t:2,g,gw,gt:0,ph:rnd()}}}
-  else if(z>(hd?.35:.45)&&f%stp===0&&rnd()<.5)spec[f]={v:Math.floor(rnd()*s.cols),t:hd&&rnd()<.3?3:2,ph:rnd()}}
- s.fort=true;s.arm=true;s.foot=null;fort={down:false,spec,hitT:0,s,br:hd?[.25,.5,.75].map((z,i)=>({f:Math.round(Rn*z),sd:i%2?1:-1,t:0})):null};
+  else if(z>(hd?.35:.45)&&f%stp===0&&rnd()<.5)spec[f]={v:Math.floor(rnd()*s.cols),t:hd&&rnd()<.3?3:2,ph:rnd()};
+  if(skip&&skip.some(f0=>Math.abs(f0-f)<=1))spec[f]=null}
+ return spec}
+/* v0.72: the Baron's last tower is a puzzle that changes. Three breakers, each with its own cable, colour and shape, must be thrown in
+   the order lit on the roof and on the sign at the foot. Each correct throw makes him rewire: the wire gaps shift and the breakers still
+   live move. A wrong throw resets all three and he reshuffles the whole tower. Then the switch on the roof. */
+const FBAND=[[.18,.34],[.42,.6],[.68,.84]];
+function fortShuffle(s,first){const Rn=s.rows.length,R=Math.random,shp=[0,1,2].sort(()=>R()-.5);fort.br.forEach((b,i)=>{b.f=Math.round(Rn*(FBAND[i][0]+R()*(FBAND[i][1]-FBAND[i][0])));b.sd=R()<.5?-1:1;b.t=0;b.sh=shp[i]});
+ fort.ord=[0,1,2].sort(()=>R()-.5);fort.k=0;fort.spec=fortSpec(s,Math.floor(R()*99999),fort.br.map(b=>b.f));if(!first){fort.hitT=1.2;fort.rw=1}}
+function fortRewire(s){const Rn=s.rows.length,R=Math.random;fort.br.forEach((b,i)=>{if(b.t>0)return;b.f=Math.round(Rn*(FBAND[i][0]+R()*(FBAND[i][1]-FBAND[i][0])));b.sd=R()<.5?-1:1});fort.spec=fortSpec(s,Math.floor(R()*99999),fort.br.map(b=>b.f));fort.hitT=1.2;fort.rw=1}
+function fortInit(s0){const s=s0||sites[0],Rn=s.rows.length,hd=!!s.isle;let sd=level*97+13;const rnd=()=>{sd=(sd*9301+49297)%233280;return sd/233280};
+ s.fort=true;s.arm=true;s.foot=null;fort={down:false,spec:fortSpec(s,sd),hitT:0,s,br:hd?[0,1,2].map(i=>({f:0,sd:1,t:0,band:i,sh:i})):null,ord:[0,1,2],k:0,rw:0};if(hd)fortShuffle(s,true);
  tdr=[];const n=hd?10:Math.min(12,6+(level-3)*2);for(let i=0;i<n;i++)tdr.push({h:(4+(Rn-6)*((i+.5)/n))*s.fh,ph:rnd()*6.283,v:.5+rnd()*.7,amp:150+rnd()*170,dead:0,x:s.cx,y:0})}
 function wireAt(s,c,f){if(!fort||fort.s!==s)return 0;const q=fort.spec[f];if(!q)return 0;const z=f/s.rows.length,on=ph=>((T*.3+ph)%1)<.4;
  if(q.v!==undefined)return c===q.v&&(q.t===2||on(q.ph))?q.t:0;if(q.t===3)return on(q.ph)?3:0;if(c>=q.g&&c<q.g+q.gw)return q.gt&&on(q.ph)?3:0;return 2}
 function fortShock(msg){const s=fort.s||sites[0];if(fort.hitT>0)return;fort.hitT=1.4;P.energy=Math.max(0,P.energy-30);if(P.energy<=0)P.ko=true;hudKey='';P.zap=.9;P.singe=2;SFX.zap();shake=RM?0:9;word('ZAP',P.x,P.y-140,'#ffd23f');sparks(P.x,P.y-60,14,'#9fd0ff');P.climb=null;P.support=null;P.slide=null;P.vx=-P.face*200;P.vy=-160;P.tumble=.8;once('live',msg,5)}
 function fortStep(dt){const s=fort.s||sites[0];if(fort.hitT>0)fort.hitT-=dt;if(fort.down||s.state!=='standing')return;
- if(fort.br)fort.br.forEach(b=>{if(b.t>0){b.t-=dt;if(b.t<=0){b.t=0;SFX.steel();word('CLACK',s.cx+b.sd*(s.w/2-30),GY-(b.f+.5)*s.fh-30,'#ff8a7a')}}});
+ if(fort.rw>0)fort.rw-=dt;
  const on=P.climb===s&&state==='play';
  if(on){const c=colOf(s,P.x),f=chestF(s);if(c>=0&&wireAt(s,c,f))fortShock('A shock drops you a floor. Go around a steady wire. Wait out a pulsing one.');
   if(f>3)once('fortclimb','Yellow wires are live. Steady ones have a gap. Pulsing ones go dark.',6)}
@@ -1991,9 +2013,12 @@ function fortStep(dt){const s=fort.s||sites[0];if(fort.hitT>0)fort.hitT-=dt;if(f
   d.x=s.cx+Math.sin(T*d.v+d.ph)*(s.w/2+d.amp);d.y=GY-d.h+Math.sin(T*1.3+d.ph)*12;
   if(on&&Math.abs(d.x-P.x)<36&&Math.abs(d.y-(P.y-46))<44)fortShock('A drone shocked you. Smash drones that come close.')}}
 function fortStrike(){const s=fort.s||sites[0];if(fort.down||s.state!=='standing')return false;
- if(fort.br&&P.climb===s){const f=chestF(s),b=fort.br.find(b=>Math.abs(b.f-f)<=1&&(P.x<s.cx?-1:1)===b.sd);if(b){b.t=BRT;SFX.steel();SFX.pick();stars(s.cx+b.sd*(s.w/2-30),GY-(b.f+.5)*s.fh,6);word('CLICK',s.cx+b.sd*(s.w/2-30),GY-(b.f+.5)*s.fh-34,'#7cc35a');once('breaker','Three breakers, then the switch on the roof. They spring back.',6);return true}}
+ if(fort.br&&P.climb===s){const f=chestF(s),b=fort.br.find(b=>Math.abs(b.f-f)<=1&&(P.x<s.cx?-1:1)===b.sd);if(b){const i=fort.br.indexOf(b),bx=s.cx+b.sd*(s.w/2-30),by=GY-(b.f+.5)*s.fh;if(b.t>0)return true;
+  if(fort.ord[fort.k]===i){b.t=1e9;fort.k++;SFX.steel();SFX.pick();stars(bx,by,6);word('CLICK',bx,by-34,'#7cc35a');if(fort.k<3){fortRewire(s);SFX.zap();once('breaker','Throw them in the order on the sign at the foot. After each one he rewires.',6)}else{word('ALL DOWN',s.cx,GY-(s.rows.length+1)*s.fh,'#7cc35a');once('breaker4','All three down. Now the switch on the roof.',5)}}
+  else{SFX.clang();sparks(bx,by,12,'#ff8a7a');word('WRONG ONE',bx,by-34,'#ff8a7a');fortShuffle(s,false);once('breaker3','Out of order. He rewired the whole tower.',5)}
+  return true}}
  const d=tdr.find(d=>!d.dead&&Math.abs(d.x-(P.x+P.face*30))<74&&Math.abs(d.y-(P.y-46))<70);if(d){d.dead=.01;SFX.crunch();stars(d.x,d.y,6);word('SWAT',d.x,d.y-30,'#ffd23f');return true}
- if(P.support===s&&P.y<=GY-(s.rows.length-.5)*s.fh&&Math.abs(P.x-s.cx)<80){if(fort.br&&fort.br.some(b=>b.t<=0)){SFX.clang();word('LOCKED',s.cx,P.y-150,'#ff8a7a');once('breaker2','A breaker sprang back. All three must be down at once.',6);return true}fortDown();return true}return false}
+ if(P.support===s&&P.y<=GY-(s.rows.length-.5)*s.fh&&Math.abs(P.x-s.cx)<80){if(fort.br&&fort.br.some(b=>b.t<=0)){SFX.clang();word('LOCKED',s.cx,P.y-150,'#ff8a7a');once('breaker2','Throw all three breakers first, in order.',6);return true}fortDown();return true}return false}
 function fortDown(){const s=fort.s||sites[0];if(s.isle){fort.down=true;tdr.forEach(d=>{if(!d.dead)d.dead=.01});s.arm=false;s.fort=false;SFX.slam();shake=RM?0:14;word('CLUNK',s.cx,P.y-170,'#fbf3dc');topple(s,1);return}fort.down=true;tdr.forEach(d=>{if(!d.dead)d.dead=.01});walls.forEach(wl=>{if(wl.up){wl.up=false;wl.t=0}});drones.forEach(d=>{if(!d.dead)d.dead=.01});sites.forEach(q=>{q.arm=false;q.foot=null;q.fort=false});
  SFX.slam();SFX.collapse();shake=RM?0:14;word('CLUNK',s.cx,P.y-170,'#fbf3dc');topple(s,1);toast('The fortress goes dark. Every wall, drone and plate lets go.',5)}
 function fortArt(s){if(!fort||fort.down)return;const fh=s.fh,cw=s.cw,Rn=s.rows.length,top=GY-Rn*fh;
@@ -2001,13 +2026,27 @@ function fortArt(s){if(!fort||fort.down)return;const fh=s.fh,cw=s.cw,Rn=s.rows.l
   if(on){ctx.globalAlpha=.24+.14*Math.sin(T*9+sd);line(x0,y0,x1,y1,'#ffd23f',16);ctx.globalAlpha=1;line(x0,y0,x1,y1,INK,8);line(x0,y0,x1,y1,'#ffd23f',4.4);if(!RM){ctx.beginPath();for(let j=0;j<=6;j++){const q=j/6,px=x0+(x1-x0)*q+(hz?0:(hr(sd+j+Math.floor(T*12))-.5)*10),py=y0+(y1-y0)*q+(hz?(hr(sd+j+Math.floor(T*12))-.5)*10:0);j?ctx.lineTo(px,py):ctx.moveTo(px,py)}ctx.strokeStyle='#fff8c8';ctx.lineWidth=1.6;ctx.stroke()}}
   else{ctx.setLineDash([7,9]);line(x0,y0,x1,y1,'#8a809c',3);ctx.setLineDash([])}
   if(t===3){dot(x0+(hz?9:0),y0-(hz?0:9),5.5,INK);dot(x0+(hz?9:0),y0-(hz?0:9),3.8,on?'#ff5a4a':'#7cc35a')}};
- if(fort.br&&fort.s===s){fort.br.forEach((b,i)=>{const x=s.cx+b.sd*(s.w/2-30),y=GY-(b.f+.5)*fh,on=b.t>0,fr=b.t/BRT;if(y<cam.y-200||y>cam.y+900)return;
-   shape(rectPts(x-22,y-28,44,56,i+840,.4),'#2a2030',{lw:2.2,sh:1});shape(rectPts(x-16,y-22,32,26,i+841,.2),on?'#2f6f3a':'#7a1a12',{lw:1.2});
-   ctx.save();ctx.translate(x,y+12);ctx.rotate(on?.9:-.9);strip(0,0,0,-22,5,'#c9d2de',{lw:.8});shape(ellPts(0,-24,6.4,6.4,i),on?'#7cc35a':'#ff5a4a',{lw:1.4});ctx.restore();
-   if(on){ctx.strokeStyle='#7cc35a';ctx.lineWidth=5;ctx.beginPath();ctx.arc(x,y-9,10,-Math.PI/2,-Math.PI/2+fr*6.2832);ctx.stroke();if(fr<.25&&!RM&&Math.sin(T*14)>0){ctx.strokeStyle='#ffd23f';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y-9,15,0,6.2832);ctx.stroke()}}
-   else{shape([[x-7,y-16],[x+7,y-16],[x,y-3]],'#ffd23f',{lw:1})}
-   {ctx.save();ctx.globalCompositeOperation='lighter';const g2=ctx.createRadialGradient(x,y,0,x,y,60);g2.addColorStop(0,on?'rgba(124,195,90,.4)':'rgba(255,90,74,.4)');g2.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g2;ctx.fillRect(x-60,y-60,120,120);ctx.restore()}});
-  fort.br.forEach((b,i)=>{const lx=s.cx-34+i*34;shape(ellPts(lx,top-40,9,9,i+850),b.t>0?'#7cc35a':'#ff5a4a',{lw:2,sh:1})})}
+ if(fort.br&&fort.s===s){const CC=['#4fd0ff','#ff9f43','#f06bd8'],rw=fort.rw>0?fort.rw:0,
+   icon=(k,x,y,r,col)=>{if(k===0)shape(ellPts(x,y,r,r,k+870),col,{lw:1.6});else if(k===1)shape([[x,y-r*1.15],[x+r*1.1,y+r*.8],[x-r*1.1,y+r*.8]],col,{lw:1.6});else shape(rectPts(x-r*.86,y-r*.86,r*1.72,r*1.72,k+871,.2),col,{lw:1.6})};
+  // a neon sign over the roof; it dies when the last breaker drops
+  {const all=fort.br.every(b=>b.t>0),fl=all?(Math.random()<.08?.5:0):(Math.random()<.03?.4:1);ctx.save();ctx.font='900 40px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='middle';const ny=top-104;shape(rectPts(s.cx-86,ny-28,172,56,890,.4),'#1b1328',{lw:2,sh:1});line(s.cx-60,ny+28,s.cx-60,top-58,'#3a3040',4);line(s.cx+60,ny+28,s.cx+60,top-58,'#3a3040',4);
+   if(fl>0){ctx.save();ctx.globalCompositeOperation='lighter';const g3=ctx.createRadialGradient(s.cx,ny,0,s.cx,ny,120);g3.addColorStop(0,'rgba(255,90,200,'+(.35*fl)+')');g3.addColorStop(1,'rgba(255,90,200,0)');ctx.fillStyle=g3;ctx.fillRect(s.cx-130,ny-90,260,180);ctx.restore()}
+   ctx.lineWidth=5;ctx.strokeStyle=fl>0?'rgba(255,120,210,'+fl+')':'#4a3a50';ctx.strokeText('BARON',s.cx,ny+2);ctx.fillStyle=fl>0?'rgba(255,236,250,'+fl+')':'#2a2030';ctx.fillText('BARON',s.cx,ny+2);ctx.restore()}
+  // cables: out of a junction box at the foot of the tower, up its side, across to the breaker, so a player at the bottom can follow each one up
+  fort.br.forEach((b,i)=>{const bx=s.cx+b.sd*(s.w/2-30),by=GY-(b.f+.5)*fh,ex=b.sd<0?s.x-8-i*8:s.x+s.w+8+i*8,done=b.t>0,col=done?'#6d7684':CC[b.sh],pts=[[ex,GY-6],[ex,by],[bx+b.sd*24,by]];shape(rectPts(ex-7,GY-20,14,16,i+895,.3),'#3a3040',{lw:1.4});
+   ctx.lineJoin='round';ctx.lineCap='round';ctx.beginPath();pts.forEach((p2,j)=>j?ctx.lineTo(p2[0],p2[1]):ctx.moveTo(p2[0],p2[1]));ctx.strokeStyle=INK;ctx.lineWidth=7.5;ctx.stroke();ctx.strokeStyle=col;ctx.lineWidth=4.4;ctx.stroke();
+   for(let m=1;m<6;m++){const yy=GY+(by-GY)*m/6;dot(ex,yy,3.2,'#3a3040')}
+   if(!done&&!RM){const seg=[];let tot=0;for(let j=1;j<pts.length;j++){const d=Math.hypot(pts[j][0]-pts[j-1][0],pts[j][1]-pts[j-1][1]);seg.push(d);tot+=d}
+    for(let m=0;m<Math.ceil(tot/80);m++){let u=(T*130+m*80)%tot;for(let j=0;j<seg.length;j++){if(u<=seg[j]){const q=u/seg[j];dot(pts[j][0]+(pts[j+1][0]-pts[j][0])*q,pts[j][1]+(pts[j+1][1]-pts[j][1])*q,2.6,'#fff8c8');break}u-=seg[j]}}}
+   if(rw>0&&!done){ctx.globalAlpha=Math.min(1,rw);for(let m=0;m<6;m++)dot(ex+(Math.random()-.5)*18,GY+(by-GY)*Math.random(),2.6,'#fff8c8');ctx.globalAlpha=1}});
+  fort.br.forEach((b,i)=>{const x=s.cx+b.sd*(s.w/2-30),y=GY-(b.f+.5)*fh,on=b.t>0;if(y<cam.y-200||y>cam.y+900)return;
+   shape(rectPts(x-25,y-31,50,62,i+839,.4),on?'#6d7684':CC[b.sh],{lw:2.2,sh:1});shape(rectPts(x-20,y-26,40,52,i+840,.4),'#2a2030',{lw:1.4});shape(rectPts(x-15,y-21,30,24,i+841,.2),on?'#2f6f3a':'#3a1a22',{lw:1.2});icon(b.sh,x,y-9,8,on?'#7cc35a':CC[b.sh]);
+   ctx.save();ctx.translate(x,y+14);ctx.rotate(on?.9:-.9);strip(0,0,0,-20,5,'#c9d2de',{lw:.8});shape(ellPts(0,-22,6,6,i),on?'#7cc35a':'#ffd23f',{lw:1.4});ctx.restore();
+   {ctx.save();ctx.globalCompositeOperation='lighter';const g2=ctx.createRadialGradient(x,y,0,x,y,62);g2.addColorStop(0,on?'rgba(124,195,90,.4)':CC[b.sh]+'66');g2.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g2;ctx.fillRect(x-62,y-62,124,124);ctx.restore()}});
+  // the order: lit on the roof, and again on a sign at the foot where the climb starts
+  const order=(ox,oy,sc)=>{shape(rectPts(ox-58*sc,oy-20*sc,116*sc,40*sc,880,.3),'#1b1328',{lw:2,sh:1});fort.ord.forEach((bi,j)=>{const b=fort.br[bi],px=ox+(j-1)*34*sc,done=b.t>0;icon(b.sh,px,oy,10*sc,done?'#7cc35a':CC[b.sh]);
+   if(j===fort.k&&!RM){ctx.strokeStyle='#fff8c8';ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(px,oy,15*sc+Math.sin(T*6)*1.5,0,6.283);ctx.stroke()}})};
+  order(s.cx,top-40,1);{const px=s.x-74;strip(px,GY,px,GY-74,6,'#6d7684',{lw:1});order(px,GY-96,1.2)}}
  for(let f=0;f<Rn;f++){const q=fort.spec[f];if(!q)continue;const y=GY-(f+.5)*fh;if(y<cam.y-200||y>cam.y+900)continue;
   if(q.v!==undefined){const x=s.x+(q.v+.5)*cw;wire(x,y+fh*.45,x,y-fh*.45,q.t,!!wireAt(s,q.v,f),f*13)}
   else if(q.t===3)wire(s.x+4,y,s.x+s.w-4,y,3,!!wireAt(s,0,f),f*17)
@@ -2234,6 +2273,21 @@ function cracks(x,y,w,h,n,seed){if(n<=0)return;const ox=x+w*(.25+hr(seed*1.3)*.5
  dot(ox,oy,1.2+n*.5,INK)}
 function cardTone(c,seed){return mix(c,hr(seed*1.7+3)<.5?'#fff4dc':'#120816',.02+hr(seed*3.1+1)*.09)}
 function lit(x,y,w){ctx.fillStyle='rgba(255,244,220,.17)';ctx.fillRect(x+3,y+2.6,w-6,2)}
+/* v0.72: the Baron's tower is his hotel: poured concrete, balconies with glass rails, gaudy curtains, a glass lift core with gold trim.
+   Each section goes dark when its breaker drops. */
+function hotelCell(s,c,f,x,y,cw,fh,k,d){const n=s.rows.length,band=f<n*.38?0:f<n*.63?1:2,dark=fort&&fort.s===s&&fort.br&&fort.br[band]&&fort.br[band].t>0,sd=k.seed;
+ if(c===2){shape(rectPts(x,y,cw,fh,sd,.5),'#2a4a58',{lw:1.6});ctx.fillStyle=dark?'#1b2830':'#3f7a8c';ctx.fillRect(x+6,y+3,cw-12,fh-6);ctx.fillStyle='rgba(251,246,234,.18)';ctx.fillRect(x+8,y+3,5,fh-6);ctx.fillStyle='#c9a84a';ctx.fillRect(x+1,y,3,fh);ctx.fillRect(x+cw-4,y,3,fh);cracks(x,y,cw,fh,d,sd);return}
+ shape(rectPts(x,y,cw,fh,sd,.6),k.tc||(k.tc=cardTone('#e6dac4',sd)),{lw:1.8});
+ const lit=!dark&&hr(sd*1.7)<.7,cur=['#f06bd8','#4fd0ff','#ffd23f','#ff9f43'][(f+c)%4];
+ ctx.fillStyle=lit?'#ffe3a8':'#2a3440';ctx.fillRect(x+6,y+5,cw-12,fh-15);
+ if(lit){ctx.fillStyle=cur;ctx.fillRect(x+6,y+5,(cw-12)*.36,fh-15);ctx.fillStyle='rgba(27,19,40,.35)';ctx.fillRect(x+cw/2-1,y+5,2,fh-15);if(hr(sd*2.3)<.35){ctx.fillStyle='#5b3a24';ctx.beginPath();ctx.arc(x+cw*.62,y+fh*.42,3.4,0,6.283);ctx.fill();ctx.fillRect(x+cw*.62-3,y+fh*.42+3,6,9)}}
+ // the balcony slab and its glass rail
+ ctx.fillStyle='#cfc2aa';ctx.fillRect(x-1,y+fh-10,cw+2,6);ctx.fillStyle='rgba(27,19,40,.25)';ctx.fillRect(x-1,y+fh-4,cw+2,2);ctx.fillStyle='rgba(180,230,240,.35)';ctx.fillRect(x+1,y+fh-22,cw-2,12);ctx.fillStyle='#c9a84a';ctx.fillRect(x+1,y+fh-23,cw-2,2);
+ const r=hr(sd*3.1);if(r<.18){ctx.fillStyle='#b05a3a';ctx.fillRect(x+8,y+fh-18,8,8);ctx.strokeStyle='#3f8443';ctx.lineWidth=2;ctx.beginPath();for(let m=-2;m<=2;m++){ctx.moveTo(x+12,y+fh-18);ctx.quadraticCurveTo(x+12+m*5,y+fh-30,x+12+m*8,y+fh-24)}ctx.stroke()}
+ else if(r<.3){ctx.fillStyle='#f06bd8';ctx.beginPath();ctx.ellipse(x+cw-16,y+fh-17,5,4,0,0,6.283);ctx.fill();ctx.strokeStyle='#f06bd8';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(x+cw-13,y+fh-19);ctx.quadraticCurveTo(x+cw-8,y+fh-30,x+cw-12,y+fh-31);ctx.stroke()}
+ if(f%6===5){ctx.fillStyle='#c9a84a';ctx.fillRect(x,y,cw,3)}
+ if(lit){ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(255,190,110,.08)';ctx.fillRect(x-4,y,cw+8,fh);ctx.restore()}
+ cracks(x,y,cw,fh,d,sd)}
 function drawCells(s){const fh=s.fh,cw=s.cw,n=s.rows.length;if(s.eye){eyeArt(s);return}
  for(let f=0;f<n;f++){const row=s.rows[f];for(let c=0;c<row.length;c++){const k=row[c];if(!k||k.hp<=0)continue;const x=s.x+c*cw,y=GY-(f+1)*fh,d=k.max-k.hp;
   if(k.t==='k'){blockArt(x+cw/2,y+fh/2,Math.min(cw,fh)-4,k.seed);}
@@ -2247,6 +2301,7 @@ function drawCells(s){const fh=s.fh,cw=s.cw,n=s.rows.length;if(s.eye){eyeArt(s);
   else if(k.t==='g'){shape(rectPts(x,y,cw,fh,k.seed,.8),k.tc||(k.tc=cardTone(s.col,k.seed)),{lw:1.8});lit(x,y,cw);shape(rectPts(x+9,y+9,cw-18,fh-18,k.seed+1,.4),'#e3b24f',{lw:1.6});line(x+cw/2,y+9,x+cw/2,y+fh-9,INK,1.4)}
   else if(k.t==='v'){shape(rectPts(x,y,cw,fh,k.seed,.8),k.tc||(k.tc=cardTone(s.col,k.seed)),{lw:1.8});lit(x,y,cw);shape(ellPts(x+cw/2,y+fh/2,15,15,k.seed),k.glow?'#ff9a3a':'#3a2a2a',{lw:2});for(let i=-1;i<=1;i++)line(x+cw/2-11,y+fh/2+i*6,x+cw/2+11,y+fh/2+i*6,k.glow?'#fff1b8':'#8a7b70',2);cracks(x,y,cw,fh,d,k.seed)}
   else if(k.t==='a'){shape(rectPts(x,y+8,cw,fh-8,k.seed,.6),'#3a3a40',{lw:1.8});line(x+4,y+11,x-1,y+fh-3,'#ece6dc',2);if(d===0&&c%2===0)car(x+7,y+9,['#c8342b','#3b6ea8','#e8c25a'][c%3],.9);cracks(x,y+8,cw,fh-8,d,k.seed)}
+  else if(s.isle&&k.t==='c'){hotelCell(s,c,f,x,y,cw,fh,k,d)}
   else{const deck=row.deck;if(deck){shape(rectPts(x,y+12,cw,fh-12,k.seed,.7),s.l2?'#3a3a40':'#4f7a5c',{lw:1.8});line(x,y+fh-9,x+cw,y+fh-9,s.l2?'#ffd23f':'#35573f',3);for(let r=0;r<4;r++)dot(x+8+r*15,y+22,1.8,'#9fc2a8');if(hr(k.seed)<.5)line(x+10+hr(k.seed+1)*30,y+17,x+8+hr(k.seed+1)*30,y+fh-11,'#8a5a34',2.4);shape(rectPts(x,y+2,cw,11,k.seed+1,.5),'#b3ada2',{lw:1.6});line(x+cw/2,y+2,x+cw/2,y-9,'#6d7684',2.4);line(x,y-9,x+cw,y-9,'#6d7684',2.4)}else shape(rectPts(x,y,cw,fh,k.seed,.9),k.tc||(k.tc=cardTone(s.col,k.seed)),{lw:1.8});lit(x,y,cw);
    cracks(x,y,cw,fh,d,k.seed)}}}
  if(s.key&&!s.paved)s.rows.forEach((r,f)=>r.forEach((k,c)=>{if(k&&k.key&&k.hp>0)keyArt(s.x+c*s.cw,GY-(f+1)*s.fh,s.cw,s.fh,k)}));
@@ -2407,8 +2462,10 @@ function drawLair(a,b,gr){const line=cutLine,dot=cutDot;const L=isle.lair,cx=L.x
    {const wx=cx+TIERS[0][0]-9,y0=GY-12-60,y1=GY-6;shape(rectPts(wx,y0,9,y1-y0,321,.4),'#8cc9e6',{lw:1.6});shape(ellPts(wx+2,y1+1,30,6,322),'#3f8fb6',{lw:1.4});for(let n=0;n<3;n++){ctx.fillStyle='#eaf8ff';ctx.beginPath();ctx.arc(wx+4+Math.sin(T*7+n*2)*12,y1-3-Math.abs(Math.sin(T*5+n))*7,2.6,0,7);ctx.fill()}}ctx.globalAlpha=1}}
  ctx.restore();
  // the rooms: flung out like seeds, then set down as homes on the terraces
- if(L.state==='burst')CAPS.forEach((c,i)=>{const h=HOMES[i],sx=cx+c[0],sy=GY+c[1],tx=cx+h[0],ty=GY-15-h[1],u=clamp((L.t-.08*i)/1.7,0,1),e=ease(u),bo=u>=1?Math.abs(Math.sin((L.t-.08*i-1.7)*9))*10*Math.max(0,1-(L.t-.08*i-1.7)*2):0,px=sx+(tx-sx)*e,py=sy+(ty-sy)*e-Math.sin(u*3.1416)*(170+i*14)-bo;pod(c[3],px,py,c[4]+(h[2]-c[4])*e,c[2],i,e,(c[0]<0?-1:1)*6.2832*e,false);if(u<1&&Math.random()<.3)puff(px,py-30,{kind:'steam'})});
- if(L.state==='village'){const g=L.g;
+ if(L.state==='burst'){CAPS.forEach((c,i)=>{const h=HOMES[i],ord=SHARE[i],sx=cx+c[0],sy=GY+c[1],qx=cx-6+(ord-3)*64,qy=GY-390,tx=cx+h[0],ty=GY-15-h[1],a1=ease(clamp(L.t/1.1,0,1)),t0=1.3+ord*.45,u=clamp((L.t-t0)/1,0,1),e=ease(u);let px,py;
+   if(u<=0){px=sx+(qx-sx)*a1;py=sy+(qy-sy)*a1-Math.sin(a1*3.1416)*40+(a1>=1&&!RM?Math.sin(T*2+i)*4:0)}else{px=qx+(tx-qx)*e;py=qy+(ty-qy)*e-Math.sin(u*3.1416)*60}
+   pod(c[3],px,py,c[4]+(h[2]-c[4])*e,c[2],i,e,0,false);if(u>0&&u<1&&Math.random()<.2)puff(px,py-30,{kind:'steam'})});if(L.t>1.1)commonsArt(cx,L)}
+ if(L.state==='village'){const g=L.g;commonsArt(cx,L);if(g>=1)shareArt(cx,L);
   // chimney smoke
   if(g>.4)CAPS.forEach((c,i)=>{const K=PODS[c[3]],h=HOMES[i];if(K.ch&&Math.sin(T*.7+i)>-.5)puffDraw(cx+h[0]+K.ch[0]*h[2],GY-15-h[1]+(K.ch[1]-24)*h[2])});
   if(g>=1){
@@ -2428,6 +2485,39 @@ function drawLair(a,b,gr){const line=cutLine,dot=cutDot;const L=isle.lair,cx=L.x
    for(let k=0;k<4;k++){const u=(T*.45+k/4)%1,nx=ax-30+k*22+Math.sin(u*5)*8,ny=ay-70-u*70;ctx.globalAlpha=1-u;line(nx,ny,nx,ny-13,'#fbf3dc',2.2);shape(ellPts(nx-3.4,ny,4.4,3.2,k),'#fbf3dc',{lw:.8});if(k%2)line(nx,ny-13,nx+7,ny-10,'#fbf3dc',2.2)}ctx.globalAlpha=1}
   for(let i=0;i<18;i++)if(Math.sin(T*2+i*1.9)>.2){ctx.fillStyle='#fff1b8';ctx.beginPath();ctx.arc(cx-450+hr(i+170)*900,GY-40-hr(i*3+171)*420,2.2,0,7);ctx.fill()}}}}
 // the terraced hill and its homes; everything here holds still, so the finished hill is cut once and reused
+/* v0.72: the mansion is shared out through systems, not scattered. When the tower falls, the seven rooms rise and line up over the island,
+   then go out one by one, left to right, to the terraces. The Baron's hoard (21 coins) lands at the commons hall. From the hall, three lanes
+   run along the village paths and stairs to every home: water, power, and an equal share of the money, three coins each. A home lights up
+   when its share arrives. Four rooms become homes; the others become a school, a clinic and a market. */
+const SHARE=[0,1,3,6,4,2,5],ROLE=['home','school','clinic','home','home','market','home'],
+ TRUNK=[[-6,0],[200,0],[160,60],[60,60],[25,124],[-60,124],[-95,188],[-120,188],[-150,252],[-145,252],[-170,316]];
+function sharePath(i){const h=HOMES[i],H=h[1],k=TRUNK.findIndex(p=>p[1]===H),pts=TRUNK.slice(0,k+1).map(p=>p.slice());pts.push([h[0],H]);return pts}
+function plen(pts){let L=0;for(let j=1;j<pts.length;j++)L+=Math.hypot(pts[j][0]-pts[j-1][0],pts[j][1]-pts[j-1][1]);return L}
+function pdraw(pts,len,X2,Y2){ctx.beginPath();ctx.moveTo(X2(pts[0][0]),Y2(pts[0][1]));let left=len,hx=pts[0][0],hy=pts[0][1];for(let j=1;j<pts.length&&left>0;j++){const d=Math.hypot(pts[j][0]-pts[j-1][0],pts[j][1]-pts[j-1][1]),q=Math.min(1,left/d);hx=pts[j-1][0]+(pts[j][0]-pts[j-1][0])*q;hy=pts[j-1][1]+(pts[j][1]-pts[j-1][1])*q;ctx.lineTo(X2(hx),Y2(hy));left-=d}ctx.stroke();return[hx,hy]}
+function shareU(L,i){const sh=L.state==='village'?(L.sh||0):0,t0=SHARE[i]/7*.62;return clamp((sh-t0)/.38,0,1)}
+function commonsArt(cx,L){const line=cutLine,dot=cutDot,hx=cx-6,hy=GY-12;
+ shape(arcPts(hx,hy-38,36,36,Math.PI,2*Math.PI,14).concat([[hx+36,hy],[hx-36,hy]]),'#fbf3dc',{lw:2,sh:1});shape(arcPts(hx,hy-36,28,30,Math.PI,2*Math.PI,14).concat([[hx+28,hy],[hx-28,hy]]),'#4a3424',{lw:1.6});
+ {ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(hx,hy-24,0,hx,hy-24,46);g.addColorStop(0,'rgba(255,196,110,.38)');g.addColorStop(1,'rgba(255,170,80,0)');ctx.fillStyle=g;ctx.fillRect(hx-46,hy-70,92,92);ctx.restore()}
+ // over the door, a ring of six neighbours holding hands
+ ctx.strokeStyle='#8a6a48';ctx.lineWidth=2;ctx.beginPath();ctx.arc(hx,hy-88,12,0,6.283);ctx.stroke();for(let k=0;k<6;k++){const an=k/6*6.283-1.571;dot(hx+Math.cos(an)*12,hy-88+Math.sin(an)*12,3.4,['#d9534a','#2f8f8a','#e8a22a','#3b6ea8','#7cc35a','#f3b6c8'][k])}
+ // the hoard: whatever has not gone out yet
+ let gone=0;if(L.state==='village')for(let i=0;i<7;i++)if(shareU(L,i)>0)gone+=3;const left=21-gone;let n=0;
+ for(let r=0;r<6;r++)for(let m=0;m<6-r;m++){if(n++>=left)break;const kx=hx-27+r*4.5+m*9,ky=hy-3-r*5;shape(ellPts(kx,ky,5.4,2.6,r*7+m+900),'#e8c25a',{lw:1});line(kx-3,ky-.4,kx+3,ky-.4,'rgba(251,246,234,.6)',1)}}
+function shareArt(cx,L){const line=cutLine,dot=cutDot,X2=u=>cx+u,Y2=v=>GY-13-v,lanes=[['#5ab8ee',-3.4,-4.4],['#ffd23f',0,0],['#f0b43a',3.4,4.4]];
+ // the lanes, home by home, as far as each share has got
+ CAPS.forEach((c,i)=>{const u=shareU(L,i);if(u<=0)return;const pts=sharePath(i),len=plen(pts)*u;
+  lanes.forEach(([col,ox,oy],li)=>{ctx.save();ctx.translate(ox,oy);ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle='rgba(27,19,40,.6)';ctx.lineWidth=5.4;pdraw(pts,len,X2,Y2);ctx.strokeStyle=col;ctx.lineWidth=3.2;const hd=pdraw(pts,len,X2,Y2);ctx.restore();
+   if(u<1){const px=X2(hd[0])+ox,py=Y2(hd[1])+oy;if(li===0){shape(smoothPts([[px,py-6],[px+3.4,py],[px,py+3],[px-3.4,py]],2),'#8fd0e8',{lw:.8})}else if(li===1){dot(px,py,3.4,'#fff8c8');dot(px,py,1.6,'#ffd23f')}else{shape(ellPts(px,py,5,2.4,i+930),'#e8c25a',{lw:1})}}});
+  if(u>=1){const h=HOMES[i],K=PODS[c[3]],tx=cx+h[0],ty=GY-15-h[1],sc=h[2],sd=K.d>0?-1:1,sx=tx+(K.d+sd*22)*sc;
+   for(let m=0;m<3;m++)shape(ellPts(sx,ty-3-m*4,7,3,i*5+m+940),'#e8c25a',{lw:1.1});
+   {ctx.save();ctx.globalCompositeOperation='lighter';const g=ctx.createRadialGradient(tx,ty-40*sc,0,tx,ty-40*sc,52*sc);g.addColorStop(0,'rgba(255,200,120,.32)');g.addColorStop(1,'rgba(255,170,80,0)');ctx.fillStyle=g;ctx.fillRect(tx-60*sc,ty-100*sc,120*sc,120*sc);ctx.restore()}}});
+ // what the rooms became: four homes, a school, a clinic, a market
+ CAPS.forEach((c,i)=>{const role=ROLE[i];if(role==='home')return;const h=HOMES[i],K=PODS[c[3]],tx=cx+h[0],ty=GY-15-h[1],sc=h[2];
+  if(role==='school'){const bx=tx+K.top[0]*sc+18,by=ty+K.top[1]*sc+30;strip(bx-10,by,bx+10,by,4,'#b98a5a',{lw:.8});shape(arcPts(bx,by-12,10,13,Math.PI,2*Math.PI,8).concat([[bx+10,by],[bx-10,by]]),'#fbf3dc',{lw:1.3});const sw=RM?0:Math.sin(T*3)*.25;ctx.save();ctx.translate(bx,by-20);ctx.rotate(sw);shape([[-5,0],[5,0],[6,9],[-6,9]],'#e8a22a',{lw:1.1});dot(0,10,1.6,INK);ctx.restore()}
+  else if(role==='clinic'){const fx=tx+(K.d>0?-1:1)*(K.bw+8)*sc;line(fx,ty,fx,ty-46,'#8a6a48',2.2);const fl=RM?0:Math.sin(T*4+i)*2;shape([[fx,ty-46],[fx+24,ty-44+fl],[fx+24,ty-30+fl],[fx,ty-32]],'#2f8f8a',{lw:1.2});
+   const hx=fx+12,hy=ty-38+fl*.5;ctx.fillStyle='#fbf6ea';ctx.beginPath();ctx.moveTo(hx,hy+4);ctx.bezierCurveTo(hx-7,hy-1,hx-4,hy-6,hx,hy-3);ctx.bezierCurveTo(hx+4,hy-6,hx+7,hy-1,hx,hy+4);ctx.fill()}
+  else if(role==='market'){const mx=tx+K.d*sc,my=ty;for(let k=0;k<4;k++){const ax=mx-26+k*13;shape([[ax,my-30],[ax+13,my-30],[ax+13,my-22],[ax+6.5,my-18],[ax,my-22]],k%2?'#fbf3dc':'#d9534a',{lw:1})}
+   [[-18,'#e8862a'],[18,'#5fae50']].forEach((cr,k)=>{shape(rectPts(mx+cr[0]-8,my-10,16,10,k+960,.3),'#b98a5a',{lw:1});for(let m=0;m<3;m++)dot(mx+cr[0]-5+m*5,my-11,2.6,cr[1])})}})}
 function lairHill(cx,g){const line=cutLine,dot=cutDot,q=ease(g);shape(blobPts(cx-10,GY-6,520,22,88,18),'#7cb35a',{lw:2});
  if(g>.5)tree(cx-175,GY-10-316,2.1*ease((g-.5)/.5),196,1);
  TIERS.map((t,k)=>[t,k]).reverse().forEach(([t,k])=>{const h=t[2],x0=cx+t[0],wd=t[1]-t[0];shape(rectPts(x0,GY-10-h,wd,h,89+k,.6),'#c9a978',{lw:2.4,sh:1});blockWall(x0+2,GY-1-h,wd-4,57,38,19,'#c9a978',600+k*97,.14);
@@ -2457,8 +2547,8 @@ function drawUtopia(a,b,gr){const line=cutLine,dot=cutDot;if(gr<.45)return;const
  for(let i=0;i<10;i++){const bx=ISX0+200+hr(i+370)*2800+Math.sin(T*.9+i*2)*24,by=GY-50-hr(i+371)*90+Math.cos(T*1.3+i)*12;if(bx<a||bx>b)continue;const fl=Math.abs(Math.sin(T*9+i))*6,c=['#f3b6c8','#ffd23f','#9fd8ee','#e8a22a'][i%4];flutter(bx,by,c,i*1.9,.9)}}
 function drawIsle(){const line=cutLine,dot=cutDot;const a=cam.x-80,b=cam.x+viewW+80,isl=sites.slice(5),up=q=>q&&(q.state==='standing'||q.state==='toppling');
  {const dt=Math.min(.05,Math.max(0,T-(isle.lt||T)));isle.lt=T;const L=isle.lair,M=isle.mast;{const ti=sites.findIndex(q=>q.isle),tw=sites[ti];if(tw){if(tw.state==='collapsing'&&L.state==='up'){L.state='burst';L.t=0;SFX.pop();shake=RM?0:18;dust(L.x,GY-40,30,180);word('POP',L.x,GY-260,'#f3b6c8')}if(tw.state!=='standing'&&tw.state!=='toppling'&&tw.state!=='collapsing')sites.splice(ti,1)}}isle.lairS={state:'grown',choice:L.state==='up'?'none':L.state==='village'&&L.g>=1?'terr':'none',cx:L.x,x:L.x-480,w:940};if(L.state==='up'&&state==='play'){L.lt-=dt;if(false&&L.lt<=0){if(L.gap||L.lit<0){L.gap=0;let n=Math.floor(Math.random()*3);if(n===L.prev)n=(n+1+Math.floor(Math.random()*2))%3;L.lit=n;L.prev=n;L.lt=Math.max(1.9,3.8-(L.max-L.hp)*.34);SFX.steam&&SFX.steam()}else{L.gap=1;L.lit=-1;L.lt=.7}}
-   if(!swim&&!P.climb&&P.support==='ground'&&Math.abs(P.x-L.x)<470){isle.bt=(isle.bt===undefined?3:isle.bt)-dt;if(isle.bt<=0){isle.bt=Math.max(2.1,3.8-(L.max-L.hp)*.3);const bx=P.x+P.vx*.5+(Math.random()-.5)*40;barrels.push({x:bx,y:GY-600,vy:0});isle.tg={x:bx,t:T}}}};const gn=((L.state==='village'?L.g:0)+(isle.bl&&isle.bl.sp?1:0))/2;isle.gr+=(gn-isle.gr)*Math.min(1,dt*.6);if(L.jolt>0)L.jolt-=dt;if(M.jolt>0)M.jolt-=dt;if(M.state==='down')M.t+=dt;if(L.state==='burst'){L.t+=dt;if(L.t>2.6){L.state='village';L.g=0;SFX.grow()}}else if(L.state==='village'&&L.g<1){L.g=Math.min(1,L.g+dt/6);if(L.g>=1){built++;SFX.grow();leaves(L.x,GY-120,30);word('HOME',L.x,GY-300,'#7cc35a');folk.forEach(f=>f.cheer=3.5)}}
-  if(L.state==='village'&&L.g>=1){rainbow=Math.max(rainbow,4);isle.party=(isle.party||0)+dt;if(isle.party<10&&Math.random()<dt*6)leaves(L.x-620+Math.random()*1240,GY-40-Math.random()*340,7)}
+   if(!swim&&!P.climb&&P.support==='ground'&&Math.abs(P.x-L.x)<470){isle.bt=(isle.bt===undefined?3:isle.bt)-dt;if(isle.bt<=0){isle.bt=Math.max(2.1,3.8-(L.max-L.hp)*.3);const bx=P.x+P.vx*.5+(Math.random()-.5)*40;barrels.push({x:bx,y:GY-600,vy:0});isle.tg={x:bx,t:T}}}};const gn=((L.state==='village'?L.g:0)+(isle.bl&&isle.bl.sp?1:0))/2;isle.gr+=(gn-isle.gr)*Math.min(1,dt*.6);if(L.jolt>0)L.jolt-=dt;if(M.jolt>0)M.jolt-=dt;if(M.state==='down')M.t+=dt;if(L.state==='burst'){L.t+=dt;if(L.t>4.9){L.state='village';L.g=0;SFX.grow()}}else if(L.state==='village'&&L.g<1){L.g=Math.min(1,L.g+dt/6);if(L.g>=1){built++;SFX.grow();leaves(L.x,GY-120,30);word('HOME',L.x,GY-300,'#7cc35a');folk.forEach(f=>f.cheer=3.5)}}
+  if(L.state==='village'&&L.g>=1){rainbow=Math.max(rainbow,4);L.sh=Math.min(1,(L.sh||0)+dt/10);isle.party=(isle.party||0)+dt;if(isle.party<10&&Math.random()<dt*6)leaves(L.x-620+Math.random()*1240,GY-40-Math.random()*340,7)}
   if(!isle.fin&&L.state==='village'&&L.g>=1&&isle.bl&&isle.bl.t>6){isle.fin=1;isle.ft=0;SFX.grow();hudKey='';toast('A bridge joins the island to the city. Walk home.',9)}
   if(M.state==='up'&&P.x<ISX1&&!swim){isle.rant-=dt;if(isle.rant<=0){isle.rant=1e9;const bx=M.x-70;if(isle.no||!isle.said){word(isle.no?'NO NO NO':'MINE',bx,GY-390,'#ffd23f');isle.said=1}isle.no=0}}
   if(!isle.bl&&isle.mast.state==='down'){isle.bl={t:0,sp:0};SFX.pfft();word('PFFFFT',isle.mast.x-70,GY-340,'#ffd23f')}if(isle.fin&&isle.ft<1)isle.ft=Math.min(1,isle.ft+dt/3.2);
