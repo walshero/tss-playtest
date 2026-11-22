@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.89</title>
+<title>Rewilder v0.90</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.89 | LAB | 2026-11-22
+<!-- TSP build: Rewilder v0.90 | LAB | 2026-11-22
+     v0.90 (founder 2026-11-22: "Next major focus is the climbing animation for turtle and beaver both"): a climb cycle driven by real travel.
+       Beaver: arms alternate reach and pull with claws, feet alternate push with gripping toes, body lifts each pull, tail sways as a counterweight.
+       Turtle: diagonal-pair gait while climbing, neck stretches with each reach, the shell rocks; both rest with a slow breathing grip.
      v0.89 (founder 2026-11-22, playtest of v0.87): hops no longer lift the camera; the 93 climbs only by its legs and piers, its whole deck
        is a landing, and the triple-deckers climb with a roof to stand on; a flood on hard ground and the dam's mud surge carry you most of a
        screen downstream for a tenth of your energy; the mud no longer buries young sites and is drawn as a silt surge that builds the beach.
@@ -728,7 +731,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.89</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.90</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -4048,12 +4051,12 @@ function drawHero(){if(P.zap>0){const x=P.x,y=P.y,pts=[];for(let i=0;i<22;i++){c
    line(x-15,y-82,x-38,y-116,W,4.4);line(x+15,y-82,x+38,y-116,W,4.4);line(x-8,y-26,x-18,y-3,W,4.4);line(x+8,y-26,x+18,y-3,W,4.4);return}}
  if(who==='turtle'){if(P.flip>0){const w=RM?0:Math.sin(T*16)*.07;ctx.save();ctx.translate(P.x,P.y-38);ctx.rotate(Math.PI+w);ctx.translate(-P.x,-(P.y-38));drawTurtle();ctx.restore()}else if(depot&&depot.shell>0){ctx.save();ctx.translate(P.x,P.y-38);ctx.rotate(T*24);ctx.translate(-P.x,-(P.y-38));drawTurtle();ctx.restore()}else drawTurtle()}else drawBeaver()}
 /* Mossback: an original snapping turtle, drawn with shell plates, a saw-edged tail and a hooked beak */
-function drawTurtle(){const climbing=!!(P.climb||P.gc||P.pole),nap=P.nap>0,moving=Math.abs(P.vx)>12&&P.support,cheer=P.cheer>0&&!nap,tuck=!P.support&&!climbing&&!P.slide||P.tumble>0;
+function drawTurtle(){const cp=climbPh(),climbing=!!cp,nap=P.nap>0,moving=Math.abs(P.vx)>12&&P.support,cheer=P.cheer>0&&!nap,tuck=!P.support&&!climbing&&!P.slide||P.tumble>0;
  const bob=cheer?Math.abs(Math.sin(T*12))*10:moving?Math.abs(Math.sin(P.walk*8))*2.5:Math.sin(P.walk*1.6);
  ctx.save();ctx.translate(P.x,P.y-(nap?0:bob));const sq=P.squash>0?P.squash/.25:0;ctx.scale(P.face*(1+sq*.2),1-sq*.24);
- if(climbing){ctx.translate(0,-50);ctx.rotate(-1.15);ctx.translate(0,50)}
+ if(climbing){ctx.translate(0,-50);ctx.rotate(-1.15+(RM?0:Math.sin(cp.c)*.05*Math.max(.2,cp.m)));ctx.translate(0,50)}
  if(tuck){ctx.translate(0,-44);ctx.rotate(RM?0:T*9);ctx.translate(0,44)}
- const sk='#7d8f4e',skd='#55663a',sh='#3f5136',pA='#4d6340',pB='#5f7848',rim='#2f3d2a',pl='#d9c27a',red='#c8584a',yl='#e8c25a',pk=P.punch>0?Math.sin((1-P.punch/.26)*Math.PI):0,step=moving?Math.sin(P.walk*8)*7:0;
+ const sk='#7d8f4e',skd='#55663a',sh='#3f5136',pA='#4d6340',pB='#5f7848',rim='#2f3d2a',pl='#d9c27a',red='#c8584a',yl='#e8c25a',pk=P.punch>0?Math.sin((1-P.punch/.26)*Math.PI):0,step=climbing?Math.sin(cp.c)*10*Math.max(.2,cp.m):moving?Math.sin(P.walk*8)*7:0;
  const leg=(x,o,seed)=>{shape([[x-12+o,-30],[x+12+o,-30],[x+14+o,-6],[x+10+o,0],[x-12+o,0],[x-14+o,-8]],sk,{lw:2});line(x-9+o,-22,x+9+o,-20,skd,2);line(x-9+o,-13,x+9+o,-11,skd,2);[-7,0,7].forEach(c=>line(x+c+o,-1,x+c+2+o,4,INK,2.2))};
  if(!tuck){shape([[-56,-38],[-66,-40],[-70,-33],[-78,-35],[-82,-27],[-94,-24],[-58,-25]],sk,{lw:2});leg(-38,step,3);leg(34,-step,4)}
  // belly plate, then the shell: a low dome of plates with a dark rim
@@ -4070,7 +4073,7 @@ function drawTurtle(){const climbing=!!(P.climb||P.gc||P.pole),nap=P.nap>0,movin
  ctx.fillStyle='rgba(255,244,220,.2)';ctx.beginPath();ctx.ellipse(-22,-76,16,6,-.5,0,7);ctx.fill();
  if(tuck){shape(ellPts(56,-38,8,7,5),'#232a1c',{lw:1.6});shape(ellPts(-56,-38,6,6,6),'#232a1c',{lw:1.6});ctx.restore();return}
  leg(-22,-step,7);leg(50,step,8);
- const nx=nap?54:64+pk*(P.tire?52:P.lunge>0?118:52),ny=nap?-40:-56-pk*6;ctx.beginPath();ctx.moveTo(48,-42);ctx.lineTo(nx,ny);ctx.strokeStyle=INK;ctx.lineWidth=21;ctx.lineCap='round';ctx.stroke();ctx.strokeStyle=sk;ctx.lineWidth=17;ctx.stroke();
+ const nx=(nap?54:64+pk*(P.tire?52:P.lunge>0?118:52))+(climbing?6+Math.sin(cp.c*2)*5*Math.max(.2,cp.m):0),ny=nap?-40:-56-pk*6;ctx.beginPath();ctx.moveTo(48,-42);ctx.lineTo(nx,ny);ctx.strokeStyle=INK;ctx.lineWidth=21;ctx.lineCap='round';ctx.stroke();ctx.strokeStyle=sk;ctx.lineWidth=17;ctx.stroke();
  if(P.tire){const mx=(48+nx)/2+10,my=(-42+ny)/2;ctx.beginPath();ctx.ellipse(mx,my,10,24,.25,0,7);ctx.strokeStyle=INK;ctx.lineWidth=13;ctx.stroke();ctx.strokeStyle='#3a3a40';ctx.lineWidth=8;ctx.stroke();for(let i=0;i<6;i++){const a2=i/6*6.283;line(mx+Math.cos(a2)*8,my+Math.sin(a2)*20,mx+Math.cos(a2)*11,my+Math.sin(a2)*26,INK,2)}}
  shape([[nx-4,ny-16],[nx+16,ny-21],[nx+32,ny-14],[nx+40,ny-3],[nx+32,ny+8],[nx+10,ny+12],[nx-4,ny+6]],sk,{lw:2.2});
  shape([[nx+30,ny-11],[nx+44,ny-4],[nx+40,ny+6],[nx+34,ny],[nx+30,ny+4]],pl,{lw:1.8});
@@ -4082,18 +4085,23 @@ function drawTurtle(){const climbing=!!(P.climb||P.gc||P.pole),nap=P.nap>0,movin
  else{dot(nx+15,ny-9,5,'#fbf6ea');dot(nx+16,ny-9,3.4,INK);dot(nx+17.2,ny-10.4,1.2,'#fbf6ea')}
  line(nx+7,ny-17,nx+22,ny-17,skd,3);
  ctx.restore()}
+/* v0.90 (founder 2026-11-22: "Next major focus is the climbing animation for turtle and beaver both"): one climb cycle for both animals,
+   driven by how far the animal actually moved, so it climbs when you climb and rests when you stop. */
+function climbPh(){const climbing=!!(P.climb||P.gc||P.pole);if(!climbing){P._cy=undefined;P.cmv=0;return null}const dy=P._cy===undefined?0:P._cy-P.y;P._cy=P.y;const mv=Math.min(1,Math.abs(dy)/3);P.cmv=(P.cmv||0)+(mv-(P.cmv||0))*.25;P.cph=(P.cph||0)+Math.abs(dy)*.075+(RM?0:.012);return{c:P.cph,m:P.cmv,up:dy>0}}
 /* Big Gnaw: an original beaver, cut from paper */
-function drawBeaver(){const climbing=!!(P.climb||P.gc||P.pole),nap=P.nap>0,moving=Math.abs(P.vx)>20&&P.support,cheer=P.cheer>0&&!climbing&&!nap;
+function drawBeaver(){const cp=climbPh(),climbing=!!cp,nap=P.nap>0,moving=Math.abs(P.vx)>20&&P.support,cheer=P.cheer>0&&!climbing&&!nap;
  const bob=cheer?Math.abs(Math.sin(T*14))*14:moving?Math.abs(Math.sin(P.walk*12))*4:Math.sin(P.walk*2)*1.5;
- ctx.save();ctx.translate(P.x,P.y-(nap?0:bob));const sq=P.squash>0?P.squash/.25:0;ctx.scale(P.face*(1+sq*.18),1-sq*.2);
+ const cA=cp?Math.sin(cp.c):0,cB=cp?Math.sin(cp.c+Math.PI):0,cm=cp?Math.max(.18,cp.m):0,lift=cp?Math.abs(Math.sin(cp.c))*5*cm+Math.sin(T*2)*1.2*(1-cm):0;
+ ctx.save();ctx.translate(P.x,P.y-(nap?0:bob)-lift);const sq=P.squash>0?P.squash/.25:0;ctx.scale(P.face*(1+sq*.18),(1-sq*.2)*(cp?1+cA*.03*cm:1));
  if(P.spin>0)ctx.rotate(-(1-P.spin/.35)*Math.PI*2*.999);
  if(nap)ctx.rotate(.12);if(climbing)ctx.rotate(-.12);if(P.tumble>0)ctx.rotate(T*14);
  const br='#8a5530',belly='#c08a5a',dk='#3b2a22',ch=P.charge;
  if(ch>0){ctx.globalAlpha=.35+.5*ch;ctx.strokeStyle='#ffd23f';ctx.lineWidth=4;ctx.beginPath();ctx.arc(0,-60,58+ch*14+Math.sin(T*30)*2*ch,0,7);ctx.stroke();ctx.globalAlpha=1}
- if(!P.sw){ctx.save();ctx.translate(-34,-16);ctx.rotate(ch>0?-.4-ch*1.1:P.punch>0?-.9:climbing?.6:.25+Math.sin(P.walk*3)*.06);shape(ellPts(-18,0,24,10,8),dk,{lw:2,sh:1});for(let k=-2;k<=2;k++)line(-36,k*4,-2,k*4,'#5a4033',1.2);line(-28,-7,-10,7,'#5a4033',1.2);line(-10,-7,-28,7,'#5a4033',1.2);ctx.restore();
- shape(ellPts(-10,-3,14,6,1),dk);shape(ellPts(18,-3,14,6,2),dk)}
+ if(!P.sw){ctx.save();ctx.translate(-34,-16);ctx.rotate(ch>0?-.4-ch*1.1:P.punch>0?-.9:climbing?.62+Math.sin(cp.c*.5)*.2*cm+Math.sin(T*1.6)*.05:.25+Math.sin(P.walk*3)*.06);shape(ellPts(-18,0,24,10,8),dk,{lw:2,sh:1});for(let k=-2;k<=2;k++)line(-36,k*4,-2,k*4,'#5a4033',1.2);line(-28,-7,-10,7,'#5a4033',1.2);line(-10,-7,-28,7,'#5a4033',1.2);ctx.restore();
+ if(climbing){/* feet take turns pushing; toes grip the face */const ft=(x,y,sd)=>{shape(ellPts(x,y,12,6,sd),dk);[-6,0,6].forEach(o=>line(x+8+o*.4,y-3+o,x+15+o*.3,y-4+o,'#1b1310',2))};ft(-8,-6+cA*11*cm-4,1);ft(16,-6+cB*11*cm-4,2)}
+ else{shape(ellPts(-10,-3,14,6,1),dk);shape(ellPts(18,-3,14,6,2),dk)}}
  shape(blobPts(0,-50,34,46,21,16),br,{sh:1});shape(ellPts(8,-44,19,31,3),belly,{lw:1.8});
- if(climbing||cheer)line(4,-74,cheer?-14:22,cheer?-118:-112,dk,10);
+ if(cheer)line(4,-74,-14,-118,dk,10);else if(climbing){/* far arm: reaches while the near one pulls */const fx=18+cB*5,fy=-122-cB*24*cm;line(4,-74,fx,fy,mix(dk,'#000000',.25),11);[-1,0,1].forEach(o=>line(fx,fy,fx+7+o*2,fy-6+o*4,'#1b1310',2))}
  shape(ellPts(-2,-120,8,8,4),br,{lw:2});
  shape(ellPts(14,-100,27,25,5),br);shape(ellPts(35,-93,14+ch*3,11+ch*3,6),belly,{lw:2});
  dot(46,-97,4.5,INK);
@@ -4105,7 +4113,7 @@ function drawBeaver(){const climbing=!!(P.climb||P.gc||P.pole),nap=P.nap>0,movin
  line(13,-116,29,-118+(ch>0?4:0),dk,3);
  shape(rectPts(30,-86,11,grin?16:13,9,.2),'#f0a830',{lw:1.8});line(35.5,-86,35.5,grin?-70:-73,INK,1.4);
  const pk=P.punch>0?Math.sin((1-P.punch/.26)*Math.PI):0;
- if(cheer)line(14,-70,34,-116,dk,11);else if(climbing)line(12,-70,30+pk*24,-100+pk*30,dk,11);else line(14,-66,26+pk*40,-50-pk*12,dk,11);
+ if(cheer)line(14,-70,34,-116,dk,11);else if(climbing){const hx=28+cA*5+pk*24,hy=-116-cA*26*cm+pk*30;line(12,-70,hx,hy,dk,12);[-1,0,1].forEach(o=>line(hx,hy,hx+8+o*2,hy-5+o*4,'#1b1310',2.2))}else line(14,-66,26+pk*40,-50-pk*12,dk,11);
  if(P.idle>4&&state==='play'&&sites.some(s=>s.state==='grown')&&!climbing){const hy=-128;line(-4,hy,-4,hy-16,INK,1.6);line(2,hy,2,hy-16,INK,1.6);shape(ellPts(0,hy-24,11,8,2),'#dfe6ea',{lw:1.6});line(8,hy-28,12,hy-44,'#dfe6ea',4);dot(13,hy-46,4,'#dfe6ea');line(16,hy-46,27,hy-43,'#f0a830',2.4);dot(14,hy-47,1.2,INK)}
  ctx.restore();
  if(P.dizzy>0)for(let k=0;k<3;k++){const a=T*7+k*2.09;ctx.save();ctx.translate(P.x+Math.cos(a)*26,P.y-150+Math.sin(a)*7);const pts=[];for(let i=0;i<8;i++){const r=i%2?3:7,an=i/8*6.283;pts.push([Math.cos(an)*r,Math.sin(an)*r])}shape(pts,'#ffd23f',{lw:1.2});ctx.restore()}}
