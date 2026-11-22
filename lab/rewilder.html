@@ -3,10 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.90</title>
+<title>Rewilder v0.91</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.90 | LAB | 2026-11-22
+<!-- TSP build: Rewilder v0.91 | LAB | 2026-11-22
+     v0.91 (founder 2026-11-22): TAG and TOLL signs keep their words; the DIVE sign is gone and each dive point has a real light-grey pool ladder
+       going down into the water; the flood is three cut-paper sheets twice as deep with a foam edge and flow streaks, and warns 3 s before it
+       sweeps; the mud waits 2.5 s with a rumble, then comes as a taller cut-card wall with a churning crest, tumbling rocks and a log;
+       each tells the player why and what to do; climbing animals turn their backs and climb into the wall (back-view beaver and turtle);
+       smashing the coal plant (or any building beside the 93) no longer flings the cars driving past; only a player on the 93 hits traffic.
      v0.90 (founder 2026-11-22: "Next major focus is the climbing animation for turtle and beaver both"): a climb cycle driven by real travel.
        Beaver: arms alternate reach and pull with claws, feet alternate push with gripping toes, body lifts each pull, tail sways as a counterweight.
        Turtle: diagonal-pair gait while climbing, neck stretches with each reach, the shell rocks; both rest with a slow breathing grip.
@@ -731,7 +736,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.90</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.91</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -1413,8 +1418,8 @@ function dropFloor(s){const row=s.rows[0];if(row)row.forEach((k,c)=>{if(!k||k.hp
 function collapse(s){s.state='collapsing';s.t=0;s.lift=null;s.jet=null;SFX.collapse();shake=RM?0:14;dust(s.cx,GY,28,s.w);word('KA-THOOM',s.cx,GY-120,'#ffd23f');
  if(P.climb===s){P.climb=null;P.support=null}if(P.support===s)P.support=null;
  if(state==='play'){P.cheer=1.4;if(s.id==='dam')startSediment()}}
-function startSediment(){sed={x:sites[4].x};}
-let sweep=null,floodArm=false;function startSweep(why){sweep={why,t:0,d:0,max:viewW*.9};P.support='ground';P.climb=null;P.pole=null;hurt(10/1.75);SFX.hiss();word(why==='mud'?'SLOOSH':'WHOOSH',P.x,P.y-150,why==='mud'?'#d8b98a':'#9fd0e8');shake=RM?0:6}
+function startSediment(){sed={x:sites[4].x,delay:2.5};SFX.creak();shake=RM?0:5;toast('The dam held back a century of mud. It is heading for the sea to rebuild the beach. Get up high!',6)}
+let sweep=null,floodArm=false;function startSweep(why){sweep={why,t:0,d:0,max:viewW*.9};setTimeout(()=>toast(why==='mud'?'Caught in the mud. Climb before it reaches you.':'Swept downstream. When the rain comes, climb a house or the 93.',5),900);P.support='ground';P.climb=null;P.pole=null;hurt(10/1.75);SFX.hiss();word(why==='mud'?'SLOOSH':'WHOOSH',P.x,P.y-150,why==='mud'?'#d8b98a':'#9fd0e8');shake=RM?0:6}
 function hurt(n){n*=1.75;if(swim&&swim.fish)return;if(who==='turtle'){word('TINK',P.x,P.y-150,'#c9d2de');SFX.clang();return}P.energy=Math.max(0,P.energy-n);if(P.energy<=0)P.ko=true;P.dizzy=1;SFX.bump()}
 function knock(dir,n){if(who==='turtle'){hurt(n);return}hurt(n);P.climb=null;P.pole=null;P.support=null;P.vx=dir*340;P.vy=-240;P.tumble=.7;stars(P.x,P.y-90,4)}
 
@@ -1433,14 +1438,18 @@ function rate(s){let m=1;s.why=[];
   else if(n.state==='grown'&&CH[n.choice].hab){m*=1.25;s.why.push('linked to the '+CH[n.choice].short)}});
  if(s.choice==='river'&&sites[4].state==='standing'){m*=.5;s.why.push('the dam holds the river back')}
  return m}
-function drawMud(){if(sed){/* v0.89: the river's held-back soil heading home to the sea, not a brown blob */const x=sed.x;ctx.save();ctx.translate(x,GY);ctx.scale(1.5,1.7);ctx.translate(-x,-GY);[['#6e4f33',0],['#8a6a48',1],['#b08e62',2]].forEach(([c,i])=>shape([[x-74+i*10,GY+6],[x-64+i*12,GY-30+i*8],[x-34+i*6,GY-46+i*10],[x+12,GY-38+i*9],[x+170-i*22,GY-9+i*2],[x+214-i*32,GY+6]],c,{lw:1.8,sh:i===0}));
-   ctx.strokeStyle='#e2c79a';ctx.lineWidth=3.2;ctx.beginPath();ctx.arc(x-48,GY-31,12,Math.PI*.85,Math.PI*1.95);ctx.stroke();
-   for(let k=0;k<7;k++)dot(x-40+k*28+(RM?0:Math.sin(T*6+k)*3),GY-14-((k*7)%12),3+(k%3),k%2?'#5a4a3a':'#9a8a72');line(x+30,GY-27,x+74,GY-21,'#6a4a2a',4);for(let k=0;k<6;k++)dot(x-22+k*30,GY-30+(RM?0:Math.sin(T*8+k*2)*6),1.8,'#ffd23f');ctx.restore()}}
+function drawMud(){if(!sed||sed.delay>0)return;/* v0.91: a wall of river silt in cut card: three bands, a churning crest of scallops, rocks and a log tumbling in it, spatter ahead of it */
+ const x=sed.x,H0=118;const band=(c,k,sd)=>{const pts=[[x-30,GY+6]];for(let i=0;i<=10;i++){const u=i/10,xx=x-30+u*360,hh=H0*k*(u<.12?u/.12:1-(u-.12)*.95);pts.push([xx,GY-hh+(RM?0:Math.sin(u*9+T*4+sd)*4)])}pts.push([x+330,GY+6]);shape(pts,c,{lw:1.9,sh:1})};
+ band('#5e4129',1,0);band('#7d5a38',.78,2);band('#a07a4e',.55,4);band('#c49a66',.3,6);
+ for(let k=0;k<5;k++){const cx=x-26+k*9,cy=GY-H0+12+k*16+(RM?0:Math.sin(T*6+k)*3);ctx.fillStyle=k%2?'#d9b88a':'#e8cfa4';ctx.beginPath();ctx.arc(cx,cy,10-k,Math.PI*.6,Math.PI*1.9);ctx.fill();ctx.strokeStyle='rgba(40,25,15,.5)';ctx.lineWidth=1.2;ctx.stroke()}
+ for(let k=0;k<6;k++){ctx.save();ctx.translate(x+20+k*44,GY-30-((k*29)%50));ctx.rotate(RM?0:T*(2+k%3)*(k%2?1:-1));shape(blobPts(0,0,7+k%3*3,6,k+5,6),k%2?'#6a5a48':'#8f7f68',{lw:1.4,sh:1});ctx.restore()}
+ ctx.save();ctx.translate(x+130,GY-62);ctx.rotate(RM?0:Math.sin(T*2)*.5);shape(rectPts(-30,-5,60,10,7,.3),'#6a4a2a',{lw:1.6,sh:1});ctx.restore();
+ if(!RM)for(let k=0;k<8;k++){const u=(T*1.7+k/8)%1;dot(x-36-u*60,GY-H0*.6-Math.sin(u*Math.PI)*40+k*4,3-u*2,'#7d5a38')}}
 function floodEnv(){if(flood<=0)return 0;const u=1-flood/FLD;return u<.16?ease(u/.16):u<.66?1:1-ease((u-.66)/.34)}
 // how deep the flood stands at x: deep against hard ground, shallow where the ground drinks
 function floodAt(x){let f=.8;for(let i=0;i<5;i++){const q=sites[i];if(!q||x<q.x-40||x>q.x+q.w+40)continue;f=(q.state==='standing'||q.state==='toppling')?1.2:q.state==='grown'&&CH[q.choice]?(CH[q.choice].soak>=1?.28:.6):.8}return f}
 /* v0.59: the flood as cut paper. Two sheets of water rise against hard ground and stay low where the ground soaks. Foam curls ride the back sheet, street junk floats downstream, silt is left behind. */
-function drawFlood(){if(flood<=0)return;const e=floodEnv(),a=Math.floor((cam.x-60)/26)*26,b=cam.x+viewW+60,dep=x=>(floodAt(x-70)+floodAt(x)*2+floodAt(x+70))/4*30*e,
+function drawFlood(){if(flood<=0)return;const e=floodEnv(),a=Math.floor((cam.x-60)/26)*26,b=cam.x+viewW+60,dep=x=>(floodAt(x-70)+floodAt(x)*2+floodAt(x+70))/4*62*e,
   sheet=(k,col,ph,sp,amp)=>{const pts=[[a,GY+16]];for(let x=a;x<=b;x+=26)pts.push([x,GY+5-dep(x)*k+(RM?0:Math.sin(x*.045+T*sp+ph)*amp*e)]);pts.push([b,GY+16]);shape(pts,col,{lw:1.9,sh:1})};
  if(e<1&&flood<FLD*.34){ctx.globalAlpha=.5*(1-e);ctx.fillStyle='#7a5632';ctx.fillRect(a,GY-2,b-a,6);ctx.globalAlpha=1}
  if(e<.03)return;
@@ -1456,14 +1465,17 @@ function drawFlood(){if(flood<=0)return;const e=floodEnv(),a=Math.floor((cam.x-6
   else if(i%7===5){shape(smoothPts([[-9,0],[-4,-5],[5,-5],[10,0],[4,3],[-4,3]],2),'#5fae50',{lw:1})}
   else{shape(ellPts(0,-3,6,6,i),'#d9342a',{lw:1.2});shape(ellPts(-1.6,-4.6,2,1.6,i+1),'#f6b0a8',{ln:false})}
   ctx.restore()}
- sheet(.7,'#4aa3c8',2.2,-2.7,2.4)}
+ /* v0.91: a third, front sheet of cut card with a foam scallop edge and flow streaks running downstream, so the flood reads as moving water, not a tint */
+ sheet(.82,'#3f8cb2',2.2,-2.7,2.4);sheet(.55,'#6fbcd8',4.1,-3.4,1.8);
+ for(let x=Math.floor(a/22)*22;x<b;x+=22){const y=GY+5-dep(x)*.55+(RM?0:Math.sin(x*.045+T*-3.4+4.1)*1.8*e);if(dep(x)>6){ctx.fillStyle='#eaf6fb';ctx.beginPath();ctx.arc(x+11,y,6,Math.PI,0);ctx.fill();ctx.strokeStyle='rgba(30,60,80,.45)';ctx.lineWidth=1.2;ctx.stroke()}}
+ if(!RM)for(let k=0;k<10;k++){const fx=cam.x+viewW-(((T*260+k*137)%(viewW+200))),d3=dep(fx);if(d3<10)continue;const fy=GY+2-d3*(.25+.5*((k*7)%5)/5);line(fx,fy,fx+38,fy,'rgba(234,246,251,.75)',2.4)}}
 function resolveRain(){const d=F.hard-F.soak,growing=sites.filter(s=>s.state==='growing');
  if(d>1.5){flood=FLD;floodArm=true;stats.floods++;const held=[],drank=[];growing.forEach(s=>{const i=sites.indexOf(s),nb=[sites[i-1],sites[i+1]].filter(q=>q&&sites.indexOf(q)<5),sk=nb.find(q=>q.state==='grown'&&CH[q.choice]&&CH[q.choice].soak>=1),hardN=nb.filter(q=>q.state==='standing'||q.state==='toppling').length;
    if(crates.some(c=>c.g&&c.x>s.x+s.w-30&&c.x<s.x+s.w+100))held.push(CH[s.choice].short);else if(sk)drank.push('The '+CH[sk.choice].short+' drank the flood before it reached the '+CH[s.choice].short+'.');else s.g=Math.max(0,s.g-(hardN>=2?.3:.18))});
   if(riverOn&&rivRec>.1){rivRec=Math.max(0,rivRec-.4)}
   if(drank.length)setTimeout(()=>toast(drank[0],4.5),4200);
   if(held.length)setTimeout(()=>toast('Your block held the flood back from the '+held.join(' and the ')+'.',4.5),4200);word('SPLOOSH',P.x,GY-150,'#9fd0e8');
-  toast('It flooded. Hard ground sheds rain.',4);cause('flood')}
+  toast('Too much pavement: the rain has nowhere to soak in. Get up high, then grow things that drink rain.',6);cause('flood')}
  else if(F.soak>=F.hard){stats.boosts++;growing.forEach(s=>{s.g=Math.min(.99,s.g+.08)});rainbow=10;toast('The ground drank the rain.',4)}
  else toast('Most of the rain ran off.',4)}
 function lensText(){const d=F.hard-F.soak,next=d>1.5?'The next rain will flood young growth.':F.soak>=F.hard?'The next rain will feed what is growing.':'The next rain will mostly run off.';
@@ -1493,7 +1505,7 @@ function strike(power,mv){const tu=who==='turtle';if(mv==='fwd'&&!P.climb&&P.sup
  else if(hw.choice==='tram'&&hw.state!=='standing'&&hw.g>.75){const ph=(T*.12)%2;live=hw.x+30+(ph<1?ph:2-ph)*(hw.w-150)+48}
  if(live!==null&&!P.climb&&P.y>GY-120&&Math.abs(live-rx)<72){zap();return}
  const pc=props.findIndex(c=>Math.abs(c.x-rx)<52&&Math.abs(c.y-(P.y-40))<72);if(pc>=0){const c=props[pc];props.splice(pc,1);crunch(c.x,c.y,c.c);return}
- if(hw.state==='standing'&&hw.traffic){const top=GY-hw.rows.length*hw.fh;if(Math.abs((P.y-40)-top)<84){const c=hw.cars.find(c=>c.dead<=0&&c.on&&Math.abs(c.x-rx)<54);if(c){c.dead=7;fling(c.x,top-8,c.c)}}}
+ const bldT=(()=>{const q=sites.find(q=>q!==hw&&q.state==='standing'&&colOf(q,P.x)>=0);return !!(q&&target(q))})();if(hw.state==='standing'&&hw.traffic&&!bldT&&(P.support===hw||(P.support&&P.support.via)||P.climb===hw)){/* v0.91 (founder: "When I'm breaking the coal plant cars on 93 start flying"): only a player on the 93 hits its traffic */const top=GY-hw.rows.length*hw.fh;if(Math.abs((P.y-40)-top)<84){const c=hw.cars.find(c=>c.dead<=0&&c.on&&Math.abs(c.x-rx)<54);if(c){c.dead=7;fling(c.x,top-8,c.c)}}}
  const s=sites.find(s=>s.state==='standing'&&colOf(s,P.x)>=0);
  if(s){let q=target(s);if(q){if(mv==='up'){const r=s.rows[q[1]+1],k=r&&r[q[0]];if(k&&k.hp>0)q=[q[0],q[1]+1]}hitCell(s,q[0],q[1],power);return}}
  const es=sites.find(s=>(s.state==='growing'||s.state==='grown')&&s.g>.3&&((s.choice==='canopy'&&rx>s.x&&rx<s.x+s.w)||(s.choice==='wind'&&rx>s.x+140&&rx<s.x+s.w+10)));
@@ -1601,11 +1613,11 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return
  /* v0.89 (founder: "The Rain when there is no place for rain to go or too much asphalt: let it sweep players away into the next screen and cause 10% damage.
     The mudslide too."): standing on hard ground when the flood crests, or in the mud's path, carries you most of a screen downstream and costs a tenth of
     your energy. Climbing, roofs and the 93 are the way to stay put. The turtle rides it out in her shell. */
- if(floodArm&&flood>0&&floodEnv()>.55&&state==='play'){floodArm=false;if(!sweep&&!swim&&!P.climb&&!P.pole&&P.support==='ground'&&floodAt(P.x)>=1)startSweep('flood')}
- if(sed&&!sed.hit&&state==='play'&&!sweep&&!swim&&!P.climb&&!P.pole&&P.y>GY-60&&Math.abs(P.x-sed.x)<80){sed.hit=1;startSweep('mud')}
+ if(floodArm&&flood>0&&FLD-flood>3&&floodEnv()>.55&&state==='play'){floodArm=false;if(!sweep&&!swim&&!P.climb&&!P.pole&&P.support==='ground'&&floodAt(P.x)>=1)startSweep('flood')}
+ if(sed&&!(sed.delay>0)&&!sed.hit&&state==='play'&&!sweep&&!swim&&!P.climb&&!P.pole&&P.y>GY-60&&Math.abs(P.x-sed.x)<80){sed.hit=1;startSweep('mud')}
  if(sweep){const sp=sweep.max/1.6,dx=Math.min(sp*dt,sweep.max-sweep.d);P.x=Math.max(42,P.x-dx);sweep.d+=dx;sweep.t+=dt;P.tumble=Math.max(P.tumble,.25);P.vx=-40;if(!RM&&Math.random()<.5)dust(P.x+24,GY,3,40);if(sweep.d>=sweep.max-1||P.x<=42||sweep.t>2.4)sweep=null}
  if(sed){const bk=crates.find(c=>c.g&&c.x<sites[4].x&&Math.abs(c.x-sed.x)<24);if(bk){word('HELD',bk.x,GY-80,'#e8c25a');dust(bk.x,GY,10,60);toast('Your block stopped the mud.',4);sed=null;beach=.01}}
- if(sed){sed.x-=300*dt;
+ if(sed&&sed.delay>0){sed.delay-=dt;if(!RM&&Math.random()<.3)dust(sites[4].x-20,GY,4,60)}else if(sed){sed.x-=220*dt;
   if(sed.x<-100){sed=null;beach=.01;word('NEW BEACH',60,GY-130,'#e8c25a')}}
  if(beach>0&&beach<1)beach=Math.min(1,beach+dt/8);
  viaStep(dt);bills.forEach(b=>{if(b.hp<=0)b.t+=dt;if(b.jolt>0)b.jolt-=dt});dronesStep(dt);
@@ -2657,7 +2669,8 @@ function render(){if(state==='vacation'){drawVacation();return}
  docks.forEach((d,i)=>{if(!riverOn||d<cam.x-80||d>cam.x+viewW+80)return;const on=state==='play'&&!swim&&nearDock(P.x)&&Math.abs(P.x-d)<36;
   ctx.fillStyle=mix('#3f8fb6','#4a3a52',DY*.9);ctx.fillRect(d-26,GY-7,52,32);shape(rectPts(d-30,GY-9,8,34,i+3,.4),'#8a6a48',{lw:1.8});shape(rectPts(d+22,GY-9,8,34,i+4,.4),'#8a6a48',{lw:1.8});
   for(let q=0;q<3;q++)line(d-22,GY-2+q*9,d+22,GY-2+q*9,'#c9a26a',3.4);line(d-12,GY+3+Math.sin(T*3+i)*1.5,d+12,GY+3+Math.sin(T*3+i)*1.5,'rgba(255,255,255,.7)',2);
-  line(d+34,GY,d+34,GY-74,'#5b3a24',4);shape(rectPts(d+4,GY-104,62,32,i+9,.6),'#1f5f86',{lw:2.2,sh:1,st:on?'#ffd23f':'#eaf8ff'});/* v0.88 icon, not a word: a pool ladder into a wave, and a down arrow */line(d+18,GY-100,d+18,GY-80,'#eaf8ff',2.6);line(d+28,GY-100,d+28,GY-80,'#eaf8ff',2.6);for(let r=0;r<3;r++)line(d+18,GY-96+r*6,d+28,GY-96+r*6,'#eaf8ff',2);ctx.strokeStyle='#eaf8ff';ctx.lineWidth=2.4;ctx.beginPath();for(let m=0;m<=12;m++){const xx=d+12+m*3.6,yy=GY-79+Math.sin(m*1.2)*2;m?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke();line(d+50,GY-100,d+50,GY-84,'#ffd23f',3);line(d+44,GY-90,d+50,GY-83,'#ffd23f',3);line(d+56,GY-90,d+50,GY-83,'#ffd23f',3);
+  /* v0.91 (founder: "Remove the ladder sign and make actual white/light gray ladders going down at dive points"): a pool ladder, rails curving over the edge, rungs going down into the water */
+  {const lc='#e6e3dc',ld='#2a2630';for(const ox of [-11,11]){ctx.strokeStyle=ld;ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(d+ox,GY+40);ctx.lineTo(d+ox,GY-26);ctx.quadraticCurveTo(d+ox,GY-44,d+ox+(ox<0?-14:14),GY-40);ctx.stroke();ctx.strokeStyle=lc;ctx.lineWidth=4.2;ctx.stroke()}for(let r=0;r<5;r++){const ry=GY-16+r*12;line(d-11,ry,d+11,ry,ld,6);line(d-11,ry,d+11,ry,lc,3.4)}ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(d-13,GY-30,2,60)}
   if(on&&!RM){const a=(T*1.6)%1;line(d,GY-58+a*14,d,GY-36+a*14,'#ffd23f',5);line(d-10,GY-46+a*14,d,GY-34+a*14,'#ffd23f',5);line(d+10,GY-46+a*14,d,GY-34+a*14,'#ffd23f',5)}});
  sites.forEach(s=>{if(s.state!=='grown')return;for(let i=0;i<(s.fed||0);i++){const k=Math.floor(i/2);pine(i%2?s.x+s.w+22+k*26:s.x-22-k*26,GY-2,.75+hr(s.seed+i)*.35,s.seed+i*3,1)}
   if(clear>.75&&!RM)for(let i=0;i<5;i++){ctx.globalAlpha=.35+.65*Math.max(0,Math.sin(T*2.2+i*1.9+s.seed));dot(s.cx+Math.sin(T*.7+i*2+s.seed)*s.w*.5,GY-36-hr(i+s.seed)*90+Math.sin(T*1.1+i)*12,2.4,'#f6ee8a')}ctx.globalAlpha=1});
@@ -2678,7 +2691,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(baron)drawBaron();
  {const sv=Object.assign({},P,{tire:false}),w0=who;
   Object.assign(P,{x:restX,y:restY,face:downed?downed.face:tireJam?tireJam.face:restX<FRX-1?1:-1,vx:restX!==FRX&&!tireJam&&!downed?170:0,walk:T,vy:0,climb:null,support:'ground',punch:tireJam?.13:0,lunge:0,tire:!!tireJam,charge:0,spin:0,squash:0,cheer:0,tumble:0,nap:tireJam||downed||restX!==FRX?0:rest.energy<100?1:0,idle:0,zap:0,dizzy:downed?1:0});who=w0==='beaver'?'turtle':'beaver';
-  if(state!=='title'){if(downed){ctx.save();ctx.translate(restX,GY-6);ctx.rotate(-1.4*downed.face);ctx.translate(-restX,-GY);drawHero();ctx.restore();const hy=GY-150-Math.abs(Math.sin(T*3))*8;shape(rectPts(restX-40,hy-18,80,36,8,.6),'#fbf3dc',{lw:2.2,sh:1});paperText('HELP',restX,hy,22,'#b3261e',0)}else drawHero();if(!tireJam){line(FRX-104,GY,FRX-104,GY-92,'#5b3a24',4);shape(rectPts(FRX-137,GY-126,66,36,4,.7),'#1b1328',{lw:2.2,sh:1,st:'#ffd23f'});(()=>{/* v0.88 icon, not a word: two arrows trading places */const cx=FRX-104,cy=GY-108;ctx.strokeStyle='#ffd23f';ctx.lineWidth=3;ctx.lineCap='round';ctx.beginPath();ctx.arc(cx,cy,10,Math.PI*1.1,Math.PI*1.95);ctx.stroke();ctx.beginPath();ctx.arc(cx,cy,10,Math.PI*.1,Math.PI*.95);ctx.stroke();line(cx+9,cy-4,cx+13,cy-9,'#ffd23f',3);line(cx+9,cy-4,cx+3,cy-6,'#ffd23f',3);line(cx-9,cy+4,cx-13,cy+9,'#ffd23f',3);line(cx-9,cy+4,cx-3,cy+6,'#ffd23f',3)})()}}
+  if(state!=='title'){if(downed){ctx.save();ctx.translate(restX,GY-6);ctx.rotate(-1.4*downed.face);ctx.translate(-restX,-GY);drawHero();ctx.restore();const hy=GY-150-Math.abs(Math.sin(T*3))*8;shape(rectPts(restX-40,hy-18,80,36,8,.6),'#fbf3dc',{lw:2.2,sh:1});paperText('HELP',restX,hy,22,'#b3261e',0)}else drawHero();if(!tireJam){line(FRX-104,GY,FRX-104,GY-92,'#5b3a24',4);shape(rectPts(FRX-137,GY-126,66,36,4,.7),'#1b1328',{lw:2.2,sh:1,st:'#ffd23f'});paperText('TAG',FRX-104,GY-107,22,'#ffd23f',0)}}
   who=w0;Object.assign(P,sv)}
  if(state==='play'&&P.y>GY-12&&sites.some(q=>q.state==='grown'&&['river','free','wet','rain'].includes(q.choice)))for(let i=1;i<=3;i++){const tx=trail[trail.length-1-i*13];if(tx!==undefined)duck(tx,GY-9-Math.abs(Math.sin(T*9+i))*3,i+20,P.face)}
  if(riverOn&&state==='play'&&!(swim&&swim.fish)&&fishSave){const fry=run&&run.phase==='fry',ph=T%3.2;drawSalmon(Object.assign({},fishSave,{leap:!swim&&ph<.6&&!told.has('fish')?.6-ph:0,z:fry?.42+.58*run.age:1,dead:run&&run.phase==='dying'}))}
@@ -3456,7 +3469,7 @@ function drawStanding(s){const n=s.rows.length,top=GY-n*s.fh;
  if(s.id==='highway'){const t=s.rows[n-1],dk=t&&t.deck;
   if(dk){
    if(s.traffic){
-    const gx=s.x+s.w*.45;line(gx-62,top+2,gx-62,top-66,'#4f7a5c',5);line(gx+62,top+2,gx+62,top-66,'#4f7a5c',5);shape(rectPts(gx-70,top-98,140,38,s.seed+8,.6),'#2f6b3a',{lw:2.2,sh:1});(s.l2?(()=>{/* v0.88 icon, not a word: a toll coin */shape(ellPts(gx,top-79,14,14,s.seed+9),'#e8c25a',{lw:2});ctx.strokeStyle='#8a6a1a';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(gx,top-79,9.5,0,7);ctx.stroke();paperText('$',gx,top-78,15,'#fbf6ea',0)})():paperText('93 SOUTH',gx,top-78,19,'#fbf6ea',0))}}
+    const gx=s.x+s.w*.45;line(gx-62,top+2,gx-62,top-66,'#4f7a5c',5);line(gx+62,top+2,gx+62,top-66,'#4f7a5c',5);shape(rectPts(gx-70,top-98,140,38,s.seed+8,.6),'#2f6b3a',{lw:2.2,sh:1});paperText(s.l2?'TOLL':'93 SOUTH',gx,top-78,19,'#fbf6ea',0)}}
   if(s.trolley){line(s.x+20,GY-62,s.x+s.w-20,GY-62,INK,1.4);trolley(s.trolley.x,GY-4)}}
  drawCells(s);
  if(s.l2&&n){const fx=s.x+14;line(fx,top,fx,top-44,'#5a5a60',3);shape([[fx,top-44],[fx+34+Math.sin(T*5)*3,top-36],[fx,top-26]],'#1b1328',{lw:1.6});line(fx+4,top-35,fx+24,top-35,'#ffd23f',4)}
@@ -4051,7 +4064,7 @@ function drawHero(){if(P.zap>0){const x=P.x,y=P.y,pts=[];for(let i=0;i<22;i++){c
    line(x-15,y-82,x-38,y-116,W,4.4);line(x+15,y-82,x+38,y-116,W,4.4);line(x-8,y-26,x-18,y-3,W,4.4);line(x+8,y-26,x+18,y-3,W,4.4);return}}
  if(who==='turtle'){if(P.flip>0){const w=RM?0:Math.sin(T*16)*.07;ctx.save();ctx.translate(P.x,P.y-38);ctx.rotate(Math.PI+w);ctx.translate(-P.x,-(P.y-38));drawTurtle();ctx.restore()}else if(depot&&depot.shell>0){ctx.save();ctx.translate(P.x,P.y-38);ctx.rotate(T*24);ctx.translate(-P.x,-(P.y-38));drawTurtle();ctx.restore()}else drawTurtle()}else drawBeaver()}
 /* Mossback: an original snapping turtle, drawn with shell plates, a saw-edged tail and a hooked beak */
-function drawTurtle(){const cp=climbPh(),climbing=!!cp,nap=P.nap>0,moving=Math.abs(P.vx)>12&&P.support,cheer=P.cheer>0&&!nap,tuck=!P.support&&!climbing&&!P.slide||P.tumble>0;
+function drawTurtle(){const cp=climbPh();if(cp&&!(P.punch>0)){drawTurtleBack(cp);return}const climbing=!!cp,nap=P.nap>0,moving=Math.abs(P.vx)>12&&P.support,cheer=P.cheer>0&&!nap,tuck=!P.support&&!climbing&&!P.slide||P.tumble>0;
  const bob=cheer?Math.abs(Math.sin(T*12))*10:moving?Math.abs(Math.sin(P.walk*8))*2.5:Math.sin(P.walk*1.6);
  ctx.save();ctx.translate(P.x,P.y-(nap?0:bob));const sq=P.squash>0?P.squash/.25:0;ctx.scale(P.face*(1+sq*.2),1-sq*.24);
  if(climbing){ctx.translate(0,-50);ctx.rotate(-1.15+(RM?0:Math.sin(cp.c)*.05*Math.max(.2,cp.m)));ctx.translate(0,50)}
@@ -4088,8 +4101,38 @@ function drawTurtle(){const cp=climbPh(),climbing=!!cp,nap=P.nap>0,moving=Math.a
 /* v0.90 (founder 2026-11-22: "Next major focus is the climbing animation for turtle and beaver both"): one climb cycle for both animals,
    driven by how far the animal actually moved, so it climbs when you climb and rests when you stop. */
 function climbPh(){const climbing=!!(P.climb||P.gc||P.pole);if(!climbing){P._cy=undefined;P.cmv=0;return null}const dy=P._cy===undefined?0:P._cy-P.y;P._cy=P.y;const mv=Math.min(1,Math.abs(dy)/3);P.cmv=(P.cmv||0)+(mv-(P.cmv||0))*.25;P.cph=(P.cph||0)+Math.abs(dy)*.075+(RM?0:.012);return{c:P.cph,m:P.cmv,up:dy>0}}
+/* v0.91 (founder: "I want players to look different when they are climbing. Basic animation needed."): on a wall both animals turn
+   their backs to us and climb into it, as in Rampage. Arms and legs work in opposite pairs; the cycle follows real travel. */
+function drawBeaverBack(cp){const c=cp.c,m=Math.max(.2,cp.m),rL=(1+Math.sin(c))/2,rR=1-rL,lift=Math.abs(Math.sin(c))*5*m,br='#8a5530',br2='#76472a',dk='#3b2a22';
+ ctx.save();ctx.translate(P.x,P.y-lift);const sq=P.squash>0?P.squash/.25:0;ctx.scale(1+sq*.15,1-sq*.18);ctx.rotate((RM?0:Math.sin(c)*.05*m));
+ // tail hangs straight down and swings as a counterweight
+ ctx.save();ctx.translate(0,-18);ctx.rotate(RM?0:Math.sin(c*.5)*.22*m+Math.sin(T*1.6)*.04);shape(ellPts(0,22,12,26,8),dk,{lw:2,sh:1});for(let k=-2;k<=2;k++)line(-8,22+k*8,8,22+k*8,'#5a4033',1.2);line(-7,4,7,40,'#5a4033',1.1);line(7,4,-7,40,'#5a4033',1.1);ctx.restore();
+ // legs: thigh to foot, feet push in turn, toes up the wall
+ [[-1,rR],[1,rL]].forEach(([sd,r])=>{const fx=sd*28,fy=-6-r*16*m;line(sd*16,-34,fx,fy,br2,13);shape(ellPts(fx,fy,9,7,sd+3),dk,{lw:1.8});[-5,0,5].forEach(o=>line(fx+o,fy-5,fx+o*1.2,fy-12,'#1b1310',2))});
+ // the back: fur in two tones, a darker stripe down the spine
+ shape(blobPts(0,-58,33,46,21,16),br,{sh:1});shape(ellPts(0,-58,9,36,4),br2,{ln:false});
+ // arms reach up the wall in turn, claws open on the high hand
+ [[-1,rL],[1,rR]].forEach(([sd,r])=>{const hx=sd*(30+r*8),hy=-110-r*30*m;line(sd*20,-84,hx,hy,br2,12);shape(ellPts(hx,hy,8,7,sd+9),dk,{lw:1.8});[-1,0,1].forEach(o=>line(hx+o*4,hy-5,hx+o*6,hy-13,'#1b1310',2.2))});
+ // the back of the head and two ears
+ shape(ellPts(0,-106,24,22,5),br,{sh:1});shape(ellPts(-17,-122,7,7,6),br2,{lw:1.6});shape(ellPts(17,-122,7,7,7),br2,{lw:1.6});
+ ctx.restore()}
+function drawTurtleBack(cp){const c=cp.c,m=Math.max(.2,cp.m),a=(1+Math.sin(c))/2,b=1-a,sk='#7d8f4e',sh='#3f5136',pA='#4d6340',pB='#5f7848',rim='#2f3d2a';
+ ctx.save();ctx.translate(P.x,P.y);const sq=P.squash>0?P.squash/.25:0;ctx.scale(1+sq*.15,1-sq*.18);ctx.rotate(RM?0:Math.sin(c)*.04*m);
+ // four legs at the corners, diagonal pairs together: front-left with back-right
+ const leg=(x0,y0,x1,y1,sd)=>{line(x0,y0,x1,y1,'#2a3320',17);line(x0,y0,x1,y1,sk,13);shape(ellPts(x1,y1,9,7,sd),sk,{lw:1.8});[-5,0,5].forEach(o=>line(x1+o,y1-4,x1+o*1.3,y1-12,'#1b1310',2.2))};
+ leg(-30,-96,-50,-112-a*24*m,1);leg(30,-96,50,-112-b*24*m,2);leg(-30,-28,-50,-14-b*16*m,3);leg(30,-28,50,-14-a*16*m,4);
+ line(0,-8,0,6,'#2a3320',8);line(0,-8,0,6,sk,5);
+ // the head peeks up over the top of the shell
+ shape(ellPts(0,-128-(a+b)*0+Math.sin(c*2)*3*m,13,15,9),sk,{lw:2});
+ // the shell from behind: a tall oval of plates with a dark rim
+ shape(ellPts(0,-62,46,58,11),rim,{lw:2.6,sh:1});shape(ellPts(0,-62,40,52,12),sh,{lw:1.6});
+ const pl=(pts,col)=>shape(pts,col,{lw:1.6});
+ pl([[-14,-104],[14,-104],[18,-84],[0,-74],[-18,-84]],pB);pl([[-18,-84],[0,-74],[0,-50],[-24,-56],[-32,-74]],pA);pl([[18,-84],[0,-74],[0,-50],[24,-56],[32,-74]],pA);
+ pl([[-24,-56],[0,-50],[0,-26],[-16,-20],[-30,-38]],pB);pl([[24,-56],[0,-50],[0,-26],[16,-20],[30,-38]],pB);
+ ctx.fillStyle='rgba(255,244,220,.18)';ctx.beginPath();ctx.ellipse(-14,-88,10,5,-.5,0,7);ctx.fill();
+ ctx.restore()}
 /* Big Gnaw: an original beaver, cut from paper */
-function drawBeaver(){const cp=climbPh(),climbing=!!cp,nap=P.nap>0,moving=Math.abs(P.vx)>20&&P.support,cheer=P.cheer>0&&!climbing&&!nap;
+function drawBeaver(){const cp=climbPh();if(cp&&!(P.punch>0)){drawBeaverBack(cp);return}const climbing=!!cp,nap=P.nap>0,moving=Math.abs(P.vx)>20&&P.support,cheer=P.cheer>0&&!climbing&&!nap;
  const bob=cheer?Math.abs(Math.sin(T*14))*14:moving?Math.abs(Math.sin(P.walk*12))*4:Math.sin(P.walk*2)*1.5;
  const cA=cp?Math.sin(cp.c):0,cB=cp?Math.sin(cp.c+Math.PI):0,cm=cp?Math.max(.18,cp.m):0,lift=cp?Math.abs(Math.sin(cp.c))*5*cm+Math.sin(T*2)*1.2*(1-cm):0;
  ctx.save();ctx.translate(P.x,P.y-(nap?0:bob)-lift);const sq=P.squash>0?P.squash/.25:0;ctx.scale(P.face*(1+sq*.18),(1-sq*.2)*(cp?1+cA*.03*cm:1));
