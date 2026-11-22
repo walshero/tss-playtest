@@ -3,10 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.86</title>
+<title>Rewilder v0.87</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.86 | LAB | 2026-11-22
+<!-- TSP build: Rewilder v0.87 | LAB | 2026-11-22
+     v0.87 (founder 2026-11-22: "The pool / cooling tower should be more obvious and the art on the final tower should be better.
+       Rethink positioning of player... The climb camera applies game wide"): once a character leaves the ground the camera drops it
+       to the lower part of the screen so the floors above stay in view, on every level; the island tower drops the retired wire
+       puzzle's red and black paint for its hotel face; the pool is a big glass-fronted pool on the floor-32 landing, cold blue pipes
+       run down into the data center, and the data center's dish rings out to the drones until the pool is drained.
      v0.86 (founder 2026-11-22, "Ship w fixes" on the Impeccable audit): on a touch phone the camera keeps the character clear of
        the d-pad and the Smash button, so the landscape start no longer hides the beaver under the d-pad.
      v0.85 (founder on the bot playtest: "1. revive both with progress kept. 2. Allow salmon to revive other players 3. Don't let players
@@ -716,7 +721,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.86</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.87</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -1737,8 +1742,9 @@ function gravity(dt){const prevY=P.y;if(P.support&&!standOK())P.support=null;
 function qFish(){return fort&&fort.tq&&fort.tq.fish.on&&fort.s&&fort.s.isle?fort.tq.fish:null}
 /* v0.86 (impeccable audit 2026-11-22): on a touch phone the d-pad and Smash sit over the ground band, and at the left and right edges of the world the camera stopped and left the character under them (the landscape start hid the beaver under the d-pad). The camera now keeps the character clear of both. */let padK=-1,padV={l:0,r:0};function padSafe(){const k=(T*4)|0;if(k===padK)return padV;padK=k;padV={l:0,r:0};if(!document.body.classList.contains('touch'))return padV;const d=$('dpad'),m=$('smashBtn');const rd=d&&d.getBoundingClientRect(),rm=m&&m.getBoundingClientRect();const gy=OY+(GY-cam.y)*S;if(rd&&rd.width>0&&rd.top<gy)padV.l=rd.right+46;if(rm&&rm.width>0&&rm.top<gy)padV.r=W-rm.left+46;return padV}
 /* player-clear hooks (studio rule 2026-11-10): the character's on-screen box in CSS px, and a toast the gate can fire */window.__tspPlayer=()=>{if(state!=='play')return null;const f=swim||P,hw=swim?50:46,hh=swim?50:118,x=(f.x-hw-cam.x)*S,y=OY+(f.y-(swim?hh/2:hh)-cam.y)*S;return {x,y,w:hw*2*S,h:hh*S}};window.__tspToast=t=>toast(t,3);
+let feetK=-1,feetV=0;function climbFeet(){const k=(T*4)|0;if(k===feetK&&feetV)return feetV;feetK=k;let f=H*.8;if(document.body.classList.contains('touch')){const d=$('dpad'),r=d&&d.getBoundingClientRect();if(r&&r.width>0&&W<H)f=Math.min(f,r.top-14)}feetV=Math.max(H*.55,Math.min(f,H-reserve-16));return feetV}
 function camFollow(dt){let target=clamp((qFish()?qFish().x:swim?swim.x:P.x)-viewW*.45,(swim||P.x<0)?(isle?ISX0-60:OC0-70):0,Math.max(0,(swim&&swim.fish?regs()[3].x1+470:EAST())-viewW));if(look){look.t+=dt;if(look.t<3.4)target=clamp(TARDEF.x+252-viewW*.5,0,EAST()-viewW);if(!look.said&&look.t>1.4){look.said=1;toast(tarUp()?'The tar factory, up past the salmon lake. The pave crews come from here.':'Clean water runs where the tar factory stood.',8)}if(look.t>4.4)look=null}if(!swim&&!qFish()&&!look){const sf=padSafe(),sx=(P.x-target)*S;if(sf.l&&sx<sf.l)target=P.x-sf.l/S;else if(sf.r&&sx>W-sf.r)target=P.x-(W-sf.r)/S}cam.x+=(target-cam.x)*Math.min(1,dt*(look?2.6:5));if(WORLD<viewW&&!(padSafe().l&&(P.x-cam.x)*S<padSafe().l))cam.x=(WORLD-viewW)/2;
- const up=!!(fort&&fort.lifts&&!fort.down&&P.x<0&&P.y<GY-40),ty=look&&look.t<3.4?0:qFish()?Math.min(0,qFish().y-330+OY/S):swim?swim.y-GY+150:Math.min(0,P.y-(up?440:270)+OY/S);cam.y+=(ty-cam.y)*Math.min(1,dt*4)}
+ /* v0.87 (founder 2026-11-22: "Sometimes I'm climbing and I'm so close to the top I can't see barriers" ... "The climb camera applies game wide"): once the character leaves the ground (climbing, or standing on anything up high), the camera drops it to the lower part of the screen so the floors above, with their wires, drones and blocks, stay in view. On the ground nothing changes. */ const up=!!(fort&&fort.lifts&&!fort.down&&P.x<0&&P.y<GY-40),high=!!(P.climb||(P.support&&P.support!=='ground'&&P.y<GY-40)||(!P.support&&P.y<GY-90)),ty=look&&look.t<3.4?0:qFish()?Math.min(0,qFish().y-330+OY/S):swim?swim.y-GY+150:high?Math.min(0,P.y-(climbFeet()-OY)/S):Math.min(0,P.y-(up?440:270)+OY/S);cam.y+=(ty-cam.y)*Math.min(1,dt*4)}
 
 /* ---------- splash: the beaver shows the verb on beats ---------- */
 let demoT=0,demoI=0;
@@ -2359,10 +2365,39 @@ function questArt(s){const q=fort.tq,g=qGeo(s),fh=s.fh,lo=cam.y-300,hi=cam.y+100
    for(let k=0;k<2;k++){const on=q.weight>k||q.door;shape(ellPts(l0+12,L.y-60-k*22,9,9,810+k),on?'#3fbf5a':'#4a2020',{lw:2.2});if(on)dot(l0+10,L.y-62-k*22,2.6,'rgba(255,255,255,.8)')}}
   const top=g.roofY+8,sl=q.door?Math.min(1,(T-q.door)/1.2)*30:0;ctx.strokeStyle='#cfc8bb';ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.lineDashOffset=-sl;ctx.beginPath();ctx.moveTo(cx0,L.y-2);ctx.lineTo(cx0,top);ctx.stroke();ctx.setLineDash([]);
   if(inV(g.roofY)&&!q.end){const op=q.door?ease(clamp((T-q.door)/1.2,0,1)):0,w=(s.w+12)*(1-op);if(w>3){shape(rectPts(s.x-6,g.roofY-8,w,16,820,.2),'#3a3440',{lw:2.4,sh:1});dot(s.x-6+w*.5,g.roofY,4,q.door?'#3fbf5a':'#ff3b2e')}shape(rectPts(s.x-30,g.roofY-12,24,24,821,.2),'#2a2630',{lw:2})}}
- // the pool on floor 24, cooling the data center floors under it
- {const y=qD(s,QP);if(inV(y)){const p=g.pool,ph=50;shape(rectPts(p.x0,y-ph,p.x1-p.x0,ph,830,.2),'rgba(200,232,244,.35)',{lw:2.4});
-   if(q.pool>0){const wy=y-4-(ph-8)*q.pool;ctx.fillStyle='rgba(63,150,200,.78)';ctx.fillRect(p.x0+3,wy,p.x1-p.x0-6,y-3-wy);line(p.x0+3,wy,p.x1-3,wy,'#eaf8ff',2)}
-   line(p.x0-4,y-8,s.x+12,y-8,'#141016',7);line(p.x0-4,y-8,s.x+12,y-8,q.pool>.1?'#3f7fa0':'#6a6a72',4);line(s.x+12,y-8,s.x+12,y+4,'#141016',7)}}
+ // v0.87 (founder 2026-11-22: "The pool / cooling tower should be more obvious"): a big glass-fronted pool on the floor-32 landing,
+ // cantilevered past the tower; cold water runs down into the data center under it (blue pipes, frost); the data center's dish sends
+ // rings to the drones. Drain it and the pipes go empty, the racks cook, the dish sparks and stops, and the drones drop.
+ {const y=qD(s,QP),R=s.x+s.w,hot=q.drain?clamp((T-q.drain-.4)/2.4,0,1):0,cold=1-hot,dcT=GY-(QDC[1]+1)*fh,dcB=GY-QDC[0]*fh;
+  if(inV(y)||inV(dcB)){const x0=s.x+56,x1=R+14,ph=74,top=y-ph,lvl=clamp(q.pool,0,1);
+   // struts under the overhang
+   for(let k=0;k<3;k++)line(R+4+k*12,y+6,R-6,y+40+k*6,'#141016',5),line(R+4+k*12,y+6,R-6,y+40+k*6,'#bdb3a2',3);
+   // the tub: concrete shell, tiled lip
+   shape(rectPts(x0-6,top-6,x1-x0+12,ph+10,840,.25),'#e9e2d2',{lw:2.6,sh:1});
+   for(let m=x0-4;m<x1+4;m+=10){ctx.fillStyle=((m-x0)/10|0)%2?'#2f8fc0':'#f4f1ea';ctx.fillRect(m,top-6,10,5)}
+   // water: deep blue, light top band, ripple line, caustic squiggles
+   if(lvl>0){const wy=y-4-(ph-6)*lvl;ctx.fillStyle='#1f7fb8';ctx.fillRect(x0,wy,x1-x0,y-4-wy);ctx.fillStyle='#3fb0e0';ctx.fillRect(x0,wy,x1-x0,Math.min(14,y-4-wy));
+    ctx.strokeStyle='#eaf8ff';ctx.lineWidth=2.4;ctx.beginPath();for(let m=0;m<=40;m++){const xx=x0+(x1-x0)*m/40,yy=wy+(RM?0:Math.sin(m*.8+T*2.4)*1.6);m?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke();
+    ctx.strokeStyle='rgba(234,248,255,.45)';ctx.lineWidth=1.4;for(let k=0;k<6;k++){const cx=x0+20+k*((x1-x0-40)/5),cy=wy+18+(k%2)*14;if(cy<y-10){ctx.beginPath();ctx.moveTo(cx-10,cy);ctx.quadraticCurveTo(cx-3,cy-5+(RM?0:Math.sin(T*1.7+k)*2),cx+4,cy);ctx.quadraticCurveTo(cx+9,cy+4,cx+14,cy);ctx.stroke()}}
+    if(q.drain&&lvl>.02&&!RM){const vx=x1-26,vy=y-12;ctx.strokeStyle='rgba(234,248,255,.8)';ctx.lineWidth=2;for(let k=0;k<3;k++){ctx.beginPath();ctx.arc(vx,vy,4+k*6,T*6+k,T*6+k+4.2);ctx.stroke()}}}
+   // the glass front with two highlights
+   ctx.fillStyle='rgba(210,240,250,.18)';ctx.fillRect(x0,top,x1-x0,ph-4);ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=3;
+   [[.18,.3],[.62,.72]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(x0+(x1-x0)*a,y-8);ctx.lineTo(x0+(x1-x0)*b,top+4);ctx.stroke()});
+   shape(rectPts(x0-6,top-6,x1-x0+12,ph+10,840,.25),'rgba(0,0,0,0)',{lw:2.6});
+   // diving board and ladder
+   shape(rectPts(x1-4,top-14,26,6,841,.2),'#f4f1ea',{lw:2});line(x1+2,top-8,x1+2,top+8,'#141016',4);
+   for(let k=0;k<4;k++)line(x0+10,top-2+k*9,x0+22,top-2+k*9,'#c9c2b4',2.4);line(x0+10,top-10,x0+10,top+32,'#c9c2b4',2.4);line(x0+22,top-10,x0+22,top+32,'#c9c2b4',2.4);
+   // cold feed: two fat pipes from the pool floor down the face of the data center, flowing blue while cold, empty when drained
+   [R-18,R-34].forEach((px,i)=>{line(px,y,px,dcB+4,'#141016',11);line(px,y,px,dcB+4,mix('#8fdcf4','#6a6a72',hot),7);
+    if(cold>.05&&lvl>.05&&!RM){ctx.strokeStyle='rgba(255,255,255,'+(.8*cold)+')';ctx.lineWidth=2.4;ctx.setLineDash([6,10]);ctx.lineDashOffset=-T*60-i*8;ctx.beginPath();ctx.moveTo(px,y);ctx.lineTo(px,dcB+4);ctx.stroke();ctx.setLineDash([])}});
+   for(let f=QDC[0];f<=QDC[1];f++){const yy=GY-(f+1)*fh+7;line(s.x+6,yy,R-18,yy,'#141016',8);line(s.x+6,yy,R-18,yy,mix('#8fdcf4','#6a6a72',hot),5)}
+   if(cold>.05){ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(110,200,255,'+(.10*cold)+')';ctx.fillRect(s.x,dcT,s.w,dcB-dcT);ctx.restore();
+    if(!RM)for(let k=0;k<5;k++){const u=(T*.35+k/5)%1;ctx.globalAlpha=(1-u)*.5*cold;ctx.fillStyle='#eaf8ff';ctx.beginPath();ctx.ellipse(s.x-6-u*30,dcT+12+k*((dcB-dcT-24)/4),6+u*10,3+u*4,0,0,7);ctx.fill();ctx.globalAlpha=1}}
+   // the dish on the data center: rings out to the drones while it runs, sparks when it cooks
+   const live=q.dr.some(d=>d.st!=='dead'&&d.st!=='fade'&&d.st!=='fall'),dx=s.x-34,dy=dcT+(dcB-dcT)*.35;
+   line(s.x+2,dy,dx+8,dy,'#141016',6);line(s.x+2,dy,dx+8,dy,'#9a96a0',3.4);ctx.save();ctx.translate(dx,dy);ctx.rotate(-.5);shape(ellPts(0,0,15,8,842),'#d8d4dc',{lw:2.2});dot(0,0,3,'#141016');ctx.restore();
+   if(live&&hot<.3&&!RM){for(let k=0;k<3;k++){const u=(T*.8+k/3)%1;ctx.globalAlpha=(1-u)*.7;ctx.strokeStyle='#ff5a4a';ctx.lineWidth=2.6;ctx.beginPath();ctx.arc(dx,dy,14+u*70,-2.4,-.9);ctx.stroke()}ctx.globalAlpha=1}
+   else if(hot>.2&&hot<1&&!RM&&Math.random()<.3)sparks(dx,dy,3,'#ffd23f')}}
  // drones
  q.dr.forEach(d=>{if(d.st==='dead'||!inV(d.y))return;qDrone(d,d.st==='cue')});
  // the win, shown: fireworks over the tower, neighbours out on every landing and the roof
@@ -2707,13 +2742,13 @@ function lit(x,y,w){ctx.fillStyle='rgba(255,244,220,.17)';ctx.fillRect(x+3,y+2.6
 /* v0.72: the Baron's tower is his hotel: poured concrete, balconies with glass rails, gaudy curtains, a glass lift core with gold trim.
    Each section goes dark when its breaker drops. */
 function hotelCell(s,c,f,x,y,cw,fh,k,d){const n=s.rows.length,band=f<n*.38?0:f<n*.63?1:2,dark=fort&&fort.s===s&&fort.br&&fort.br[1]&&fort.br[1].t>0,sd=k.seed;
- if(fort&&fort.s===s&&fort.band&&fort.band[f]!==undefined){const bd=fort.band[f],base=bd?ISRD:ISBK;if(fort.tq&&questDC(s,c,f,x,y,cw,fh)){if(fort.tq.ren[f]>0)questCell(s,c,f,x,y,cw,fh,fort.tq.ren[f]);return}
+ /* v0.87: the island tower drops the wire puzzle's red and black paint (the puzzle went in v0.77) and wears the hotel face it was built with, so the data center and the pool read against it. The mainland fortress keeps its bands. */const tq=fort&&fort.s===s&&fort.tq;if(tq&&questDC(s,c,f,x,y,cw,fh)){if(tq.ren[f]>0)questCell(s,c,f,x,y,cw,fh,tq.ren[f]);return}const ren=()=>{if(tq&&tq.ren[f]>0)questCell(s,c,f,x,y,cw,fh,tq.ren[f])};if(!tq&&fort&&fort.s===s&&fort.band&&fort.band[f]!==undefined){const bd=fort.band[f],base=bd?ISRD:ISBK;
   // v0.76: the paint carries the rule, so the face stays quiet: no gold trim, small dim windows, and a texture per paint (ribs on red, courses on black)
   shape(rectPts(x,y,cw,fh,sd,.5),cardTone(base,sd),{lw:1.8});ctx.save();ctx.beginPath();ctx.rect(x+1,y+1,cw-2,fh-2);ctx.clip();ctx.strokeStyle=bd?'rgba(255,255,255,.11)':'rgba(255,255,255,.07)';ctx.lineWidth=1.6;ctx.beginPath();
   if(bd){for(let u=x+7;u<x+cw;u+=12){ctx.moveTo(u,y);ctx.lineTo(u,y+fh)}}else{for(let v=y+7;v<y+fh;v+=9){ctx.moveTo(x,v);ctx.lineTo(x+cw,v)}}ctx.stroke();ctx.restore();
   const lit=!dark&&hr(sd*1.7)<.4;ctx.fillStyle=lit?(bd?"#c46a4c":"#5e4640"):(bd?"#5a1414":"#2a2430");ctx.fillRect(x+cw*.3,y+fh*.22,cw*.4,fh*.38);
   ctx.fillStyle=bd?'#6a1212':'#2c2630';ctx.fillRect(x-1,y+fh-5,cw+2,5);cracks(x,y,cw,fh,d,sd);if(fort.tq&&fort.tq.ren[f]>0)questCell(s,c,f,x,y,cw,fh,fort.tq.ren[f]);return}
- if(c===2){shape(rectPts(x,y,cw,fh,sd,.5),'#2a4a58',{lw:1.6});ctx.fillStyle=dark?'#1b2830':'#3f7a8c';ctx.fillRect(x+6,y+3,cw-12,fh-6);ctx.fillStyle='rgba(251,246,234,.18)';ctx.fillRect(x+8,y+3,5,fh-6);ctx.fillStyle='#c9a84a';ctx.fillRect(x+1,y,3,fh);ctx.fillRect(x+cw-4,y,3,fh);cracks(x,y,cw,fh,d,sd);return}
+ if(c===2){shape(rectPts(x,y,cw,fh,sd,.5),'#2a4a58',{lw:1.6});ctx.fillStyle=dark?'#1b2830':'#3f7a8c';ctx.fillRect(x+6,y+3,cw-12,fh-6);ctx.fillStyle='rgba(251,246,234,.18)';ctx.fillRect(x+8,y+3,5,fh-6);ctx.fillStyle='#c9a84a';ctx.fillRect(x+1,y,3,fh);ctx.fillRect(x+cw-4,y,3,fh);cracks(x,y,cw,fh,d,sd);ren();return}
  shape(rectPts(x,y,cw,fh,sd,.6),k.tc||(k.tc=cardTone('#e6dac4',sd)),{lw:1.8});
  const lit=!dark&&hr(sd*1.7)<.7,cur=['#f06bd8','#4fd0ff','#ffd23f','#ff9f43'][(f+c)%4];
  ctx.fillStyle=lit?'#ffe3a8':'#2a3440';ctx.fillRect(x+6,y+5,cw-12,fh-15);
@@ -2724,7 +2759,7 @@ function hotelCell(s,c,f,x,y,cw,fh,k,d){const n=s.rows.length,band=f<n*.38?0:f<n
  else if(r<.3){ctx.fillStyle='#f06bd8';ctx.beginPath();ctx.ellipse(x+cw-16,y+fh-17,5,4,0,0,6.283);ctx.fill();ctx.strokeStyle='#f06bd8';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(x+cw-13,y+fh-19);ctx.quadraticCurveTo(x+cw-8,y+fh-30,x+cw-12,y+fh-31);ctx.stroke()}
  if(f%6===5){ctx.fillStyle='#c9a84a';ctx.fillRect(x,y,cw,3)}
  if(lit){ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(255,190,110,.08)';ctx.fillRect(x-4,y,cw+8,fh);ctx.restore()}
- cracks(x,y,cw,fh,d,sd)}
+ cracks(x,y,cw,fh,d,sd);ren()}
 function drawCells(s){const fh=s.fh,cw=s.cw,n=s.rows.length;if(s.eye){eyeArt(s);return}
  for(let f=0;f<n;f++){const row=s.rows[f];for(let c=0;c<row.length;c++){const k=row[c];if(!k||k.hp<=0)continue;const x=s.x+c*cw,y=GY-(f+1)*fh,d=k.max-k.hp;
   if(k.t==='k'){blockArt(x+cw/2,y+fh/2,Math.min(cw,fh)-4,k.seed);}
