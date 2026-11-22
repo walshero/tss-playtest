@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.95</title>
+<title>Rewilder v0.96</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.95 | LAB | 2026-11-22
+<!-- TSP build: Rewilder v0.96 | LAB | 2026-11-22
+     v0.96 (founder 2026-11-22: "There is a bug in level 1 as beaver approaches tar company gas containers screen turns black"): the
+     terrace's strata (v0.88) built an empty shape when only a sliver of the rock face was on a narrow portrait screen; the error stopped
+     the frame loop. The strata now skip an empty slice, an empty shape draws nothing, and the next frame is booked before drawing.
      v0.95 (founder 2026-11-22: "I can't tag a player at the bottom of the tower. For the pool party, once the RED water is turned green and
      the pool fills, player plays salmon first, then next closest player. When that player is in pool, switch to last player."):
      a tappable TAG badge at the screen edge points to a partner who is off the screen on the island; the pool party hands control
@@ -752,7 +755,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.95</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.96</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -1002,7 +1005,7 @@ function makeGrain(){const c=document.createElement('canvas');c.width=c.height=1
 function paperFill(pt){if(!pt)return;const ox=-(cam.x*S)%pt._z,oy=(OY-cam.y*S)%pt._z;ctx.save();ctx.translate(ox,oy);ctx.fillStyle=pt;ctx.fillRect(-ox-1,-oy-1,W+2,H+2);ctx.restore()}
 
 /* ---------- drawing helpers: cut paper ---------- */
-function pathPts(p){ctx.beginPath();ctx.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)ctx.lineTo(p[i][0],p[i][1]);ctx.closePath()}
+function pathPts(p){ctx.beginPath();if(!p||!p.length)return;ctx.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)ctx.lineTo(p[i][0],p[i][1]);ctx.closePath()}
 function rectPts(x,y,w,h,seed,j){j=j===undefined?1.3:j;const p=[],step=24;
  const edge=(x0,y0,x1,y1,k)=>{const n=Math.max(1,Math.round(Math.hypot(x1-x0,y1-y0)/step));for(let i=0;i<n;i++){const t=i/n;p.push([x0+(x1-x0)*t+(hr(seed+k*31+i)-.5)*j*2,y0+(y1-y0)*t+(hr(seed+k*57+i*3)-.5)*j*2])}};
  edge(x,y,x+w,y,1);edge(x+w,y,x+w,y+h,2);edge(x+w,y+h,x,y+h,3);edge(x,y+h,x,y,4);return p}
@@ -2017,7 +2020,7 @@ function drawSwimmer(){const w=swim;if(w.fish){const fry=run.phase==='fry';drawS
  for(let i=0;i<5;i++){const on=w.air>i/5;ctx.beginPath();ctx.arc(w.x-28+i*14,w.y-74,5,0,7);ctx.fillStyle=on?(w.air<.3?'#ff8a7a':'#eaf8ff'):'rgba(18,12,30,.6)';ctx.fill();ctx.strokeStyle=INK;ctx.lineWidth=1.6;ctx.stroke()}}
 function drawTerrace(clear){const f=fallX(),R=regs(),wet=!damUp(),x0=cam.x-60,x1=cam.x+viewW+60;if(x1<f-40)return;
  const T0=R[1].top,T1=R[2].top,T2=R[3].top,rock=mix(mix('#5c5a60','#77757c',clear),'#3a3644',DY*.7),rock2=mix(mix('#4a484e','#5f5d66',clear),'#2e2a36',DY*.7),water=mix('#3f8fb6','#4a3a52',DY*.8);
- const rp=[[f-16,GY+10],[f+4,GY-40],[f+20,T0-10],[f+166,T0-10],[f+172,T1-10],[f+316,T1-10],[f+322,T2-10],[R[3].x1+220,T2-10],[R[3].x1+220,GY+10]];shape(rp,rock,{lw:2.8,sh:1});/* v0.88: the rock face reads as stacked strata of cut card, each with its own tone and a lit lip, not one slab */{ctx.save();pathPts(rp);ctx.clip();const xa=Math.max(f-20,x0),xb=Math.min(R[3].x1+224,x1);for(let i=0;i<12;i++){const yt=T2-6+i*((GY+10-T2)/11),th=(GY+10-T2)/11+6,pts=[];for(let x=xa;x<=xb+40;x+=40)pts.push([x,yt+(hr(i*13+Math.round(x/40))-.5)*9]);for(let x=xb+40;x>=xa;x-=40)pts.push([x,yt+th+(hr(i*17+Math.round(x/40))-.5)*9]);const tn=mix(i%2?rock:rock2,i%3===0?'#8a8478':'#3e3a44',.12+hr(i*5)*.14);NOPAPER=true;shape(pts,tn,{lw:1.2});NOPAPER=false;line(xa,yt+1,xb,yt+1,'rgba(255,244,220,.10)',2)}for(let i=0;i<10;i++){const cx=f+60+hr(i*7+2)*(R[3].x1-f),cy=T2+20+hr(i*3+1)*(GY-T2-60);if(cx<x0||cx>x1)continue;ctx.strokeStyle='rgba(20,12,28,.35)';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+6,cy+14);ctx.lineTo(cx+1,cy+26);ctx.lineTo(cx+8,cy+40);ctx.stroke()}ctx.restore()}
+ const rp=[[f-16,GY+10],[f+4,GY-40],[f+20,T0-10],[f+166,T0-10],[f+172,T1-10],[f+316,T1-10],[f+322,T2-10],[R[3].x1+220,T2-10],[R[3].x1+220,GY+10]];shape(rp,rock,{lw:2.8,sh:1});/* v0.88: the rock face reads as stacked strata of cut card, each with its own tone and a lit lip, not one slab */{ctx.save();pathPts(rp);ctx.clip();const xa=Math.max(f-20,x0),xb=Math.min(R[3].x1+224,x1);if(xb>xa)for(let i=0;i<12;i++){const yt=T2-6+i*((GY+10-T2)/11),th=(GY+10-T2)/11+6,pts=[];for(let x=xa;x<=xb+40;x+=40)pts.push([x,yt+(hr(i*13+Math.round(x/40))-.5)*9]);for(let x=xb+40;x>=xa;x-=40)pts.push([x,yt+th+(hr(i*17+Math.round(x/40))-.5)*9]);const tn=mix(i%2?rock:rock2,i%3===0?'#8a8478':'#3e3a44',.12+hr(i*5)*.14);NOPAPER=true;shape(pts,tn,{lw:1.2});NOPAPER=false;line(xa,yt+1,xb,yt+1,'rgba(255,244,220,.10)',2)}for(let i=0;i<10;i++){const cx=f+60+hr(i*7+2)*(R[3].x1-f),cy=T2+20+hr(i*3+1)*(GY-T2-60);if(cx<x0||cx>x1)continue;ctx.strokeStyle='rgba(20,12,28,.35)';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+6,cy+14);ctx.lineTo(cx+1,cy+26);ctx.lineTo(cx+8,cy+40);ctx.stroke()}ctx.restore()}
  for(let i=0;i<9;i++){const yy=GY-18-i*36,xa=f+30+Math.max(0,(i-2))*38;if(yy>T2)line(xa+hr(i)*30,yy,R[3].x1+200,yy+hr(i+4)*8-4,rock2,2.2)}
  for(let i=0;i<14;i++){const mx=f+40+i*58+hr(i+31)*30,my=mx<f+166?T0-12:mx<f+316?T1-12:T2-12;shape(blobPts(mx,my,11+hr(i)*8,5,i+3,7),mix('#4c7a3a','#5a8a4a',clear),{lw:1.2})}
  for(let i=0;i<22;i++)pine(f+500+i*54+hr(i+60)*26,T2-10,.7+hr(i+70)*.6,i+80,run.fedBank?1:.6);pine(f+210,T1-10,.6,91,1);
@@ -4319,7 +4322,8 @@ function drawBeaver(){const cp=climbPh();if(cp&&!(P.punch>0)){drawBeaverBack(cp)
 
 /* ---------- loop ---------- */
 let last=performance.now();
-function frame(now){const dt=Math.min(.033,(now-last)/1000);last=now;zoomStep(dt);update(dt);render();requestAnimationFrame(frame)}
+/* v0.96: the next frame is booked first, so one drawing error can never freeze the game on a black screen */
+function frame(now){requestAnimationFrame(frame);const dt=Math.min(.033,(now-last)/1000);last=now;zoomStep(dt);update(dt);render()}
 applyMode();applySound();resize();makeGrain();hud();bestLine();requestAnimationFrame(frame);
 </script>
 </body>
