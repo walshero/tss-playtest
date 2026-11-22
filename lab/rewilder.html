@@ -3,10 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.94</title>
+<title>Rewilder v0.95</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.94 | LAB | 2026-11-22
+<!-- TSP build: Rewilder v0.95 | LAB | 2026-11-22
+     v0.95 (founder 2026-11-22: "I can't tag a player at the bottom of the tower. For the pool party, once the RED water is turned green and
+     the pool fills, player plays salmon first, then next closest player. When that player is in pool, switch to last player."):
+     a tappable TAG badge at the screen edge points to a partner who is off the screen on the island; the pool party hands control
+     salmon, then the animal nearer the pool, then the last one.
      v0.94 (founder 2026-11-22: "The two landing spots requiring both characters to unlock top of tower aren't clear. Make them clear"):
      two raised pads on the floor-24 landing with a lamp each, pulsing rings and arrows on empty pads, green when stood on; a padlock with
      matching lamps on the roof door; climbing into the locked door runs lights down the chain to the pads.
@@ -748,7 +752,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.94</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.95</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -1537,7 +1541,18 @@ function tagOut(){P.flip=0;const e=P.energy;P.energy=rest.energy;rest.energy=e;w
 }
 /* a tap on the resting animal: become it where it stands; the other one walks home */
 function landNow(){if(!swim)return;if(swim.fish){surface();return}const w=swim,dk=docks.slice().sort((a,b)=>Math.abs(a-w.x)-Math.abs(b-w.x))[0];FRX=dk<0?ISX1-110:3570;Object.assign(P,{x:dk===undefined?clamp(w.x,40,WORLD-60):dk,y:GY,vx:0,vy:0,support:'ground',climb:null});P.px=P.x;swim=null;SFX.pop();hudKey=''}
-function tapWorld(wx,wy){if(paused()||P.nap>0)return;if(critTap(wx,wy))return;if(questTap(wx,wy))return;const near=(x,y,rx,ry)=>Math.abs(wx-x)<rx&&Math.abs(wy-y)<ry;
+/* v0.95 (founder: "I can't tag a player at the bottom of the tower."): on the island the partner can be a whole tower away, off the screen,
+   where tapping them is impossible. A TAG badge sits at the screen edge on the side where they are, with an arrow toward them; tap it to tag. */
+function tagBadge(){if(!isle||state!=='play'||swim||!canTag()||!(P.x<0)||tireJam||downed)return null;const top=cam.y+(78-OY)/S,bot=cam.y+(H-reserve-OY)/S,py=restY-60;
+ const off=restX<cam.x+20||restX>cam.x+viewW-20||py<top+20||py>bot-20;if(!off)return null;const r=34;let x=clamp(restX,cam.x+60,cam.x+viewW-60),y=clamp(py,top+r+12,bot-r-12);
+ if(py>bot-20){x=clamp(restX,cam.x+viewW*.36,cam.x+viewW*.64);y=bot-r-16}
+ /* the badge never sits on the animal you are playing */
+ if(Math.hypot(x-P.x,y-(P.y-60))<r+90){const sd=P.x>cam.x+viewW/2?-1:1;x=clamp(P.x+sd*(r+110),cam.x+60,cam.x+viewW-60)}
+ return{x,y,r,a:Math.atan2(py-y,restX-x)}}
+function drawTagBadge(){const b=tagBadge();if(!b)return;const p=RM?0:Math.sin(T*4)*3;ctx.save();ctx.translate(b.x,b.y);
+ const ax=Math.cos(b.a)*(b.r+14+p),ay=Math.sin(b.a)*(b.r+14+p);shape([[ax+Math.cos(b.a)*14,ay+Math.sin(b.a)*14],[ax+Math.cos(b.a+2.2)*12,ay+Math.sin(b.a+2.2)*12],[ax+Math.cos(b.a-2.2)*12,ay+Math.sin(b.a-2.2)*12]],'#ffd23f',{lw:2.2,sh:1});
+ shape(ellPts(0,0,b.r,b.r,77),'#1b1328',{lw:2.6,sh:1,st:'#ffd23f'});paperText('TAG',0,1,22,'#ffd23f',0);ctx.restore()}
+function tapWorld(wx,wy){if(paused()||P.nap>0)return;{const b=tagBadge();if(b&&Math.hypot(wx-b.x,wy-b.y)<b.r+20){tagSwap();return}}if(critTap(wx,wy))return;if(questTap(wx,wy))return;const near=(x,y,rx,ry)=>Math.abs(wx-x)<rx&&Math.abs(wy-y)<ry;
  if(!tireJam&&!downed&&near(restX,restY-80,95,96)){landNow();tagSwap();return}
  if(riverOn&&!(swim&&swim.fish)&&fishSave&&near(fishSave.x,fishSave.y,105,64)){landNow();dive(true);return}
  if(swim&&swim.fish&&near(P.x,GY-80,90,100))surface()}
@@ -2392,8 +2407,9 @@ function questStep(s,dt){const q=fort.tq,g=qGeo(s),fh=s.fh;
  if(q.end&&!q.refill&&!q.hint&&T-isle.qend>4){q.hint=1;toast('Bonus: the pool is empty. Turn the water back on at the valve on the pipe.',8)}
  if(q.refill){q.pool=Math.min(1,(T-q.refill)/3);const fi=q.fish;if(q.pool>=1&&!fi.went&&!fi.on){fi.went=1;fi.on=true;fi.back=0;SFX.tag();word('SALMON',fi.x,fi.y-60,'#ffd23f');hudKey=''}
   const pd=fort.decks.find(d=>d.k===QP),R=s.x+s.w,inP=(x,y)=>q.pool>=1&&Math.abs(y-pd.y)<4&&x>s.x+50&&x<R+18,me=P.support===pd&&inP(P.x,P.y),mate=inP(restX,restY),n=(fi.pool?1:0)+(me?1:0)+(mate?1:0);
+  if(me&&!mate&&fi.pool&&!q.sw2)q.sw2=T;if(q.sw2&&!q.sw2d&&T-q.sw2>.9){q.sw2d=1;if(me&&!mate){P.ncl=T+.6;tagSwap();word(who==='turtle'?'TURTLE':'BEAVER',P.x,P.y-170,'#ffd23f')}}
   if(me&&!q.wasIn){for(let i=0;i<8;i++)puff(P.x+(Math.random()-.5)*50,pd.y-70,{kind:'steam',vx:(Math.random()-.5)*160,vy:-120-Math.random()*120,g:500,r:4,gr:4,c:'#dff1f7',life:.7,max:.7});SFX.pop()}q.wasIn=me;
-  if(n!==q.n&&!q.party){q.n=n;if(n>0&&n<3)toast('Bonus: '+n+' of 3 in the pool.'+(n===2&&!fi.pool?' The salmon comes up the pipe.':n===2?' TAG your partner and bring them up.':''),5)}
+  if(n!==q.n&&!q.party){q.n=n;if(n>0&&n<3)toast('Bonus: '+n+' of 3 in the pool.'+(n===1?' Now the closer of you two.':n===2?' Now the last one.':''),5)}
   if(n>=3&&!q.party){q.party=T;stats.party=1;SFX.grow();rainbow=Math.max(rainbow,10);shake=RM?0:5;word('POOL PARTY',s.cx,pd.y-170,'#9fd8ee');toast('Bonus win: all three of you in the pool you took back.',8)}}
  if(q.end&&!q.refill)q.pool=0
  // water: the pipe fills, then the salmon takes over
@@ -2422,7 +2438,9 @@ function questStep(s,dt){const q=fort.tq,g=qGeo(s),fh=s.fh;
  const fi=q.fish;if(fi.pool){fi.face=Math.cos(T*.5)>0?1:-1;fi.x=(s.x+56+s.x+s.w+14)/2+Math.sin(T*.5)*((s.w-40)/2-30);fi.y=qD(s,QP)-26}else if(!fi.on){fi.back=0;if(fi.y<GY+10){fi.y=Math.min(GY+14,fi.y+300*dt);fi.x+=(g.pipeX-fi.x)*Math.min(1,dt*6);fi.face=-1}else{const tx=(g.bx0+g.bx1)/2+Math.sin(T*.6)*44;fi.face=tx>fi.x?1:-1;fi.x+=(tx-fi.x)*Math.min(1,dt*1.5);fi.y=GY+14+Math.sin(T*2)*2}}}
 function questFish(dt){const s=fort.s,q=fort.tq,f=q.fish,g=qGeo(s);upQ=false;
  f.x+=(g.pipeX-f.x)*Math.min(1,dt*8);f.y=clamp(f.y+((K.d?1:0)-(K.u?1:0))*190*dt,q.refill?g.pipeTop:g.drainY-12,GY+14);
- if(q.refill&&f.y<=g.pipeTop+2&&!f.pool){f.pool=T;f.on=false;f.back=0;SFX.pop();stars(g.pool.x1,g.pipeTop,6);hudKey='';return}if(K.u||K.d)f.face=K.u?1:-1;
+ if(q.refill&&f.y<=g.pipeTop+2&&!f.pool){f.pool=T;f.on=false;f.back=0;SFX.pop();stars(g.pool.x1,g.pipeTop,6);hudKey='';
+  /* v0.95 (founder: "player plays salmon first, then next closest player. When that player is in pool, switch to last player") */
+  const pd=fort.decks.find(d=>d.k===QP);if(Math.hypot(restX-pd.x,restY-pd.y)<Math.hypot(P.x-pd.x,P.y-pd.y)){P.ncl=T+.6;tagSwap();word(who==='turtle'?'TURTLE':'BEAVER',P.x,P.y-170,'#ffd23f')}return}if(K.u||K.d)f.face=K.u?1:-1;
  if(smashQ){smashQ=false;sHeld=false;if(!q.drain&&Math.abs(f.y-g.drainY)<44){q.drain=T;f.back=1.4;SFX.steel();SFX.pop();SFX.pfft();stars(g.pipeX,g.drainY,6);word('DRAIN',g.pipeX+40,g.drainY-30,'#7cc4e0')}
   else{SFX.bump&&SFX.bump();word('BOOP',g.pipeX+30,f.y-30,'#9fd8ee')}}
  if(f.back>0){f.back-=dt;if(f.back<=0)f.on=false}
@@ -2796,7 +2814,7 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(state==='play'&&P.y>GY-12&&sites.some(q=>q.state==='grown'&&['river','free','wet','rain'].includes(q.choice)))for(let i=1;i<=3;i++){const tx=trail[trail.length-1-i*13];if(tx!==undefined)duck(tx,GY-9-Math.abs(Math.sin(T*9+i))*3,i+20,P.face)}
  if(riverOn&&state==='play'&&!(swim&&swim.fish)&&fishSave){const fry=run&&run.phase==='fry',ph=T%3.2;drawSalmon(Object.assign({},fishSave,{leap:!swim&&ph<.6&&!told.has('fish')?.6-ph:0,z:fry?.42+.58*run.age:1,dead:run&&run.phase==='dying'}))}
  {const hh=clamp((GY-P.y)/300,0,1);if(state!=='title'||P.y<=GY){ctx.globalAlpha=.3*(1-hh*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(P.x,GY-1,24*(1-hh*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1}}
- if(!swim||swim.fish)drawHero();if(swim)drawSwimmer();questPoolFront();
+ if(!swim||swim.fish)drawHero();if(swim)drawSwimmer();questPoolFront();drawTagBadge();
  parts.forEach(q=>{if(!q.bk)drawPart(q)});
  words.forEach(w=>{const a=clamp(w.life/.9,0,1),pop=1+.5*Math.sin(Math.min(1,(1-a)*5)*Math.PI);ctx.globalAlpha=Math.min(1,a*3);if(w.k){const z=Math.max(30,22/S)*pop,R=z*(.7+w.t.length*.3),pts=[];for(let i=0;i<16;i++){const r=i%2?R*.74:R,an=i/16*6.283+w.rot;pts.push([w.x+Math.cos(an)*r,w.y-(1-a)*40+Math.sin(an)*r*.6])}shape(pts,BURST[w.k][0],{lw:2.4,st:w.k==='baron'?'#ffd23f':INK})}paperText(w.t,w.x,w.y-(1-a)*40,Math.max(30,22/S)*pop,w.k?BURST[w.k][1]:w.c,w.rot);ctx.globalAlpha=1});
  drawFlood();drawMud();
