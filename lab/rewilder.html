@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.93</title>
+<title>Rewilder v0.94</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.93 | LAB | 2026-11-22
+<!-- TSP build: Rewilder v0.94 | LAB | 2026-11-22
+     v0.94 (founder 2026-11-22: "The two landing spots requiring both characters to unlock top of tower aren't clear. Make them clear"):
+     two raised pads on the floor-24 landing with a lamp each, pulsing rings and arrows on empty pads, green when stood on; a padlock with
+     matching lamps on the roof door; climbing into the locked door runs lights down the chain to the pads.
      v0.93 (founder 2026-11-22: "Oversized statue yea. Plus, the balloon has to be funnier when blowing around ... and should be DIFFERENT each time
      else it's boring. Eg. It blows up huge and explodes or it grows super small and implodes or all of the pixels fall apart etc."):
      the mid-level blimp exit is dealt from a shuffled deck of five (corkscrew, swell and pop, shrink and implode, paper comes unglued
@@ -745,7 +748,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.93</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.94</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -2361,7 +2364,7 @@ function qPattern(s,ay,kind,col){const L=s.x,R=s.x+s.w,C=s.cx;
  const x=L+s.cw*(col+.5);return[[x,ay-170],[x,ay+150],[x+40,ay+40]]}
 function questStep(s,dt){const q=fort.tq,g=qGeo(s),fh=s.fh;
  // the climb: the roof door stops you until the weight is on the plate; a landing catches you as you pass it
- if(P.climb===s){if(!q.door)P.y=Math.max(P.y,g.roofY+106);
+ if(P.climb===s){if(!q.door){if(K.u&&P.y<=g.roofY+108)q.blk=T;P.y=Math.max(P.y,g.roofY+106)}
   if(!(P.ncl>T))for(const d of fort.decks){const py=q.py||P.y;if((py>d.y+1&&P.y<=d.y+1)||(py<d.y-1&&P.y>=d.y-1)){P.climb=null;P.slide=null;P.support=d;P.y=d.y;P.vy=0;P.ncl=T+.45;dust(P.x,d.y,4,30);break}}}
  if(dt>0&&q.py!==undefined){q.vy=(q.vy||0)+(((P.y-q.py)/dt)-(q.vy||0))*Math.min(1,dt*5);q.vx=(q.vx||0)+(((P.x-(q.px0??P.x))/dt)-(q.vx||0))*Math.min(1,dt*5)}q.px0=P.x;
  q.py=P.y;if(P.support&&P.support.deck&&!P.support.lift)fort.ck=P.support;if(q.hitT>0)q.hitT-=dt;
@@ -2482,11 +2485,27 @@ function questArt(s){const q=fort.tq,g=qGeo(s),fh=s.fh,lo=cam.y-300,hi=cam.y+100
    if(!fi.on&&need&&!RM){const u=(T*.9)%1;ctx.globalAlpha=(1-u)*.8;ctx.strokeStyle='#ffffff';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(fi.x,fi.y,26+u*22,12+u*10,0,0,7);ctx.stroke();ctx.globalAlpha=1}}}
  // landings
  fort.decks.forEach(d=>{if(!inV(d.y))return;const l0=d.x-d.w/2,r0=d.x+d.w/2;shape(rectPts(l0,d.y-2,r0-l0,12,d.k*5+700,.3),'#f1eadb',{lw:2,sh:1});for(let m=l0+8;m<r0-4;m+=16)line(m,d.y-2,m,d.y-36,'#f1eadb',2);line(l0+4,d.y-36,r0-4,d.y-36,'#f1eadb',3)});
- // the plate on floor 16, its two lamps, and the chain up the left side to the roof door
- {const L=fort.decks.find(d=>d.k===QV),l0=L.x-L.w/2,cx0=s.x-14;if(inV(L.y)){for(let k=0;k<6;k++)shape(rectPts(l0+20+k*((L.w-40)/6),L.y-6,(L.w-40)/6-2,6,800+k,.2),k%2?'#1b1328':'#ffd23f',{lw:1});
-   for(let k=0;k<2;k++){const on=q.weight>k||q.door;shape(ellPts(l0+12,L.y-60-k*22,9,9,810+k),on?'#3fbf5a':'#4a2020',{lw:2.2});if(on)dot(l0+10,L.y-62-k*22,2.6,'rgba(255,255,255,.8)')}}
-  const top=g.roofY+8,sl=q.door?Math.min(1,(T-q.door)/1.2)*30:0;ctx.strokeStyle='#cfc8bb';ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.lineDashOffset=-sl;ctx.beginPath();ctx.moveTo(cx0,L.y-2);ctx.lineTo(cx0,top);ctx.stroke();ctx.setLineDash([]);
-  if(inV(g.roofY)&&!q.end){const op=q.door?ease(clamp((T-q.door)/1.2,0,1)):0,w=(s.w+12)*(1-op);if(w>3){shape(rectPts(s.x-6,g.roofY-8,w,16,820,.2),'#3a3440',{lw:2.4,sh:1});dot(s.x-6+w*.5,g.roofY,4,q.door?'#3fbf5a':'#ff3b2e')}shape(rectPts(s.x-30,g.roofY-12,24,24,821,.2),'#2a2630',{lw:2})}}
+ /* v0.93 (founder: "The two landing spots requiring both characters to unlock top of tower aren't clear. Make them clear"): two raised
+     pads on the floor-24 landing, each with its own lamp on a post. An empty pad pulses and an arrow points at it; a pad with an animal on it
+     sinks and turns green, its lamp lights and its cable glows. The roof door wears a padlock with the same two lamps, and when you
+     climb into the locked door, lights run down the chain to the pads. */
+ {const L=fort.decks.find(d=>d.k===QV),cx0=s.x-14,onL=P.support===L?(P.x<L.x?0:1):-1,onR=Math.abs(restY-L.y)<3&&Math.abs(restX-L.x)<=L.w/2+4?(restX<L.x?0:1):-1,
+   lit=[0,1].map(i=>!!q.door||q.weight>=2||onL===i||onR===i),cy=L.y-100;
+  if(inV(L.y)){[0,1].forEach(i=>{const on=lit[i],px=L.x+(i?1:-1)*L.w*.24,dy=on?3:0,lx=px+40;
+    ctx.strokeStyle=on?'#ffd23f':'#8a8478';ctx.lineWidth=on?3.4:2.4;ctx.setLineDash(on?[]:[6,5]);ctx.beginPath();ctx.moveTo(lx,cy);ctx.lineTo(cx0,cy);ctx.stroke();ctx.setLineDash([]);
+    line(lx,L.y-8,lx,cy,'#141016',6);line(lx,L.y-8,lx,cy,'#cfc8bb',3.4);
+    shape(rectPts(px-46,L.y-9,92,11,830+i,.2),'#2a2630',{lw:2,sh:1});shape(rectPts(px-40,L.y-16+dy,80,10,832+i,.2),on?'#3fbf5a':'#ffd23f',{lw:2.2,sh:1});
+    if(!on)for(let m=0;m<5;m++)line(px-32+m*16,L.y-8,px-24+m*16,L.y-15,'#1b1328',3);
+    if(on&&!RM){ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='rgba(120,255,140,.18)';ctx.beginPath();ctx.ellipse(lx,cy,30,30,0,0,7);ctx.fill();ctx.restore()}
+    shape(ellPts(lx,cy,14,14,834+i),on?'#3fbf5a':'#6a1e1a',{lw:2.6,sh:1});dot(lx-4,cy-5,3.4,on?'rgba(255,255,255,.9)':'rgba(255,255,255,.25)');
+    if(!on){if(!RM){const u=(T*1.1+i*.5)%1;ctx.globalAlpha=(1-u)*.9;ctx.strokeStyle='#ffffff';ctx.lineWidth=3.4;ctx.beginPath();ctx.ellipse(px,L.y-11,46+u*26,11+u*9,0,0,7);ctx.stroke();ctx.globalAlpha=1}
+     const b=RM?0:Math.abs(Math.sin(T*3+i))*8;shape([[px-14,L.y-70-b],[px+14,L.y-70-b],[px,L.y-48-b]],'#fbf6ea',{lw:2.2,sh:1})}})}
+  const top=g.roofY+8,sl=q.door?Math.min(1,(T-q.door)/1.2)*30:0,both=lit[0]&&lit[1];ctx.strokeStyle=both?'#ffd23f':'#cfc8bb';ctx.lineWidth=3;ctx.setLineDash([5,4]);ctx.lineDashOffset=-sl;ctx.beginPath();ctx.moveTo(cx0,cy);ctx.lineTo(cx0,top);ctx.stroke();ctx.setLineDash([]);
+  if(q.blk&&T-q.blk<3&&!q.door&&!RM){for(let m=0;m<6;m++){const u=((T-q.blk)*.9+m/6)%1,yy=top+(cy-top)*u;if(inV(yy))shape([[cx0-9,yy-6],[cx0+9,yy-6],[cx0,yy+6]],'#ffd23f',{lw:1.6})}}
+  if(inV(g.roofY)&&!q.end){const op=q.door?ease(clamp((T-q.door)/1.2,0,1)):0,w=(s.w+12)*(1-op);if(w>3){shape(rectPts(s.x-6,g.roofY-8,w,16,820,.2),'#3a3440',{lw:2.4,sh:1});
+    if(!q.door){const lk=s.x-6+w*.5,jg=q.blk&&T-q.blk<.5&&!RM?Math.sin(T*60)*3:0;ctx.strokeStyle='#141016';ctx.lineWidth=7;ctx.beginPath();ctx.arc(lk+jg,g.roofY+8,11,Math.PI,0);ctx.stroke();ctx.strokeStyle='#c9c2b4';ctx.lineWidth=4;ctx.beginPath();ctx.arc(lk+jg,g.roofY+8,11,Math.PI,0);ctx.stroke();
+     shape(rectPts(lk-17+jg,g.roofY+6,34,26,823,.2),'#c9a84a',{lw:2.4,sh:1});[0,1].forEach(i=>dot(lk-7+i*14+jg,g.roofY+19,4.6,lit[i]?'#3fbf5a':'#6a1e1a'))}
+    else dot(s.x-6+w*.5,g.roofY,4,'#3fbf5a')}shape(rectPts(s.x-30,g.roofY-12,24,24,821,.2),'#2a2630',{lw:2})}}
  // v0.87 (founder 2026-11-22: "The pool / cooling tower should be more obvious"): a big glass-fronted pool on the floor-32 landing,
  // cantilevered past the tower; cold water runs down into the data center under it (blue pipes, frost); the data center's dish sends
  // rings to the drones. Drain it and the pipes go empty, the racks cook, the dish sparks and stops, and the drones drop.
