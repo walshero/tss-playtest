@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.96</title>
+<title>Rewilder v0.97</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.96 | LAB | 2026-11-22
+<!-- TSP build: Rewilder v0.97 | LAB | 2026-11-23
+     v0.97 (founder 2026-11-23: "On phone it plays fine. On my Mac it loads slowly even the music and intro is glitchy even after minutes"):
+     canvas pixel budget (2.4 M device pixels), a frame-cost governor that steps resolution down and back up, music lookahead 0.45 s.
      v0.96 (founder 2026-11-22: "There is a bug in level 1 as beaver approaches tar company gas containers screen turns black"): the
      terrace's strata (v0.88) built an empty shape when only a sliver of the rock face was on a narrow portrait screen; the error stopped
      the frame loop. The strata now skip an empty slice, an empty shape draws nothing, and the next frame is booked before drawing.
@@ -755,7 +757,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.96</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.97</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -981,8 +983,16 @@ function tarS(){return sites.find(q=>q.id==='tar')}
 function tarUp(){const t=tarS();return !!t&&(t.state==='standing'||t.state==='toppling')}
 function EAST(){return depot&&depot.seen?WORLD+1720:WORLD}
 function zoomStep(dt){const zt=1;if(Math.abs(zt-zm)<.002)return;zm+=(zt-zm)*Math.min(1,dt*3);if(Math.abs(zt-zm)<.002)zm=zt;S=S0*zm;OY=H-reserve-600*S;viewW=W/S}
+/* v0.97 (founder: "On phone it plays fine. On my Mac it loads slowly even the music and intro is glitchy even after minutes"):
+   a big desktop window at Retina density is three to four times the pixels of a phone. The canvas now keeps to a pixel budget,
+   and a governor lowers the resolution a step when frames run long and raises it again when there is room. The music schedules
+   further ahead so a slow frame cannot starve it. */
+let RQ=1,ftA=0,ftN=0,ftOk=0;
+function pickDPR(){const dev=Math.min(2,devicePixelRatio||1),bud=Math.sqrt(2.4e6/Math.max(1,W*H));return Math.max(.6,Math.min(dev,bud)*RQ)}
+function govern(cost){ftA+=cost;ftN++;if(ftN<45)return;const avg=ftA/ftN;ftA=0;ftN=0;
+ if(avg>20&&RQ>.55){RQ=Math.max(.55,RQ*.85);ftOk=0;resize()}else if(avg<9){if(++ftOk>=4&&RQ<1){RQ=Math.min(1,RQ+.1);ftOk=0;resize()}}else ftOk=0}
 function resize(){
- W=innerWidth;H=innerHeight;DPR=Math.min(2,devicePixelRatio||1);screenFit();
+ W=innerWidth;H=innerHeight;DPR=pickDPR();screenFit();
  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
  reserve=document.body.classList.contains('touch')&&document.body.classList.contains('playing')&&W<=H*1.25?182:0;
  S0=Math.min((H-reserve)/600,W/520);S=S0*zm;
@@ -1175,7 +1185,7 @@ function musStart(){const a=ac();if(!a||mus)return;const g=a.createGain();g.gain
 function musStop(){if(!mus)return;clearInterval(mus.id);try{mus.g.disconnect()}catch(e){}mus=null}
 function mGap(p,i,max){for(let k=1;k<=max;k++)if(p[(i+k)%32])return k;return max}
 function musTick(){if(!mus||!AC)return;if(mus.dark===undefined||mus.step%16===0)mus.dark=level>1&&dys()>.2;const dark=mus.dark,spb=60/(dark?92:104)/4,grown=sites.filter(s=>s.state==='grown').length;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;
- while(mus.next<AC.currentTime+.15){const i=mus.step%32,t=mus.next+(i%2?spb*.16:0);
+ while(mus.next<AC.currentTime+.45){const i=mus.step%32,t=mus.next+(i%2?spb*.16:0);
   {const pb=dark?M_DBASS:M_BASS,bs=pb[i];if(bs)mNote(mf(bs),t,spb*Math.min(1.6,mGap(pb,i,2)*.9),dark?'triangle':'sawtooth',dark?.2:.2,dark?260:260)}
   if(dark&&i%2===1)mNote(mf(52),t,.05,'square',.03,i%8<4?700:1500);if(dark&&M_DLEAD[i])mNote(mf(M_DLEAD[i]),t,spb*Math.min(1.9,mGap(M_DLEAD,i,2)*.9),'sawtooth',.05,900);
   if(M_KICK[i]){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);g.gain.setValueAtTime(.5,t);g.gain.exponentialRampToValueAtTime(.001,t+.18);o.connect(g).connect(mus.g);o.start(t);o.stop(t+.2)}
@@ -4323,7 +4333,7 @@ function drawBeaver(){const cp=climbPh();if(cp&&!(P.punch>0)){drawBeaverBack(cp)
 /* ---------- loop ---------- */
 let last=performance.now();
 /* v0.96: the next frame is booked first, so one drawing error can never freeze the game on a black screen */
-function frame(now){requestAnimationFrame(frame);const dt=Math.min(.033,(now-last)/1000);last=now;zoomStep(dt);update(dt);render()}
+function frame(now){requestAnimationFrame(frame);const dt=Math.min(.033,(now-last)/1000);last=now;const t0=performance.now();zoomStep(dt);update(dt);render();govern(performance.now()-t0)}
 applyMode();applySound();resize();makeGrain();hud();bestLine();requestAnimationFrame(frame);
 </script>
 </body>
