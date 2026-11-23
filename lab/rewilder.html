@@ -3,10 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.0</title>
+<title>Rewilder v1.1</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.0 | LAB | 2026-11-23
+<!-- TSP build: Rewilder v1.1 | LAB | 2026-11-23
+     v1.1 (founder 2026-11-23: river white circles, clutter and variety, coal colours the river; "end scene is too easy. Make the drone pattern
+     a little harder"; drone jail on the first climber, rescued by the water for the salmon; the sun peers over its sunglasses and scorches the
+     blimp, which slides down a rainbow to the roof; the farmer Baron grows tomatoes and throws them at the pool party): river zones (meadow,
+     cobble, open gravel, lily), no white dots, coal ash greys the water; drones fly faster, peel off in longer lines, more often; floor-16
+     cage of six drones, released when the drain cooks the data center; finale beam and rainbow slide; tomato plants and a tomato barrage.
      v1.0 (founder 2026-11-23: "Help signs are not needed in the game. The arrows pointing to blocked river aren't needed. When you are
      cleaning the river, stop adding abstract circles to the river. The city needs power for a win state so repave with option for power
      if needed. When power is running tram can operate. Lights come on in houses when power is running. Make dead tractors disappear more
@@ -768,7 +773,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.0</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.1</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -1247,7 +1252,7 @@ function setMenu(o){menuOpen=o;$('landBtn').hidden=!(o&&swim&&state==='play');$(
 $('menuBtn').onclick=()=>setMenu(!menuOpen);$('menuClose').onclick=()=>setMenu(false);
 function say(t){$('say').textContent='';setTimeout(()=>{$('say').textContent=t},30)}
 function placeToast(){const el=$('toast'),c=$('corner').getBoundingClientRect();el.classList.remove('low');el.style.minHeight='0';el.style.top=Math.round(c.bottom+4)+'px'}
-const KEEPMSG=['Bonus','The city has no power','Smash the buildings','The Baron ran','A bridge joins','The city is lopsided','You are grown. This is generation','A salmon spawns once','The salmon found'];
+const KEEPMSG=['Bonus','The city has no power','The drones caught','Smash the buildings','The Baron ran','A bridge joins','The city is lopsided','You are grown. This is generation','A salmon spawns once','The salmon found'];
 function toast(t,d){if(!t||!KEEPMSG.some(k=>t.indexOf(k)===0))return;if(!t)return;const el=$('toast');el.textContent=t;placeToast();el.classList.add('on');toastT=Math.min(d||3.5,1.8+t.length*.07);say(t)}
 $('toast').onclick=()=>{toastT=0;$('toast').classList.remove('on')};
 const SAY=new Set(['story2']);
@@ -2117,9 +2122,13 @@ function drawSeaAndGravel(clear){const x0=cam.x-60,x1=cam.x+viewW+60;
   if(run.phase==='adult'){run.krill.forEach(k=>{if(!k.on)return;for(let j=0;j<9;j++)dot(k.x+Math.sin(T*2.4+j*1.3)*18+Math.cos(j*2.1)*10,k.y+Math.cos(T*2+j*1.7)*12+Math.sin(j)*8,2.6,'#f3b6c8')});
    if(run.fed>=4&&!run.mated){const m=mateXY(),a=(2.6-run.dance)*5.2;if(run.dance>0)drawSalmon({x:run.dx-Math.cos(a)*36,y:run.dy-Math.sin(a)*24,face:Math.sin(a)>0?1:-1,leap:0});else drawSalmon({x:m[0],y:m[1],face:Math.cos(T*.5)>0?1:-1,leap:0})}}}
 }
-function drawWater(clear,full){const x0=cam.x-60,x1=cam.x+viewW+60,gone=junk.filter(j=>j.hp<=0).length;
+let rivCoal=1;function drawWater(clear,full){const x0=cam.x-60,x1=cam.x+viewW+60,gone=junk.filter(j=>j.hp<=0).length,dtRc=Math.min(.05,Math.max(0,T-(drawWater.lc||T)));drawWater.lc=T;
  {const dtR=Math.min(.05,Math.max(0,T-(drawWater.lt||T)));drawWater.lt=T;const allc=junk.length>0&&gone>=junk.length,tg=junk.length?gone/junk.length*.45+(allc?.55:0):0;rivRec+=clamp(tg-rivRec,-dtR*.5,dtR*.13);if(allc&&rivFl<0){rivFl=0;SFX.grow('river');shake=RM?0:5}if(rivFl>=0&&rivFl<90)rivFl+=dtR}
  const r=rivRec;ctx.fillStyle='rgba(92,78,40,'+(.34*(1-r)).toFixed(3)+')';ctx.fillRect(x0,WT,x1-x0,RD);if(r>.01){const gr=ctx.createLinearGradient(0,WT,0,WB);gr.addColorStop(0,'rgba(120,226,226,'+(.46*r).toFixed(3)+')');gr.addColorStop(.6,'rgba(64,176,196,'+(.36*r).toFixed(3)+')');gr.addColorStop(1,'rgba(40,128,150,'+(.3*r).toFixed(3)+')');ctx.fillStyle=gr;ctx.fillRect(x0,WT,x1-x0,RD)}
+ /* v1.1 (founder: "Stopping coal plant affects river color."): while the coal plant stands, its ash greys the river; take it down and the
+    water clears over a few seconds */
+ {const c=sites.find(q=>q.id==='coal'),on=c&&!isle&&(c.state==='standing'||c.state==='toppling')?1:0;rivCoal+=clamp(on-rivCoal,-dtRc*.35,dtRc*.35);
+  if(rivCoal>.01){ctx.fillStyle='rgba(62,58,54,'+(.42*rivCoal).toFixed(3)+')';ctx.fillRect(x0,WT,x1-x0,RD);ctx.fillStyle='rgba(40,36,34,'+(.5*rivCoal).toFixed(3)+')';ctx.fillRect(x0,WT,x1-x0,5)}}
  if(flood>0){ctx.fillStyle='rgba(122,86,50,'+(.36*floodEnv()).toFixed(3)+')';ctx.fillRect(x0,WT,x1-x0,RD)}
  const g=ctx.createLinearGradient(0,WT,0,WB);g.addColorStop(0,'rgba(10,20,50,0)');g.addColorStop(1,'rgba(8,12,38,.6)');ctx.fillStyle=g;ctx.fillRect(x0,WT,x1-x0,RD);
  if(!RM){ctx.fillStyle='rgba(255,255,255,.05)';for(let x=Math.floor(x0/220)*220;x<x1;x+=220){const lx=x+hr(x*.13)*150;if(!waterOpen(lx))continue;ctx.beginPath();ctx.moveTo(lx,WT);ctx.lineTo(lx+46,WT);ctx.lineTo(lx+10+Math.sin(T*.5+x)*14,WB);ctx.lineTo(lx-50+Math.sin(T*.5+x)*14,WB);ctx.closePath();ctx.fill()}}
@@ -2130,22 +2139,27 @@ function drawWater(clear,full){const x0=cam.x-60,x1=cam.x+viewW+60,gone=junk.fil
   // a blade of river grass: broad at the foot, tapering, with a pale midrib
   const blade=(bx,hh,wd,sw,c,rib)=>{const pts=[[bx-wd,WB-12]];for(let m=1;m<=4;m++){const u=m/4;pts.push([bx-wd*(1-u)+sw*u*u,WB-12-hh*u])}for(let m=3;m>=0;m--){const u=m/4;pts.push([bx+wd*(1-u)+sw*u*u,WB-12-hh*u])}shape(pts,c,{lw:1.3});if(rib){ctx.strokeStyle=rib;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(bx,WB-14);ctx.quadraticCurveTo(bx+sw*.2,WB-12-hh*.5,bx+sw*.8,WB-12-hh*.9);ctx.stroke()}},
    fish=(fx,fy,d,sz,body,belly,fin,spots)=>{ctx.save();ctx.translate(fx,fy);ctx.scale(d*sz,sz);shape([[-13,0],[-24,-8],[-21,0],[-24,8]],fin,{lw:1.2});shape(smoothPts([[16,0],[8,-6.5],[-6,-6],[-14,-1.5],[-14,1.5],[-6,6],[8,6]],3),body,{lw:1.5,sh:sz>1.2});if(belly)shape(smoothPts([[14,1.5],[6,5.5],[-6,5],[-12,1.5],[-2,2.4],[8,2.2]],2),belly,{lw:.7});shape([[2,-6.4],[7,-11],[-5,-6.2]],fin,{lw:1});shape([[1,5.6],[5,10],[-4,5.4]],fin,{lw:.9});if(spots)[[-8,-2],[-2,-3],[4,-2.6],[-5,1],[1,.6]].forEach(q=>{ctx.fillStyle=spots;ctx.beginPath();ctx.arc(q[0],q[1],1.1,0,7);ctx.fill()});ctx.fillStyle='#fbf6ea';ctx.beginPath();ctx.arc(10.4,-1.6,2.1,0,7);ctx.fill();ctx.fillStyle=INK;ctx.beginPath();ctx.arc(10.8,-1.6,1.1,0,7);ctx.fill();ctx.restore()};
+  /* v1.1 (founder 2026-11-23: "The river still adds white circles as you clean and I don't like it. The river after it's cleaned is almost too
+     much. Reduce clutter slightly. Show less on each screen and more variety between."): the white flower dots on the grass are gone, and the
+     clean river runs in zones about a screen wide, each with its own character: a grass meadow, a cobble bed with mussels, open gravel
+     where the crayfish picks, and a lily reach. */
+  const RZ=['meadow','cobble','open','lily'],Z=x=>{const k=Math.floor(x/640);return RZ[(((k*3+(hr(k*.77)>.5?1:0))%4)+4)%4]};
   // the bed: a back row of small stones, then big river cobbles with a lit side
-  for(let x=Math.floor(x0/20)*20;x<x1;x+=20){if(hr(x*.37)>r*1.2||!waterOpen(x))continue;shape(blobPts(x+hr(x*.7)*10,WB-30-hr(x*.21)*9,8+hr(x)*5,5.4+hr(x*2)*2.6,x,7),['#8a8478','#7a746a','#9a9288'][Math.floor(hr(x*.9)*3)],{lw:1.1})}
-  for(let x=Math.floor(x0/34)*34;x<x1;x+=34){if(hr(x*.31)>r*1.25||!waterOpen(x))continue;const gx=x+hr(x*.7)*18,gy=WB-22-hr(x*.21)*7,rx=15+hr(x)*11,ry=9+hr(x*2)*6,c=['#b8b2a4','#c9b99a','#a8a296','#d8cbb8'][Math.floor(hr(x*.9)*4)];shape(blobPts(gx,gy,rx,ry,x,9),c,{lw:1.6,sh:1});ctx.globalAlpha=.3;shape(blobPts(gx-rx*.3,gy-ry*.34,rx*.42,ry*.3,x+1,7),'#fff8e8',{ln:false});ctx.globalAlpha=1;if(hr(x*.5)<.4)shape(blobPts(gx+rx*.2,gy-ry*.8,rx*.5,2.6,x+2,6),'#5a8a4a',{lw:.8})}
+  for(let x=Math.floor(x0/20)*20;x<x1;x+=20){if(hr(x*.37)>r*1.2||!waterOpen(x))continue;{const z=Z(x);if((z==='meadow'||z==='lily')&&hr(x*.93)<.7)continue}shape(blobPts(x+hr(x*.7)*10,WB-30-hr(x*.21)*9,8+hr(x)*5,5.4+hr(x*2)*2.6,x,7),['#8a8478','#7a746a','#9a9288'][Math.floor(hr(x*.9)*3)],{lw:1.1})}
+  for(let x=Math.floor(x0/34)*34;x<x1;x+=34){if(hr(x*.31)>r*1.25||!waterOpen(x))continue;{const z=Z(x);if(z!=='cobble'&&!(z==='open'&&hr(x*.57)<.3))continue}const gx=x+hr(x*.7)*18,gy=WB-22-hr(x*.21)*7,rx=15+hr(x)*11,ry=9+hr(x*2)*6,c=['#b8b2a4','#c9b99a','#a8a296','#d8cbb8'][Math.floor(hr(x*.9)*4)];shape(blobPts(gx,gy,rx,ry,x,9),c,{lw:1.6,sh:1});ctx.globalAlpha=.3;shape(blobPts(gx-rx*.3,gy-ry*.34,rx*.42,ry*.3,x+1,7),'#fff8e8',{ln:false});ctx.globalAlpha=1;if(hr(x*.5)<.4)shape(blobPts(gx+rx*.2,gy-ry*.8,rx*.5,2.6,x+2,6),'#5a8a4a',{lw:.8})}
   // mussels wedged between the stones
-  if(r>.45)for(let x=Math.floor(x0/210)*210;x<x1;x+=210){const mx=x+hr(x*.51)*150;if(!waterOpen(mx))continue;for(let q=0;q<4;q++){shape(ellPts(mx+q*11,WB-22-(q%2)*4,7.4,4.6,x+q),q%2?'#2b2a33':'#3a3140',{lw:1.2});ctx.strokeStyle='rgba(159,216,238,.5)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx+q*11,WB-22-(q%2)*4,4.4,3.6,5.4);ctx.stroke()}}
+  if(r>.45)for(let x=Math.floor(x0/210)*210;x<x1;x+=210){const mx=x+hr(x*.51)*150;if(!waterOpen(mx)||Z(mx)!=='cobble')continue;for(let q=0;q<4;q++){shape(ellPts(mx+q*11,WB-22-(q%2)*4,7.4,4.6,x+q),q%2?'#2b2a33':'#3a3140',{lw:1.2});ctx.strokeStyle='rgba(159,216,238,.5)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(mx+q*11,WB-22-(q%2)*4,4.4,3.6,5.4);ctx.stroke()}}
   // river grass, back layer
-  for(let x=Math.floor(x0/52)*52;x<x1;x+=52){if(hr(x*.23)>.15+r*.85||!waterOpen(x))continue;const bx=x+hr(x*.4)*26,hh=(50+hr(x*.6)*96)*Math.min(1,r*1.3);for(let k2=0;k2<4;k2++){const sw=RM?0:Math.sin(T*1.1+x+k2*1.3)*(8+hh*.14)+(k2-1.5)*7;blade(bx+k2*8-12,hh*(.7+hr(x+k2)*.3),5.4,sw,['#3f9a52','#5fbe5a','#4aae58','#6cc866'][k2],'rgba(234,255,240,.45)')}if(r>.85)shape(ellPts(bx+Math.sin(T*1.1+x+1.3)*(8+hh*.14)-4,WB-16-hh*.86,4.6,4,x),'#fbf6ea',{lw:1})}
+  for(let x=Math.floor(x0/52)*52;x<x1;x+=52){if(hr(x*.23)>.15+r*.85||!waterOpen(x))continue;{const z=Z(x),k=z==='meadow'?1:z==='lily'?.4:z==='cobble'?.15:0;if(hr(x*.81)>=k)continue}const bx=x+hr(x*.4)*26,hh=(50+hr(x*.6)*96)*Math.min(1,r*1.3);for(let k2=0;k2<4;k2++){const sw=RM?0:Math.sin(T*1.1+x+k2*1.3)*(8+hh*.14)+(k2-1.5)*7;blade(bx+k2*8-12,hh*(.7+hr(x+k2)*.3),5.4,sw,['#3f9a52','#5fbe5a','#4aae58','#6cc866'][k2],'rgba(234,255,240,.45)')}}
   // a crayfish picks along the bed
-  if(r>.7)for(let x=Math.floor(x0/560)*560;x<x1;x+=560){const cxr=x+280+Math.sin(T*.3+x)*90,cy=WB-27,d=Math.cos(T*.3+x)>0?1:-1;if(!waterOpen(cxr))continue;ctx.save();ctx.translate(cxr,cy);ctx.scale(d,1);for(let m=0;m<3;m++)shape(ellPts(-8-m*6,1+m*.6,5-m*.8,4.4-m*.7,x+m),'#b8452a',{lw:1});shape([[-25,0],[-31,-4],[-33,2],[-29,5]],'#b8452a',{lw:1});shape(smoothPts([[12,0],[6,-6],[-6,-5.4],[-8,0],[-6,5.4],[6,5]],2),'#c8552e',{lw:1.5,sh:1});[[-1,1],[1,1]].forEach(q=>{const cl=Math.sin(T*3+x)*2;strip(9,q[0]*3,19,q[0]*8+cl,2.6,'#c8552e',{lw:.7});shape([[18,q[0]*8+cl-3],[27,q[0]*8+cl-4],[24,q[0]*8+cl],[27,q[0]*8+cl+4],[18,q[0]*8+cl+3]],'#d9703a',{lw:1.1})});[-2,2,6].forEach(o=>line(o,5,o-2,10,'#8a3a22',1.4));line(11,-2,22,-9,'#8a3a22',1);line(11,-1,24,-5,'#8a3a22',1);ctx.fillStyle=INK;ctx.beginPath();ctx.arc(9,-3,1.2,0,7);ctx.fill();ctx.restore()}
+  if(r>.7)for(let x=Math.floor(x0/560)*560;x<x1;x+=560){const cxr=x+280+Math.sin(T*.3+x)*90,cy=WB-27,d=Math.cos(T*.3+x)>0?1:-1;if(!waterOpen(cxr)||Z(x+280)==='meadow'||Z(x+280)==='lily')continue;ctx.save();ctx.translate(cxr,cy);ctx.scale(d,1);for(let m=0;m<3;m++)shape(ellPts(-8-m*6,1+m*.6,5-m*.8,4.4-m*.7,x+m),'#b8452a',{lw:1});shape([[-25,0],[-31,-4],[-33,2],[-29,5]],'#b8452a',{lw:1});shape(smoothPts([[12,0],[6,-6],[-6,-5.4],[-8,0],[-6,5.4],[6,5]],2),'#c8552e',{lw:1.5,sh:1});[[-1,1],[1,1]].forEach(q=>{const cl=Math.sin(T*3+x)*2;strip(9,q[0]*3,19,q[0]*8+cl,2.6,'#c8552e',{lw:.7});shape([[18,q[0]*8+cl-3],[27,q[0]*8+cl-4],[24,q[0]*8+cl],[27,q[0]*8+cl+4],[18,q[0]*8+cl+3]],'#d9703a',{lw:1.1})});[-2,2,6].forEach(o=>line(o,5,o-2,10,'#8a3a22',1.4));line(11,-2,22,-9,'#8a3a22',1);line(11,-1,24,-5,'#8a3a22',1);ctx.fillStyle=INK;ctx.beginPath();ctx.arc(9,-3,1.2,0,7);ctx.fill();ctx.restore()}
   // minnow schools, then trout
-  for(let k2=0;k2<Math.floor(r*4.2);k2++){const sp=26+k2*7,sx=cam.x+((k2*260+T*sp)%(viewW+240))-120,sy=WT+50+hr(k2+11)*120+Math.sin(T*.7+k2)*14;for(let q=0;q<7;q++)fish(sx-(q%3)*22-hr(q+k2)*12+Math.sin(T*2+q)*3,sy+(Math.floor(q/3)-1)*15+Math.sin(T*3+q*1.3)*3,1,.62,'#cfe6ee','#f4fbff','#9fc4d2',null)}
+  for(let k2=0;k2<Math.floor(r*2.6);k2++){const sp=26+k2*7,sx=cam.x+((k2*260+T*sp)%(viewW+240))-120,sy=WT+50+hr(k2+11)*120+Math.sin(T*.7+k2)*14;for(let q=0;q<7;q++)fish(sx-(q%3)*22-hr(q+k2)*12+Math.sin(T*2+q)*3,sy+(Math.floor(q/3)-1)*15+Math.sin(T*3+q*1.3)*3,1,.62,'#cfe6ee','#f4fbff','#9fc4d2',null)}
   if(r>.78)for(let k2=0;k2<2;k2++){const d=k2?-1:1,u=((T*(18+k2*5)+k2*300)%(viewW+300))/(viewW+300),fx=cam.x-150+(d>0?u:1-u)*(viewW+300),fy=WT+92+k2*66+Math.sin(T*.8+k2)*16;fish(fx,fy,d,1.9,k2?'#a8743a':'#b98a5a','#f0d9b0','#a8603a','#5b3a24')}
   // river grass, front layer: darker and taller, so the fish swim between two sheets
-  for(let x=Math.floor(x0/130)*130;x<x1;x+=130){if(hr(x*.47)>r||!waterOpen(x+60))continue;const bx=x+60+hr(x*.9)*40,hh=(90+hr(x*.3)*70)*Math.min(1,r*1.2);for(let k2=0;k2<3;k2++){const sw=RM?0:Math.sin(T*.9+x*.7+k2*1.7)*(12+hh*.12)+(k2-1)*10;blade(bx+k2*11-11,hh*(.75+hr(x+k2*3)*.25),7,sw,k2===1?'#2f7a45':'#276a3c',null)}}
+  for(let x=Math.floor(x0/130)*130;x<x1;x+=130){if(hr(x*.47)>r||!waterOpen(x+60))continue;{const z=Z(x+60);if(!(z==='meadow'||(z==='lily'&&hr(x*.29)<.3)))continue}const bx=x+60+hr(x*.9)*40,hh=(90+hr(x*.3)*70)*Math.min(1,r*1.2);for(let k2=0;k2<3;k2++){const sw=RM?0:Math.sin(T*.9+x*.7+k2*1.7)*(12+hh*.12)+(k2-1)*10;blade(bx+k2*11-11,hh*(.75+hr(x+k2*3)*.25),7,sw,k2===1?'#2f7a45':'#276a3c',null)}}
   // lily pads on the surface, each on its stem
-  if(r>.8)for(let x=Math.floor(x0/240)*240;x<x1;x+=240){const lx=x+90+hr(x*.61)*80;if(!waterOpen(lx))continue;ctx.strokeStyle='#3f8443';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(lx,WT+6);ctx.quadraticCurveTo(lx+14,WT+90,lx-8,WB-20);ctx.stroke();shape(arcPts(lx,WT+5,17,5.4,.5,6.1,12).concat([[lx,WT+5]]),'#5fae50',{lw:1.3});if(hr(x)<.6){shape(ellPts(lx+4,WT+1,4.6,3.4,x),'#f3b6c8',{lw:1});shape(ellPts(lx+4,WT+.4,2,1.6,x+1),'#ffd23f',{ln:false})}}
+  if(r>.8)for(let x=Math.floor(x0/170)*170;x<x1;x+=170){const lx=x+60+hr(x*.61)*80;if(!waterOpen(lx)||Z(lx)!=='lily')continue;ctx.strokeStyle='#3f8443';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(lx,WT+6);ctx.quadraticCurveTo(lx+14,WT+90,lx-8,WB-20);ctx.stroke();shape(arcPts(lx,WT+5,17,5.4,.5,6.1,12).concat([[lx,WT+5]]),'#5fae50',{lw:1.3});if(hr(x)<.6){shape(ellPts(lx+4,WT+1,4.6,3.4,x),'#f3b6c8',{lw:1});shape(ellPts(lx+4,WT+.4,2,1.6,x+1),'#ffd23f',{ln:false})}}
   // bubbles, each a ring with a glint
   if(false)for(let i=0;i<12;i++){const mx=cam.x+((i*97+T*9)%(viewW+60))-30,my=WB-30-((T*14+i*40)%(RD-60)),rr=2.2+hr(i+70)*2.4;ctx.strokeStyle='rgba(240,255,250,'+(.35+.35*r).toFixed(2)+')';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(mx,my,rr,0,7);ctx.stroke();ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(mx-rr*.35,my-rr*.35,rr*.28,0,7);ctx.fill()}}
  if(rivFl>=0&&rivFl<3.2&&!RM){// the flush: a bright front sweeps down the channel when the last piece comes out
@@ -2455,15 +2469,29 @@ function questStep(s,dt){const q=fort.tq,g=qGeo(s),fh=s.fh;
  q.dr.forEach(d=>{d.t+=dt;const sl=qSlot(s,d);
   if(d.st==='form'){d.x+=(sl[0]-d.x)*Math.min(1,dt*4);d.y+=(sl[1]-d.y)*Math.min(1,dt*4)}
   else if(d.st==='cue'){d.x=sl[0]+Math.sin(T*28+d.i)*4;d.y=sl[1];if(d.t>.7){d.st='fly';d.t=-d.k*.24;d.path=qPath([[d.x,d.y]].concat(d.pts,[sl]))}}
-  else if(d.st==='fly'){if(d.t<0){d.x=sl[0];d.y=sl[1];return}const dur=d.path.len/300,u=clamp(d.t/dur,0,1),p=qAt(d.path,u);d.x=p[0];d.y=p[1];if(u>=1){d.st='back';d.t=0}
+  else if(d.st==='fly'){if(d.t<0){d.x=sl[0];d.y=sl[1];return}const dur=d.path.len/335,u=clamp(d.t/dur,0,1),p=qAt(d.path,u);d.x=p[0];d.y=p[1];if(u>=1){d.st='back';d.t=0}
    if(tgt&&q.hitT<=0&&Math.hypot(d.x-P.x,d.y-(P.y-56))<38){q.hitT=1.1;SFX.zap();sparks(P.x,P.y-60,10,'#9fd0ff');word('ZAP',P.x,P.y-150,'#9fd0ff');
     P.climb=null;P.support=null;P.slide=null;P.vx=clamp((s.cx-P.x)*1.2,-90,90);P.vy=-140;P.tumble=.45;shake=RM?0:6}}
   else if(d.st==='back'){d.x+=(sl[0]-d.x)*Math.min(1,dt*3);d.y+=(sl[1]-d.y)*Math.min(1,dt*3);if(d.t>1)d.st='form'}
   else if(d.st==='fade'){d.y+=Math.sin(T*17+d.i)*d.t*2;d.x+=Math.sin(T*23+d.i)*d.t*3;if(d.t>1.5){d.st='fall';d.t=0;sparks(d.x,d.y,6,'#ffd23f')}}
   else if(d.st==='fall'){d.vy=(d.vy||0)+900*dt;d.y+=d.vy*dt;if(d.y>GY-6){dust(d.x,GY,4,30);d.st='dead'}}});
- if(!q.drain&&tgt){q.gt-=dt;const fl=(GY-P.y)/fh;const n=fl>18?5:4,starts=[];for(let st=0;st<=8-n;st++)if(q.dr.slice(st,st+n).every(d=>d.st==='form'))starts.push(st);if(q.gt<=0&&starts.length){const start=starts[Math.floor(Math.random()*starts.length)],kind=q.pat%4;q.pat+=1+(Math.random()<.4?1:0);
+ if(!q.drain&&tgt){q.gt-=dt;const fl=(GY-P.y)/fh;const n=fl>18?6:fl>8?5:4,starts=[];for(let st=0;st<=8-n;st++)if(q.dr.slice(st,st+n).every(d=>d.st==='form'))starts.push(st);if(q.gt<=0&&starts.length){const start=starts[Math.floor(Math.random()*starts.length)],kind=q.pat%4;q.pat+=1+(Math.random()<.4?1:0);
    const ay=clamp(P.y-56+clamp((q.vy||0)*1.5,-330,60),g.roofY+100,GY-120),pts=qPattern(s,ay,kind,Math.floor(Math.random()*s.cols));
-   for(let k=0;k<n;k++){const d=q.dr[start+k];if(d.st!=='form')continue;d.st='cue';d.t=0;d.k=k;d.pts=pts}q.gt=fl>18?1.1:fl>8?1.3:1.6}}
+   for(let k=0;k<n;k++){const d=q.dr[start+k];if(d.st!=='form')continue;d.st='cue';d.t=0;d.k=k;d.pts=pts}q.gt=fl>18?.95:fl>8?1.15:1.45}}
+ /* v1.1 (founder 2026-11-23: "Make 1st character after reaching certain floor get held in a drone pattern jail so the other player has
+    to rescue by triggering the water for salmon."): the first animal to reach the floor-16 landing is caught. Six more drones fly in and
+    circle it as a cage, and it can't move. TAG the partner, climb past to the valve on floor 24, turn on the water; when the salmon drains
+    the pool and the data center cooks, the cage drones fall with the rest and the caught animal walks free. */
+ {const J=fort.decks.find(d=>d.k===16);
+  if(!q.jail&&!q.jailDone&&!q.water&&!q.fish.on&&qOnTower(s)&&P.y<=J.y+2&&P.y>J.y-60){q.jail={who,x:clamp(P.x,J.x-J.w/2+40,J.x+J.w/2-40),y:J.y,t0:T};
+   Object.assign(P,{x:q.jail.x,y:J.y,support:J,climb:null,slide:null,vx:0,vy:0,tumble:0});q.jd=[];for(let i=0;i<6;i++)q.jd.push({i,x:s.cx+(i-2.5)*70,y:q.fy,st:'jail',a:i/6*6.283,t:0});
+   SFX.zap();shake=RM?0:5;word('CAUGHT',q.jail.x,J.y-170,'#ff6a5a');hudKey='';toast('The drones caught the '+(who==='turtle'?'turtle':'beaver')+'. TAG your partner, then turn on the water so the salmon can short them out.',9)}
+  if(q.jail){const jx=q.jail.x,jy=q.jail.y-56;if(who===q.jail.who&&!swim){Object.assign(P,{x:jx,y:q.jail.y,support:J,climb:null,slide:null,vx:0,vy:0});upQ=false}
+   (q.jd||[]).forEach(d=>{d.t+=dt;if(d.st==='jail'){d.a+=dt*1.7;const tx=jx+Math.cos(d.a)*72,ty=jy+Math.sin(d.a)*64;d.x+=(tx-d.x)*Math.min(1,dt*5);d.y+=(ty-d.y)*Math.min(1,dt*5)}
+    else if(d.st==='fade'){d.y+=Math.sin(T*17+d.i)*d.t*2;d.x+=Math.sin(T*23+d.i)*d.t*3;if(d.t>1.2){d.st='fall';d.t=0;sparks(d.x,d.y,6,'#ffd23f')}}
+    else if(d.st==='fall'){d.vy=(d.vy||0)+900*dt;d.y+=d.vy*dt;if(d.y>GY-6){dust(d.x,GY,4,30);d.st='dead'}}});
+   if(q.drain){const u=T-q.drain;q.jd.forEach((d,i)=>{if(d.st==='jail'&&u>1.2+i*.3){d.st='fade';d.t=0}});
+    if(q.jd.every(d=>d.st!=='jail')){q.jailDone=1;word('FREE',jx,jy-120,'#7cc35a');SFX.grow();const fw=q.jail.who;q.jail=null;if(who===fw)P.ncl=T+.3}}}}
  if(isle.fin&&!done){q.finT=(q.finT||0)+dt;if(q.party?T-q.party>9:q.finT>(q.refill?150:22))finish()}
  if(q.end&&!q.refill&&!q.hint&&T-isle.qend>4){q.hint=1;toast('Bonus: the pool is empty. Turn the water back on at the valve on the pipe.',8)}
  if(q.refill){q.pool=Math.min(1,(T-q.refill)/3);const fi=q.fish;if(q.pool>=1&&!fi.went&&!fi.on){fi.went=1;fi.on=true;fi.back=0;SFX.tag();word('SALMON',fi.x,fi.y-60,'#ffd23f');hudKey=''}
@@ -2471,7 +2499,9 @@ function questStep(s,dt){const q=fort.tq,g=qGeo(s),fh=s.fh;
   if(me&&!mate&&fi.pool&&!q.sw2)q.sw2=T;if(q.sw2&&!q.sw2d&&T-q.sw2>.9){q.sw2d=1;if(me&&!mate){P.ncl=T+.6;tagSwap();word(who==='turtle'?'TURTLE':'BEAVER',P.x,P.y-170,'#ffd23f')}}
   if(me&&!q.wasIn){for(let i=0;i<8;i++)puff(P.x+(Math.random()-.5)*50,pd.y-70,{kind:'steam',vx:(Math.random()-.5)*160,vy:-120-Math.random()*120,g:500,r:4,gr:4,c:'#dff1f7',life:.7,max:.7});SFX.pop()}q.wasIn=me;
   if(n!==q.n&&!q.party){q.n=n;if(n>0&&n<3)toast('Bonus: '+n+' of 3 in the pool.'+(n===1?' Now the closer of you two.':n===2?' Now the last one.':''),5)}
-  if(n>=3&&!q.party){q.party=T;stats.party=1;SFX.grow();rainbow=Math.max(rainbow,10);shake=RM?0:5;word('POOL PARTY',s.cx,pd.y-170,'#9fd8ee');toast('Bonus win: all three of you in the pool you took back.',8)}}
+  if(n>=3&&!q.party){q.party=T;q.tom=[];q.tomT=1.2;stats.party=1;SFX.grow();rainbow=Math.max(rainbow,10);shake=RM?0:5;word('POOL PARTY',s.cx,pd.y-170,'#9fd8ee');toast('Bonus win: all three of you in the pool you took back.',8)}}
+ if(q.party&&q.tom){const pd=fort.decks.find(d=>d.k===QP),wy=pd.y-72,R=s.x+s.w;if(T-q.party<11){q.tomT-=dt;if(q.tomT<=0){q.tomT=.7+Math.random()*.6;const x0=R-34,y0=g.roofY-56,tx=s.x+70+Math.random()*(R-s.x-50),tau=1.1;q.tom.push({x:x0,y:y0,vx:(tx-x0)/tau,vy:(wy-y0)/tau-.5*900*tau,r:0})}}
+  q.tom=q.tom.filter(t=>{t.vy+=900*dt;t.x+=t.vx*dt;t.y+=t.vy*dt;t.r+=dt*9;if(t.y>=wy&&t.vy>0){SFX.pop();for(let i=0;i<9;i++)puff(t.x,wy,{kind:'chunk',vx:(Math.random()-.5)*220,vy:-60-Math.random()*200,g:700,r:3+Math.random()*3,c:i%3?'#d9342a':'#f08a6a',life:.9,max:.9,vr:(Math.random()-.5)*10});return false}return true})}
  if(q.end&&!q.refill)q.pool=0
  // water: the pipe fills, then the salmon takes over
  if(q.water&&q.fill<1){q.fill=Math.min(1,q.fill+dt/1.6);if(q.fill>=1&&!q.drain){{const LV=fort.decks.find(d=>d.k===QV);if(P.support!==LV&&!P.support)Object.assign(P,{x:clamp(P.x,LV.x-LV.w/2+24,LV.x+LV.w/2-24),y:LV.y,support:LV,climb:null,slide:null,vx:0,vy:0,tumble:0})}q.fish.on=true;q.fish.back=0;SFX.tag();word('SALMON',q.fish.x,q.fish.y-60,'#ffd23f');hudKey=''}}
@@ -2492,7 +2522,8 @@ function questStep(s,dt){const q=fort.tq,g=qGeo(s),fh=s.fh;
  const r=q.roof;if(r.ph!=='wait')r.t+=dt;if(r.bt>=0)r.bt+=dt;
  if(r.ph==='wait'&&q.door&&P.support===s&&P.y<=g.roofY+2){r.ph='run';r.t=0;word('MY BLIMP',s.x+70,g.roofY-150,'#ffd23f')}
  if(r.ph==='run'&&r.t>2.2){r.ph='climb';r.t=0}
- if(r.ph==='cut'&&r.t>2.6){r.ph='hoe';r.t=0}
+ if(r.ph==='cut'&&r.t>7.9){r.ph='hoe';r.t=0}
+ if(r.bt>=3.4&&!r.zap){r.zap=1;SFX.zap();shake=RM?0:4}if(r.bt>=7.3&&!r.land){r.land=1;SFX.slam();shake=RM?0:7;dust(s.x+s.w-30-150,g.roofY,8,70)}
  if(r.ph==='hoe'&&r.t>2.2){r.ph='farm';r.t=0;q.end=1;questRenovate(s,32,s.rows.length-1);SFX.grow();word('FARMER',s.cx,g.roofY-140,'#7cc35a');isle.qend=T;
   const L=isle.lair;if(L.state==='up'){L.state='village';L.inplace=1;L.g=0}}
  // the salmon idles in the spring when you aren't her
@@ -2620,6 +2651,8 @@ function questArt(s){const q=fort.tq,g=qGeo(s),fh=s.fh,lo=cam.y-300,hi=cam.y+100
    else if(hot>.2&&hot<1&&!RM&&Math.random()<.3)sparks(dx,dy,3,'#ffd23f')}}
  // drones
  q.dr.forEach(d=>{if(d.st==='dead'||!inV(d.y))return;qDrone(d,d.st==='cue')});
+ if(q.jd&&q.jd.length){const cage=q.jd.filter(d=>d.st==='jail');if(cage.length>1&&inV(cage[0].y)){ctx.save();ctx.globalAlpha=.85;for(let i=0;i<cage.length;i++){const a=cage[i],b=cage[(i+1)%cage.length];line(a.x,a.y,b.x,b.y,'#5a1a16',5);line(a.x,a.y,b.x,b.y,RM||(T*8|0)%2?'#ff6a5a':'#ffb0a0',2.4)}ctx.restore()}
+  q.jd.forEach(d=>{if(d.st==='dead'||!inV(d.y))return;qDrone(d,false)})}
  // the win, shown: fireworks over the tower, neighbours out on every landing and the roof
  if(q.end){const gq=clamp((T-isle.qend)/24,0,1),H=GY-g.roofY;[s.x+4,s.x+s.w-4,s.x+s.w*.42].forEach((vx,i)=>{const L=H*gq*(i===2?.6:.95);for(let m=10;m<L;m+=16){const yy=g.roofY+m;if(!inV(yy))continue;qLeaf(vx+Math.sin(m*.05+i)*6,yy,8,(i===1?Math.PI-.5:.5)+Math.sin(m*.2)*.5,['#2f5a2a','#3f7a34','#5f9a44','#86b24e'][(m/16|0)%4])}});
   if(inV(g.roofY)&&gq>0)[[s.x+40,1],[s.x+s.w-46,.85]].forEach(([tx,k],i)=>{const h=70*k*ease(gq);line(tx,g.roofY-8,tx,g.roofY-8-h,'#6b4a30',5);shape(blobPts(tx,g.roofY-8-h,34*k*ease(gq)+4,26*k*ease(gq)+3,i+40,10),i?'#3f8443':'#5fae50',{lw:2,sh:1})});}
@@ -2628,15 +2661,32 @@ function questArt(s){const q=fort.tq,g=qGeo(s),fh=s.fh,lo=cam.y-300,hi=cam.y+100
  // the roof: penthouse, mooring post, blimp, the Baron
  {const ry=g.roofY;if(inV(ry)){const r=q.roof,pxL=s.x+16;
    if(!q.end){shape(rectPts(pxL,ry-62,86,62,82,.3),'#1b1328',{lw:2.4,sh:1});line(pxL,ry-62,pxL+86,ry-62,'#c9a84a',4);shape(rectPts(pxL+30,ry-40,24,40,83,.2),'#c9a84a',{lw:1.6})}
-   else{const u=clamp((T-isle.qend)/2,0,1);for(let k=0;k<4;k++){const bx=s.x+20+k*62;shape(rectPts(bx,ry-10,50,10,84+k,.3),'#6a4a2a',{lw:1.4});if(u>.3)for(let m=0;m<4;m++)qLeaf(bx+8+m*11,ry-10,9*u,-1.7+(m%2)*.4,'#5f9a44')}}
+   else{const u=clamp((T-isle.qend)/2,0,1);for(let k=0;k<4;k++){const bx=s.x+20+k*62;shape(rectPts(bx,ry-10,50,10,84+k,.3),'#6a4a2a',{lw:1.4});if(u>.3)for(let m=0;m<4;m++)qLeaf(bx+8+m*11,ry-10,9*u,-1.7+(m%2)*.4,'#5f9a44');
+     /* v1.1 (founder: "As farmer, baron grows tomatoes and throws them on the pool party later.") */ const tg=clamp((T-isle.qend-5)/12,0,1);if(tg>0)for(let m=0;m<3;m++){const tx=bx+10+m*14,ty=ry-18-(m%2)*6;line(tx,ry-10,tx,ty-4,'#3f7a34',1.6);dot(tx,ty,(2+3.4*tg)*(q.party&&m===((T*1.1|0)%3)?.4:1),tg<.5?'#9ac24a':'#d9342a');dot(tx-1,ty-3*tg-1,1.2,'#3f7a34')}}}
    const post=g.post;if(!q.end){shape(rectPts(post.x-14,ry-18,28,18,85,.3),'#4a4450',{lw:2,sh:1});line(post.x-18,ry-20,post.x+18,ry-20,'#4a4450',5);if(r.post>0){shape(ellPts(post.x,ry-24,9,7,86),'#c9a46a',{lw:2});if(r.post<2)line(post.x-6,ry-28,post.x+4,ry-20,'#2a1a10',2.4)}
     if((r.ph==='run'||r.ph==='climb')&&!RM){const u=(T*1.1)%1;ctx.globalAlpha=(1-u)*.9;ctx.strokeStyle='#ffffff';ctx.lineWidth=3.4;ctx.beginPath();ctx.ellipse(post.x,ry-22,26+u*24,16+u*14,0,0,7);ctx.stroke();ctx.globalAlpha=1}}
    let bx=post.x+70,by=ry-170,rot=Math.sin(T*.7)*.04,sc=.62;
-   if(r.bt>=0){const u=clamp(r.bt/7,0,1),ph=u*15;bx=post.x+70-820*u+150*(1-u)*Math.cos(ph);by=ry-170-110*Math.sin(u*Math.PI)+380*u*u+30*(1-u)*Math.sin(ph);rot=ph+Math.PI*.5*Math.sin(ph);sc=.62*(1-u*.55)*(1+.18*Math.sin(ph*1.3));if(!RM&&Math.random()<.5)puff(bx+Math.cos(rot)*60*sc,by+Math.sin(rot)*60*sc,{kind:'steam'})}
-   if(r.bt<7.2){if(r.bt<0){line(post.x,ry-24,bx-10,by+30,'#141016',4.4);line(post.x,ry-24,bx-10,by+30,'#e8d8b0',2.6);line(bx-6,by+36,bx-30,ry-4,'#c9a84a',2);for(let k=1;k<6;k++)line(bx-6-k*4,by+36+(ry-4-by-36)*k/6,bx+4-k*4,by+36+(ry-4-by-36)*k/6,'#c9a84a',1.6)}blimpArt(bx,by,rot,sc,r.bt>=0)}
+   /* v1.1 (founder 2026-11-23: "In the finale, as the blimp flies around, let the sun peer over its sunglasses and send a scorch beam that
+      fries the balloon to a crisp, it slides down the rainbow and then lands back on roof."): loose, the blimp loops over the roof; the sun
+      lowers its shades (drawn with the sky); a beam from the sun cooks it black; it drops onto a rainbow and slides down it to the roof. */
+   let crisp=0;const rcx=s.x+s.w-30,rcy=ry-8,RR=150,hx=post.x+10,hy=ry-230;
+   if(r.bt>=0){const t=r.bt;
+    if(t<2.8){const u=t/2.8;bx=post.x+70+(hx-post.x-70)*u+120*Math.sin(u*Math.PI*2);by=ry-170+(hy-ry+170)*u-70*Math.sin(u*Math.PI*2);rot=Math.sin(u*Math.PI*4)*.3;sc=.62}
+    else if(t<4.6){bx=hx+(RM?0:Math.sin(T*2)*8);by=hy+(RM?0:Math.sin(T*3)*5);rot=(RM?0:Math.sin(T*2))*.08;crisp=clamp((t-3.5)/1,0,1);
+     if(t>=3.4&&t<4.6){const sx=cam.x+viewW*.74,sy=cam.y+80-OY/S*.5+sunDrop(),fl=RM?1:.75+.25*Math.sin(T*40);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.35*fl;line(sx,sy,bx,by,'#ff9a2a',30);ctx.globalAlpha=.9*fl;line(sx,sy,bx,by,'#ffe27a',10);ctx.globalAlpha=1;line(sx,sy,bx,by,'#fffbe6',3.4);ctx.restore();
+      if(!RM&&Math.random()<.6)sparks(bx+(Math.random()-.5)*60,by+(Math.random()-.5)*30,3,'#ffd23f')}}
+    else{crisp=1;const RB=RR+24,a0=-Math.acos(clamp((hx-rcx)/RB,-1,1));
+     if(t<5.1){const u=(t-4.6)/.5;bx=hx;const ty=rcy+RB*Math.sin(a0);by=hy+(ty-hy)*u*u;rot=0}
+     else if(t<7.3){const u=(t-5.1)/2.2,a=a0-(Math.PI+a0)*u*u;bx=rcx+RB*Math.cos(a);by=rcy+RB*Math.sin(a);rot=clamp(a+Math.PI/2,-.7,.7)}
+     else{const u=clamp((t-7.3)/.5,0,1);bx=rcx-RB;by=ry-26-Math.sin(u*Math.PI)*18;rot=-.12*(1-u)}}
+    if(crisp>0&&crisp<1&&!RM&&Math.random()<.5)puff(bx+(Math.random()-.5)*50,by-20,{kind:'steam',c:'#5a5048'});if(crisp>=1&&!RM&&Math.random()<.08)puff(bx+(Math.random()-.5)*40,by-24,{kind:'steam',c:'#6a6058'})}
+   // the rainbow it slides down, in front of the sky, from high over the roof to the roof
+   if(r.bt>=4.2){const al=clamp((r.bt-4.2)/.6,0,1)*(q.end?Math.max(.35,1-(T-isle.qend)/12):1);ctx.save();ctx.globalAlpha=al*.85;['#c8584a','#f0a830','#e8d25a','#5fae50','#3f8fb6'].forEach((c,i)=>{ctx.beginPath();ctx.arc(rcx,rcy,RR-i*12,Math.PI,Math.PI*2);ctx.strokeStyle=c;ctx.lineWidth=12;ctx.stroke()});ctx.restore()}
+   {if(r.bt<0){line(post.x,ry-24,bx-10,by+30,'#141016',4.4);line(post.x,ry-24,bx-10,by+30,'#e8d8b0',2.6);line(bx-6,by+36,bx-30,ry-4,'#c9a84a',2);for(let k=1;k<6;k++)line(bx-6-k*4,by+36+(ry-4-by-36)*k/6,bx+4-k*4,by+36+(ry-4-by-36)*k/6,'#c9a84a',1.6)}blimpArt(bx,by,rot,sc,r.bt>=0);if(crisp>0){ctx.save();ctx.translate(bx,by);ctx.rotate(rot);ctx.scale(sc,sc*(1-.25*crisp));ctx.globalAlpha=.88*crisp;shape(ellPts(0,0,114,44,7),'#2a1a12',{lw:2.8});shape([[96,0],[138,-30],[132,0],[138,30]],'#2a1a12',{lw:2});ctx.globalAlpha=1;if(crisp>.5)for(let k=0;k<7;k++){const ex=-90+k*30+hr(k)*10,ey=(hr(k*3)-.5)*50;dot(ex,ey,3+hr(k*7)*2,(T*3+k|0)%3?'#f08a3c':'#ffd23f')}ctx.restore()}}
    if(r.ph!=='wait'){let x=pxL+44,pose='stand',straw=false;const ladder=post.x+28;
     if(r.ph==='run'){x=pxL+44+(ladder-pxL-44)*ease(clamp(r.t/2.2,0,1));pose='run'}else if(r.ph==='climb'){x=ladder;pose='slip'}else if(r.ph==='cut'){x=ladder-30*ease(clamp(r.t/.6,0,1));pose=r.t<.7?'fall':'sit'}
     else if(r.ph==='hoe'){x=ladder-30;pose='sit';const hx=s.x+s.w*.4+(x-24-s.x-s.w*.4)*ease(clamp(r.t/1.6,0,1));person(hx,ry,'#7cc35a',611,r.t<1.6);if(r.t<1.8)line(hx+8,ry-30,hx+20,ry-62,'#8a5a34',3)}
+    else if(q.party&&T-q.party<12){x=s.x+s.w-34;straw=true;pose='slip'}
     else{x=s.x+80+((T*20)%(s.w-140));straw=true;pose='hoe'}
     questBaron(x,ry,1,pose,straw)}}}}
 /* v0.93: the water in front of whoever is in the pool, so they read as in it; the salmon and, after the bonus, neighbours bobbing */
@@ -2646,7 +2696,10 @@ function questPoolFront(){if(!isle||!fort||!fort.tq)return;const s=fort.s;if(!s|
   {const ph=(T*.7)%2,k=ph<1?ph:2-ph,bx=x0+30+(x1-x0-60)*k,by=wy-10-Math.sin(ph%1*Math.PI)*90;dot(bx,by,11,'#fbf6ea');ctx.save();ctx.beginPath();ctx.arc(bx,by,10,0,7);ctx.clip();ctx.fillStyle='#d9342a';ctx.fillRect(bx-10,by-10,7,20);ctx.fillStyle='#2f8fc0';ctx.fillRect(bx+3,by-10,7,20);ctx.restore()}
   if(u<10&&!RM&&Math.random()<.2)sparks(x0+Math.random()*(x1-x0),wy-140-Math.random()*160,12,['#ffd23f','#f3b6c8','#9fd8ee','#7cc35a'][(Math.random()*4)|0])}
  if(q.fish.pool)drawSalmon({x:q.fish.x,y:q.fish.y,face:q.fish.face,z:.7,leap:0});
+ (q.tom||[]).forEach(t=>{ctx.save();ctx.translate(t.x,t.y);ctx.rotate(t.r);shape(ellPts(0,0,9,8,77),'#d9342a',{lw:1.6,sh:1});shape([[-4,-7],[0,-11],[4,-7],[0,-6]],'#3f7a34',{lw:1});dot(-3,-3,2,'rgba(255,255,255,.6)');ctx.restore()});
  ctx.fillStyle='rgba(31,127,184,.5)';ctx.fillRect(x0,wy+10,x1-x0,y-4-wy-10);ctx.strokeStyle='#eaf8ff';ctx.lineWidth=2.2;ctx.beginPath();for(let m=0;m<=30;m++){const xx=x0+(x1-x0)*m/30,yy=wy+10+(RM?0:Math.sin(m*.9+T*3)*1.8);m?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke()}
+/* v1.1: in the finale the sun comes down out from behind the bar to look, then goes back up */
+function sunDrop(){const fr=isle&&fort&&fort.tq&&fort.tq.roof.bt>=0?fort.tq.roof.bt:-1;return fr<0?0:120*ease(clamp(Math.min((fr-2.1)/.6,(6-fr)/.8),0,1))}
 function questBaron(x,y,face,pose,straw){const t=T;let lift=0,lean=0;if(pose==='run'){lift=Math.abs(Math.sin(t*14))*4;lean=.15}if(pose==='slip')lift=Math.abs(Math.sin(t*5))*16;
  ctx.save();ctx.translate(x,y-lift);if(pose==='sit'){ctx.translate(0,14);ctx.scale(1,.86)}if(pose==='fall')ctx.rotate(-.6);ctx.rotate(lean*face);
  const lg=pose==='run'?Math.sin(t*14)*8:pose==='slip'?Math.sin(t*10)*10:0;if(pose!=='sit'){line(-4,-20,-4-lg,0,'#1b1328',4);line(4,-20,4+lg,0,'#1b1328',4)}else{line(-4,-16,-22,-12,'#1b1328',4);line(4,-16,20,-10,'#1b1328',4)}
@@ -2794,9 +2847,12 @@ function render(){if(state==='vacation'){drawVacation();return}
  if(lift93>0){const u=1-lift93/7,k=Math.sin(Math.min(1,u*1.25)*Math.PI);const g3=ctx.createLinearGradient(0,0,0,H);g3.addColorStop(0,'rgba(52,132,214,'+(.8*k).toFixed(3)+')');g3.addColorStop(.62,'rgba(150,212,240,'+(.6*k).toFixed(3)+')');g3.addColorStop(1,'rgba(255,206,110,'+(.7*k).toFixed(3)+')');ctx.fillStyle=g3;ctx.fillRect(0,0,W,H);if(!RM&&u<.1){ctx.fillStyle='rgba(255,246,214,'+(.4*(1-u/.1)).toFixed(3)+')';ctx.fillRect(0,0,W,H)}}
  shX=(shake>0&&!RM)?(Math.random()-.5)*shake:0;shY=(shake>0&&!RM)?(Math.random()-.5)*shake:0;shake=Math.max(0,shake-.6);
  // sun and clouds hang on threads, like a toy theater
- setWorld(.1);const sx=cam.x*.1+viewW*.74,sy=cam.y*.1+80-OY/S*.5;line(sx,sy-900,sx,sy,'rgba(251,246,234,.5)',1.2);ctx.globalAlpha=.4+.6*clear;shape(ellPts(sx,sy,34,34,5),sk.sun,{lw:2.4});
+ setWorld(.1);const sx=cam.x*.1+viewW*.74,sy=cam.y*.1+80-OY/S*.5+sunDrop();line(sx,sy-900,sx,sy,'rgba(251,246,234,.5)',1.2);ctx.globalAlpha=.4+.6*clear;shape(ellPts(sx,sy,34,34,5),sk.sun,{lw:2.4});
  for(let k=0;k<10;k++){const a=k/10*6.283+T*.1;line(sx+Math.cos(a)*40,sy+Math.sin(a)*40,sx+Math.cos(a)*(50+clear*8),sy+Math.sin(a)*(50+clear*8),sk.sun,4)}ctx.globalAlpha=1;
- if(clear>.7){shape(rectPts(sx-25,sy-11,21,14,1,.3),INK,{lw:1});shape(rectPts(sx+4,sy-11,21,14,2,.3),INK,{lw:1});line(sx-5,sy-7,sx+5,sy-7,INK,2.6);ctx.beginPath();ctx.arc(sx,sy+5,14,.15*Math.PI,.85*Math.PI);ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke()}
+ const fr=isle&&fort&&fort.tq&&fort.tq.roof.bt>=0?fort.tq.roof.bt:-1,peer=fr>2.5&&fr<5.4?clamp(Math.min((fr-2.5)/.4,(5.4-fr)/.4),0,1):0;
+ if(peer>0){const dn=9*peer;shape(ellPts(sx-12,sy-12,7,6,11),'#fbf6ea',{lw:1.4});shape(ellPts(sx+12,sy-12,7,6,12),'#fbf6ea',{lw:1.4});dot(sx-14,sy-10,2.6,INK);dot(sx+10,sy-10,2.6,INK);line(sx-20,sy-23-3*peer,sx-6,sy-21,INK,2.4);line(sx+20,sy-23-3*peer,sx+6,sy-21,INK,2.4);
+  shape(rectPts(sx-25,sy-11+dn,21,14,1,.3),INK,{lw:1});shape(rectPts(sx+4,sy-11+dn,21,14,2,.3),INK,{lw:1});line(sx-5,sy-7+dn,sx+5,sy-7+dn,INK,2.6);ctx.beginPath();ctx.moveTo(sx-8,sy+16);ctx.lineTo(sx+8,sy+16);ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke()}
+ else if(clear>.7){shape(rectPts(sx-25,sy-11,21,14,1,.3),INK,{lw:1});shape(rectPts(sx+4,sy-11,21,14,2,.3),INK,{lw:1});line(sx-5,sy-7,sx+5,sy-7,INK,2.6);ctx.beginPath();ctx.arc(sx,sy+5,14,.15*Math.PI,.85*Math.PI);ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke()}
  else{const dr=clear<.35;dot(sx-11,sy-4,3.2,INK);dot(sx+11,sy-4,3.2,INK);line(sx-18,sy-(dr?9:14),sx-6,sy-(dr?14:11),INK,2.4);line(sx+18,sy-(dr?9:14),sx+6,sy-(dr?14:11),INK,2.4);ctx.beginPath();if(dr)ctx.arc(sx,sy+20,10,1.15*Math.PI,1.85*Math.PI);else{ctx.moveTo(sx-8,sy+13);ctx.lineTo(sx+8,sy+13)}ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke();if(dr&&(T%5)<.6)dot(sx+24+(T%5)*34,sy+14-(T%5)*8,5+(T%5)*6,'rgba(110,100,92,.6)')}
  if(rainbow>0){ctx.globalAlpha=Math.min(1,rainbow/2)*.8;['#c8584a','#f0a830','#e8d25a','#5fae50','#3f8fb6'].forEach((c,i)=>{ctx.beginPath();ctx.arc(cam.x*.1+viewW*.4,cam.y*.1+420,300-i*14,Math.PI,Math.PI*2);ctx.strokeStyle=c;ctx.lineWidth=13;ctx.stroke()});ctx.globalAlpha=1}
  if(clear>.6&&D===0&&!RM){ctx.globalAlpha=.09*(clear-.6)/.4;ctx.fillStyle=sk.sun;for(let k=0;k<5;k++){ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(sx-620+k*210+Math.sin(T*.3+k)*20,sy+900);ctx.lineTo(sx-520+k*210+Math.sin(T*.3+k)*20,sy+900);ctx.closePath();ctx.fill()}ctx.globalAlpha=1}
