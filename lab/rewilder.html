@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v0.97</title>
+<title>Rewilder v0.98</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v0.97 | LAB | 2026-11-23
+<!-- TSP build: Rewilder v0.98 | LAB | 2026-11-23
+     v0.98 (founder 2026-11-23: "Still slow to start. Pre-load to fix this"): a pre-load pass times the opening scene with the graphics
+     chip finished and starts at the resolution the machine can hold; the governor now judges each half second of real frame time.
      v0.97 (founder 2026-11-23: "On phone it plays fine. On my Mac it loads slowly even the music and intro is glitchy even after minutes"):
      canvas pixel budget (2.4 M device pixels), a frame-cost governor that steps resolution down and back up, music lookahead 0.45 s.
      v0.96 (founder 2026-11-22: "There is a bug in level 1 as beaver approaches tar company gas containers screen turns black"): the
@@ -757,7 +759,7 @@ body.touch .se-chrome p{display:none}
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v0.97</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v0.98</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <nav class="se-rail" aria-label="Page navigation"><a class="nav" href="./index.html">Back</a></nav>
   <button id="notesBtn" type="button">Field guide</button>
@@ -987,10 +989,17 @@ function zoomStep(dt){const zt=1;if(Math.abs(zt-zm)<.002)return;zm+=(zt-zm)*Math
    a big desktop window at Retina density is three to four times the pixels of a phone. The canvas now keeps to a pixel budget,
    and a governor lowers the resolution a step when frames run long and raises it again when there is room. The music schedules
    further ahead so a slow frame cannot starve it. */
-let RQ=1,ftA=0,ftN=0,ftOk=0;
+let RQ=1,ftA=0,ftN=0,ftS=0,ftOk=0,ftHold=0;
 function pickDPR(){const dev=Math.min(2,devicePixelRatio||1),bud=Math.sqrt(2.4e6/Math.max(1,W*H));return Math.max(.6,Math.min(dev,bud)*RQ)}
-function govern(cost){ftA+=cost;ftN++;if(ftN<45)return;const avg=ftA/ftN;ftA=0;ftN=0;
- if(avg>20&&RQ>.55){RQ=Math.max(.55,RQ*.85);ftOk=0;resize()}else if(avg<9){if(++ftOk>=4&&RQ<1){RQ=Math.min(1,RQ+.1);ftOk=0;resize()}}else ftOk=0}
+/* v0.98 (founder: "Still slow to start. Pre-load to fix this"): the governor judges every half second of real time, not every 45 frames,
+   so a slow machine is fixed in about a second instead of half a minute; it reads the true frame interval (the graphics chip's work
+   included), cuts harder the slower it is, and waits longer before raising again. */
+function govern(cost,iv){if(iv>250)return;const f=Math.max(cost,iv);ftA+=f;ftN++;ftS+=iv;if(ftS<500)return;const avg=ftA/ftN;ftA=0;ftN=0;ftS=0;if(ftHold>0){ftHold--;return}
+ if(avg>26&&RQ>.55){RQ=Math.max(.55,RQ*Math.max(.6,Math.sqrt(20/avg)));ftOk=0;ftHold=1;resize()}else if(avg<18){if(++ftOk>=6&&RQ<1){RQ=Math.min(1,RQ+.12);ftOk=0;ftHold=1;resize()}}else ftOk=0}
+/* pre-load: before the first frame is shown, draw the opening scene a few times at full size, wait for the graphics chip to finish
+   each one, and start at the resolution this machine can hold. The same draws warm every pattern and cache the game uses early on. */
+function preload(){try{const c=[];for(let i=0;i<4;i++){const t=performance.now();render();ctx.getImageData(0,0,1,1);c.push(performance.now()-t)}c.shift();c.sort((a,b)=>a-b);const m=c[1];
+ if(m>18){RQ=Math.max(.55,Math.min(1,Math.sqrt(18/m)));resize();render()}}catch(e){}}
 function resize(){
  W=innerWidth;H=innerHeight;DPR=pickDPR();screenFit();
  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
@@ -4333,8 +4342,8 @@ function drawBeaver(){const cp=climbPh();if(cp&&!(P.punch>0)){drawBeaverBack(cp)
 /* ---------- loop ---------- */
 let last=performance.now();
 /* v0.96: the next frame is booked first, so one drawing error can never freeze the game on a black screen */
-function frame(now){requestAnimationFrame(frame);const dt=Math.min(.033,(now-last)/1000);last=now;const t0=performance.now();zoomStep(dt);update(dt);render();govern(performance.now()-t0)}
-applyMode();applySound();resize();makeGrain();hud();bestLine();requestAnimationFrame(frame);
+function frame(now){requestAnimationFrame(frame);const iv=now-last,dt=Math.min(.033,iv/1000);last=now;const t0=performance.now();zoomStep(dt);update(dt);render();govern(performance.now()-t0,iv)}
+applyMode();applySound();resize();makeGrain();hud();bestLine();preload();last=performance.now();requestAnimationFrame(frame);
 </script>
 </body>
 </html>
