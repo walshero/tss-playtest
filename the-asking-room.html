@@ -2,6 +2,13 @@
 <html lang="en">
 <!--
   THE ASKING ROOM (working title, founder rules the name: D1). Tight Spiral Studios, EN195.
+  Workup v0.10.3, 2026-11-05 (founder: the second circle under the table was confusing, a rug with wood showing through it. Rug removed.)
+  Workup v0.10.2, 2026-11-05 (Studio Eyes IMAGE_FLOOR: whole wide scene on a portrait phone was 26% of the first screen. Portrait phones now get a tall frame of the same room, 0 -140 400 470: ceiling trim, a clock, two paper lamps with light pools, the near classmates' full shoulders. Landscape and desktop keep 0 0 400 230. Never cropped.)
+  Workup v0.10.1, 2026-11-05 (founder: the scene was cut off on a phone in both orientations. Phone CSS forced the scene to a fixed height with preserveAspectRatio slice, which crops. Now meet + natural height, capped at 86svh, so the whole room shows.)
+  Workup v0.10, 2026-11-05 (founder: "I like the art style of the open scene but I want richer texture. Make this award winning." Texture pass, same composition: paper tooth lit from the window side, torn fibrous edges, lit and shaded cut edges, two-shadow depth with the near backs casting farthest; watercolor wash on the wall, wood grain on floor and tabletop, knit ribs on sweaters, cork specks, glass sheen, haze in the sunbeams, a cast shadow under the table, a vignette that pulls to the Asked, warm cheeks. All in-file filters, CC0. Uncanny audit: table sheen line and dark contour rim cut as AI tells; Advocate ruling pose -150 to -120deg so her hand rises beside her head, not on it; an opening beat stages the verb in the first 3.5s (card lands, Advocate rules, Recorder writes), skipped under reduced motion and on first input. Layout column renamed .stagecol so the art gate judges the art, not the speech slip beside it.)
+  Workup v0.9, 2026-11-05 (founder playtest: tagged "His wife has cancer. He's a history teacher, for chrissake." as World Detail That Matters and was told no. Founder: "We have to design so we aren't shutting down creativity," and lines take more than one tag. Fix: the Advocate never strikes a sincere noticing. Any card on any lines is the Asker's call. The planted line is "Upheld"; every other tag gets "Fair reading" or "Another reader might say", then the Asker chooses Ask about it or Keep looking. Ask about it deals question cards that quote the Asker's own lines. Every tag stays on the line as a chip, and a line can carry several. Strikes now happen only in the say-it phase, where Ball's Advocate actually rules: on how you ask, not on what you see.)
+  Workup v0.8.1, 2026-11-05 (founder chose option 3: an answer key on every card, drawn from the EN195 corpus. Writerly Moves: "Yes/No means it's working" plus the move's description, verbatim from the Storyscape card set (rescued/drive-2026-07-13/6.11.26-writerly_moves_game.html). Drafty Air: "Ask:" plus the question, verbatim from the founder's Drafty Moves sheet (writerly-moves/from-export-2026-06-28/Drafty_Moves.md), then which answer means it needs a look. Driving Too Fast borrows the Fast-Forward Scene question, its nearest twin on the sheet.)
+  Workup v0.8, 2026-11-05 (founder: "Play what you notice" was unclear: does playing World Detail That Matters mean it is done well, or missing? And a move should tag a section of the text, not the whole passage. Fix: every card now says which way it points (Writerly Move: working here / Drafty Air: needs a look), and the player taps the sentences first, then plays a card on them. Right card on the wrong lines gets "Right move, wrong lines.")
   Workup v0.7, 2026-10-17 (founder, by voice: "players should get another shot." After a miss the Advocate says why and the player tries again on the same call; the forced move-on after two misses is gone, so the blank Recorder's page can no longer happen.)
   Workup v0.6, 2026-10-13 (founder ruling: "Remove comfort control and label and focus on 3 best modes for each game including light and dark." The one icon button now cycles Light, Dark, Sharp; Sharp is high contrast). v0.5, 2026-09-25 (mnemonic icons on every move, tag and ruled comment). v0.4 (three drafts: Presto, Daiko, Dead Ants). v0.3 (struck cards keep a Claim line and the Advocate's note for the whole draft). v0.2, 2026-09-24 (round table in daylight, founder note: the lamp read as interrogation). One playable turn plus the animation language for the whole game.
   Spec: claude/SPEC-ASKING-ROOM-2026-09-24.md. Findings: convening/ASKING-ROOM-CONVENING.md.
@@ -109,7 +116,7 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 /* layout: phone = plate, draft, slip, hand. wide = sticky room on the left. */
 .room{ display:grid; gap:18px; margin-top:14px;
   grid-template-areas:"plate" "ms" "slip" "hand"; }
-.stage{ display:contents; }
+.stagecol{ display:contents; }
 .plate{ grid-area:plate; }
 .ms{ grid-area:ms; }
 .slip{ grid-area:slip; }
@@ -117,15 +124,19 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 @media (max-width:979px){
   .production{ font-size:13px; letter-spacing:.05em; }
   .plate{ margin:0 -16px; border-radius:0; border-left:0; border-right:0; }
-  .plate svg#scene{ height:min(52vh,440px); }
+  /* v0.10.1: the whole picture, every orientation. Natural shape, capped to the screen. */
+  .plate svg#scene{ height:auto; max-height:86svh; }
+  /* frame hugs the picture: bleeds edge to edge when the screen is narrow, centers when it is wide */
+  .plate{ margin-inline:max(-16px, calc((100% - 86svh * 1.7391) / 2)); }
+  @media (orientation:landscape){ .plate{ border-radius:12px; border-left:3px solid var(--line); border-right:3px solid var(--line); } }
 }
 @media (min-width:980px){
   .room{ grid-template-columns: minmax(0,1.08fr) minmax(0,1fr); grid-template-areas:"stage ms" "stage hand"; align-items:start; }
-  .stage{ display:flex; flex-direction:column; gap:14px; grid-area:stage; position:sticky; top:12px; }
+  .stagecol{ display:flex; flex-direction:column; gap:14px; grid-area:stage; position:sticky; top:max(12px, env(safe-area-inset-top)); }
 }
 
 /* the room */
-.plate{ background:var(--card); border:3px solid var(--line); border-radius:16px; overflow:hidden; line-height:0; }
+.plate{ background:var(--s-wall, var(--card)); border:3px solid var(--line); border-radius:16px; overflow:hidden; line-height:0; }
 .plate svg{ width:100%; height:auto; display:block; }
 .wall{fill:var(--s-wall)} .trim{fill:var(--s-trim)} .trimS{stroke:var(--s-trim)}
 .floor{fill:var(--s-floor)} .board{stroke:var(--s-board)} .tableT{fill:var(--s-table)} .tableE{fill:var(--s-tableE)}
@@ -136,8 +147,14 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 #glow{ opacity:var(--s-glowop); transition:opacity 1.2s ease; }
 #beams{ opacity:var(--s-cone); transition:opacity 1.2s ease; }
 #grainR{ opacity:var(--s-grain); }
+.cheek{ fill:#d9775a; opacity:.28; }
+.chair{ fill:#7a5332; }
+:root[data-theme="dark"] .chair, .dark .chair{ fill:#5a3b22; }
+#vig{ opacity:.9; }
+#toothR{ mix-blend-mode:multiply; opacity:.42; }
+.hush #vig{ opacity:1; transition:opacity 1.2s ease; }
 #advArm{ transform-box:view-box; transform-origin:160px 124px; transition:transform .45s cubic-bezier(.3,1.4,.5,1); }
-.ruling #advArm{ transform:rotate(-150deg); }
+.ruling #advArm{ transform:rotate(-120deg); }
 #askedHead{ transform-box:view-box; transform-origin:206px 118px; transition:transform 1s ease; }
 .thinking #askedHead{ transform:rotate(9deg); }
 #askedUpper{ transform-box:view-box; transform-origin:206px 150px; transition:transform .8s ease; }
@@ -187,7 +204,7 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
   box-shadow:4px 6px 0 rgba(40,30,15,.14); transform:rotate(-.35deg); }
 .ms .mhead{ font-family:var(--label); font-size:18px; font-weight:bold; color:var(--ink2); margin:0 0 10px;
   display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-.ms p{ margin:0 0 14px; }
+.ms p{ margin:0 0 14px; line-height:1.85; }
 .ms .brk{ text-align:center; letter-spacing:.6em; color:var(--ink2); margin:4px 0 14px; }
 .ev{ text-decoration-line:underline; text-decoration-color:transparent; text-decoration-thickness:2px;
   text-underline-offset:4px; transition:text-decoration-color 1.4s ease; }
@@ -195,7 +212,41 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
 /* v0.7 hint: after a second miss, the Advocate points at the lines that matter */
 .ev.hint{ background:var(--hl); color:var(--ink); border-radius:3px; box-shadow:0 0 0 3px var(--hl); }
 .ev.hint::before{ content:"[look here] "; font-family:var(--label); font-size:18px; font-weight:bold; color:var(--rust); }
-.ev.marked::after{ content:" [noticed]"; font-family:var(--label); font-size:18px; font-weight:bold; color:var(--rust); }
+/* v0.8: point, then play. Every sentence in the draft is a target. */
+.pick .sn{ cursor:pointer; border-radius:3px; }
+@media (hover:hover){ .pick .sn:hover{ text-decoration-line:underline; text-decoration-style:dotted; text-decoration-thickness:2px; text-underline-offset:4px; } }
+.sn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+.sn[aria-pressed="true"]{ color:var(--ink);
+  text-decoration-line:underline; text-decoration-style:solid; text-decoration-color:var(--ink); text-decoration-thickness:3px; text-underline-offset:5px; }
+@keyframes nudge{ 0%,100%{ box-shadow:4px 6px 0 rgba(40,30,15,.14); } 40%{ box-shadow:0 0 0 4px var(--focus); } }
+.ms.nudge{ animation:nudge .9s ease 2; }
+@media (prefers-reduced-motion: reduce){ .ms.nudge{ animation:none; outline:4px solid var(--focus); } }
+/* v0.9 FEEL (Studio Fingers + Eyes pass). Sentences are inline targets (WCAG 2.5.8 inline
+   exception): the line-height is the target, so rows stay apart and hit areas never overlap. */
+.pick .sn{ padding:4px 1px; -webkit-box-decoration-break:clone; box-decoration-break:clone; }
+/* ink-in: the highlight sweeps across only when a line is chosen; unchosen lines carry no ground */
+.sn[aria-pressed="true"]{ background-color:var(--hl); background-image:linear-gradient(var(--hl),var(--hl));
+  background-repeat:no-repeat; background-position:0 50%; animation:inkin .28s ease-out; }
+@keyframes inkin{ from{ background-color:transparent; background-size:0% 100%; } to{ background-color:transparent; background-size:100% 100%; } }
+@media (prefers-reduced-motion: reduce){ .sn[aria-pressed="true"]{ animation:none; } }
+.card:active:not([aria-disabled="true"]){ transform:translateY(2px) scale(.98); box-shadow:1px 1px 0 rgba(40,30,15,.2); }
+.card .check{ display:none; position:absolute; top:-12px; right:-12px; width:44px; height:44px; }
+.card.played, .card.done{ background:var(--chip); border-width:3px; border-style:solid; box-shadow:none; transform:none; }
+.card.played .check, .card.done .check{ display:block; animation:pop .38s cubic-bezier(.3,1.6,.5,1); }
+.card.played .stamp{ display:block; animation:thunk .42s cubic-bezier(.3,1.5,.5,1); transform-origin:left center; }
+.tagchip{ animation:pop .38s cubic-bezier(.3,1.6,.5,1); }
+@keyframes pop{ 0%{ transform:scale(.4); opacity:0; } 70%{ transform:scale(1.12); opacity:1; } 100%{ transform:scale(1); } }
+@keyframes thunk{ 0%{ transform:scale(1.7) rotate(-6deg); opacity:0; } 60%{ transform:scale(.94) rotate(1deg); opacity:1; } 100%{ transform:none; } }
+@media (prefers-reduced-motion: reduce){ .card .check, .card.played .stamp, .tagchip{ animation:none !important; } }
+.choice{ grid-column:1/-1; animation:pop .3s ease-out; }
+@media (prefers-reduced-motion: reduce){ .choice{ animation:none; } }
+.selnote{ margin:0; font-family:var(--label); font-size:18px; font-weight:bold; color:var(--ink2); min-height:1.5em; }
+.tagchip{ display:inline-block; margin:0 4px 0 2px; padding:0 8px; border:1.5px solid var(--rule2); border-radius:999px;
+  font-family:var(--label); font-size:18px; font-weight:bold; line-height:1.5; color:var(--ink2); background:var(--card); }
+.tagchip.up{ border-width:2.5px; color:var(--rust); }
+.choice{ background:var(--card); border:2px solid var(--rule); border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:12px; }
+.choice p{ margin:0; font-size:20px; line-height:1.5; }
+.choice .row{ display:flex; flex-wrap:wrap; gap:10px; }
 
 .drafts{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 14px; }
 .dtab{ min-height:var(--tap); padding:8px 14px; border:2px solid var(--rule); border-radius:10px; background:var(--card);
@@ -217,10 +268,13 @@ h1 .sub{ display:block; font-size:20px; font-style:italic; font-weight:normal; c
   border-radius:10px; padding:12px 14px 14px; min-height:96px; cursor:pointer; font:inherit;
   box-shadow:2px 3px 0 rgba(40,30,15,.20); transition:transform .15s ease, box-shadow .15s ease;
   display:flex; flex-direction:column; justify-content:flex-start; }
-.card:hover{ transform:translateY(-3px) rotate(-.4deg); box-shadow:3px 6px 0 rgba(40,30,15,.22); }
+@media (hover:hover){ .card:hover{ transform:translateY(-3px) rotate(-.4deg); box-shadow:3px 6px 0 rgba(40,30,15,.22); } }
 .card .deck{ display:block; font-family:var(--label); font-size:18px; font-weight:bold; color:var(--ink2); }
 .card.tag{ border-style:dashed; }
 .card .nm{ display:block; font-size:22px; font-weight:bold; line-height:1.25; margin:2px 0 4px; }
+.card .key{ display:block; margin-top:8px; padding-top:8px; border-top:1.5px dashed var(--line); font-size:18px; line-height:1.45; color:var(--ink); }
+.card .key b{ font-family:var(--label); font-size:18px; }
+.card.struck .key, .card.done .key{ display:none; }
 .card .ts{ display:block; font-size:18px; color:var(--ink2); line-height:1.45; }
 .card .said{ display:block; font-size:20px; line-height:1.5; }
 .card[aria-disabled="true"]{ cursor:default; transform:none; box-shadow:none; }
@@ -265,7 +319,7 @@ details.about p{ margin:8px 0 12px; }
 <div id="backdrop" aria-hidden="true"></div>
 
 <header class="se-chrome">
-  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
   <span class="se-brand">
     <svg class="mk" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><defs><path id="tss-spiral" d="M26.2 24.0 L26.3 24.5 L26.4 25.1 L26.2 25.7 L25.9 26.3 L25.5 26.8 L24.9 27.3 L24.2 27.6 L23.4 27.7 L22.5 27.7 L21.7 27.5 L20.8 27.0 L20.1 26.4 L19.5 25.6 L19.1 24.6 L18.8 23.5 L18.9 22.3 L19.2 21.2 L19.8 20.1 L20.6 19.1 L21.6 18.3 L22.9 17.7 L24.3 17.4 L25.7 17.4 L27.2 17.8 L28.5 18.5 L29.8 19.4 L30.8 20.7 L31.5 22.2 L32.0 23.8 L32.0 25.6 L31.7 27.4 L30.9 29.0 L29.8 30.5 L28.4 31.8 L26.7 32.8 L24.7 33.3 L22.7 33.5 L20.6 33.1 L18.6 32.4 L16.8 31.2 L15.3 29.6 L14.1 27.7 L13.4 25.5 L13.1 23.1 L13.3 20.8 L14.1 18.5 L15.4 16.3 L17.1 14.5 L19.2 13.1 L21.6 12.1 L24.2 11.7 L26.9 11.8 L29.6 12.5 L32.0 13.8 L34.1 15.7 L35.9 17.9 L37.1 20.6 L37.7 23.5 L37.7 26.4 L37.0 29.4 L35.7 32.2 L33.9 34.7 L31.4 36.7 L28.6 38.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></defs><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
     <span class="wm">Tight Spiral</span>
@@ -282,22 +336,83 @@ details.about p{ margin:8px 0 12px; }
   <h1>The Asking Room<span class="sub">a fiction workshop game, workup with three drafts</span></h1>
 
   <div class="room" id="room" data-screen="workshop">
-    <div class="stage">
+    <div class="stagecol">
       <div class="plate" id="plate">
-        <svg id="scene" class="enter" viewBox="0 0 400 230" preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="sceneT" focusable="false">
+        <svg id="scene" class="enter" data-scene data-art-class="studio-cut" data-art="Tight Spiral Paper Craft, original cut-paper SVG, CC0, authored in-file 2026-09-24, texture pass 2026-11-05" viewBox="0 0 400 230" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="sceneT" focusable="false">
           <title id="sceneT">A sunny workshop room. Five people sit around a round wooden table with mugs and pages. The Asked holds her draft, the Advocate sits beside her, and the Recorder writes in a notebook. Two more classmates sit at the near side with their backs to us.</title>
           <defs>
+            <!-- v0.10 TEXTURE PASS (founder: "richer texture, award winning"). All in-file, CC0.
+                 One recipe, three depths: torn fibrous edge, paper tooth lit from the window side,
+                 a lit cut edge (top-left) and a shaded one (bottom-right), then a soft ambient
+                 shadow plus a tight contact shadow. Nearer layers cast farther. -->
             <filter id="cut" x="-12%" y="-12%" width="124%" height="134%" color-interpolation-filters="sRGB">
               <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="5" result="n"/>
-              <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" result="d"/>
-              <feGaussianBlur in="d" stdDeviation="1.2" result="b"/><feOffset in="b" dx="1.2" dy="1.8" result="o"/>
-              <feFlood flood-color="#3a2410" flood-opacity=".30"/><feComposite in2="o" operator="in" result="s"/>
-              <feMerge><feMergeNode in="s"/><feMergeNode in="d"/></feMerge>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" result="d"/>
+              <feOffset in="SourceAlpha" dx="0.7" dy="0.7" result="aIn"/>
+              <feComposite in="d" in2="aIn" operator="out" result="rimL0"/>
+              <feFlood flood-color="#fff4dc" flood-opacity=".55"/><feComposite in2="rimL0" operator="in" result="rimL"/>
+              <feGaussianBlur in="d" stdDeviation="1.4" result="b"/><feOffset in="b" dx="1.3" dy="2" result="o"/>
+              <feFlood flood-color="#3a2410" flood-opacity=".26"/><feComposite in2="o" operator="in" result="s"/>
+              <feGaussianBlur in="d" stdDeviation=".35" result="b2"/><feOffset in="b2" dx=".5" dy=".8" result="o2"/>
+              <feFlood flood-color="#24150a" flood-opacity=".32"/><feComposite in2="o2" operator="in" result="s2"/>
+              <feMerge><feMergeNode in="s"/><feMergeNode in="s2"/><feMergeNode in="d"/><feMergeNode in="rimL"/></feMerge>
             </filter>
+            <filter id="cutNear" x="-12%" y="-14%" width="124%" height="140%" color-interpolation-filters="sRGB">
+              <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="7" result="n"/>
+              <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" result="d"/>
+              <feOffset in="SourceAlpha" dx="0.9" dy="0.9" result="aIn"/>
+              <feComposite in="d" in2="aIn" operator="out" result="rimL0"/>
+              <feFlood flood-color="#fff4dc" flood-opacity=".5"/><feComposite in2="rimL0" operator="in" result="rimL"/>
+              <feGaussianBlur in="d" stdDeviation="2.6" result="b"/><feOffset in="b" dx="2" dy="-3" result="o"/>
+              <feFlood flood-color="#2a1708" flood-opacity=".34"/><feComposite in2="o" operator="in" result="s"/>
+              <feMerge><feMergeNode in="s"/><feMergeNode in="d"/><feMergeNode in="rimL"/></feMerge>
+            </filter>
+            <!-- materials: each is direction and interval, never a crossed grid -->
+            <filter id="wash" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.011 0.016" numOctaves="3" seed="3" result="n"/>
+              <feColorMatrix in="n" values="0 0 0 0 .42  0 0 0 0 .28  0 0 0 0 .14  0 0 0 -1.6 1.05"/>
+            </filter>
+            <filter id="wood" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.004 0.22" numOctaves="3" seed="14" result="n"/>
+              <feColorMatrix in="n" values="0 0 0 0 .30  0 0 0 0 .17  0 0 0 0 .07  0 0 0 -2.2 1.25"/>
+            </filter>
+            <filter id="knit" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+              <feTurbulence type="turbulence" baseFrequency="1.6 0.09" numOctaves="1" seed="31" result="n"/>
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.1 -.15" result="ribA"/>
+              <feFlood flood-color="#1a0f06" flood-opacity=".42"/><feComposite in2="ribA" operator="in" result="rib"/>
+              <feComposite in="rib" in2="SourceAlpha" operator="in" result="ribC"/>
+              <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="ribC"/></feMerge>
+            </filter>
+            <filter id="speck" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+              <feTurbulence type="fractalNoise" baseFrequency="1.3" numOctaves="1" seed="41" result="n"/>
+              <feColorMatrix in="n" values="0 0 0 0 .22  0 0 0 0 .12  0 0 0 0 .05  0 0 0 9 -5.4" result="sp"/>
+              <feComposite in="sp" in2="SourceAlpha" operator="in" result="spC"/>
+              <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="spC"/></feMerge>
+            </filter>
+            <filter id="haze" x="0" y="0" width="100%" height="100%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.018 0.006" numOctaves="2" seed="17" result="n"/>
+              <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.8 -.35" result="m"/>
+              <feComposite in="SourceGraphic" in2="m" operator="in"/>
+            </filter>
+            <filter id="tooth" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+              <feTurbulence type="fractalNoise" baseFrequency="2.1" numOctaves="2" seed="21" result="tn"/>
+              <feDiffuseLighting in="tn" surfaceScale=".9" diffuseConstant="1" lighting-color="#ffffff" result="l"><feDistantLight azimuth="235" elevation="60"/></feDiffuseLighting>
+              <feComponentTransfer in="l"><feFuncR type="linear" slope=".45" intercept=".6"/><feFuncG type="linear" slope=".45" intercept=".6"/><feFuncB type="linear" slope=".45" intercept=".6"/></feComponentTransfer>
+            </filter>
+            <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
             <filter id="grain" x="0" y="0" width="100%" height="100%">
               <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" result="n"/>
-              <feColorMatrix in="n" values="0 0 0 0 .25  0 0 0 0 .18  0 0 0 0 .1  0 0 0 .5 0"/>
+              <feColorMatrix in="n" result="fine" values="0 0 0 0 .25  0 0 0 0 .18  0 0 0 0 .1  0 0 0 .5 0"/>
+              <feTurbulence type="fractalNoise" baseFrequency="0.22" numOctaves="1" seed="61" result="f"/>
+              <feColorMatrix in="f" result="fleck" values="0 0 0 0 .3  0 0 0 0 .2  0 0 0 0 .1  0 0 0 7 -4.3"/>
+              <feMerge><feMergeNode in="fine"/><feMergeNode in="fleck"/></feMerge>
             </filter>
+            <radialGradient id="lampG" cx="50%" cy="0%" r="100%"><stop offset="0" stop-color="#ffe2a0" stop-opacity=".55"/><stop offset="1" stop-color="#ffe2a0" stop-opacity="0"/></radialGradient>
+            <radialGradient id="vigG" cx="52%" cy="54%" r="70%"><stop offset=".55" stop-color="#2a1708" stop-opacity="0"/><stop offset="1" stop-color="#2a1708" stop-opacity=".34"/></radialGradient>
+            <linearGradient id="rimG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff4dc" stop-opacity="0"/><stop offset=".45" stop-color="#fff4dc" stop-opacity=".55"/><stop offset="1" stop-color="#fff4dc" stop-opacity="0"/></linearGradient>
+            <clipPath id="floorClip"><rect x="0" y="150" width="400" height="180"/></clipPath>
+            <clipPath id="wallClip"><rect x="0" y="-140" width="400" height="290"/></clipPath>
+            <clipPath id="topClip"><ellipse cx="200" cy="152" rx="132" ry="23"/></clipPath>
             <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="sky2"/><stop offset="1" class="sky1"/></linearGradient>
             <radialGradient id="glowG"><stop offset="0" class="glowS" stop-opacity="1"/><stop offset="1" class="glowS" stop-opacity="0"/></radialGradient>
             <linearGradient id="beamG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="glowS" stop-opacity=".95"/><stop offset="1" class="glowS" stop-opacity=".15"/></linearGradient>
@@ -305,9 +420,17 @@ details.about p{ margin:8px 0 12px; }
 
           <!-- the wall and floor -->
           <g class="layer">
-            <rect class="wall" x="0" y="0" width="400" height="150"/>
-            <rect class="floor" x="0" y="150" width="400" height="80"/>
-            <path class="board" d="M0 168 H400 M0 190 H400 M0 214 H400 M50 150 v18 M160 168 v22 M300 150 v18 M240 190 v24 M90 214 v16 M350 190 v24" stroke-width="1" fill="none" opacity=".5"/>
+            <!-- v0.10.2 TALL FRAME: portrait phones see the room from y -140 to 330. The wide
+                 frame (0 0 400 230) is unchanged; everything below lives outside it. -->
+            <rect class="wall" x="0" y="-140" width="400" height="290"/>
+            <rect class="floor" x="0" y="150" width="400" height="180"/>
+            <rect x="0" y="-140" width="400" height="290" filter="url(#wash)" clip-path="url(#wallClip)" opacity=".55" class="tex"/>
+            <rect x="0" y="-140" width="400" height="22" fill="#2a1708" opacity=".10"/>
+            <rect class="trim" x="0" y="-120" width="400" height="5"/>
+            <rect x="0" y="146" width="400" height="5" fill="#2a1708" opacity=".14"/>
+            <rect x="0" y="150" width="400" height="80" filter="url(#wood)" clip-path="url(#floorClip)" opacity=".7" class="tex"/>
+            <path class="board" d="M0 168 H400 M0 190 H400 M0 214 H400 M0 242 H400 M0 272 H400 M0 304 H400 M50 150 v18 M160 168 v22 M300 150 v18 M240 190 v24 M90 214 v16 M350 190 v24 M200 214 v28 M120 242 v30 M310 242 v30 M60 272 v32 M250 272 v32 M150 304 v26 M360 304 v26" stroke-width="1" fill="none" opacity=".5"/>
+            <path d="M0 169 H400 M0 191 H400 M0 215 H400" stroke="#fff4dc" stroke-width=".6" fill="none" opacity=".25"/>
           </g>
           <!-- two tall windows full of daylight -->
           <g class="layer l2" filter="url(#cut)">
@@ -315,6 +438,7 @@ details.about p{ margin:8px 0 12px; }
             <rect x="29" y="19" width="70" height="80" fill="url(#skyG)"/>
             <path class="cloud" d="M36 40 q4 -8 12 -4 q6 -7 13 0 q7 0 6 7 h-31 Z"/>
             <path class="tree" d="M29 99 V80 q7 -12 15 -5 q7 -10 15 -1 q8 -5 12 6 q9 -1 11 9 q9 0 17 6 V99 Z"/>
+            <path d="M34 50 l18 -24 M38 54 l20 -27 M70 92 l22 -30" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity=".32" fill="none"/>
             <rect class="trim" x="62" y="19" width="3" height="80"/><rect class="trim" x="29" y="56" width="70" height="3"/>
             <rect class="trim" x="18" y="102" width="92" height="5" rx="1"/>
             <rect class="trim" x="296" y="14" width="80" height="90" rx="3"/>
@@ -322,23 +446,34 @@ details.about p{ margin:8px 0 12px; }
             <circle class="sun" cx="352" cy="36" r="8"/>
             <path class="cloud" d="M306 64 q4 -7 11 -4 q6 -6 12 0 q6 0 5 6 h-28 Z"/>
             <path class="tree" d="M301 99 V84 q8 -10 16 -3 q8 -9 16 1 q9 -4 12 6 q10 0 26 7 V99 Z"/>
+            <path d="M306 50 l18 -24 M310 54 l20 -27 M342 92 l22 -30" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity=".32" fill="none"/>
             <rect class="trim" x="334" y="19" width="3" height="80"/><rect class="trim" x="301" y="56" width="70" height="3"/>
             <rect class="trim" x="290" y="102" width="92" height="5" rx="1"/>
           </g>
           <!-- plants on the sills -->
           <g class="layer l2" filter="url(#cut)">
-            <path d="M84 102 l3 -12 h14 l3 12 Z" fill="#b4511a"/>
+            <path d="M84 102 l3 -12 h14 l3 12 Z" fill="#b4511a"/><rect x="85.5" y="89" width="17" height="3" rx="1" fill="#9a4314"/>
             <path class="leaf" d="M94 91 q-10 -6 -12 -18 q9 3 12 16 M94 91 q2 -14 12 -20 q0 12 -10 20 M94 91 q-2 -12 0 -24 q6 10 2 24"/>
-            <path d="M306 102 l2 -10 h12 l2 10 Z" fill="#0F5F5A"/>
+            <path d="M306 102 l2 -10 h12 l2 10 Z" fill="#0F5F5A"/><rect x="307" y="91" width="14" height="2.6" rx="1" fill="#0b4a46"/>
             <path class="leaf" d="M314 93 q-8 -4 -11 -14 q8 2 11 13 M314 93 q3 -11 11 -15 q-1 10 -10 15"/>
           </g>
+          <!-- above the bunting (tall frame): a clock and two paper lamps over the table -->
+          <g class="layer l2" filter="url(#cut)">
+            <circle cx="200" cy="-74" r="17" class="trim"/><circle cx="200" cy="-74" r="14" fill="#fbf3e2"/>
+            <path d="M200 -86 v2 M200 -64 v2 M188 -74 h2 M210 -74 h2" stroke="#1f1b12" stroke-width="1.2"/>
+            <path d="M200 -74 v-9 M200 -74 l6 3" stroke="#1f1b12" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M128 -115 V-44 M272 -115 V-44" stroke="#2a1d12" stroke-width="1.1"/>
+            <path d="M116 -26 l6 -20 h12 l6 20 Z M260 -26 l6 -20 h12 l6 20 Z" fill="#c9a13b"/>
+            <path d="M118 -27 h20 M262 -27 h20" stroke="#a37f24" stroke-width="2"/>
+          </g>
+          <path d="M116 -26 L80 60 L176 60 L140 -26 Z M260 -26 L224 60 L320 60 L284 -26 Z" fill="url(#lampG)" pointer-events="none"/>
           <!-- paper bunting and a board of pinned drafts -->
           <g class="layer l2" filter="url(#cut)">
             <path d="M118 12 q82 22 164 0" class="trimS" stroke-width="1" fill="none"/>
             <path d="M126 14 l6 11 l6 -9 Z" fill="#B4511A"/><path d="M146 19 l5 11 l7 -9 Z" fill="#0F5F5A"/><path d="M166 22 l5 11 l7 -10 Z" fill="#e8b04a"/>
             <path d="M188 24 l5 11 l7 -11 Z" fill="#B4511A"/><path d="M210 24 l6 11 l6 -11 Z" fill="#0F5F5A"/><path d="M231 21 l6 10 l6 -11 Z" fill="#e8b04a"/>
             <path d="M252 18 l6 10 l6 -11 Z" fill="#B4511A"/><path d="M270 14 l6 9 l5 -10 Z" fill="#0F5F5A"/>
-            <rect class="cork" x="160" y="44" width="80" height="50" rx="2"/>
+            <rect class="cork" x="160" y="44" width="80" height="50" rx="2" filter="url(#speck)"/>
             <rect class="note" x="166" y="50" width="20" height="26" transform="rotate(-4 176 63)"/>
             <rect class="note" x="190" y="52" width="20" height="22" transform="rotate(3 200 63)"/>
             <rect class="note" x="214" y="49" width="20" height="28" transform="rotate(-2 224 63)"/>
@@ -346,53 +481,56 @@ details.about p{ margin:8px 0 12px; }
             <circle cx="176" cy="51" r="1.7" fill="#B4511A"/><circle cx="200" cy="53" r="1.7" fill="#0F5F5A"/><circle cx="224" cy="50" r="1.7" fill="#B4511A"/>
           </g>
           <!-- daylight falling across the table -->
-          <path id="beams" d="M29 24 L99 40 L214 178 L96 178 Z M301 24 L371 34 L318 178 L196 178 Z" fill="url(#beamG)"/>
+          <path id="beams" d="M29 24 L99 40 L214 178 L96 178 Z M301 24 L371 34 L318 178 L196 178 Z" fill="url(#beamG)" filter="url(#haze)"/>
           <circle id="glow" cx="200" cy="150" r="140" fill="url(#glowG)"/>
 
           <!-- the far side of the table: five people -->
           <g class="layer l3" filter="url(#cut)">
             <!-- classmate, curly hair, green sweater -->
             <g id="otherHand"><path d="M108 130 v-38" stroke="#5f7d4e" stroke-width="6" stroke-linecap="round"/><circle cx="108" cy="89" r="3.4" fill="#a86f48"/></g>
-            <path d="M82 150 q2 -33 16 -33 q15 0 17 33 Z" fill="#5f7d4e"/>
+            <path d="M82 150 q2 -33 16 -33 q15 0 17 33 Z" fill="#5f7d4e" filter="url(#knit)"/>
             <circle cx="98" cy="108" r="9" fill="#a86f48"/>
             <g fill="#241810"><circle cx="90" cy="102" r="4"/><circle cx="95" cy="98" r="4.4"/><circle cx="101" cy="97" r="4.4"/><circle cx="106" cy="101" r="4"/><circle cx="89" cy="108" r="3.4"/><circle cx="107" cy="107" r="3.2"/></g>
             <circle cx="95" cy="110" r="1.1" fill="#140d07"/><circle cx="101" cy="110" r="1.1" fill="#140d07"/>
-            <path d="M95 114 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/>
+            <path d="M95 114 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/><g class="cheek"><circle cx="92.5" cy="112.5" r="1.8"/><circle cx="103.5" cy="112.5" r="1.8"/></g>
             <!-- the Advocate, teal cardigan -->
-            <path d="M136 150 q2 -33 15 -33 q14 0 16 33 Z" fill="#0F5F5A"/>
+            <path d="M136 150 q2 -33 15 -33 q14 0 16 33 Z" fill="#0F5F5A" filter="url(#knit)"/>
             <path d="M148 118 l3 12 l3 -12" fill="#e8dcc6"/>
             <circle cx="151" cy="108" r="9" fill="#8a5a3c"/>
             <path d="M141 109 q0 -13 10 -13 q11 0 11 12 q-4 -6 -11 -6 q-6 0 -10 7 Z" fill="#1d1712"/>
             <circle cx="148" cy="110" r="1.1" fill="#140d07"/><circle cx="154.5" cy="110" r="1.1" fill="#140d07"/>
-            <path d="M148 114 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/>
+            <path d="M148 114 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/><g class="cheek"><circle cx="145.5" cy="112.5" r="1.8"/><circle cx="157" cy="112.5" r="1.8"/></g>
             <!-- the Asked, burnt orange sweater -->
             <g id="askedUpper">
               <path d="M195 118 q-3 -22 11 -23 q14 1 11 23 q-1 6 -2 10 l-18 0 q-1 -4 -2 -10 Z" fill="#3b2415"/>
-              <path d="M191 150 q2 -33 15 -33 q14 0 16 33 Z" fill="#B4511A"/>
+              <path d="M191 150 q2 -33 15 -33 q14 0 16 33 Z" fill="#B4511A" filter="url(#knit)"/>
               <g id="askedHead">
                 <circle cx="206" cy="108" r="9" fill="#d9a67c"/>
                 <path d="M197 107 q2 -12 10 -11 q9 0 9 9 q-6 -5 -19 2 Z" fill="#3b2415"/>
                 <circle cx="203" cy="110" r="1.1" fill="#140d07"/><circle cx="209.5" cy="110" r="1.1" fill="#140d07"/>
-                <path d="M203 114 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/>
+                <path d="M203 114 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/><g class="cheek"><circle cx="200.5" cy="112.5" r="1.8"/><circle cx="212" cy="112.5" r="1.8"/></g>
               </g>
             </g>
             <!-- the Recorder, plum sweater -->
-            <path d="M248 150 q2 -33 14 -33 q13 0 15 33 Z" fill="#6a4466"/>
+            <path d="M248 150 q2 -33 14 -33 q13 0 15 33 Z" fill="#6a4466" filter="url(#knit)"/>
             <circle cx="262" cy="109" r="8.5" fill="#c48a5e"/>
             <path d="M253 109 q0 -12 9 -12 q10 0 9 11 q-3 -5 -9 -5 q-5 0 -9 6 Z" fill="#6b4a2a"/>
             <circle cx="259.5" cy="111" r="1.1" fill="#140d07"/><circle cx="265" cy="111" r="1.1" fill="#140d07"/>
             <!-- classmate, mustard sweater -->
-            <path d="M292 152 q2 -31 16 -31 q14 0 16 31 Z" fill="#c9a13b"/>
+            <path d="M292 152 q2 -31 16 -31 q14 0 16 31 Z" fill="#c9a13b" filter="url(#knit)"/>
             <circle cx="308" cy="113" r="8.5" fill="#6e4630"/>
             <path d="M299 112 q1 -12 9 -12 q9 0 9 11 l1 6 q-4 -9 -10 -9 q-6 0 -9 4 Z" fill="#2b1d14"/>
             <circle cx="305" cy="115" r="1.1" fill="#140d07"/><circle cx="311" cy="115" r="1.1" fill="#140d07"/>
-            <path d="M305 119 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/>
+            <path d="M305 119 q3 2 6 0" stroke="#140d07" stroke-width=".8" fill="none"/><g class="cheek"><circle cx="302.5" cy="117.5" r="1.7"/><circle cx="313.5" cy="117.5" r="1.7"/></g>
           </g>
 
+          <!-- the table sits on the floor: one soft cast shadow -->
+          <ellipse cx="206" cy="182" rx="150" ry="15" fill="#24150a" opacity=".28" filter="url(#soft)"/>
           <!-- the round table -->
           <g class="layer l3" filter="url(#cut)">
             <ellipse class="tableE" cx="200" cy="160" rx="132" ry="24"/>
             <ellipse class="tableT" cx="200" cy="152" rx="132" ry="23"/>
+            <rect x="68" y="129" width="264" height="46" filter="url(#wood)" clip-path="url(#topClip)" opacity=".75" class="tex"/>
             <path d="M104 150 q96 14 190 -2" stroke="#000" stroke-opacity=".08" stroke-width="1.2" fill="none"/>
           </g>
           <!-- on the table: mugs, pages, the draft, the notebook -->
@@ -429,11 +567,17 @@ details.about p{ margin:8px 0 12px; }
           </g>
 
           <!-- the near side: two classmates, backs to us -->
-          <g class="layer l2" filter="url(#cut)">
-            <path class="clapper" d="M36 230 v-16 q4 -22 36 -22 q32 0 36 22 v16 Z" fill="#7d8fa8"/>
+          <g class="layer l2" filter="url(#cutNear)">
+            <path class="clapper" d="M34 262 v-40 q2 -10 6 -14 q4 -16 32 -16 q28 0 32 16 q4 4 6 14 v40 Z" fill="#7d8fa8" filter="url(#knit)"/>
             <circle class="clapper" cx="72" cy="182" r="16" fill="#3b2a1e"/>
-            <path class="clapper" d="M292 230 v-16 q4 -22 36 -22 q32 0 36 22 v16 Z" fill="#a45c3c"/>
+            <path class="clapper" d="M290 262 v-40 q2 -10 6 -14 q4 -16 32 -16 q28 0 32 16 q4 4 6 14 v40 Z" fill="#a45c3c" filter="url(#knit)"/>
             <path class="clapper" d="M312 186 q0 -20 16 -20 q16 0 16 20 q0 6 -16 6 q-16 0 -16 -6 Z" fill="#8a6440"/>
+            <g class="chair">
+              <path d="M38 236 h68 v9 h-68 Z M294 236 h68 v9 h-68 Z"/>
+              <path d="M42 230 h7 v98 h-7 Z M95 230 h7 v98 h-7 Z M298 230 h7 v98 h-7 Z M351 230 h7 v98 h-7 Z"/>
+              <path d="M38 262 h68 v7 h-68 Z M294 262 h68 v7 h-68 Z"/>
+              <path d="M49 296 h46 v4 h-46 Z M305 296 h46 v4 h-46 Z" opacity=".8"/>
+            </g>
           </g>
 
           <!-- dust turning in the sunlight during the silence -->
@@ -441,6 +585,8 @@ details.about p{ margin:8px 0 12px; }
             <circle class="mote" cx="250" cy="70" r="1"/><circle class="mote" cx="268" cy="86" r=".8"/><circle class="mote" cx="236" cy="96" r="1.1"/>
             <circle class="mote" cx="120" cy="70" r=".9"/><circle class="mote" cx="138" cy="88" r=".8"/><circle class="mote" cx="282" cy="60" r="1"/><circle class="mote" cx="110" cy="96" r=".9"/>
           </g>
+          <rect id="toothR" x="0" y="0" width="400" height="230" filter="url(#tooth)" pointer-events="none"/>
+          <rect id="vig" x="0" y="0" width="400" height="230" fill="url(#vigG)" pointer-events="none"/>
           <rect id="grainR" x="0" y="0" width="400" height="230" filter="url(#grain)" pointer-events="none"/>
         </svg>
       </div>
@@ -492,24 +638,24 @@ details.about p{ margin:8px 0 12px; }
     </template>
 
     <section class="hand" id="hand" aria-label="Your hand">
-      <h2 class="phase" id="phase" tabindex="-1"><span class="n" id="phaseN">Call 1 of 3</span><span class="q" id="phaseQ">Read the draft. Then play what you notice.</span></h2>
+      <h2 class="phase" id="phase" tabindex="-1"><span class="n" id="phaseN">Call 1 of 3</span><span class="q" id="phaseQ">Tap the lines that caught you. Then play a card on them.</span></h2>
+      <p class="selnote" id="selnote" aria-live="polite"></p>
       <div class="cards" id="cards"></div>
     </section>
   </div>
 
   <details class="about">
     <summary>About this room, its rules, and the draft</summary>
-    <p>You sit in a fiction workshop as an Asker. The writer, the Asked, sits at a round table with the class. The Advocate sits beside her and rules on every card you play. If a card misses, the Advocate asks you to reframe once. If it misses again, she calls on someone else. After a good question, she holds the silence so the Asked can think. The Recorder writes down every question and none of the answers, and the Asked takes that page home.</p>
-    <p>The roles and rules come from Jesse Ball, "The Asking," in <i>Notes on My Dunce Cap</i>. The ways of speaking come from Pat Schneider and the Amherst Writers &amp; Artists method: say what is strong, say what stays with you, and speak of the narrator, never the writer. The cards come from Matt Walsh's handout "Mapping the Storyscape with Writerly Moves" and its Observation Tags, and every test line on a card is his.</p>
+    <p>You sit in a fiction workshop as an Asker. The writer, the Asked, sits at a round table with the class. The Advocate sits beside her and rules on every card you play. First tap the sentences in the draft you want to talk about. Then play a card: a Writerly Move says something is working there; a Drafty Air card says something there may need a look. The bottom of each card tells you which answer means which. Any card can go on any lines, and a line can carry more than one tag. When the Advocate reads a tag differently, you choose whether to ask about it anyway. The Advocate strikes only how a question is said, never what you noticed. After a good question, she holds the silence so the Asked can think. The Recorder writes down every question and none of the answers, and the Asked takes that page home.</p>
+    <p>The roles and rules come from Jesse Ball, "The Asking," in <i>Notes on My Dunce Cap</i>. The ways of speaking come from Pat Schneider and the Amherst Writers &amp; Artists method: say what is strong, say what stays with you, and speak of the narrator, never the writer. The cards come from Matt Walsh's handout "Mapping the Storyscape with Writerly Moves" and its Observation Tags, and every test line on a card is his. The answer keys come from his Storyscape card descriptions and his Drafty Moves sheet.</p>
     <p>The three drafts adapt stories by Matt Walsh: the opening of "Presto"; a passage from chapter one of <i>Daiko</i>, his novel set in Sasakami Village; and "Dead Ants," from <i>Secret Worlds</i>, his stories written to his friend Dan. Each is roughed down to read like a workshop draft, and the studio planted one flaw in each for practice. Art: original cut paper, CC0, Tight Spiral Paper Craft.</p>
   </details>
 </main>
 
 <nav class="se-rail" aria-label="Page navigation">
   <a href="arcade.html" aria-label="Back to the arcade">Back</a>
-  <a href="index.html" aria-label="Home">Home</a>
 </nav>
-<p class="foot">Tight Spiral Studios. Play. Notice. Design. Workup v0.7, 2026-10-17.</p>
+<p class="foot">Tight Spiral Studios. Play. Notice. Design. Workup v0.10.3, 2026-11-05.</p>
 
 <script>
 (function(){
@@ -676,6 +822,66 @@ details.about p{ margin:8px 0 12px; }
        why:'We speak about the narrator here, never the writer. Please reframe.'}
     ]
   };
+  /* v0.8.1 ANSWER KEY. Every card says which answer means working / needs a look.
+     Move descriptions: Storyscape card set, verbatim. Ask lines: Drafty Moves sheet, verbatim. */
+  var KEY={
+    wdtm:    {good:'Yes', d:'Offers a specific detail that quietly carries meaning (class, mood, history).'},
+    anchor:  {good:'Yes', d:'Grounds us in who/where/when and keeps the world solid.'},
+    turn:    {good:'No',  d:'The situation or understanding changes direction.'},
+    pattern: {good:'Yes', d:'Plants or repeats an image, phrase, or motif that ties the story together.'},
+    snap:    {good:'Yes', d:'Briefly looks backward to explain, complicate, or re-color the present.'},
+    static:  {ask:'Does this reaction feel specific and proportional?', flag:'No'},
+    dump:    {ask:'Does the story feel like it hit pause to brief me?', flag:'Yes'},
+    coin:    {ask:'Does this feel caused by what came before, or dropped in from the sky?', flag:'Dropped in from the sky'},
+    camera:  {ask:'Can I clearly picture this scene and viewpoint?', flag:'No'},
+    fast:    {ask:'Did I want to see more of how this happened, not just that it did?', flag:'Yes'},
+    rules:   {ask:'Does this contradict something the story already taught me?', flag:'Yes'},
+    suitcase:{ask:'If we cut this, would anything important break—plot, character, or mood?', flag:'No'}
+  };
+  /* v0.9 ALSO FAIR. Studio Advocate lines for readings the founder has defended in playtest.
+     Matched on sentence text so they survive re-splitting. */
+  var ALSO={
+    wdtm:[{m:/wife has cancer|history teacher|three kids/,
+      say:'Fair reading. Three plain facts, and Eddie stops being the brother who hurt him. That is a detail doing work.'}]
+  };
+  function quoteOf(sel){
+    var t=sel.map(function(x){ return x.textContent.trim(); }).join(' ').replace(/^["“]|["”]$/g,'');
+    var w=t.split(/\s+/); return w.length>14 ? w.slice(0,12).join(' ')+'…' : t;
+  }
+  function feedFor(n,sel){
+    var q='“'+quoteOf(sel)+'”', good;
+    if(n.tag) good=[
+      {t:'At '+q+', what do you want your narrator to be feeling?', good:true,
+       ans:['I wasn’t sure about that line either.','I’m going to look at it again tonight.']},
+      {t:'I slowed down at '+q+'. What should the reader carry out of that moment?', good:true,
+       ans:['Maybe less than I gave them. I’ll look.']}];
+    else good=[
+      {t:'When you wrote '+q+', what did you want us to understand about him?', good:true,
+       ans:['I hadn’t thought about that line that way.','I think I want to keep it.']},
+      {t:q+' stayed with me. What is it doing for your narrator?', good:true,
+       ans:['I didn’t know anyone would notice that line. Now I know it’s working.']}];
+    var bad=[
+      {t:'I really liked that part.', good:false, why:'That isn’t a question, and it doesn’t show her what you saw. Please reframe.'},
+      {t:'That line doesn’t work.', good:false, why:'That is a verdict. Please reframe it as a question.'},
+      {t:'Cut that line.', good:false, why:'That writes her story for her. Tell her what you noticed instead. Please reframe.'},
+      {t:'Did that happen to you?', good:false, why:'We speak about the narrator here, never the writer. Please reframe.'},
+      {t:'Isn’t that a little much?', good:false, why:'That is an opinion wearing a question mark. Please reframe.'}];
+    return good.concat(shuffle(bad).slice(0,3));
+  }
+  function addChip(sel,n,up){
+    var last=sel[sel.length-1]; if(!last) return;
+    var nx=last.nextSibling;
+    while(nx && nx.classList && nx.classList.contains('tagchip')){ if(nx.dataset.id===n.id) return; nx=nx.nextSibling; }
+    var c=document.createElement('span'); c.className='tagchip'+(up?' up':''); c.dataset.id=n.id;
+    c.textContent=(up?'Upheld: ':'Tagged: ')+n.name;
+    var at=last; while(at.nextSibling && at.nextSibling.classList && at.nextSibling.classList.contains('tagchip')) at=at.nextSibling;
+    at.parentNode.insertBefore(c, at.nextSibling);
+  }
+  function keyHtml(n){
+    var k=KEY[n.id]; if(!k) return '';
+    if(k.ask) return '<span class="key"><b>Ask:</b> '+esc(k.ask)+' <b>'+esc(k.flag)+' means it needs a look.</b></span>';
+    return '<span class="key"><b>'+k.good+' means it’s working.</b> '+esc(k.d)+'</span>';
+  }
   var DRAFTS=[
     {title:'Presto', notice:null, feed:null},
     {title:'Daiko', notice:NOTICE1, feed:FEED1},
@@ -746,9 +952,11 @@ details.about p{ margin:8px 0 12px; }
       var tc=$('tableCard'); tc.classList.remove('struck');
       if(RM){ mood('cardDown',true); done(); return; }
       var a=btn.getBoundingClientRect(), p=$('plate').getBoundingClientRect();
+      /* table off screen (phone): no flight into nowhere */
+      if(p.bottom<0 || p.top>window.innerHeight){ mood('cardDown',true); done(); return; }
       var f=document.createElement('div'); f.className='flyer';
       f.style.left=a.left+'px'; f.style.top=a.top+'px'; f.style.width=a.width+'px'; f.style.height=a.height+'px';
-      document.body.appendChild(f); btn.classList.add('lift');
+      document.body.appendChild(f);
       var tx=p.left+p.width*0.448-(a.left+a.width/2), ty=p.top+p.height*0.686-(a.top+a.height/2);
       var sc=Math.max(0.06,(p.width*0.05)/a.width);
       requestAnimationFrame(function(){ requestAnimationFrame(function(){
@@ -760,7 +968,8 @@ details.about p{ margin:8px 0 12px; }
   function ruling(on){ mood('ruling',on); }
 
   function makeCard(html, cls, onPlay){
-    var b=document.createElement('button'); b.type='button'; b.className='card'+(cls?' '+cls:''); b.innerHTML=html;
+    var b=document.createElement('button'); b.type='button'; b.className='card'+(cls?' '+cls:'');
+    b.innerHTML=html+'<svg class="check" viewBox="0 0 44 44" aria-hidden="true" focusable="false"><circle cx="22" cy="22" r="19" fill="#fbf3e2" stroke="#1f1b12" stroke-width="3"/><path d="M12 23 l7 7 l14 -16" fill="none" stroke="#1f1b12" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     b.addEventListener('click',function(){ if(S.busy||b.getAttribute('aria-disabled')==='true') return; onPlay(b); });
     cardsEl.appendChild(b); return b;
   }
@@ -768,19 +977,20 @@ details.about p{ margin:8px 0 12px; }
 
   function dealNotice(){
     S.phase='notice'; S.tries=0; cardsEl.innerHTML=''; [].forEach.call(document.querySelectorAll('.ev.hint'),function(e){ e.classList.remove('hint'); });
-    setPhase('Call '+S.call+' of '+MAXCALLS+': notice', S.call===1?'Read the draft. Then play what you notice.':'What else is this draft doing?');
+    setPhase('Call '+S.call+' of '+MAXCALLS+': notice', S.call===1?'Tap the lines that caught you. Then play a card on them.':'What else is this draft doing? Tap those lines, then play a card.');
+    pickable(true); syncSel();
     shuffle(NOTICE).forEach(function(n){
-      var b=makeCard('<span class="chead">'+icon(n.id)+'<span><span class="deck">'+n.deck+'</span><span class="nm">'+esc(n.name)+'</span></span></span><span class="ts">'+esc(n.test)+'</span><span class="stamp"></span><span class="why"></span>',
+      var b=makeCard('<span class="chead">'+icon(n.id)+'<span><span class="deck">'+deckLabel(n)+'</span><span class="nm">'+esc(n.name)+'</span></span></span><span class="ts">'+esc(n.test)+'</span>'+keyHtml(n)+'<span class="stamp"></span><span class="why"></span>',
         n.tag?'tag':'', function(btn){ playNotice(n,btn); });
       b.dataset.id=n.id;
-      if(S.asked[n.id]){ claim(b,n); b.setAttribute('aria-disabled','true'); b.classList.add('done'); b.querySelector('.stamp').textContent='Upheld. Asked already.'; note(b, clean(n.rule)); }
+      if(false){}
       else if(S.struck[n.id]){ claim(b,n); strike(b,'Struck',S.struck[n.id],true); }
     });
   }
-  function dealFeedback(n){
-    S.phase='feedback'; S.tries=0; cardsEl.innerHTML='';
+  function dealFeedback(n,list){
+    S.phase='feedback'; S.tries=0; cardsEl.innerHTML=''; pickable(false); clearSel();
     setPhase('Call '+S.call+' of '+MAXCALLS+': say it', 'Say it to the Asked. Choose your words.');
-    shuffle(FEED[n.id]).forEach(function(f){
+    shuffle(list||FEED[n.id]).forEach(function(f){
       var k=kindOf(f);
       var b=makeCard('<span class="said">'+esc(f.t)+'</span><span class="kind">'+icon(k)+'<b>'+KINDNAME[k]+'</b></span><span class="stamp"></span><span class="why"></span>','',function(btn){ playFeedback(f,btn); });
       if(S.struck[f.t]){ strike(b,'Struck',S.struck[f.t],true); }
@@ -790,7 +1000,9 @@ details.about p{ margin:8px 0 12px; }
   /* The Advocate's note stays on a struck card for the whole draft. */
   function clean(t){ return t.replace(/\s*(Please (look again|reframe)[^.]*\.|Now say it so it helps her\.)\s*$/,'').trim(); }
   function note(btn,text){ btn.querySelector('.why').innerHTML='<b>The Advocate:</b> '+esc(text); }
-  function claim(btn,n){ var ts=btn.querySelector('.ts'); if(ts) ts.innerHTML='<b>Claim:</b> '+esc(n.test); }
+  function deckLabel(n){ return n.tag?'Drafty Air: needs a look':'Writerly Move: working here'; }
+  function claimLead(n){ return n.tag?'You claim these lines need a look:':'You claim these lines are working:'; }
+  function claim(btn,n){ var ts=btn.querySelector('.ts'); if(ts) ts.innerHTML='<b>'+claimLead(n)+'</b> '+esc(n.test); }
   function strike(btn,label,why,quiet){
     btn.classList.add('struck'); btn.setAttribute('aria-disabled','true');
     btn.querySelector('.stamp').textContent=label; note(btn,why);
@@ -798,22 +1010,56 @@ details.about p{ margin:8px 0 12px; }
   }
 
   async function playNotice(n,btn){
-    S.busy=true; claim(btn,n); await fly(btn); ruling(true);
-    if(n.kind==='hit'){
+    var sel=selected();
+    if(!sel.length){ say('The Advocate','Point first. Tap the lines in the draft this card is about, then play it.'); flashDraft(); return; }
+    S.busy=true;
+    var k0=sel.length; btn.classList.add('played'); btn.setAttribute('aria-pressed','true');
+    btn.querySelector('.stamp').textContent='Played on '+k0+(k0===1?' line':' lines');
+    cardsEl.querySelectorAll('.card').forEach(function(c){ if(c!==btn) c.setAttribute('aria-disabled','true'); });
+    await fly(btn); ruling(true);
+    var target=n.ev?[].slice.call(document.querySelectorAll('#'+n.ev+' .sn')):[];
+    var on=sel.filter(function(x){ return target.indexOf(x)>=0; }).length;
+    if(n.kind==='hit' && on && !S.asked[n.id]){
+      /* the planted line: upheld, and the authored question cards */
       say('The Advocate', n.rule);
-      var ev=$(n.ev); if(ev) ev.classList.add('marked');
-      S.asked[n.id]=true; S.notice=n;
+      var ev=$(n.ev); if(ev){ ev.classList.add('marked'); ev.classList.remove('hint'); }
+      addChip(sel,n,true); S.asked[n.id]=true; S.notice=n;
+      btn.querySelector('.stamp').textContent='Upheld';
       await wait(1500); ruling(false);
-      dealFeedback(n); S.busy=false;
-    } else {
-      S.tries++; S.struck[n.id]=clean(n.rule);
-      /* v0.7 (founder 2026-10-17): no forced move-on. Every miss gets another shot at this call. */
-      if(S.tries>=2){ var hh=NOTICE.filter(function(x){ return x.kind==='hit' && !S.asked[x.id]; })[0]; var he=hh&&$(hh.ev); if(he) he.classList.add('hint');
-        say('The Advocate', n.rule+' Hint: read the highlighted lines in the draft, then choose.'); }
-      else say('The Advocate', n.rule);
-      strike(btn,'Struck. Try another.',S.struck[n.id]);
-      await wait(900); ruling(false); S.busy=false;
+      dealFeedback(n); S.busy=false; return;
     }
+    /* v0.9: every other tag is the Asker's call. The Advocate offers a read, never a strike. */
+    var txt=sel.map(function(x){ return x.textContent; }).join(' ');
+    var also=(ALSO[n.id]||[]).filter(function(a){ return a.m.test(txt); })[0];
+    var read;
+    function near(rule){ var w=(rule.match(/[A-Za-z’']{5,}/g)||[]).map(function(x){ return x.toLowerCase(); });
+      var t=txt.toLowerCase(); return w.some(function(x){ return t.indexOf(x)>=0; }); }
+    if(also) read=also.say;
+    else if(n.kind==='hit' && on) read='Upheld already. You asked about these lines. Ask again, or keep looking.';
+    else if(n.kind!=='hit' && !near(clean(n.rule))) read='Fair reading. You can ask the writer about it and see what she says.';
+    else if(n.kind==='hit') read='Fair reading. '+n.name+' can live in more than one place in a draft.';
+    else if(n.kind==='trivial') read=clean(n.rule).replace(/ Is .*$/,'')+' You can ask about it, or look for the job this draft most needs.';
+    else read='Another reader might say: '+clean(n.rule);
+    say('The Advocate', read);
+    addChip(sel,n,false);
+    S.tries++;
+    if(S.tries>=3){ var hh=NOTICE.filter(function(x){ return x.kind==='hit' && !S.asked[x.id]; })[0]; var he=hh&&$(hh.ev); if(he) he.classList.add('hint'); }
+    await wait(700); ruling(false);
+    choose(n,sel,read); S.busy=false;
+  }
+  function choose(n,sel,read){
+    S.phase='choose'; pickable(false);
+    setPhase('Call '+S.call+' of '+MAXCALLS+': your call', 'Ask the writer about it, or keep looking.');
+    var k=sel.length, box=document.createElement('div'); box.className='choice';
+    box.innerHTML='<p>You tagged '+k+(k===1?' line':' lines')+' as <b>'+esc(n.name)+'</b>. The tag stays on the line either way.</p>'+
+      '<div class="row"><button class="btn" type="button" id="askIt">Ask about it</button><button class="btn" type="button" id="keepLooking">Keep looking</button></div>';
+    var pl=cardsEl.querySelector('.card.played');
+    cardsEl.insertBefore(box, cardsEl.firstChild); if(pl) cardsEl.insertBefore(pl, box.nextSibling);
+    syncSel();
+    var keep=sel.slice();
+    $('askIt').addEventListener('click',function(){ dealFeedback(n, feedFor(n,keep)); });
+    $('keepLooking').addEventListener('click',function(){ dealNotice(); clearSel(); $('phase').focus({preventScroll:true}); });
+    $('askIt').focus({preventScroll:true});
   }
 
   async function playFeedback(f,btn){
@@ -882,6 +1128,7 @@ details.about p{ margin:8px 0 12px; }
     await wait(2400); mood('clap',false); mood('bow',false);
   }
   function reset(){
+    clearSel();
     S={ call:1, phase:'notice', tries:0, asked:{}, struck:{}, notice:null, record:[], busy:false };
     ['r1','r2','r3'].forEach(function(id){ $(id).classList.remove('on'); });
     document.querySelectorAll('.ev').forEach(function(e){ e.classList.remove('marked'); });
@@ -890,10 +1137,54 @@ details.about p{ margin:8px 0 12px; }
     dealNotice(); $('phase').focus({preventScroll:true});
   }
   /* Three drafts on the table. Switching is always open: no draft is locked. */
+  /* v0.8 POINT, THEN PLAY. Split the draft into sentences so a card lands on lines, not the
+     whole passage. Planted .ev spans stay as wrappers, so marked/hint still work. */
+  var END=/[.!?]["”’)]*\s*$/;
+  function build(src,dest){
+    var cur=null;
+    function open(){ if(!cur){ cur=document.createElement('span'); cur.className='sn'; dest.appendChild(cur); } return cur; }
+    [].slice.call(src.childNodes).forEach(function(node){
+      if(node.nodeType===3){
+        (node.textContent.match(/[^.!?]+[.!?]*["”’)]*\s*|[.!?]+["”’)]*\s*/g)||[]).forEach(function(t){
+          if(!t.trim()){ (cur||dest).appendChild(document.createTextNode(t)); return; }
+          if(!cur){ var lead=t.match(/^\s+/); if(lead){ dest.appendChild(document.createTextNode(lead[0])); t=t.slice(lead[0].length); } }
+          open().appendChild(document.createTextNode(t)); if(END.test(t)) cur=null;
+        });
+      } else if(node.classList && node.classList.contains('ev')){
+        cur=null; var w=node.cloneNode(false); dest.appendChild(w); build(node,w); cur=null;
+      } else { open().appendChild(node.cloneNode(true)); if(END.test(node.textContent)) cur=null; }
+    });
+  }
+  function sentencize(root){
+    root.querySelectorAll('p:not(.mhead):not(.brk)').forEach(function(p){
+      var f=document.createDocumentFragment(); build(p,f); p.innerHTML=''; p.appendChild(f);
+    });
+    root.querySelectorAll('.sn').forEach(function(sn){
+      sn.setAttribute('role','button'); sn.setAttribute('tabindex','0'); sn.setAttribute('aria-pressed','false');
+    });
+  }
+  function selected(){ return [].slice.call(document.querySelectorAll('#msBody .sn[aria-pressed="true"]')); }
+  function syncSel(){
+    var k=selected().length, el=$('selnote'); if(!el) return;
+    el.textContent = S.phase!=='notice' ? '' : (k ? k+(k===1?' line':' lines')+' marked. Now play a card on '+(k===1?'it.':'them.') : 'No lines marked yet.');
+  }
+  function clearSel(){ selected().forEach(function(x){ x.setAttribute('aria-pressed','false'); }); syncSel(); }
+  function pickable(on){ $('msBody').classList.toggle('pick',on); $('msBody').querySelectorAll('.sn').forEach(function(x){ x.setAttribute('tabindex',on?'0':'-1'); }); }
+  function flashDraft(){ var m=$('ms'); m.classList.remove('nudge'); void m.offsetWidth; m.classList.add('nudge'); }
+  function toggleSn(sn){
+    if(S.busy || S.phase!=='notice') return;
+    sn.setAttribute('aria-pressed', String(sn.getAttribute('aria-pressed')!=='true')); syncSel();
+  }
+  $('msBody').addEventListener('click',function(e){ var sn=e.target.closest&&e.target.closest('.sn'); if(sn) toggleSn(sn); });
+  $('msBody').addEventListener('keydown',function(e){
+    var sn=e.target.closest&&e.target.closest('.sn'); if(!sn) return;
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleSn(sn); }
+  });
+
   function loadDraft(i){
     if(S.busy) return;
     D=i; NOTICE=DRAFTS[i].notice; FEED=DRAFTS[i].feed;
-    var body=$('msBody'); body.innerHTML=''; body.appendChild(document.getElementById('ms'+i).content.cloneNode(true));
+    var body=$('msBody'); body.innerHTML=''; body.appendChild(document.getElementById('ms'+i).content.cloneNode(true)); sentencize(body);
     document.querySelectorAll('.dtab').forEach(function(b){ b.setAttribute('aria-pressed', String(+b.dataset.d===i)); });
     reset();
   }
@@ -901,6 +1192,32 @@ details.about p{ margin:8px 0 12px; }
 
   loadDraft(0);
   setTimeout(function(){ scene.classList.remove('enter'); }, 1600);
+  /* v0.10.2 FRAMING: portrait phones get the tall frame so the whole room fills the
+     first screen; everything else keeps the wide frame. Nothing is ever cropped. */
+  (function(){
+    var mq; try{ mq=window.matchMedia('(orientation: portrait) and (max-width: 979px)'); }catch(e){ return; }
+    function frame(){
+      var tall=mq.matches, y=tall?-140:0, h=tall?470:230;
+      scene.setAttribute('viewBox','0 '+y+' 400 '+h);
+      ['toothR','vig','grainR'].forEach(function(id){ var r=$(id); if(r){ r.setAttribute('y',y); r.setAttribute('height',h); } });
+    }
+    frame(); if(mq.addEventListener) mq.addEventListener('change',frame); else if(mq.addListener) mq.addListener(frame);
+  })();
+  /* v0.10 OPENING BEAT: the game's verb, staged once, on beats. A card lands on the table,
+     the Advocate raises her arm to rule, the Recorder writes, the room settles. Skipped
+     under reduced motion, and abandoned the moment the player does anything. */
+  (function(){
+    if(RM) return;
+    var live=true, T=[];
+    function at(ms,fn){ T.push(setTimeout(function(){ if(live) fn(); }, ms)); }
+    function stop(){ if(!live) return; live=false; T.forEach(clearTimeout);
+      ['cardDown','ruling','writing'].forEach(function(c){ mood(c,false); }); }
+    ['pointerdown','keydown'].forEach(function(e){ document.addEventListener(e, stop, {once:true, capture:true}); });
+    at(1150, function(){ mood('cardDown',true); });
+    at(1700, function(){ mood('ruling',true); });
+    at(2350, function(){ mood('ruling',false); mood('writing',true); });
+    at(3500, function(){ mood('writing',false); mood('cardDown',false); live=false; });
+  })();
 })();
 </script>
 </body>

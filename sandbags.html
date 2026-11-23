@@ -4,6 +4,25 @@
   SANDBAGS, a flash-fiction compression game. Tight Spiral Studios · walshero@gmail.com
   EN195 Creative Writing. v2 GAME REBUILD 2026-07-06 (founder GATE-1 verdict: "no game").
 
+  v49 2026-10-19, BLACK SPOTS ART PASS (founder: "the scene needs love. The
+  hospital looks too small. Not enough green. The pigeons are moving like rats.
+  And the two lines of clouds look fake"). The 1914 pavilion is now the biggest
+  thing at street level: wider, two storeys, a bigger dome, with a hedge and a
+  lawn in front. Five full-size street trees in June leaf and a grass strip at
+  the curb. Pigeons are redrawn upright (breast out, tail up, neck sheen) and
+  walk in steps with a head nod at half the old speed; the fast body jitter is
+  gone. The sky's two rows of flat smears are replaced by six scattered
+  cumulus at no common height, near ones higher and bigger.
+
+  v48 2026-10-13, THREE MODES (founder: "Remove comfort control and label and
+  focus on 3 best modes for each game including light and dark"). The one round
+  button in the header now cycles Light, Dark, Sharp on each tap. Sharp is high
+  contrast for the founder's eyes: near-black ground, near-white ink, a bright
+  yellow focus and accent, every text token past 7:1, and the paper grain and
+  vignette overlays flattened. Icon-only (sun, moon, half-filled circle); the
+  aria-label names the current mode and the next. Same data-light attribute
+  (day / night / sharp), same 'sandbags-scheme' key, old saved values load.
+
   v47 2026-09-26, THE LUMINO PASS (founder: "That looks like a crane? Almost.
   Lumino city. That's what we strive for. Take your time and make all sandbags
   10/10"). Worked against an independent critic scoring each scene 1-10 against
@@ -818,6 +837,7 @@ body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif
    where it started, stop, peck, turn. Two of them run half a cycle apart on
    the same stretch of pavement, so they cross. */
 #scenery .fx .pw{ transform-box:fill-box; transform-origin:50% 100%; animation:pwalk var(--t) linear infinite; animation-delay:var(--dl); }
+#scenery .fx .pw .pnod{ transform-box:view-box; }
 @keyframes pwalk{
   0%{ transform:translateX(0) scaleX(1); }
   28%{ transform:translateX(var(--d)) scaleX(1); }
@@ -828,9 +848,8 @@ body{ margin:0; font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif
   90.4%{ transform:translateX(var(--d2)) scaleX(1); }
   100%{ transform:translateX(0) scaleX(1); }
 }
-#scenery .fx .pw .phead{ transform-box:fill-box; transform-origin:0% 100%; animation:phead var(--t) linear infinite; animation-delay:var(--dl); }
+#scenery .fx .pw .phead{ transform-box:fill-box; transform-origin:20% 100%; animation:phead var(--t) linear infinite; animation-delay:var(--dl); }
 @keyframes phead{ 0%,29%{ transform:rotate(0); } 31%{ transform:rotate(42deg); } 33%{ transform:rotate(0); } 35.5%{ transform:rotate(44deg); } 37.5%,79%{ transform:rotate(0); } 81%{ transform:rotate(42deg); } 83%{ transform:rotate(0); } 86%{ transform:rotate(44deg); } 88%,100%{ transform:rotate(0); } }
-#scenery .fx .pw .pbob{ animation:pbob .34s ease-in-out infinite alternate; }
 @keyframes pbob{ to{ transform:translateY(-.35px); } }
 #scenery{ overflow:visible; }
 /* v35 THE SHINKANSEN (founder: "Echigo should have a Shinkansen that arrives
@@ -1010,6 +1029,29 @@ html{ background:var(--bg); }
   background:var(--surface-2); color:var(--ink); border:2px solid var(--ink); cursor:pointer; }
 .iconbtn svg{ width:26px; height:26px; display:block; }
 .iconbtn:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
+/* v48 mode button: one icon per mode, shown by data-light. */
+.iconbtn .ic{ display:none; }
+html[data-light="day"] .iconbtn .ic-day,
+html[data-light="night"] .iconbtn .ic-night,
+html[data-light="sharp"] .iconbtn .ic-sharp,
+html:not([data-light]) .iconbtn .ic-day{ display:block; }
+
+/* ---- v48 SHARP: high contrast. Near-black ground, near-white ink, every
+   text token past 7:1 on every surface, bright yellow focus. Specificity is
+   doubled so it beats the OS-dark :root and flown rules above. ---- */
+html[data-light="sharp"][data-light]{
+  --bg:#0b0b0b; --card:#141414; --ink:#f7f7f2; --line:#c9c9c0;
+  --slate:#a6dcff; --gold:#ffd95a; --gold-br:#ffd95a; --gold-pale:#2a2406;
+  --rust:#ffb796; --sky:#141820; --skyhi:#1c212b; --focus:#ffe34d;
+  --land-far:#181d26; --land:#0f1319; --land-near:#070a0e; --piece-accent:#ffd95a;
+  --surface:#141414; --surface-2:#1f1f1f; --ink-2:#e8e8e0;
+  --accent:#a6dcff; --accent-strong:#cfeaff; --on-accent:#0b0b0b;
+  --stamp:#8ff0e2; --shade:rgba(0,0,0,.6); --shadow:rgba(0,0,0,.5); --tape:rgba(150,130,92,.62);
+}
+html.flown[data-light="sharp"][data-light]{ --bg:#1a1606; }
+html[data-light="sharp"][data-light] .skybox{ filter:none; }
+html[data-light="sharp"] .skybox::after,
+html[data-light="sharp"] .skybox > .grain{ display:none; }
 
 /* THE CARD HAND (Row K v34): sheets set down by hand. */
 .plate{ border-radius:14px 20px 16px 22px; box-shadow:0 2px 0 var(--shade), 0 10px 22px var(--shadow); }
@@ -1134,19 +1176,21 @@ html.se-reduce #scenery .urain{ animation:none; }
 
 <!-- RESERVED CHROME -->
 <header class="se-chrome">
-  <a class="se-home" href="index.html" aria-label="The studio">Studio</a><a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
+  <a class="se-home" href="arcade.html" aria-label="The cabinet">Cabinet</a>
   <span class="se-brand">
     <svg class="mk" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><defs><path id="tss-spiral" d="M26.2 24.0 L26.3 24.5 L26.4 25.1 L26.2 25.7 L25.9 26.3 L25.5 26.8 L24.9 27.3 L24.2 27.6 L23.4 27.7 L22.5 27.7 L21.7 27.5 L20.8 27.0 L20.1 26.4 L19.5 25.6 L19.1 24.6 L18.8 23.5 L18.9 22.3 L19.2 21.2 L19.8 20.1 L20.6 19.1 L21.6 18.3 L22.9 17.7 L24.3 17.4 L25.7 17.4 L27.2 17.8 L28.5 18.5 L29.8 19.4 L30.8 20.7 L31.5 22.2 L32.0 23.8 L32.0 25.6 L31.7 27.4 L30.9 29.0 L29.8 30.5 L28.4 31.8 L26.7 32.8 L24.7 33.3 L22.7 33.5 L20.6 33.1 L18.6 32.4 L16.8 31.2 L15.3 29.6 L14.1 27.7 L13.4 25.5 L13.1 23.1 L13.3 20.8 L14.1 18.5 L15.4 16.3 L17.1 14.5 L19.2 13.1 L21.6 12.1 L24.2 11.7 L26.9 11.8 L29.6 12.5 L32.0 13.8 L34.1 15.7 L35.9 17.9 L37.1 20.6 L37.7 23.5 L37.7 26.4 L37.0 29.4 L35.7 32.2 L33.9 34.7 L31.4 36.7 L28.6 38.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></defs><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
     <span class="wm">Tight Spiral</span>
   </span>
-  <button class="iconbtn" id="darkBtn" type="button" aria-label="Dark mode" aria-pressed="false">
-    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/></svg>
+  <button class="iconbtn" id="darkBtn" type="button" aria-label="Mode: Light. Tap for Dark.">
+    <svg class="ic ic-day" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
+    <svg class="ic ic-night" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" fill="currentColor"/></svg>
+    <svg class="ic ic-sharp" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3 A9 9 0 0 1 12 21 Z" fill="currentColor"/></svg>
   </button>
 </header>
 
 <div class="wrap">
   <p class="production">A Tight Spiral Studios production for EN195</p>
-  <h1 class="gametitle">Sandbags <span class="ver">v47</span><span class="sub">a flash fiction climb</span></h1>
+  <h1 class="gametitle">Sandbags <span class="ver">v49</span><span class="sub">a flash fiction climb</span></h1>
   <p class="prompt" id="prompt">Too heavy to fly. Tap words this piece can live without. Tear the meaning twice, and it crashes.</p>
 
   <div class="plate">
@@ -1255,7 +1299,7 @@ html.se-reduce #scenery .urain{ animation:none; }
 <div class="wrap">
   <div class="foot">
     <p>Sandbags, a Tight Spiral Studios production for EN195 Creative Writing, MassBay Community College. Stagecraft: Matt Walsh. Tight Spiral Studios &middot; walshero@gmail.com. Single-file, offline, stores nothing. A strike is never shame. That word was holding the piece up, and now you know it by feel. Excerpts from four pieces by Matt Walsh, used by the author. Art: original cut-paper SVG, CC0, Tight Spiral Paper Craft.</p>
-    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v1 <span style="opacity:.75">new</span></span> &middot; v47</p>
+    <p class="updated"><span id="seUpdated"></span> <span class="se-version" style="font:inherit;opacity:.85">&middot; v46 <span style="opacity:.75">ac1602f</span></span> &middot; v49</p>
     <div class="studiofoot">
       <svg class="spiralmark" viewBox="0 0 48 48" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="45" height="45" rx="11" fill="#B4511A"/><use href="#tss-spiral" stroke="#0F5F5A" stroke-width="4.6" transform="translate(1.6,1.6)"/><use href="#tss-spiral" stroke="#FAF6EE" stroke-width="3.4"/></svg>
       <div>
@@ -1269,7 +1313,6 @@ html.se-reduce #scenery .urain{ animation:none; }
 <!-- BOTTOM NAV RAIL -->
 <nav class="se-rail" aria-label="Page navigation">
   <a href="arcade.html" aria-label="Back to the arcade">Back</a>
-  <a href="index.html" aria-label="Home">Home</a>
 </nav>
 
 <script>
@@ -1538,14 +1581,14 @@ html.se-reduce #scenery .urain{ animation:none; }
 
   // Children's Hospital, 300 Longwood, the 1914 pavilion: a columned marble
   // front under a green dome on a drum. Shepley, Rutan and Coolidge.
-  function pavilion(x,y,w,d){
-    var h=44, o=box(x,y-h,w,h,d,'var(--p-white)','var(--p-white-d)','var(--p-granite)');
+  function pavilion(x,y,w,d,hh){
+    var h=hh||44, two=h>=60, o=box(x,y-h,w,h,d,'var(--p-white)','var(--p-white-d)','var(--p-granite)');
     o+=rc(x-2,y-h-5,w+4,5.5,'var(--p-white-d)')+rc(x-1,y-h-1,w+2,1.6,'var(--p-granite)');
     o+=rc(x,y-4,w,4,'var(--p-granite)');
     var n=Math.floor(w/14), c='';
     for(var i=0;i<=n;i++) c+=rc(x+4+i*((w-10)/n),y-h+2,3.4,h-6,'var(--p-white-d)');
-    o+='<g class="noedge">'+c+rc(x+6,y-h+30,w-12,1.4,'var(--p-granite)')+'</g>';
-    o+='<g class="noedge" fill="var(--p-char-d)">'+win(x+9,y-h+8,n,1,6,14,(w-10)/n-6,0)+'</g>';
+    o+='<g class="noedge">'+c+rc(x+6,y-h+(two?h*.5:30),w-12,1.4,'var(--p-granite)')+'</g>';
+    o+='<g class="noedge" fill="var(--p-char-d)">'+(two?win(x+9,y-h+7,n,2,6,h*.3,(w-10)/n-6,h*.2):win(x+9,y-h+8,n,1,6,14,(w-10)/n-6,0))+'</g>';
     var cx=x+w/2, dw=w*.34;
     o+=rc(cx-dw/2,y-h-20,dw,16,'var(--p-white)')+rc(cx-dw/2-2,y-h-21,dw+4,3,'var(--p-white-d)');
     o+='<g class="noedge" fill="var(--p-char-d)">'+win(cx-dw/2+4,y-h-17,3,1,4,10,(dw-8-12)/2,0)+'</g>';
@@ -1553,6 +1596,18 @@ html.se-reduce #scenery .urain{ animation:none; }
     o+='<path d="M'+(cx-dw/2-3)+' '+(y-h-21)+' a'+(dw/2+3)+' '+(dw*.62)+' 0 0 1 '+(dw/2+3)+' -'+(dw*.62)+' l0 '+(dw*.62)+' z" fill="var(--p-moss-d)"/>';
     o+=rc(cx-2,y-h-21-dw*.62-7,4,8,'var(--p-white)')+'<circle cx="'+cx+'" cy="'+(y-h-21-dw*.62-8)+'" r="1.8" fill="var(--p-moss-d)"/>';
     return o;
+  }
+  // a Longwood street tree in June leaf, planted on the far sidewalk (base 151)
+  function streetTree(x,h,k){
+    var c=k?['#3f6f2c','#5f9440','#9cc46a']:['#36612a','#548a39','#8fbb5e'];
+    return paperTree(x,151,h,{form:k?'oak':'elm',cols:c,trunk:'#4a3a2c'});
+  }
+  // a clipped privet hedge along a building's base
+  function hedge(x,y,w){
+    var o='<path d="M'+x+' '+y+' V'+(y-6), k=0;
+    for(var hx=x;hx<x+w;hx+=4.6){ k++; o+=' Q'+(hx+2.3)+' '+(y-9.4-(k%3)*.7)+' '+(hx+4.6)+' '+(y-6); }
+    o+=' V'+y+' Z" fill="#4f8236"/>';
+    return o+rc(x,y-2.4,w,2.4,'#3e6a2a');
   }
   // a seventies hospital slab: concrete, ribbon windows
   function slab(x,y,w,h,d){
@@ -1786,7 +1841,17 @@ html.se-reduce #scenery .urain{ animation:none; }
       /* v42: the clouds sit behind the towers (they were drawn over them) */
       var tis=function(y,n,sz,op){ var g=''; for(var k=0;k<n;k++){ var cx=W*(k+.5)/n+(rnd()-.5)*W/n*.5, cy=y+(rnd()-.5)*H*.04, w=S*sz*(.8+rnd()*.5);
           for(var j=0;j<4;j++) g+=skBlob(rnd,cx+(rnd()-.5)*w*.5,cy+(rnd()-.5)*w*.08,w*(.35+rnd()*.25),w*(.08+rnd()*.05),j%2?'#f7f5ee':'#e3e9ee',op); } return g; };
-      return [{c:skG('sx0',tis(H*.34,3,.3,'.55')),v:3,far:1},{c:skG('sx1',tis(H*.18,2,.5,'.62')),v:6,far:1}];
+      /* v49 (founder 10-19: "the two lines of clouds look fake"): two rows of
+         flat smears at one height each, evenly spaced, read as stripes. A fair
+         morning has scattered cumulus at no common height: a few, each its own
+         size, near ones higher and bigger, far ones low, small and flatter,
+         with real gaps of blue between. Grown from the cumulus seed, so they
+         have bumps, a flat base and a lit cap. Still no big top row (v33). */
+      var cu=function(list,tier){ var g=''; list.forEach(function(c){ var w=S*c[2];
+          g+=skG(tier,'<g transform="translate(0 0) scale(1 '+c[3]+')" style="transform-origin:'+skF(W*c[0])+'px '+skF(H*c[1])+'px">'+cumulus(rnd,W*c[0],H*c[1],w,col)+'</g>',c[4]); }); return g; };
+      var far1=cu([[.08,.40,.13,.7,'.82'],[.47,.37,.09,.65,'.78'],[.71,.42,.11,.7,'.8'],[1.02,.385,.08,.65,'.78']],'sx0'),
+          near1=cu([[.26,.24,.24,.85,'.9'],[.86,.17,.2,.8,'.88']],'sx1');
+      return [{c:far1,v:3,far:1},{c:near1,v:6,far:1}];
     },
     /* 2, golden hour: rows of small altocumulus lit gold from below, a second
        low row, and a haze band sitting on the treeline */
@@ -2208,14 +2273,60 @@ html.se-reduce #scenery .urain{ animation:none; }
   }
   // a city pigeon, drawn facing right. Which way it walks is the animation's
   // business: it flips to turn and only ever walks the way it faces.
-  function pigeon(x,y,v){
-    return '<g class="pw" style="--t:'+v[0]+'s;--dl:'+v[1]+'s;--d:'+v[2]+'px;--d2:'+v[3]+'px"><g class="pbob">'
-      +'<ellipse cx="'+x+'" cy="'+(y-3)+'" rx="3.4" ry="2.1" fill="#6b6f78"/>'
-      +'<path d="M'+(x-2.8)+' '+(y-3.2)+' l-2.6 -.5 l.5 1.4 z" fill="#4c505a"/>'
-      +'<ellipse cx="'+(x+.4)+'" cy="'+(y-3.2)+'" rx="1.9" ry="1.3" fill="#7e838c"/>'
-      +'<path d="M'+(x-1)+' '+(y-1)+' l-.3 1 M'+(x+1)+' '+(y-1)+' l.3 1" stroke="#c9895a" stroke-width=".5" fill="none"/>'
-      +'<g class="phead"><circle cx="'+(x+3.1)+'" cy="'+(y-4.9)+'" r="1.3" fill="#5a5e68"/><path d="M'+(x+4.3)+' '+(y-4.8)+' l1.1 .35 l-1.1 .4 z" fill="#d9a66b"/>'
-      +'<circle cx="'+(x+2.6)+'" cy="'+(y-3.9)+'" r=".75" fill="#f2f0ea"/></g></g></g>';
+  /* v49 (founder 10-19: "The pigeons are moving like rats"): they glided low
+     and flat at an even speed with a fast body jitter, which is how a rat
+     runs. A pigeon walks in short steps: the head shoots forward and holds
+     still in the air while the body catches up under it, a stop between
+     steps, and it stands tall with its breast out and tail up. Each pigeon
+     gets its own step track, built from its own walk lengths, so every step
+     is the same length (about a sixth of its body) and the head nod lines
+     up with the feet. */
+  var GAIT={}, gaitSheet=null;
+  function gait(t,d,d2){
+    var name='pg'+(t+'_'+d+'_'+d2).replace(/[^0-9_]/g,function(c){ return c==='-'?'n':'p'; });
+    if(GAIT[name]) return name; GAIT[name]=1;
+    var B=[], H=[], SL=1.7;
+    function f(n){ return (+n).toFixed(2); }
+    function walk(p0,p1,a,b,sx){
+      var k=Math.max(2,Math.round(Math.abs(b-a)/SL)), L=(p1-p0)/k;
+      for(var i=0;i<k;i++){ var t0=p0+i*L, x0=a+(b-a)*i/k, x1=a+(b-a)*(i+1)/k;
+        B.push([t0,x0,0,sx],[t0+L*.45,x0,0,sx],[t0+L*.72,(x0+x1)/2,-.3,sx],[t0+L,x1,0,sx]);
+        H.push([t0,0],[t0+L*.45,1.25],[t0+L,0]); }
+    }
+    B.push([0,0,0,1]); H.push([0,0]);
+    walk(0,28,0,d,1); B.push([40,d,0,1],[40.4,d,0,-1]); H.push([40,0],[40.4,0]);
+    walk(40.4,78,d,d2,-1); B.push([90,d2,0,-1],[90.4,d2,0,1]); H.push([90,0],[90.4,0]);
+    walk(90.4,100,d2,0,1);
+    var css='@keyframes '+name+'b{'+B.map(function(r){ return f(r[0])+'%{transform:translate('+f(r[1])+'px,'+f(r[2])+'px) scaleX('+r[3]+')}'; }).join('')+'}'
+      +'@keyframes '+name+'h{'+H.map(function(r){ return f(r[0])+'%{transform:translateX('+f(r[1])+'px)}'; }).join('')+'}';
+    if(!gaitSheet){ gaitSheet=document.createElement('style'); document.head.appendChild(gaitSheet); }
+    gaitSheet.textContent+=css;
+    return name;
+  }
+  function pigeon(x,y,v,still){
+    /* a pigeon steps about two and a half times a second and covers about a
+       body length a second; the old cycles ran it at twice that */
+    var T=+(v[0]*1.9).toFixed(1), g=still?'':gait(T,v[2],v[3]),
+        an=still?'':';animation:'+g+'b '+T+'s linear '+v[1]+'s infinite',
+        hn=still?'':' style="animation:'+g+'h '+T+'s linear '+v[1]+'s infinite"';
+    return '<g class="pw" style="--t:'+T+'s;--dl:'+v[1]+'s;--d:'+v[2]+'px;--d2:'+v[3]+'px'+an+'"><g>'
+      // tail, up and behind
+      +'<path d="M'+(x-2.6)+' '+(y-3.6)+' l-3.6 -1.6 l.3 2.2 z" fill="#4a4f5b"/>'
+      // body: a round breast held up at the front
+      +'<ellipse cx="'+x+'" cy="'+(y-3.4)+'" rx="3.6" ry="2.5" fill="#7b808b" transform="rotate(-14 '+x+' '+(y-3.4)+')"/>'
+      // folded wing, darker, with its two bars
+      +'<ellipse cx="'+(x-.7)+'" cy="'+(y-3.7)+'" rx="2.5" ry="1.45" fill="#959aa4" transform="rotate(-10 '+(x-.7)+' '+(y-3.7)+')"/>'
+      +'<path d="M'+(x-2)+' '+(y-3.3)+' l2 -.4 M'+(x-2.2)+' '+(y-2.6)+' l2.2 -.45" stroke="#3c404a" stroke-width=".45" fill="none"/>'
+      // legs, coral, short
+      +'<path d="M'+(x-.6)+' '+(y-1.2)+' v1.2 M'+(x+.9)+' '+(y-1.2)+' v1.2" stroke="#d0644f" stroke-width=".6" fill="none"/>'
+      +'<g class="pnod"'+hn+'><g class="phead">'
+      // neck with the green and violet sheen, then the head
+      +'<ellipse cx="'+(x+2.4)+'" cy="'+(y-5.2)+'" rx="1.35" ry="1.9" fill="#5d6a72"/>'
+      +'<path d="M'+(x+1.5)+' '+(y-5.6)+' q1 -.9 2 .2 q-.9 .9 -2 -.2 z" fill="#5f9a7c"/><path d="M'+(x+1.6)+' '+(y-4.6)+' q.9 -.6 1.8 .2 q-.8 .6 -1.8 -.2 z" fill="#8a6c9e"/>'
+      +'<circle cx="'+(x+3)+'" cy="'+(y-7)+'" r="1.35" fill="#5a5f6a"/>'
+      +'<path d="M'+(x+4.2)+' '+(y-7)+' l1.1 .4 l-1.1 .35 z" fill="#3a3a3a"/><circle cx="'+(x+4.1)+'" cy="'+(y-7.3)+'" r=".35" fill="#f2f0ea"/>'
+      +'<circle cx="'+(x+3.3)+'" cy="'+(y-7.25)+'" r=".42" fill="#e07a2e"/>'
+      +'</g></g></g></g>';
   }
 
 
@@ -2964,16 +3075,22 @@ html.se-reduce #scenery .urain{ animation:none; }
    '<g class="ly2">'+
      box(-124,110,136,40,10,'var(--p-brick)','var(--p-brick-d)','var(--p-char-d)')+
      '<g class="noedge" fill="var(--p-char-d)">'+win(-116,116,8,2,8,9,7,7)+'</g>'+acUnit(-114,125.6)+acUnit(-54,125.6)+acUnit(-24,141.6)+stains(-120,125,130,9,11)+
-     pavilion(18,150,140,10)+
-     box(196,108,324,42,10,'var(--p-terra)','var(--p-terra-d)','var(--p-char-d)')+
-     '<g class="noedge" fill="var(--p-char-d)">'+win(204,114,19,2,8,9,8,7)+'</g>'+acUnit(205,123.6)+acUnit(253,123.6)+acUnit(349,139.6)+acUnit(413,123.6)+acUnit(461,139.6)+stains(200,123,316,16,23)+
+     /* v49 (founder 10-19: "The hospital looks too small. Not enough green."):
+        the 1914 pavilion is the hospital, so it is the biggest thing at street
+        level: two storeys of tall windows, wider, a bigger dome, a hedge along
+        its base and a lawn in front of it. Street trees in full June leaf on
+        the far sidewalk and a grass strip at the curb. */
+     box(240,108,280,42,10,'var(--p-terra)','var(--p-terra-d)','var(--p-char-d)')+
+     '<g class="noedge" fill="var(--p-char-d)">'+win(248,114,16,2,8,9,8,7)+'</g>'+acUnit(253,123.6)+acUnit(349,139.6)+acUnit(413,123.6)+acUnit(461,139.6)+stains(244,123,272,14,23)+
+     pavilion(34,146,196,12,78)+
+     hedge(36,146,74)+hedge(154,146,74)+
      box(300,130,52,20,8,'var(--p-terra)','var(--p-terra-d)','var(--p-granite)')+
      rc(296,128,60,3,'var(--p-granite)')+rc(298,131,3,19,'var(--p-granite-d)')+rc(351,131,3,19,'var(--p-granite-d)')+
      '<g class="lit glow">'+lr(314,134,24,14)+'</g>'+P('M308 131 h44 l4 6 h-52 Z','#2f5a46')+'<g class="noedge">'+ln('M310 137 v-.1 M316 137 M322 137','#244637',.1)+rc(304,136.4,52,1,'#244637')+'</g>'+
      signal(172,86,-26)+
      pole(374,80,80,-26,false)+
-     rc(-124,150,648,8,'var(--p-bone-d)')+curb(-124,158,648,4)+
-     tree(262,150,9,'var(--p-moss)','var(--p-moss-d)')+tree(330,150,8,'var(--p-sage)','var(--p-sage-d)')+tree(392,150,9,'var(--p-moss)','var(--p-moss-d)')+tree(446,150,9,'var(--p-sage)','var(--p-sage-d)')+tree(500,150,8,'var(--p-moss)','var(--p-moss-d)')+tree(-40,150,9,'var(--p-moss)','var(--p-moss-d)')+tree(-100,150,8,'var(--p-sage)','var(--p-sage-d)')+
+     rc(-124,150,648,8,'var(--p-bone-d)')+rc(30,146,204,5,'#6f9e48')+rc(112,146,40,5,'var(--p-bone)')+rc(-124,155,648,3,'#6f9e48')+curb(-124,158,648,4)+
+     streetTree(40,80,0)+streetTree(228,74,1)+streetTree(272,84,0)+streetTree(320,72,1)+streetTree(368,82,0)+tree(446,150,9,'var(--p-sage)','var(--p-sage-d)')+tree(500,150,8,'var(--p-moss)','var(--p-moss-d)')+tree(-40,150,9,'var(--p-moss)','var(--p-moss-d)')+tree(-100,150,8,'var(--p-sage)','var(--p-sage-d)')+
      polesline([-80,28,120,240,352,470],108,150)+
      '<g class="noedge">'+ao(-124,524,150,6,.35,'aoB')+'</g>'+
    '</g>'+ haze(.14) +
@@ -3299,7 +3416,7 @@ html.se-reduce #scenery .urain{ animation:none; }
       +ln('M154.4 140 l-.6 3.6 M153.8 143.6 l-1.6 3 M153.8 143.6 l1.4 3 M154.3 141 l-1.8 1.6 M154.3 141 l1.9 1.2','#f2f0ea',.9)+'</g></g>';
     // the pigeons, back on foot, in single file along the stripes
     var p='';
-    [0,10,20,30].forEach(function(dx,i){ p+=pigeon(62+dx,187.6,[1.2+i*.1,-i*.3,2,-1]).replace('class="pw"','class="pw2"'); });
+    [0,10,20,30].forEach(function(dx,i){ p+=pigeon(62+dx,187.6,[1.2+i*.1,-i*.3,2,-1],1).replace('class="pw"','class="pw2"'); });
     o+='<g class="file">'+p+'</g>';
     return o;
   }
@@ -3452,16 +3569,27 @@ html.se-reduce #scenery .urain{ animation:none; }
     var n=parseInt(v,16); if(isNaN(n)) return false;
     return (((n>>16)&255)*.299+((n>>8)&255)*.587+(n&255)*.114) < 110;
   }
-  function setScheme(dark,save){
-    root.setAttribute('data-light', dark?'night':'day');
-    if(btn) btn.setAttribute('aria-pressed', dark?'true':'false');
-    if(save){ try{ localStorage.setItem(KEY, dark?'dark':'light'); }catch(e){} }
+  /* v48: three modes on the one button, cycling Light -> Dark -> Sharp.
+     Stored as 'light' | 'dark' | 'sharp' under the same key, so a v47 save
+     ('light' / 'dark') still loads. */
+  var ATTR={light:'day',dark:'night',sharp:'sharp'},
+      NAME={light:'Light',dark:'Dark',sharp:'Sharp'},
+      NEXT={light:'dark',dark:'sharp',sharp:'light'};
+  function current(){
+    var a=root.getAttribute('data-light');
+    return a==='sharp'?'sharp':a==='night'?'dark':'light';
+  }
+  function setMode(mode,save){
+    if(!ATTR[mode]) mode='light';
+    root.setAttribute('data-light', ATTR[mode]);
+    if(btn) btn.setAttribute('aria-label','Mode: '+NAME[mode]+'. Tap for '+NAME[NEXT[mode]]+'.');
+    if(save){ try{ localStorage.setItem(KEY, mode); }catch(e){} }
   }
   try{ saved=localStorage.getItem(KEY); }catch(e){}
-  if(saved) setScheme(saved==='dark',false);
-  else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) setScheme(true,false);
-  else setScheme(painted(),false);   // mismatch host: pin the attribute to what CSS actually painted
-  if(btn) btn.addEventListener('click',function(){ setScheme(!painted(),true); });
+  if(saved && ATTR[saved]) setMode(saved,false);
+  else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) setMode('dark',false);
+  else setMode(painted()?'dark':'light',false);   // mismatch host: pin the attribute to what CSS actually painted
+  if(btn) btn.addEventListener('click',function(){ setMode(NEXT[current()],true); });
   // last-updated: computed, not typed
   (function(){ var u=document.getElementById('seUpdated'); if(!u) return;
     var dt=new Date(document.lastModified);
