@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.2</title>
+<title>Rewilder v1.3</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.2 | LAB | 2026-11-23
+<!-- TSP build: Rewilder v1.3 | LAB | 2026-11-24
+     v1.3 (founder 2026-11-24: "I'm getting a fail state on level 1 when it says i have no power, but I have solar. If a player has no power by
+     last site, present 2 power options."): the solar canopy meets the power need by itself; the last site offers wind or solar when no power is picked.
      v1.2 (founder 2026-11-23: "When the baron slides down the rainbow, I meant the existing on screen rainbow, not a second one. Baron lands
      on the roof, but the balloon is gone for good now. Let the pool party become a cut scene now. It's the finale, so let's see the pool close
      up, in a new 3-d perspective, with a killer review."): the scorch beam burns the balloon to ash; the Baron rides the sky's own rainbow
@@ -778,7 +780,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.2</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.3</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -871,7 +873,7 @@ const CH={
  wind:{name:'Raise a wind port',does:'Meets the need for power. It adds little habitat.',soak:.5,hab:0,power:2,short:'wind port'},
  woods:{name:'Grow a woodland',does:'Makes the most habitat and shade, and soaks up rain. It makes no power.',soak:1.5,hab:2,short:'woodland'},
  rain:{name:'Dig a rain garden',does:'Soaks up the most storm water for its size.',soak:2,hab:1,water:1,short:'rain garden'},
- canopy:{name:'Put up a solar canopy',does:'Makes some power and shade. Rain still runs off it.',soak:0,hab:0,power:1,short:'solar canopy'},
+ canopy:{name:'Put up a solar canopy',does:'Meets the need for power and makes shade. Rain still runs off it.',soak:0,hab:0,power:2,short:'solar canopy'},
  free:{name:'Let the river run',does:'Salmon come back. It makes the most habitat.',soak:1,hab:2,short:'free river'},
  wet:{name:'Let beavers build a wetland',does:'A leaky stick dam holds storm water better than anything else here.',soak:3,hab:1,short:'beaver wetland'}
 };
@@ -1257,7 +1259,7 @@ function setMenu(o){menuOpen=o;$('landBtn').hidden=!(o&&swim&&state==='play');$(
 $('menuBtn').onclick=()=>setMenu(!menuOpen);$('menuClose').onclick=()=>setMenu(false);
 function say(t){$('say').textContent='';setTimeout(()=>{$('say').textContent=t},30)}
 function placeToast(){const el=$('toast'),c=$('corner').getBoundingClientRect();el.classList.remove('low');el.style.minHeight='0';el.style.top=Math.round(c.bottom+4)+'px'}
-const KEEPMSG=['Bonus','The city has no power','The drones caught','Smash the buildings','The Baron ran','A bridge joins','The city is lopsided','You are grown. This is generation','A salmon spawns once','The salmon found'];
+const KEEPMSG=['Bonus','The city has no power','The city needs more power','The drones caught','Smash the buildings','The Baron ran','A bridge joins','The city is lopsided','You are grown. This is generation','A salmon spawns once','The salmon found'];
 function toast(t,d){if(!t||!KEEPMSG.some(k=>t.indexOf(k)===0))return;if(!t)return;const el=$('toast');el.textContent=t;placeToast();el.classList.add('on');toastT=Math.min(d||3.5,1.8+t.length*.07);say(t)}
 $('toast').onclick=()=>{toastT=0;$('toast').classList.remove('on')};
 const SAY=new Set(['story2']);
@@ -1274,6 +1276,10 @@ $('cardBtn').onclick=()=>{$('cardSheet').classList.remove('open');cardOpen=false
 function unbalanced(){const ch=sites.slice(0,5).filter(q=>q.choice&&CH[q.choice]&&(q.state==='grown'||q.state==='growing')),nat=ch.filter(q=>CH[q.choice].hab>0).length,ind=ch.filter(q=>CH[q.choice].travel||CH[q.choice].power).length,f=flows();return f.tu>0||f.pu>0||(ch.length>=2&&(nat===0||ind===0))}
 function needLine(nd){const r=nd.includes('room for rain'),o=nd.filter(x=>x!=='room for rain');return o.length?' The city needs '+o.join(' and ')+'.'+(r?' It also needs room for rain.':''):r?' The city needs room for rain.':''}
 function openPick(s,re){pickOpen=true;{const f=flows(),nd=[];if(f.tu>0)nd.push('transit');if(f.pu>0)nd.push('power');if(f.hard>f.soak+1)nd.push('room for rain');$('pickLab').textContent=(s.opts?'The crew paved it.':re?'Replant the '+CH[s.choice].short+'.':'The '+s.name+' is down.')+needLine(nd)}const b=$('pickBtns');b.innerHTML='';
+ /* v1.3 (founder 2026-11-24: "I'm getting a fail state on level 1 when it says i have no power, but I have solar. If a player has no power by
+    last site, present 2 power options."): solar now meets the power need on its own; and when the last of the five sites comes down with no
+    power chosen anywhere else, its card offers the two power picks, wind and solar, in place of its usual pair. */
+ if(!re&&!s.opts&&sites.slice(0,5).indexOf(s)>=0){const others=sites.slice(0,5).filter(q=>q!==s);if(others.every(q=>q.choice&&(q.state==='grown'||q.state==='growing'))&&others.reduce((a,q)=>a+((CH[q.choice]||{}).power||0),0)<2){s.opts=['wind','canopy'];$('pickLab').textContent='The '+s.name+' is down. The city still has no power: pick one.'}}
  (s.opts||PICK[s.id]).forEach(k=>{const c=CH[k],el=document.createElement('button');el.type='button';el.innerHTML=c.name+'<span>'+c.does+'</span>';
   el.onclick=()=>{if(re&&k===s.choice){pickOpen=false;$('pickSheet').classList.remove('open');return}s.choice=k;s.state='growing';s.g=re?.35:0;hudKey='';pickOpen=false;$('pickSheet').classList.remove('open');SFX.pick();toast(c.name+'.',3)};b.appendChild(el)});
  s.opts=null;$('pickSheet').classList.add('open');b.querySelector('button').focus({preventScroll:true})}
@@ -1693,7 +1699,7 @@ function lopsided(){const ch=sites.slice(0,4).filter(q=>CH[q.choice]&&q.state===
 function powerCrew(){const f=flows();if(f.pu<=0)return false;if(trucks.some(t=>t.why==='power'&&t.state==='drive'))return true;
  const c=sites.slice(0,5).concat(sites.filter(q=>q.plot!==undefined)).filter(q=>q.state==='grown'&&PICK[q.id]&&PICK[q.id].some(k=>k!==q.choice&&CH[k].power)).sort((a,b)=>Math.max(...PICK[b.id].map(k=>CH[k].power||0))-Math.max(...PICK[a.id].map(k=>CH[k].power||0)))[0];
  if(!c)return false;c.state='growing';c.g=.5;c.reopt=true;built=Math.max(0,built-1);const x=Math.max(c.cx,cam.x+viewW)+170;trucks.push({x,dir:x<c.cx?1:-1,state:'drive',target:c,t:0,why:'power',need:'NEED POWER'});
- SFX.beeps();hudKey='';toast('The city has no power. A crew is coming to repave the '+CH[c.choice].short+' so you can choose power.',8);return true}
+ SFX.beeps();hudKey='';toast((f.pm>0?'The city needs more power.':'The city has no power.')+' A crew is coming to repave the '+CH[c.choice].short+' so you can choose power.',8);return true}
 function crewNow(){const lop=lopsided();if(!lop||!tarUp()||trucks.some(t=>t.state==='drive'||t.state==='pave'))return false;const s=sites.slice(0,4).find(q=>PICK[q.id]&&PICK[q.id].indexOf(q.choice)>=0&&q.state==='grown'&&PICK[q.id].some(k=>k!==q.choice&&(lop==='nat'?(CH[k].travel||CH[k].power):!(CH[k].travel||CH[k].power))));if(!s)return false;
  s.state='growing';s.g=.5;s.reopt=true;built=Math.max(0,built-1);const x=Math.min(TARDEF.x-30,Math.max(s.cx,cam.x+viewW)+170);{const alt=PICK[s.id].find(k=>k!==s.choice);trucks.push({x,dir:x<s.cx?1:-1,state:'drive',target:s,t:0,why:'habit',need:lop==='ind'?'NEED GREEN':CH[alt].travel?'NEED TRANSIT':'NEED POWER'})}SFX.beeps();hudKey='';toast('The city is lopsided. A pave crew is coming for the '+CH[s.choice].short+'.',7);return true}
 function spawnTruck(force){if(!force)return;if(!tarUp())return;const grow=sites.filter(s=>s.x>0&&s.id!=='tar'&&s.state==='growing'&&!s.paving&&!trucks.some(t=>t.target===s&&t.state==='drive'));if(!grow.length)return;
