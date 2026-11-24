@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.6</title>
+<title>Rewilder v1.7</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.6 | LAB | 2026-11-24
+<!-- TSP build: Rewilder v1.7 | LAB | 2026-11-24
+     v1.7 (founder 2026-11-24: "When the baron falls off rainbow he's not aligned with tower, so have his bum bounce off a pointy pine tree and he
+     bounces onto the roof with stars around his head then he farms"): a potted pine on a ledge off the tower's top; he drops seat-first on its
+     tip, it springs, he arcs onto the roof and sits dazed with stars circling until the neighbour brings the hoe.
      v1.6 (founder 2026-11-24: "In tag mode, the barons island tower often places a player back at the ground when they have already climbed the
      building. Make tag remember other players previous position and only start at bottom if dead and reborn. When baron is defeated play new
      victory music. When the sun shoots beams at baron the baron should be at the top of the screen so he naturally slides down the rainbow. He
@@ -792,7 +795,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.6</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.7</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -2597,8 +2600,8 @@ function questStep(s,dt){const q=fort.tq,g=qGeo(s),fh=s.fh;
  const r=q.roof;if(r.ph!=='wait')r.t+=dt;if(r.bt>=0)r.bt+=dt;
  if(r.ph==='wait'&&q.door&&P.support===s&&P.y<=g.roofY+2){r.ph='run';r.t=0;word('MY BLIMP',s.x+70,g.roofY-150,'#ffd23f')}
  if(r.ph==='run'&&r.t>2.2){r.ph='climb';r.t=0}
- if(r.ph==='cut'&&r.t>8.6){r.ph='hoe';r.t=0}
- if(r.bt>=3.4&&!r.zap){r.zap=1;SFX.zap();shake=RM?0:4}if(r.bt>=4.2&&r.bt<8.6)rainbow=Math.max(rainbow,3);if(r.bt>=7.6&&!r.land){r.land=1;SFX.slam();shake=RM?0:7;dust(g.post.x-2,g.roofY,8,50)}
+ if(r.ph==='cut'&&r.t>10.6){r.ph='hoe';r.t=0}
+ if(r.bt>=3.4&&!r.zap){r.zap=1;SFX.zap();shake=RM?0:4}if(r.bt>=4.2&&r.bt<10.6)rainbow=Math.max(rainbow,3);if(r.bt>=7.65&&!r.boing){r.boing=T;tone(160,.5,'triangle',.25,520);tone(90,.2,'sine',.3,-40);sparks(s.x+s.w+44,g.roofY+60,8,'#7cc35a')}if(r.bt>=8.45&&!r.land){r.land=1;SFX.slam();shake=RM?0:7;dust(s.cx,g.roofY,8,50)}
  if(r.ph==='hoe'&&r.t>2.2){r.ph='farm';r.t=0;q.end=1;questRenovate(s,32,s.rows.length-1);SFX.grow();word('FARMER',s.cx,g.roofY-140,'#7cc35a');isle.qend=T;
   const L=isle.lair;if(L.state==='up'){L.state='village';L.inplace=1;L.g=0}}
  // the salmon idles in the spring when you aren't her
@@ -2665,7 +2668,11 @@ function qDrone(d,cue){if(d.broke){ctx.save();ctx.translate(d.x,d.y);ctx.rotate(
  ctx.save();ctx.translate(d.x,d.y);if(d.st==='fall')ctx.rotate(d.t*8);if(d.st==='fade')ctx.globalAlpha=(T*14|0)%2?.45:1;
  shape(ellPts(0,0,17,8.5,d.i+60),'#2b2a33',{lw:2});line(-22,-6,-8,-6,INK,2.6);line(8,-6,22,-6,INK,2.6);if(d.st!=='fall'&&!RM){const r=Math.sin(T*40+d.i)*10;line(-15-r,-9,-15+r,-9,'#c9d2de',2);line(15-r,-9,15+r,-9,'#c9d2de',2)}
  const lit=cue?(T*12|0)%2:1;dot(0,3,5.6,lit?'#ff3b2e':'#5a1a16');ctx.restore()}
+function qPine(s,g){return[s.x+s.w-22,g.roofY-96]}
 function questArt(s){const q=fort.tq,g=qGeo(s),fh=s.fh,lo=cam.y-300,hi=cam.y+1000,inV=y=>y>lo&&y<hi;
+ {const tp=qPine(s,g),by=g.roofY;if(inV(by)){shape(rectPts(tp[0]-18,by-20,36,20,950,.3),'#8a5a34',{lw:2,sh:1});const rb=q.roof&&q.roof.boing?T-q.roof.boing:9,w=rb<1.6&&!RM?Math.sin(rb*22)*.22*(1-rb/1.6):0;
+  ctx.save();ctx.translate(tp[0],by-20);ctx.rotate(w);const H=by-20-tp[1];line(0,0,0,-14,'#5b3a24',5);
+  for(let k=0;k<4;k++){const y0=-14-k*H*.2,y1=-H*(.42+k*.19),hw=38-k*7;shape([[-hw,y0],[hw,y0],[0,y1]],['#1f4a2a','#2f6b3a','#3f8443','#2f6b3a'][k],{lw:2,sh:1})}ctx.restore()}}
  if(inV(g.roofY)&&!isle.qend){const R=s.x+s.w,ry=g.roofY;for(let u=s.x;u<R-6;u+=24)shape(rectPts(u,ry-14,14,14,u,.2),'#24202a',{lw:1.6});
   [s.x+8,R-8].forEach((px,i)=>{shape([[px-14,ry],[px+14,ry],[px+9,ry-46],[px,ry-104],[px-9,ry-46]],'#24202a',{lw:2.2,sh:1});line(px,ry-40,px,ry-96,'#8a5a2a',2);dot(px,ry-108,4.4,'#c9a84a');
    if(!RM&&i===0){const u=(T*.5)%1;ctx.globalAlpha=(1-u)*.5;dot(px,ry-112-u*60,6+u*12,'#3a3436');ctx.globalAlpha=1}})}
@@ -2783,19 +2790,23 @@ function questArt(s){const q=fort.tq,g=qGeo(s),fh=s.fh,lo=cam.y-300,hi=cam.y+100
      if(crisp>0&&!RM&&Math.random()<.5)puff(bx+(Math.random()-.5)*50,by-20,{kind:'steam',c:'#5a5048'})}
     else{// the balloon is ash; the Baron rides the sky's rainbow down (its centre and radius as the sky draws it, carried into the world)
      if(!r.ash){r.ash=1;r.fx=hx;r.fy=hy+44*.62+76;r.fdx=hx-cam.x;r.fdy=r.fy-cam.y;SFX.pfft();shake=RM?0:6;for(let k=0;k<26;k++)puff(hx+(Math.random()-.5)*130,hy+(Math.random()-.5)*50,{kind:'chunk',vx:(Math.random()-.5)*160,vy:-40-Math.random()*120,g:160,r:3+Math.random()*5,c:k%3?'#2a1a12':'#5a5048',life:1.8,max:1.8,vr:(Math.random()-.5)*6});for(let k=0;k<6;k++)puff(hx+(Math.random()-.5)*90,hy,{kind:'steam',c:'#4a4440'})}
-     const C=[cam.x+viewW*.4,cam.y+420+rbOff()],RB=300,land=[post.x-2,ry],xa=clamp(cam.x+r.fdx,C[0]-RB+20,C[0]+RB-20),ya=C[1]-Math.sqrt(RB*RB-(xa-C[0])**2),a0=Math.atan2(ya-C[1],xa-C[0]),aE=land[0]<C[0]?-Math.PI+.02:-.02,eX=C[0]+RB*Math.cos(aE),eY=C[1]+RB*Math.sin(aE);
+     const C=[cam.x+viewW*.4,cam.y+420+rbOff()],RB=300,land=[s.cx,ry],xa=clamp(cam.x+r.fdx,C[0]-RB+20,C[0]+RB-20),ya=C[1]-Math.sqrt(RB*RB-(xa-C[0])**2),a0=Math.atan2(ya-C[1],xa-C[0]),aE=-.55,eX=C[0]+RB*Math.cos(aE),eY=C[1]+RB*Math.sin(aE);
      if(t<5.1){const u=(t-4.6)/.5,fx=cam.x+r.fdx,fy=cam.y+r.fdy;bxB=fx+(xa-fx)*u;byB=fy+(ya-fy)*u*u;bPose='fall'}
      else if(t<7.0){const u=(t-5.1)/1.9,a=a0+(aE-a0)*u*u;bxB=C[0]+RB*Math.cos(a);byB=C[1]+RB*Math.sin(a);bPose='sit';if(!RM&&Math.random()<.4)sparks(bxB,byB,1,['#c8584a','#f0a830','#e8d25a','#5fae50','#3f8fb6'][(Math.random()*5)|0])}
-     else if(t<7.6){const u=(t-7)/.6;bxB=eX+(land[0]-eX)*u;byB=eY+(land[1]-eY)*u-Math.sin(u*Math.PI)*70;bPose='fall'}
+     /* v1.7 (founder 2026-11-24: "When the baron falls off rainbow he's not aligned with tower, so have his bum bounce off a pointy pine tree and
+        he bounces onto the roof with stars around his head then he farms"): off the end of the arc he drops seat-first onto the tip of the
+        pine on the tower's top terrace, it springs him up and over onto the middle of his roof, and he sits there seeing stars until the hoe arrives. */
+     else if(t<7.65){const u=(t-7)/.65,tp=qPine(s,g);bxB=eX+(tp[0]-eX)*u;byB=eY+(tp[1]+8-eY)*u*u-Math.sin(u*Math.PI)*30*(1-u);bPose='fall'}
+     else if(t<8.45){const u=(t-7.65)/.8,tp=qPine(s,g);bxB=tp[0]+(land[0]-tp[0])*u;byB=tp[1]+8+(land[1]-tp[1]-8)*u-Math.sin(u*Math.PI)*170;bPose='fall'}
      else{bxB=land[0];byB=land[1];bPose='sit'}}}
    {if(r.bt<0){line(post.x,ry-24,bx-10,by+30,'#141016',4.4);line(post.x,ry-24,bx-10,by+30,'#e8d8b0',2.6);line(bx-6,by+36,bx-30,ry-4,'#c9a84a',2);for(let k=1;k<6;k++)line(bx-6-k*4,by+36+(ry-4-by-36)*k/6,bx+4-k*4,by+36+(ry-4-by-36)*k/6,'#c9a84a',1.6)}
     if(r.bt<4.6){if(r.bt>=0){line(bx-6,by+36*sc,bxB-6,byB-76,'#c9a84a',2);line(bx+6,by+36*sc,bxB+6,byB-76,'#c9a84a',2)}blimpArt(bx,by,rot,sc,r.bt>=0);if(crisp>0){ctx.save();ctx.translate(bx,by);ctx.rotate(rot);ctx.scale(sc,sc*(1-.25*crisp));ctx.globalAlpha=.88*crisp;shape(ellPts(0,0,114,44,7),'#2a1a12',{lw:2.8});shape([[96,0],[138,-30],[132,0],[138,30]],'#2a1a12',{lw:2});ctx.globalAlpha=1;if(crisp>.5)for(let k=0;k<7;k++){const ex=-90+k*30+hr(k)*10,ey=(hr(k*3)-.5)*50;dot(ex,ey,3+hr(k*7)*2,(T*3+k|0)%3?'#f08a3c':'#ffd23f')}ctx.restore()}}}
    if(r.ph!=='wait'){let x=pxL+44,y=ry,pose='stand',straw=false;const ladder=post.x+28;
     if(r.ph==='run'){x=pxL+44+(ladder-pxL-44)*ease(clamp(r.t/2.2,0,1));pose='run'}else if(r.ph==='climb'){x=ladder;pose='slip'}else if(r.ph==='cut'){x=bxB;y=byB;pose=bPose}
-    else if(r.ph==='hoe'){x=ladder-30;pose='sit';const hx=s.x+s.w*.4+(x-24-s.x-s.w*.4)*ease(clamp(r.t/1.6,0,1));person(hx,ry,'#7cc35a',611,r.t<1.6);if(r.t<1.8)line(hx+8,ry-30,hx+20,ry-62,'#8a5a34',3)}
+    else if(r.ph==='hoe'){x=s.cx;pose='sit';const hx=s.x+s.w*.4+(x-24-s.x-s.w*.4)*ease(clamp(r.t/1.6,0,1));person(hx,ry,'#7cc35a',611,r.t<1.6);if(r.t<1.8)line(hx+8,ry-30,hx+20,ry-62,'#8a5a34',3)}
     else if(q.party&&T-q.party<12){x=s.x+s.w-34;straw=true;pose='slip'}
     else{x=s.x+80+((T*20)%(s.w-140));straw=true;pose='hoe'}
-    questBaron(x,y,1,pose,straw)}}}}
+    questBaron(x,y,1,pose,straw);if(r.ph==='cut'&&r.bt>=8.45||r.ph==='hoe'&&r.t<1.2){for(let k=0;k<5;k++){const a=T*4+k/5*6.283,sx=x+Math.cos(a)*30,sy=y-96+Math.sin(a)*9,pts=[];for(let j=0;j<10;j++){const b=-Math.PI/2+j*Math.PI/5,rr=j%2?3.2:7.5;pts.push([sx+Math.cos(b)*rr,sy+Math.sin(b)*rr])}shape(pts,k%2?'#ffd23f':'#fbf6ea',{lw:1.4})}}}}}}
 /* v0.93: the water in front of whoever is in the pool, so they read as in it; the salmon and, after the bonus, neighbours bobbing */
 function questPoolFront(){if(!isle||!fort||!fort.tq)return;const s=fort.s;if(!s||!s.isle)return;const q=fort.tq;if(!q.refill)return;const lvl=clamp(q.pool,0,1);if(lvl<=0)return;
  const y=qD(s,QP),R=s.x+s.w,x0=s.x+18,x1=R+18,wy=y-4-102*lvl;if(wy>cam.y+1000||y<cam.y-300)return;
