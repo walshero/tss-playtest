@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.3</title>
+<title>Rewilder v1.4</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.3 | LAB | 2026-11-24
+<!-- TSP build: Rewilder v1.4 | LAB | 2026-11-24
+     v1.4: the Island Gazette card grows to fit a long review (caught filming the promo: the byline sat on the last line).
      v1.3 (founder 2026-11-24: "I'm getting a fail state on level 1 when it says i have no power, but I have solar. If a player has no power by
      last site, present 2 power options."): the solar canopy meets the power need by itself; the last site offers wind or solar when no power is picked.
      v1.2 (founder 2026-11-23: "When the baron slides down the rainbow, I meant the existing on screen rainbow, not a second one. Baron lands
@@ -780,7 +781,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.3</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.4</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -2852,7 +2853,7 @@ function poolReview(){const five=sites.slice(0,5).filter(q=>q.state==='grown').m
  return{head:'A SPLASH ON THE ROOF',pull:'You can hear this party from the mainland.',lines,by:'The Island Gazette, pool critic'}}
 function pcWrap(txt,x,y,w,lh){const words=txt.split(' ');let ln='';for(const wd of words){const t=ln?ln+' '+wd:wd;if(ctx.measureText(t).width>w&&ln){ctx.fillText(ln,x,y);y+=lh;ln=wd}else ln=t}if(ln){ctx.fillText(ln,x,y);y+=lh}return y}
 function drawPoolCut(){const t=pcT;ctx.setTransform(DPR,0,0,DPR,0,0);const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#3b6fb8');sky.addColorStop(.45,'#f3b07a');sky.addColorStop(1,'#f6d79a');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
- const port=H>W*1.1,DW=port?560:900,DH=port?1060:620,ox=port?170:0,k=Math.min(W/DW,H/DH);ctx.setTransform(DPR*k,0,0,DPR*k,((W-DW*k)/2-ox*k)*DPR,(H-DH*k)/2*DPR);const X0=ox-((W/k)-DW)/2-40,X1=ox+DW+((W/k)-DW)/2+40,Y1=DH+((H/k)-DH)/2+40;
+ const port=H>W*1.1,DW=port?560:900,DH=port?1090:620,ox=port?170:0,k=Math.min(W/DW,H/DH);ctx.setTransform(DPR*k,0,0,DPR*k,((W-DW*k)/2-ox*k)*DPR,(H-DH*k)/2*DPR);const X0=ox-((W/k)-DW)/2-40,X1=ox+DW+((W/k)-DW)/2+40,Y1=DH+((H/k)-DH)/2+40;
  // the sun, shades back up, and the sea and the island far below the parapet
  const SX=port?630:720;ctx.save();ctx.translate(SX-720,0);shape(ellPts(720,70,34,34,5),'#fff1b8',{lw:2.4});for(let i=0;i<10;i++){const a=i/10*6.283+T*.15;line(720+Math.cos(a)*42,70+Math.sin(a)*42,720+Math.cos(a)*54,70+Math.sin(a)*54,'#fff1b8',4)}shape(rectPts(695,59,21,14,1,.3),INK,{lw:1});shape(rectPts(724,59,21,14,2,.3),INK,{lw:1});line(716,63,724,63,INK,2.6);ctx.beginPath();ctx.arc(720,75,14,.15*Math.PI,.85*Math.PI);ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke();ctx.restore();
  ctx.fillStyle='#3f8fb6';ctx.fillRect(X0,190,X1-X0,60);for(let i=0;i<14;i++){const x=((i*80+T*12)%(X1-X0+80))+X0-40;line(x,200+(i%3)*14,x+30,200+(i%3)*14,'rgba(255,255,255,.55)',2.4)}
@@ -2884,12 +2885,12 @@ function drawPoolCut(){const t=pcT;ctx.setTransform(DPR,0,0,DPR,0,0);const sky=c
  pcTom=pcTom.filter(m=>{const u=(T-m.t0)/1.1;if(u>1.5)return false;if(u<1){const y=PF-10+(m.yE-PF+10)*u,x=px(VX-170+(m.xf-VX+170)*u,y),z=.4+.9*u*((y-VY)/(PN-VY)),h=Math.sin(u*Math.PI)*170*(1-u*.3);ctx.save();ctx.translate(x,y-h);ctx.rotate(T*9);shape(ellPts(0,0,10*z,9*z,77),'#d9342a',{lw:1.4,sh:1});shape([[-4*z,-8*z],[0,-12*z],[4*z,-8*z]],'#3f7a34',{lw:1});ctx.restore()}
   else{if(!m.sp){m.sp=1;SFX.splat()}const v=u-1,y=m.yE,x=px(m.xf,y),z=(y-VY)/(PN-VY);ctx.globalAlpha=1-v*2;for(let q=0;q<7;q++){const a=q/7*6.283;dot(x+Math.cos(a)*v*90*z,y-Math.abs(Math.sin(a))*v*60*z,4*z,q%2?'#d9342a':'#f08a6a')}ctx.globalAlpha=1}return true});
  // the review, flown in from the right
- if(pcRev&&t>3){const u=ease(clamp((t-3)/.8,0,1)),cx=(port?285:575)+(1-u)*600,cy=port?600:130,w=330,rot=-.04;ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);
-  shape(rectPts(0,0,w,370,91,.6),'#fbf3dc',{lw:2.6,sh:1});ctx.fillStyle=INK;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.font=DISPLAY.replace('%',22);ctx.fillText('THE ISLAND GAZETTE',w/2,34);line(16,44,w-16,44,INK,2);line(16,49,w-16,49,INK,1);
+ if(pcRev&&t>3){const u=ease(clamp((t-3)/.8,0,1)),cx=(port?285:575)+(1-u)*600,cy=port?580:130,w=330,rot=-.04;ctx.save();ctx.translate(cx,cy);ctx.rotate(rot);
+  /* v1.4: the card grows to fit the review, so the byline never sits on the last line */const txt=()=>{ctx.fillStyle=INK;ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.font=DISPLAY.replace('%',22);ctx.fillText('THE ISLAND GAZETTE',w/2,34);line(16,44,w-16,44,INK,2);line(16,49,w-16,49,INK,1);
   ctx.font=DISPLAY.replace('%',21);const hy=pcWrap(pcRev.head,w/2,76,w-30,24);for(let i=0;i<5;i++){const sx=w/2-64+i*32,sy=hy+4,pts=[];for(let j=0;j<10;j++){const a=-Math.PI/2+j*Math.PI/5,rr=j%2?6:14;pts.push([sx+Math.cos(a)*rr,sy+Math.sin(a)*rr])}shape(pts,'#e8b23a',{lw:1.6})}
   ctx.font='italic 700 17px Georgia,serif';ctx.fillStyle='#8a2a1e';let yy=pcWrap('“'+pcRev.pull+'”',w/2,hy+42,w-36,21);ctx.fillStyle=INK;ctx.textAlign='left';ctx.font='15px Georgia,serif';yy+=4;
-  pcRev.lines.forEach(l=>{yy=pcWrap(l,18,yy,w-36,19)+5});ctx.font='italic 13px Georgia,serif';ctx.textAlign='right';ctx.fillText(pcRev.by,w-16,Math.min(yy+6,358));ctx.restore()}
- if(t>4.5){const ty=port?1010:Math.min(Y1-60,600);shape(rectPts(300,ty-24,300,46,93,.4),'#1b1328',{lw:2});ctx.globalAlpha=.75+.25*Math.sin(T*3);paperText('Tap to take your bow',450,ty,26,'#fbf3dc',0);ctx.globalAlpha=1}
+  pcRev.lines.forEach(l=>{yy=pcWrap(l,18,yy,w-36,19)+5});ctx.font='italic 13px Georgia,serif';ctx.textAlign='right';ctx.fillText(pcRev.by,w-16,yy+10);return yy+10};ctx.globalAlpha=0;const hh=txt()+18;ctx.globalAlpha=1;shape(rectPts(0,0,w,hh,91,.6),'#fbf3dc',{lw:2.6,sh:1});txt();ctx.restore()}
+ if(t>4.5){const ty=port?1050:Math.min(Y1-60,600);shape(rectPts(300,ty-24,300,46,93,.4),'#1b1328',{lw:2});ctx.globalAlpha=.75+.25*Math.sin(T*3);paperText('Tap to take your bow',450,ty,26,'#fbf3dc',0);ctx.globalAlpha=1}
  if(t<.8){ctx.fillStyle='rgba(18,12,30,'+(1-t/.8).toFixed(3)+')';ctx.fillRect(X0,-200,X1-X0,Y1+400)}
  ctx.setTransform(DPR,0,0,DPR,0,0);if(grain){ctx.fillStyle=grain;ctx.fillRect(0,0,W,H)}}
 function drawVacation(){const t=vacT;ctx.setTransform(DPR,0,0,DPR,0,0);const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#4a9be0');g.addColorStop(.55,'#cdeef6');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
