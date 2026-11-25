@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.11</title>
+<title>Rewilder v1.12</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.11 | LAB | 2026-11-25
+<!-- TSP build: Rewilder v1.12 | LAB | 2026-11-25
+     v1.12 (founder 2026-11-25: "The maze is hard to identify as such. Don't have red lights in the background in a pattern that confounds the maze. And
+     no need to take up two lanes with a barrier. A live wall is a barrier. Make a clearer maze like a simple diner menu maze."): thin live walls on a
+     dark panel, one way in and one way out, a true puzzle-sheet maze; the windows behind it go dark.
      v1.11 (founder 2026-11-25: "The last tower should be all red and black. No green or hotel until conversion. The top floors art don't work for me.
      Make the building taller before the drones attack the building lights up in a maze with electric borders player has almost enough time to escape
      first maze when it turns to a second different maze. That takes the first 15-20 floors, then the drones come. When the fish goes back down the pipe
@@ -810,7 +813,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.11</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.12</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -2535,35 +2538,53 @@ function questInit(s){const q=isleSpec(s,Math.random,null);fort.band=q.band;fort
  const dr=[];for(let i=0;i<8;i++)dr.push({i,x:s.cx+(i-3.5)*48,y:GY-(MZ+9)*s.fh,st:'form',t:0,path:null});fort.mz=mzMake(s);
  fort.tq={water:0,fill:0,drain:0,pool:1,hand:0,door:0,weight:0,dr,gt:1.2,fy:qD(s,MZ+9),pat:0,hitT:0,ren:[],rs:[],fish:{x:s.x+s.w+70,y:GY+14,on:false,face:-1,back:0},
   roof:{ph:'wait',t:0,post:2,bt:-1},end:0}}
+/* v1.12 (founder 2026-11-25: "The maze is hard to identify as such. Don't have red lights in the background in a pattern that confounds the maze.
+   And no need to take up two lanes with a barrier. A live wall is a barrier. Make a clearer maze like a simple diner menu maze."): the maze is now
+   thin live walls on the lines between cells, a proper one-path puzzle-sheet maze (carved by a random walk with backtracking) with one way in at
+   the bottom and one way out at the top, drawn as bright lines on a dark panel; the tower's windows and lamps go dark behind it. Crossing a live
+   wall zaps you back to where you were. */
 function mzGen(C,R0){let sd=R0;const R=()=>{sd=(sd*9301+49297)%233280;return sd/233280};
- for(let tries=0;tries<60;tries++){const live=[];let g=Math.floor(R()*C);
-  for(let f=1;f<=MZ;f++){live[f]=[];for(let c=0;c<C;c++)live[f][c]=false;
-   if(f%2===0){let ng;do{ng=Math.floor(R()*C)}while(Math.abs(ng-g)<2);g=ng;const g2=R()<.35?(g+2+Math.floor(R()*(C-3)))%C:-1;for(let c=0;c<C;c++)live[f][c]=c!==g&&c!==g2}
-   else if(f>1&&R()<.45){const pc=Math.floor(R()*C);live[f][pc]=true}}
-  // breadth-first check that the bottom reaches the top through safe cells
-  const seen={},Q=[];for(let c=0;c<C;c++)if(!live[1][c]){Q.push([1,c]);seen[1+'_'+c]=1}let ok=false;
-  while(Q.length){const [f,c]=Q.shift();if(f===MZ&&!live[f][c]){ok=true;break}[[f+1,c],[f-1,c],[f,c+1],[f,c-1]].forEach(([nf,nc])=>{if(nf<1||nf>MZ||nc<0||nc>=C||live[nf][nc]||seen[nf+'_'+nc])return;seen[nf+'_'+nc]=1;Q.push([nf,nc])})}
-  if(ok)return live}
- return null}
-/* the first maze's clock: about one and a half times the quickest route through it (a floor up takes ~0.22 s, a column across ~0.47 s), so
-   a player who keeps moving gets most of the way before it changes */
-function mzTime(L,C){if(!L)return 14;const D={},Q=[];for(let c=0;c<C;c++)if(!L[1][c]){D[1+'_'+c]=.22;Q.push([.22,1,c])}let best=99;
- while(Q.length){Q.sort((a,b)=>a[0]-b[0]);const [d,f,c]=Q.shift();if(d>(D[f+'_'+c]??99))continue;if(f===MZ){best=Math.min(best,d+.22);continue}
-  [[f+1,c,.22],[f-1,c,.22],[f,c+1,.47],[f,c-1,.47]].forEach(([nf,nc,w])=>{if(nf<1||nf>MZ||nc<0||nc>=C||L[nf][nc])return;const nd=d+w;if(nd<(D[nf+'_'+nc]??99)){D[nf+'_'+nc]=nd;Q.push([nd,nf,nc])}})}
- return clamp(best*1.5+1,8,22)}
-function mzMake(s){const r=Math.floor(Math.random()*9999),a=mzGen(s.cols,r+7);return{a,b:mzGen(s.cols,r+5011),cur:'a',t0:null,sw:null,hit:0,T1:mzTime(a,s.cols)}}
-function mzLiveAt(c,f){const m=fort&&fort.mz;if(!m||f<1||f>MZ||(fort.tq&&fort.tq.end))return false;const L=m[m.cur];if(!L)return false;if(m.sw&&T-m.sw<.7)return false;return !!L[f][c]}
-function mzStep(s,dt){const m=fort.mz;if(!m||fort.tq.end)return;const onT=P.climb===s,f=onT?chestF(s):0;
- if(m.t0===null&&onT&&f>=1){m.t0=T;SFX.zap();once('maze','The tower lights up. Climb through the gaps in the electric maze.',6)}
- if(m.t0!==null&&m.cur==='a'&&T-m.t0>m.T1){m.cur='b';m.sw=T;SFX.zap();shake=RM?0:4;sparks(s.cx,P.y-60,10,'#ff5a48')}
- if(onT&&f>=1&&f<=MZ&&fort.hitT<=0&&mzLiveAt(colOf(s,P.x),f)){fort.hitT=1.1;P.energy=Math.max(0,P.energy-18);if(P.energy<=0)P.ko=true;hudKey='';P.zap=.8;SFX.zap();shake=RM?0:6;word('ZAP',P.x,P.y-140,'#ff5a48');sparks(P.x,P.y-60,12,'#ff8a7a');
-  let nf=f;while(nf>0&&mzLiveAt(colOf(s,P.x),nf))nf--;if(nf<=0){P.climb=null;P.support='ground';P.y=GY}else P.y=Math.min(GY,P.y+(f-nf)*s.fh+6)}}
-function mzDraw(s){const m=fort.mz;if(!m||fort.tq.end)return;const fh=s.fh,lo=cam.y-200,hi=cam.y+1000,warn=m.cur==='a'&&m.t0!==null&&T-m.t0>m.T1-2.2;
- const draw=(L,al,col)=>{if(!L)return;ctx.save();ctx.globalAlpha=al;for(let f=1;f<=MZ;f++){const y=GY-(f+1)*fh;if(y>hi||y+fh<lo)continue;for(let c=0;c<s.cols;c++){if(!L[f][c])continue;const x=s.x+c*s.cw;
-   ctx.fillStyle='rgba(60,4,6,.55)';ctx.fillRect(x+2,y+2,s.cw-4,fh-4);const ed=[[f+1,c,x,y,x+s.cw,y],[f-1,c,x,y+fh,x+s.cw,y+fh],[f,c-1,x,y,x,y+fh],[f,c+1,x+s.cw,y,x+s.cw,y+fh]];
-   ed.forEach(([nf,nc,x0,y0,x1,y1])=>{if(nf>=1&&nf<=MZ&&nc>=0&&nc<s.cols&&L[nf][nc])return;ctx.strokeStyle=col;ctx.lineWidth=4;ctx.globalCompositeOperation='lighter';ctx.beginPath();ctx.moveTo(x0,y0);const n=6;for(let k=1;k<=n;k++){const u=k/n,jx=(RM?0:(Math.random()-.5)*5),jy=(RM?0:(Math.random()-.5)*5);ctx.lineTo(x0+(x1-x0)*u+(k<n?jx:0),y0+(y1-y0)*u+(k<n?jy:0))}ctx.stroke();ctx.lineWidth=1.6;ctx.strokeStyle='#fff3e8';ctx.stroke();ctx.globalCompositeOperation='source-over'})}}ctx.restore()};
- if(m.t0===null){draw(m.a,.35+.15*Math.sin(T*3),'#ff3b2e');return}
- draw(m[m.cur],m.sw&&T-m.sw<.7?((T*12|0)%2?.3:1):1,'#ff3b2e');if(warn)draw(m.b,(T*8|0)%2?.45:.1,'#ffd23f')}
+ // walls: h[f][c] = wall on the TOP edge of cell (c,f), f=0..MZ (h[0] is the bottom edge of floor 1); v[f][c] = wall on the RIGHT edge of cell (c,f)
+ const h=[],v=[],seen={};for(let f=0;f<=MZ;f++){h[f]=[];v[f]=[];for(let c=0;c<C;c++){h[f][c]=true;v[f][c]=c<C-1}}
+ const st=[[1,Math.floor(R()*C)]];seen[st[0][0]+'_'+st[0][1]]=1;
+ while(st.length){const [f,c]=st[st.length-1],nb=[[f+1,c],[f-1,c],[f,c+1],[f,c-1]].filter(([nf,nc])=>nf>=1&&nf<=MZ&&nc>=0&&nc<C&&!seen[nf+'_'+nc]);
+  if(!nb.length){st.pop();continue}
+  // favor sideways runs so the corridors read as a maze rather than a ladder
+  const pick=nb.length>1&&R()<.55?(nb.find(([nf])=>nf===f)||nb[Math.floor(R()*nb.length)]):nb[Math.floor(R()*nb.length)],[nf,nc]=pick;
+  if(nf===f+1)h[f][c]=false;else if(nf===f-1)h[nf][c]=false;else if(nc===c+1)v[f][c]=false;else v[f][nc]=false;seen[nf+'_'+nc]=1;st.push([nf,nc])}
+ const inC=Math.floor(R()*C),outC=Math.floor(R()*C);h[0][inC]=false;h[MZ][outC]=false;return{h,v,inC,outC}}
+function mzWall(M,c0,f0,c1,f1){if(!M)return false;if(f0>MZ&&f1>MZ)return false;if(f0<1&&f1<1)return false;
+ if(c0===c1){const lo=Math.min(f0,f1);if(lo<0||lo>MZ)return false;return !!M.h[lo][c0]}
+ if(f0===f1&&f0>=1&&f0<=MZ){const lc=Math.min(c0,c1);return !!M.v[f0][lc]}return false}
+function mzTime(M,C){if(!M)return 14;const D={},Q=[[.22,1,M.inC]];D[1+'_'+M.inC]=.22;let best=99;
+ while(Q.length){Q.sort((a,b)=>a[0]-b[0]);const [d,f,c]=Q.shift();if(d>(D[f+'_'+c]??99))continue;if(f===MZ&&c===M.outC){best=Math.min(best,d+.22);continue}
+  [[f+1,c,.22],[f-1,c,.22],[f,c+1,.47],[f,c-1,.47]].forEach(([nf,nc,w])=>{if(nf<1||nf>MZ||nc<0||nc>=C||mzWall(M,c,f,nc,nf))return;const nd=d+w;if(nd<(D[nf+'_'+nc]??99)){D[nf+'_'+nc]=nd;Q.push([nd,nf,nc])}})}
+ return clamp(best*1.5+2,10,40)}
+function mzMake(s){const r=Math.floor(Math.random()*9999),a=mzGen(s.cols,r+7);return{a,b:mzGen(s.cols,r+5011),cur:'a',t0:null,sw:null,T1:mzTime(a,s.cols),last:null}}
+function mzOn(){const m=fort&&fort.mz;return !!(m&&!(fort.tq&&fort.tq.end)&&!(m.sw&&T-m.sw<.7))}
+function mzCur(){const m=fort&&fort.mz;return m?m[m.cur]:null}
+function mzStep(s,dt){const m=fort.mz;if(!m||fort.tq.end)return;const onT=P.climb===s,f=onT?chestF(s):-1,c=onT?colOf(s,P.x):-1;
+ if(m.t0===null&&onT&&f>=1){m.t0=T;SFX.zap();once('maze','The bottom of the tower is an electric maze. The bright lines are live: find the way through.',7)}
+ if(m.t0!==null&&m.cur==='a'&&T-m.t0>m.T1){m.cur='b';m.sw=T;SFX.zap();shake=RM?0:4;sparks(P.x,P.y-60,10,'#ffd23f');m.last=null}
+ if(!onT||f>MZ+1||c<0){m.last=null;return}
+ if(m.last&&(m.last.c!==c||m.last.f!==f)&&fort.hitT<=0&&mzOn()){const dc=Math.sign(c-m.last.c),df=Math.sign(f-m.last.f);let hit=false;
+  if(dc&&mzWall(mzCur(),m.last.c,m.last.f,m.last.c+dc,m.last.f))hit=true;if(df&&mzWall(mzCur(),dc?m.last.c+dc:m.last.c,m.last.f,dc?m.last.c+dc:m.last.c,m.last.f+df))hit=true;
+  if(hit){fort.hitT=.9;P.energy=Math.max(0,P.energy-15);if(P.energy<=0)P.ko=true;hudKey='';P.zap=.7;SFX.zap();shake=RM?0:5;word('ZAP',P.x,P.y-140,'#ffd23f');sparks(P.x,P.y-60,12,'#ffd23f');P.x=m.last.x;P.y=m.last.y;return}}
+ m.last={c,f,x:P.x,y:P.y}}
+function mzDraw(s){const m=fort.mz;if(!m||fort.tq.end)return;const fh=s.fh,x0=s.x,x1=s.x+s.w,yTop=GY-(MZ+1)*fh,yBot=GY-fh;if(yBot<cam.y-300||yTop>cam.y+1100)return;
+ const warn=m.cur==='a'&&m.t0!==null&&T-m.t0>m.T1-2.5,flick=m.sw&&T-m.sw<.7;
+ ctx.fillStyle='rgba(8,4,6,.82)';ctx.fillRect(x0,yTop,x1-x0,yBot-yTop);
+ const walls=(M,col,w,al)=>{if(!M)return;ctx.save();ctx.globalAlpha=al;ctx.lineCap='round';const segs=[];
+  for(let f=0;f<=MZ;f++)for(let c=0;c<s.cols;c++)if(M.h[f][c]){const y=GY-(f+1)*fh;segs.push([x0+c*s.cw,y,x0+(c+1)*s.cw,y])}
+  for(let f=1;f<=MZ;f++)for(let c=0;c<s.cols-1;c++)if(M.v[f][c]){const x=x0+(c+1)*s.cw;segs.push([x,GY-(f+1)*fh,x,GY-f*fh])}
+  segs.push([x0,yTop,x0,yBot],[x1,yTop,x1,yBot]);
+  ctx.strokeStyle=col;ctx.lineWidth=w+6;ctx.globalAlpha=al*.35;ctx.beginPath();segs.forEach(([a,b,c2,d])=>{ctx.moveTo(a,b);ctx.lineTo(c2,d)});ctx.stroke();
+  ctx.globalAlpha=al;ctx.lineWidth=w;ctx.beginPath();segs.forEach(([a,b,c2,d])=>{ctx.moveTo(a,b);const jx=RM?0:(Math.random()-.5)*1.6,jy=RM?0:(Math.random()-.5)*1.6;ctx.lineTo((a+c2)/2+jx,(b+d)/2+jy);ctx.lineTo(c2,d)});ctx.stroke();
+  ctx.strokeStyle='#fffbe6';ctx.lineWidth=1.4;ctx.stroke();ctx.restore();
+  // way in and way out: soft arrows in the gaps
+  [[M.inC,0],[M.outC,MZ]].forEach(([c,f])=>{const cx=x0+(c+.5)*s.cw,y=GY-(f+1)*fh;shape([[cx-10,y+8],[cx,y-6],[cx+10,y+8]],'#7cc35a',{lw:1.6})})};
+ const M=m[m.cur];if(m.t0===null){walls(M,'#ffd23f',4,.75);return}
+ walls(M,'#ffd23f',4,flick?((T*12|0)%2?.25:1):1);if(warn)walls(m.b,'#9fd8ee',3,(T*8|0)%2?.5:.12)}
 function questRenovate(s,f0,f1){const q=fort.tq;for(let f=f0;f<=f1&&f<s.rows.length;f++){if(q.rs[f]!==undefined)continue;q.rs[f]=T+.3+(f-f0)*.22;q.ren[f]=0}}
 function questSupportAt(s,x,y){if(Math.abs(y-GY)<3)return'ground';const d=fort.decks.find(d=>Math.abs(d.y-y)<3);if(d)return d;if(Math.abs(y-qGeo(s).roofY)<3)return s;return null}
 function qOnTower(s){return !swim&&P.x>s.x-40&&P.x<s.x+s.w+60&&P.y<GY-40&&(P.climb===s||(P.support&&P.support.deck))}
@@ -3396,11 +3417,11 @@ function hotelCell(s,c,f,x,y,cw,fh,k,d){const n=s.rows.length,band=f<n*.38?0:f<n
  if(c===2){shape(rectPts(x,y,cw,fh,sd,.5),'#1c1a22',{lw:1.6});ctx.fillStyle='#24141a';ctx.fillRect(x+9,y+2,cw-18,fh-4);
   ctx.strokeStyle='rgba(200,52,43,.45)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+9,y+2);ctx.lineTo(x+cw-9,y+fh-2);ctx.moveTo(x+cw-9,y+2);ctx.lineTo(x+9,y+fh-2);ctx.stroke();
   ctx.fillStyle='#5a1010';ctx.fillRect(x+2,y,5,fh);ctx.fillRect(x+cw-7,y,5,fh);for(let v=y+6;v<y+fh;v+=12){dot(x+4.5,v,1.4,'#c8342b');dot(x+cw-4.5,v,1.4,'#c8342b')}
-  if(f%4===1){const on=!dark&&(T*1.3+f*.7)%2<1.3;if(on){ctx.save();ctx.globalCompositeOperation='lighter';dot(x+cw/2,y+fh/2,14,'rgba(255,60,40,.22)');ctx.restore()}dot(x+cw/2,y+fh/2,5.4,on?'#ff3b2e':'#4a1414')}
+  if(f%4===1&&!(fort&&fort.mz&&f<=MZ+1)){const on=!dark&&(T*1.3+f*.7)%2<1.3;if(on){ctx.save();ctx.globalCompositeOperation='lighter';dot(x+cw/2,y+fh/2,14,'rgba(255,60,40,.22)');ctx.restore()}dot(x+cw/2,y+fh/2,5.4,on?'#ff3b2e':'#4a1414')}
   cracks(x,y,cw,fh,d,sd);ren();return}
  shape(rectPts(x,y,cw,fh,sd,.6),k.tc||(k.tc=cardTone('#1c1418',sd)),{lw:1.8});
  ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(x,y+fh*.34);ctx.lineTo(x+cw,y+fh*.34);ctx.moveTo(x,y+fh*.68);ctx.lineTo(x+cw,y+fh*.68);ctx.moveTo(x+cw*(f%2?.2:.8),y);ctx.lineTo(x+cw*(f%2?.2:.8),y+fh*.34);ctx.stroke();
- const lit=!dark&&hr(sd*1.7)<.55,ax=x+cw/2,aw=cw*.4,ab=y+fh-7,at=y+5,sp=y+fh*.48;
+ const lit=!dark&&hr(sd*1.7)<.55&&!(fort&&fort.mz&&f<=MZ+1),ax=x+cw/2,aw=cw*.4,ab=y+fh-7,at=y+5,sp=y+fh*.48;
  const arch=(o)=>{ctx.beginPath();ctx.moveTo(ax-aw/2-o,ab);ctx.lineTo(ax-aw/2-o,sp);ctx.quadraticCurveTo(ax-aw/2-o,at+8-o,ax,at-o);ctx.quadraticCurveTo(ax+aw/2+o,at+8-o,ax+aw/2+o,sp);ctx.lineTo(ax+aw/2+o,ab);ctx.closePath()};
  arch(3);ctx.fillStyle='#3a1418';ctx.fill();arch(0);if(lit){const gw=ctx.createLinearGradient(0,at,0,ab);gw.addColorStop(0,'#ff6a52');gw.addColorStop(1,'#7a0c0c');ctx.fillStyle=gw}else ctx.fillStyle='#15131a';ctx.fill();ctx.strokeStyle=INK;ctx.lineWidth=2;ctx.stroke();
  line(ax,at+6,ax,ab,'rgba(20,16,22,.85)',2);line(ax-aw/2,sp+4,ax+aw/2,sp+4,'rgba(20,16,22,.85)',1.6);
