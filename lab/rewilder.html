@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.8</title>
+<title>Rewilder v1.9</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.8 | LAB | 2026-11-25
+<!-- TSP build: Rewilder v1.9 | LAB | 2026-11-25
+     v1.9 (founder 2026-11-25: "Get rid of 'tap to take your bow' player can shoot hoops on a floating basket. Salmon will reject every 2-3 shots.
+     The end music and the climax music need changing out."): pool hoops; new climax cue (D minor taiko and brass) and new end music (steel band).
      v1.8 (founder 2026-11-25: "The end scene choreography makes no sense... Look at the logic of the scene! Revert level 1 dam art to where it was
      v95 and earlier. Don't make road crews have to adjust ecosystem. Narrow down the players choices so they have to create a balanced system. The
      ending baron music shouldn't happen until you swim to the island. Ending music needs to be better. And the timing - we go back to regular happy
@@ -799,7 +801,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.8</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.9</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -1259,15 +1261,25 @@ function mNoise(t,d,v,hp){const s=AC.createBufferSource(),g=AC.createGain(),fl=A
 function musStart(){const a=ac();if(!a||mus)return;const g=a.createGain();g.gain.value=.5;g.connect(a.destination);const n=a.sampleRate,b=a.createBuffer(1,n,n),c=b.getChannelData(0);for(let i=0;i<n;i++)c[i]=Math.random()*2-1;
  mus={g,nb:b,next:a.currentTime+.1,step:0,id:setInterval(musTick,50)}}
 function musStop(){if(!mus)return;clearInterval(mus.id);try{mus.g.disconnect()}catch(e){}mus=null}
-function musBattle(){const spb=60/140/4;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;
- while(mus.next<AC.currentTime+.45){const i=mus.step%32,t=mus.next,bar=(mus.step>>5)%4;
-  mNote(mf(M_WBASS[i]),t,spb*.8,'sawtooth',.19,420);if(i%2===0)mNote(mf(M_WBASS[i]-12),t,spb*.7,'square',.08,220);
-  if(i%4===0){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(42,t+.13);g.gain.setValueAtTime(.55,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);o.connect(g).connect(mus.g);o.start(t);o.stop(t+.22)}
-  if(i%8===4){mNoise(t,.16,.22,1400);mNote(196,t,.08,'triangle',.16,1500)}
-  if(i%2===1)mNoise(t,.03,.05,6000);
-  if(i>=28){mNote([196,174,155,131][i-28],t,spb*.9,'sine',.24,900)}
-  if(bar%2===1||mus.step>=64){const m=M_WLEAD[i];if(m)mNote(mf(m),t,spb*Math.min(2.6,mGap(M_WLEAD,i,3)*.95),'square',.06,2600)}
-  if(i%16===0)[52,55,59].forEach(m=>mNote(mf(m),t,spb*3,'sawtooth',.035,1200));
+/* v1.9 (founder 2026-11-25: "The end music and the climax music need changing out."): new instruments that swell instead of only plucking
+   (mPad, mBrass), and a new climax cue: D minor at 132 bpm, low taiko on a 3-3-2 pattern, a running string ostinato, brass swells on each bar,
+   a choir-like pad, and a horn theme that enters on the second pass, with a noise riser into every fourth bar. */
+function mPad(f,t,d,v,type,lp,att){const o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter();o.type=o2.type=type;o.frequency.value=f;o2.frequency.value=f*1.006;fl.type='lowpass';fl.frequency.value=lp;
+ g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+(att||.08));g.gain.setValueAtTime(v,t+Math.max(att||.08,d-.12));g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(fl);o2.connect(fl);fl.connect(g).connect(mus.g);o.start(t);o2.start(t);o.stop(t+d+.02);o2.stop(t+d+.02)}
+function mBrass(f,t,d,v){const o=AC.createOscillator(),g=AC.createGain(),fl=AC.createBiquadFilter();o.type='sawtooth';o.frequency.value=f;fl.type='lowpass';fl.Q.value=2;fl.frequency.setValueAtTime(500,t);fl.frequency.linearRampToValueAtTime(2600,t+.09);fl.frequency.exponentialRampToValueAtTime(900,t+d);
+ g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.04);g.gain.exponentialRampToValueAtTime(v*.5,t+d*.6);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(fl).connect(g).connect(mus.g);o.start(t);o.stop(t+d+.02)}
+function mTaiko(t,v,f0){const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setValueAtTime(f0||95,t);o.frequency.exponentialRampToValueAtTime(38,t+.3);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.45);o.connect(g).connect(mus.g);o.start(t);o.stop(t+.5);mNoise(t,.06,v*.18,300)}
+const M_BCH=[[50,[62,65,69]],[46,[62,65,70]],[48,[60,64,67]],[45,[61,64,69]]];
+const M_BHORN=[62,0,0,0,0,0,65,0,69,0,0,0,67,0,65,0, 62,0,0,0,0,0,0,0,58,0,0,0,62,0,0,0, 60,0,0,0,64,0,67,0,72,0,0,0,70,0,69,0, 69,0,0,0,0,0,0,0,73,0,0,0,76,0,0,0];
+function musBattle(){const spb=60/132/4;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;
+ while(mus.next<AC.currentTime+.45){const n=mus.step%128,k=n%64,bar=k>>4,i=k%16,t=mus.next,[r,tri]=M_BCH[bar];
+  if(i===0||i===3||i===6||i===8||i===11||i===14)mTaiko(t,i===0?.6:i===8?.5:.32,i%8===0?110:85);
+  if(i===4||i===12){mNoise(t,.16,.2,1500);mNote(185,t,.08,'triangle',.12,1200)}
+  const os=[0,12,7,12,3,12,7,15,0,12,7,12,3,12,10,7];mNote(mf(r+12+os[i]+(bar===1&&os[i]===3?-3+0:0)),t,spb*.85,'sawtooth',.045,1500);
+  if(i===0){tri.forEach(m=>mBrass(mf(m-12),t,spb*7,.05));tri.forEach(m=>mPad(mf(m),t,spb*15.5,.022,'triangle',2200,.4));mNote(mf(r-12),t,spb*14,'sawtooth',.14,260)}
+  if(i===8)tri.forEach(m=>mBrass(mf(m-12),t,spb*4,.035));
+  if(n>=64){const m=M_BHORN[k];if(m){let g=1;while(g<8&&!M_BHORN[(k+g)%64])g++;mBrass(mf(m),t,spb*g*.95,.075);mBrass(mf(m-12),t,spb*g*.95,.03)}}
+  if(bar===3&&i>=8){mNoise(t,spb*1.1,.02+(i-8)*.012,2500+(i-8)*500)}
   mus.step++;mus.next+=spb}}
 function mGap(p,i,max){for(let k=1;k<=max;k++)if(p[(i+k)%32])return k;return max}
 /* v1.5 (founder 2026-11-24: "In Level 3 the happy music plays when you still have to defeat the last building. Hold off. Check level 2 as well."
@@ -1281,22 +1293,22 @@ const M_WLEAD=[64,0,0,67,0,71,0,72,71,0,67,0,0,0,0,0,65,0,0,69,0,72,0,74,72,0,71
    timing - we go back to regular happy music after we defeat the drones."): the battle cue now starts only once you reach the island and holds
    through the drones until the rope snaps; then a new victory theme: a timpani roll into a held brass chord, then an eight-bar anthem in E major
    (E, B, C#m, A, F#m, A, B, E) with a warm pad, a running arpeggio, a melody doubled an octave up, a harmony line under it, and a half-time march. */
-const M_VCHORD=[[40,[64,68,71]],[47,[63,66,71]],[49,[61,64,68]],[45,[61,64,69]],[42,[61,66,69]],[45,[61,64,69]],[47,[63,66,71]],[40,[64,68,71]]];
-const M_VMEL=[71,0,0,76,0,0,80,0,78,0,76,0,0,0,0,0, 75,0,0,0,73,0,71,0,73,0,75,0,0,0,0,0, 76,0,0,73,0,0,76,0,80,0,78,0,76,0,0,0, 73,0,0,0,0,0,0,0,71,0,69,0,68,0,0,0,
- 69,0,0,73,0,0,78,0,76,0,73,0,0,0,0,0, 76,0,0,0,73,0,76,0,81,0,0,0,80,0,0,0, 78,0,0,0,80,0,78,0,75,0,71,0,73,0,75,0, 76,0,0,0,0,0,0,0,0,0,0,0,0,0,71,0];
-function mKick(t,v){const o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(42,t+.16);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.26);o.connect(g).connect(mus.g);o.start(t);o.stop(t+.28)}
-function musVictory(){const spb=60/108/4;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;if(mus.vs===undefined)mus.vs=mus.step;
+/* v1.9: the new end music, an island steel band: F major at 116 bpm, a steel-pan melody over a bouncing bass, offbeat chord skanks, a shaker
+   and congas, eight bars (F Bb C F F Bb C F), opened by a pan roll and a cymbal. It plays from the Baron's fall through the farm and the pool. */
+function mPan(f,t,d,v){[[1,1,d],[2,.42,d*.6],[3.01,.18,.18],[4.2,.08,.08]].forEach(([m,a,dd])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f*m;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v*a,t+.006);g.gain.exponentialRampToValueAtTime(.001,t+dd);o.connect(g).connect(mus.g);o.start(t);o.stop(t+dd+.02)})}
+const M_ICH=[[41,[65,69,72]],[46,[65,70,74]],[48,[64,67,72]],[41,[65,69,72]],[41,[65,69,72]],[46,[65,70,74]],[48,[64,67,72]],[41,[65,69,72]]];
+const M_IMEL=[72,0,69,0,72,0,77,0,0,0,76,0,74,0,72,0, 74,0,0,70,0,74,0,77,0,0,74,0,72,0,70,0, 72,0,0,76,0,79,0,76,0,0,74,0,72,0,0,0, 77,0,0,0,72,0,69,0,72,0,0,0,0,0,0,0,
+ 69,0,72,0,77,0,72,0,81,0,0,0,79,0,77,0, 79,0,0,77,0,74,0,77,0,0,74,0,70,0,74,0, 76,0,79,0,76,0,72,0,74,0,76,0,79,0,0,0, 77,0,0,0,0,0,0,0,72,0,74,0,76,0,0,0];
+function musVictory(){const spb=60/116/4;if(mus.next<AC.currentTime-.5)mus.next=AC.currentTime+.05;if(mus.vs===undefined)mus.vs=mus.step;
  while(mus.next<AC.currentTime+.45){const n=mus.step-mus.vs,t=mus.next;
-  if(n<16){if(n<12){mNote(82,t,spb*.9,'sine',.08+n*.025,300);mNoise(t,spb*.8,.03+n*.01,500)}
-   if(n===12){[52,59,64,68,71,76].forEach(m=>mNote(mf(m),t,spb*4.2,'sawtooth',.05,2600));mNoise(t,1.4,.16,5000);mKick(t,.6)}}
-  else{const k=(n-16)%128,bar=k>>4,i=k%16,[root,tri]=M_VCHORD[bar];
-   if(i===0){tri.forEach(m=>mNote(mf(m-12),t,spb*15.5,'sawtooth',.022,1300));if(bar===0)mNoise(t,1.1,.1,5000)}
-   if(i===0)mNote(mf(root),t,spb*5.6,'sawtooth',.17,360);if(i===6)mNote(mf(root+7),t,spb*1.8,'sawtooth',.13,360);if(i===8)mNote(mf(root+12),t,spb*3.6,'sawtooth',.13,380);if(i===12)mNote(mf(root+7),t,spb*1.8,'sawtooth',.12,360);if(i===14)mNote(mf(root+(bar===7?-1:2)),t,spb*1.8,'sawtooth',.11,360);
-   if(i%2===0)mNote(mf(tri[(i>>1)%3]+12),t,spb*.7,'square',.022,2400);
-   const m=M_VMEL[k];if(m){let g=1;while(g<8&&!M_VMEL[(k+g)%128])g++;mNote(mf(m),t,spb*g*.92,'triangle',.12,3600);mNote(mf(m+12),t,spb*g*.6,'sine',.03,6000);
-    const ct=[];tri.forEach(c=>{for(let o=-12;o<=12;o+=12)ct.push(c+o)});const h=ct.filter(c=>c<=m-3).sort((x,y)=>y-x)[0];if(h)mNote(mf(h),t,spb*g*.85,'square',.026,2000)}
-   if(i===0||i===10)mKick(t,.5);if(i===8)mKick(t,.35);if(i===4||i===12){mNoise(t,.14,.17,1700);mNote(200,t,.07,'triangle',.12,1400)}if(i%4===2)mNoise(t,.05,.045,7500);
-   if(i===15&&bar%2===1)mNote(mf(88),t,spb*2,'sine',.05,7000)}
+  if(n<8){mPan(mf(72+[0,2,4,5,7,9,11,12][n]),t,.3,.14);if(n===0)mNoise(t,1.2,.12,5000)}
+  else{const k=(n-8)%128,bar=k>>4,i=k%16,[r,tri]=M_ICH[bar];
+   if(i===0||i===6)mNote(mf(r),t,spb*2.6,'triangle',.22,700);if(i===3||i===11)mNote(mf(r+7),t,spb*1.6,'triangle',.17,700);if(i===8)mNote(mf(r+12),t,spb*2.2,'triangle',.17,700);if(i===14)mNote(mf(r+(bar%4===3?-1:2)),t,spb*1.6,'triangle',.15,700);
+   if(i%4===2)tri.forEach(m=>mNote(mf(m),t,spb*.6,'square',.028,2600));
+   if(i%2===0||i%4===3)mNoise(t,.04,i%4===2?.07:.04,6500);
+   if(i===0||i===8)mTaiko(t,.32,120);if(i===7||i===10)mNote(330,t,.12,'sine',.12,900);if(i===15)mNote(220,t,.14,'sine',.12,700);
+   const m=M_IMEL[k];if(m){let g=1;while(g<6&&!M_IMEL[(k+g)%128])g++;mPan(mf(m),t,Math.min(.9,spb*g*1.4),.16);if(g>=3)mPan(mf(m),t+spb,.25,.07)}
+   if(i===0&&bar===4)mNoise(t,.8,.08,5000)}
   mus.step++;mus.next+=spb}}
 function musTick(){if(!mus||!AC)return;if(mus.dark===undefined||mus.step%16===0){const beat=!!(isle&&fort&&fort.tq&&fort.s&&fort.s.isle&&fort.tq.roof.bt>=0);if(isle&&!isle.reached&&(P.x<=ISX1+20||restX<=ISX1+20&&P.x<0))isle.reached=1;mus.vic=!!isle&&(beat||!!isle.qend);mus.battle=!mus.vic&&!!isle&&!!isle.reached;mus.dark=level>1&&sites.some(l2up);if(!mus.vic)mus.vs=undefined}
  if(mus.vic){musVictory();return}
@@ -1378,7 +1390,7 @@ function finish(){if(state!=='play'||done)return;done=true;setLens(false);SFX.gr
 function bestLine(){const bq=store.get('best',null),el=$('bestLine');if(el)el.textContent=bq&&bq.sys?'Best: '+bq.sys+' systems built, '+(bq.gen||0)+' salmon generations':''}
 function startGame(){P.pole=null;P.pinch=0;sweep=null;state='play';resetWorld();ac();musStart();document.body.classList.add('playing');resize();hudKey='';hud();cam.x=0}
 $('startBtn').onclick=startGame;
-cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');if(state==='vacation'){smashQ=true;return}if(state==='poolcut'){if(pcT>4)endPoolCut();return}if(state!=='play'&&!cardOpen&&!notesOpen&&!menuOpen)startGame();
+cv.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')document.body.classList.add('touch');if(state==='vacation'){smashQ=true;return}if(state==='poolcut'){const r=cv.getBoundingClientRect();pcShoot(e.clientX-r.left,e.clientY-r.top);return}if(state!=='play'&&!cardOpen&&!notesOpen&&!menuOpen)startGame();
  else if(state==='play')tapWorld(e.clientX/S+cam.x,(e.clientY-OY)/S+cam.y)});
 addEventListener('touchstart',()=>{if(!document.body.classList.contains('touch')){document.body.classList.add('touch');resize()}},{passive:true});
 if(matchMedia('(pointer:coarse)').matches)document.body.classList.add('touch');
@@ -1392,7 +1404,7 @@ function sDown(){smashQ=true;sHeld=true;sT=0}
 function sUp(){if(sHeld&&sT>=.45)slamQ=true;sHeld=false;sT=0}
 addEventListener('keydown',e=>{
  if(e.key==='Escape'){if(cardOpen)$('cardBtn').click();else if(notesOpen)closeNotes();else if(menuOpen)setMenu(false);else if(lensOn)setLens(false);return}
- if(state==='poolcut'){if(pcT>4&&!e.repeat)endPoolCut();return}
+ if(state==='poolcut'){if(!e.repeat&&(e.key===' '||e.key==='Enter'||e.key==='ArrowUp'||e.key==='w'))pcShoot();return}
  if((state!=='play'&&state!=='vacation')||paused())return;
  if(e.target&&e.target.tagName==='BUTTON'&&(e.code==='Space'||e.code==='Enter')){if(e.code==='Space'&&['menuBtn','soundBtn','lensBtn','tagBtn','modeBtn'].includes(e.target.id)){e.preventDefault();e.target.blur()}else return}
  const k=KM[e.code];
@@ -1781,7 +1793,7 @@ function spawnTruck(force){if(!force)return;if(!tarUp())return;const grow=sites.
  if(crewSeen>=2&&F.unmet>0)cause('need')}
 
 /* ---------- update ---------- */
-function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return}if(state==='poolcut'){pcT+=raw;T+=raw;if(pcT>26)endPoolCut();return}
+function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return}if(state==='poolcut'){pcT+=raw;T+=raw;pcStep(raw);return}
  if(hitstop>0){hitstop-=raw;return}const dt=(lensOn&&state==='play')?raw*.3:raw;T+=dt;critStep(dt);sites.forEach(s=>{if(s.sway>0)s.sway*=Math.pow(.015,dt)});
  if(toastT>0){toastT-=raw;placeToast();if(toastT<=0)$('toast').classList.remove('on')}
  const coal=sites[2];
@@ -2968,7 +2980,23 @@ function startLevel(){restC=null;level++;crit=[];critNext={};foundNow.clear();ri
    below, the three of them in the water, a beach ball, rings, neighbours on the deck, the Baron at the far end lobbing tomatoes that grow as
    they come at you. Then the Island Gazette lands with its review, written from how you played. Tap to take your bow. */
 let pcT=0,pcTom=[],pcRev=null;
-function beginPoolCut(){state='poolcut';document.body.classList.add('cut');pcT=0;pcTom=[];swim=null;upQ=smashQ=false;K.u=K.d=K.l=K.r=0;$('swimBtn').classList.remove('can');$('tagBtn').classList.remove('can');toastT=0;$('toast').classList.remove('on');pcRev=poolReview();SFX.grow()}
+/* v1.9 (founder 2026-11-25: "Get rid of 'tap to take your bow' player can shoot hoops on a floating basket. Salmon will reject every 2-3 shots."):
+   a basketball hoop floats on a buoy and drifts across the pool. Tap where you want the shot to land (or press Space to shoot at the hoop) and
+   the beaver lobs the ball; a ball that reaches the rim while the hoop is under it goes in. Every second or third shot the salmon leaps out
+   of the water and swats it away. Eight shots and the scene ends on its own. */
+let PC={shots:0,made:0,rej:2,ball:null,tf:null,last:0,fly:null};
+const pcPx=(xf,y)=>450+(xf-450)*(y+170)/420;
+function pcHoop(tm){const xf=450+Math.sin(tm*.55)*125,y=388+Math.sin(tm*.9)*6,z=.5+(y-250)/400;const bx=pcPx(xf,y);return{bx,by:y-96*z,r:26*z,baseX:bx,baseY:y,z}}
+function pcShoot(cx,cy){if(PC.ball||PC.shots>=8||pcT<1)return;const S={x:pcPx(500,470),y:470-80},h=pcHoop(T+.95);let tg;
+ if(cx===undefined||!PC.tf){tg={x:h.bx+(Math.random()-.5)*16,y:h.by+(Math.random()-.5)*8}}else{tg={x:(cx-PC.tf[1])/PC.tf[0],y:(cy-PC.tf[2])/PC.tf[0]}}
+ PC.shots++;const rej=PC.shots===PC.rej;if(rej)PC.rej+=2+(Math.random()<.5?1:0);PC.ball={t0:T,S,tg,rej,res:null};SFX.pop()}
+function pcStep(dt){const b=PC.ball;if(b){const u=(T-b.t0)/.95;
+  if(b.rej&&!b.sw&&u>=.72){b.sw=T;const P0=pcBall(b,.72);b.rp=P0;b.rv={x:(P0.x<450?-1:1)*(260+Math.random()*120),y:-280};SFX.splat()}
+  if(!b.res&&!b.rej&&u>=1){const h=pcHoop(T);if(Math.hypot(b.tg.x-h.bx,(b.tg.y-h.by)*1.6)<h.r*1.5){b.res='in';PC.made++;SFX.grow();b.h=h}else{b.res='miss';SFX.splat()}b.t1=T}
+  if((b.res&&T-b.t1>.8)||(b.sw&&T-b.sw>1.3)){PC.ball=null;PC.last=T}}
+ if(PC.shots>=8&&!PC.ball&&T-PC.last>1.8)endPoolCut();if(pcT>60)endPoolCut()}
+function pcBall(b,u){const x=b.S.x+(b.tg.x-b.S.x)*u,y=b.S.y+(b.tg.y-b.S.y)*u-Math.sin(Math.PI*Math.min(u,1))*170;return{x,y}}
+function beginPoolCut(){state='poolcut';document.body.classList.add('cut');pcT=0;pcTom=[];PC={shots:0,made:0,rej:2+(Math.random()<.5?1:0),ball:null,tf:null,last:0};swim=null;upQ=smashQ=false;K.u=K.d=K.l=K.r=0;$('swimBtn').classList.remove('can');$('tagBtn').classList.remove('can');toastT=0;$('toast').classList.remove('on');pcRev=poolReview();SFX.grow()}
 function endPoolCut(){if(state!=='poolcut')return;document.body.classList.remove('cut');state='play';finish()}
 function poolReview(){const five=sites.slice(0,5).filter(q=>q.state==='grown').map(q=>CH[q.choice]?CH[q.choice].short:'').filter(Boolean),c=sites.find(q=>q.id==='coal');
  const pw=c&&c.choice==='wind'?'The lights are on, and they come off the wind.':'The lights are on.';
@@ -2993,7 +3021,7 @@ function pcHib(x,y,r,c,sd){for(let i=0;i<5;i++){const a=i/5*6.283+sd+(RM?0:Math.
  dot(x,y,r*.22,'#8a1a3a');line(x,y,x+r*.7,y-r*.7,'#ffd23f',2);dot(x+r*.72,y-r*.72,2.4,'#ffd23f')}
 function pcFly(x,y,c,sd){const f=RM?1:Math.abs(Math.sin(T*14+sd));ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(T*2+sd)*.3);shape(ellPts(-6*f,-4,7*f+1,9,sd),c,{lw:1.2});shape(ellPts(6*f,-4,7*f+1,9,sd+1),c,{lw:1.2});shape(ellPts(-4*f,6,4*f+1,5,sd+2),c,{lw:1});shape(ellPts(4*f,6,4*f+1,5,sd+3),c,{lw:1});line(0,-8,0,8,INK,2);ctx.restore()}
 function drawPoolCut(){const t=pcT;ctx.setTransform(DPR,0,0,DPR,0,0);const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#3b6fb8');sky.addColorStop(.45,'#f3b07a');sky.addColorStop(1,'#f6d79a');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
- const port=H>W*1.1,DW=port?560:900,DH=port?700:620,ox=port?170:0,k=Math.min(W/DW,H/DH);ctx.setTransform(DPR*k,0,0,DPR*k,((W-DW*k)/2-ox*k)*DPR,(H-DH*k)/2*DPR);const X0=ox-((W/k)-DW)/2-40,X1=ox+DW+((W/k)-DW)/2+40,Y1=DH+((H/k)-DH)/2+40;
+ const port=H>W*1.1,DW=port?560:900,DH=port?700:620,ox=port?170:0,k=Math.min(W/DW,H/DH);ctx.setTransform(DPR*k,0,0,DPR*k,((W-DW*k)/2-ox*k)*DPR,(H-DH*k)/2*DPR);PC.tf=[k,(W-DW*k)/2-ox*k,(H-DH*k)/2];const X0=ox-((W/k)-DW)/2-40,X1=ox+DW+((W/k)-DW)/2+40,Y1=DH+((H/k)-DH)/2+40;
  // the sun, shades back up, and the sea and the island far below the parapet
  const SX=port?630:720;ctx.save();ctx.translate(SX-720,0);shape(ellPts(720,70,34,34,5),'#fff1b8',{lw:2.4});for(let i=0;i<10;i++){const a=i/10*6.283+T*.15;line(720+Math.cos(a)*42,70+Math.sin(a)*42,720+Math.cos(a)*54,70+Math.sin(a)*54,'#fff1b8',4)}shape(rectPts(695,59,21,14,1,.3),INK,{lw:1});shape(rectPts(724,59,21,14,2,.3),INK,{lw:1});line(716,63,724,63,INK,2.6);ctx.beginPath();ctx.arc(720,75,14,.15*Math.PI,.85*Math.PI);ctx.strokeStyle=INK;ctx.lineWidth=2.8;ctx.stroke();ctx.restore();
  ctx.fillStyle='#3f8fb6';ctx.fillRect(X0,190,X1-X0,60);for(let i=0;i<14;i++){const x=((i*80+T*12)%(X1-X0+80))+X0-40;line(x,200+(i%3)*14,x+30,200+(i%3)*14,'rgba(255,255,255,.55)',2.4)}
@@ -3028,12 +3056,17 @@ function drawPoolCut(){const t=pcT;ctx.setTransform(DPR,0,0,DPR,0,0);const sky=c
  const hero=(w,face)=>{const sv=Object.assign({},P),w0=who;Object.assign(P,{x:0,y:62,vx:0,vy:0,climb:null,support:'ground',punch:0,charge:0,spin:0,squash:0,dizzy:0,cheer:(T*1.2|0)%3===0?1:0,tumble:0,idle:0,zap:0,face,nap:0,pole:null,pinch:0,flip:0});who=w;try{drawHero()}catch(e){}who=w0;Object.assign(P,sv)};
  // the far end: the Baron in his straw hat behind the coping, winding up
  const bxF=px(VX-170,PF-8);questBaron(bxF,PF-6,1,(T*1.4%2)<.5?'slip':'hoe',true);
- sw(600,320,.62,()=>drawSalmon({x:0,y:.001,face:1,leap:0,z:1}));
+ if(!(PC.ball&&PC.ball.rej&&T-PC.ball.t0>.45))sw(600,320,.62,()=>drawSalmon({x:0,y:.001,face:1,leap:0,z:1}));
  sw(340,380,.66,()=>hero('turtle',1));
  sw(500,470,.84,()=>hero('beaver',-1));
  // rings and the ball
  [[560,500,'#f3b6c8',1],[330,300,'#ffd23f',.7]].forEach(([xf,y,c,z])=>{const x=px(xf,y),b=RM?0:Math.sin(T*2+xf)*2;ctx.lineWidth=12*z;ctx.strokeStyle='#141016';ctx.beginPath();ctx.ellipse(x,y+b,34*z,10*z,0,0,7);ctx.stroke();ctx.lineWidth=8*z;ctx.strokeStyle=c;ctx.beginPath();ctx.ellipse(x,y+b,34*z,10*z,0,0,7);ctx.stroke()});
- {const ph=(T*.6)%2,u=ph<1?ph:2-ph,y=360+u*120,x=px(330+u*180,y),z=.6+u*.5,h=Math.abs(Math.sin(ph*Math.PI))*120*z;dot(x,y-h,18*z,'#fbf6ea');ctx.save();ctx.beginPath();ctx.arc(x,y-h,17*z,0,7);ctx.clip();ctx.fillStyle='#d9342a';ctx.fillRect(x-17*z,y-h-17*z,34*z,13*z);ctx.fillStyle='#ffd23f';ctx.fillRect(x-17*z,y-h+4*z,34*z,13*z);ctx.restore()}
+ // the floating hoop: a red-and-white buoy, a pole, a backboard, an orange rim and a net
+ {const h=pcHoop(T),z=h.z,bx=h.baseX,by=h.baseY;ctx.lineWidth=10*z;ctx.strokeStyle='#141016';ctx.beginPath();ctx.ellipse(bx,by,40*z,12*z,0,0,7);ctx.stroke();for(let m=0;m<8;m++){ctx.strokeStyle=m%2?'#fbf6ea':'#e8455a';ctx.lineWidth=7*z;ctx.beginPath();ctx.ellipse(bx,by,40*z,12*z,0,m*Math.PI/4,(m+1)*Math.PI/4);ctx.stroke()}
+  line(bx+30*z,by-4*z,bx+30*z,h.by-50*z,'#9aa0a8',5*z);shape(rectPts(bx-6*z,h.by-62*z,64*z,44*z,970,.2),'#fbf6ea',{lw:2});ctx.strokeStyle='#e86a2a';ctx.lineWidth=2.4*z;ctx.strokeRect(bx+14*z,h.by-48*z,24*z,18*z);
+  for(let m=0;m<6;m++){const a=m/6*6.283;line(bx+Math.cos(a)*h.r,h.by+Math.sin(a)*h.r*.32,bx+Math.cos(a)*h.r*.55,h.by+30*z,'rgba(251,246,234,.85)',1.4)}
+  ctx.lineWidth=4*z;ctx.strokeStyle='#e86a2a';ctx.beginPath();ctx.ellipse(bx,h.by,h.r,h.r*.32,0,0,7);ctx.stroke();
+  if(PC.shots===0&&pcT>1.2&&!RM){const pu=(T*1.4)%1;ctx.globalAlpha=1-pu;ctx.lineWidth=3;ctx.strokeStyle='#ffd23f';ctx.beginPath();ctx.ellipse(bx,h.by,h.r*(1.4+pu*1.4),h.r*(.6+pu*.6),0,0,7);ctx.stroke();ctx.globalAlpha=1}}
  // neighbours on the deck
  [[px(150,300),300,'#e8c25a'],[px(760,300),300,'#9fd8ee'],[px(170,420),420,'#7cc35a'],[px(740,430),430,'#f3b6c8']].forEach(([x,y,c],i)=>{const z=.7+(y-300)/400;ctx.save();ctx.translate(x,y);ctx.scale(z*1.6,z*1.6);
   line(0,-6,0,-70,'#6a4a2a',2.4);ctx.save();ctx.beginPath();ctx.ellipse(0,-70,38,16,0,Math.PI,0);ctx.closePath();ctx.clip();for(let m=0;m<8;m++){ctx.fillStyle=m%2?'#fbf6ea':['#e8455a','#2f8f8a','#f0a830','#3f8fb6'][i];ctx.beginPath();ctx.moveTo(0,-70);ctx.lineTo(-38+m*9.5,-70);ctx.lineTo(-38+(m+1)*9.5,-70);ctx.lineTo(0,-86);ctx.fill()}ctx.restore();ctx.strokeStyle=INK;ctx.lineWidth=1.6;ctx.beginPath();ctx.ellipse(0,-70,38,16,0,Math.PI,0);ctx.stroke();
@@ -3042,6 +3075,13 @@ function drawPoolCut(){const t=pcT;ctx.setTransform(DPR,0,0,DPR,0,0);const sky=c
  if(t>1.2&&!RM&&(pcTom.length===0||T-pcTom[pcTom.length-1].t0>1.1)&&t<20)pcTom.push({t0:T,xf:280+Math.random()*260,yE:330+Math.random()*190});
  pcTom=pcTom.filter(m=>{const u=(T-m.t0)/1.1;if(u>1.5)return false;if(u<1){const y=PF-10+(m.yE-PF+10)*u,x=px(VX-170+(m.xf-VX+170)*u,y),z=.4+.9*u*((y-VY)/(PN-VY)),h=Math.sin(u*Math.PI)*170*(1-u*.3);ctx.save();ctx.translate(x,y-h);ctx.rotate(T*9);shape(ellPts(0,0,10*z,9*z,77),'#d9342a',{lw:1.4,sh:1});shape([[-4*z,-8*z],[0,-12*z],[4*z,-8*z]],'#3f7a34',{lw:1});ctx.restore()}
   else{if(!m.sp){m.sp=1;SFX.splat()}const v=u-1,y=m.yE,x=px(m.xf,y),z=(y-VY)/(PN-VY);ctx.globalAlpha=1-v*2;for(let q=0;q<7;q++){const a=q/7*6.283;dot(x+Math.cos(a)*v*90*z,y-Math.abs(Math.sin(a))*v*60*z,4*z,q%2?'#d9342a':'#f08a6a')}ctx.globalAlpha=1}return true});
+ if(PC.ball){const b=PC.ball,u=(T-b.t0)/.95;let p;
+  if(b.sw){const d=T-b.sw;p={x:b.rp.x+b.rv.x*d,y:b.rp.y+b.rv.y*d+450*d*d}}else if(b.res==='in'){const d=T-b.t1;p={x:b.h.bx,y:b.h.by+60*d+300*d*d}}else p=pcBall(b,Math.min(u,1.15));
+  if(b.rej&&u>.45&&!(b.sw&&T-b.sw>.6)){const h=pcHoop(T),lu=clamp((u-.45)/.27,0,1),sx=h.bx+(b.rp?0:(pcBall(b,.72).x-h.bx)*lu),sy=h.baseY-(h.baseY-(b.rp?b.rp.y:pcBall(b,.72).y))*Math.sin(Math.PI*.5*lu)-(b.sw?(T-b.sw)*-200:0);ctx.save();ctx.translate(sx,sy);ctx.rotate(-1.2);ctx.translate(-sx,-sy);drawSalmon({x:sx,y:sy,face:1,leap:0,z:.9});ctx.restore()}
+  if(!(b.res==='in'&&T-b.t1>.5)&&!(b.sw&&T-b.sw>1.1)&&!(b.res==='miss'&&T-b.t1>.1)){const z=.7+(p.y-200)/600;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(T*8);dot(0,0,11*z,'#e86a2a');ctx.strokeStyle='#141016';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(0,0,11*z,0,7);ctx.moveTo(-11*z,0);ctx.lineTo(11*z,0);ctx.moveTo(0,-11*z);ctx.lineTo(0,11*z);ctx.stroke();ctx.restore()}
+  if(b.res==='miss'&&T-b.t1<.6||b.sw&&T-b.sw>.9&&T-b.sw<1.3)for(let m=0;m<6;m++){const a=m/6*Math.PI,d=(b.res?T-b.t1:T-b.sw-.9)*60;dot(p.x+Math.cos(a)*d*-1,p.y-Math.sin(a)*d*.6,3,'#dff1f7')}
+  if(b.res==='in'&&T-b.t1<.7)paperText('SWISH',b.h.bx,b.h.by-60,26,'#ffd23f',0);if(b.sw&&T-b.sw<.8)paperText('SWAT!',b.rp.x,b.rp.y-50,28,'#e8455a',0)}
+ {const lbl='BASKETS '+PC.made+(PC.shots?'  /  SHOTS '+PC.shots+' OF 8':'');ctx.font='800 20px Georgia,serif';const tw=ctx.measureText(lbl).width;shape(rectPts(450-tw/2-18,8,tw+36,36,93,.4),'#1b1328',{lw:2});ctx.fillStyle='#fbf3dc';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lbl,450,27);ctx.textBaseline='alphabetic'}
  // frangipani floating on the water
  for(let m=0;m<6;m++){const y=300+m*38+(RM?0:Math.sin(T*1.3+m)*3),xf=300+hr(m*5)*300,x=px(xf,y),z=.5+(y-FY)/400;for(let i=0;i<5;i++){const a=i/5*6.283+m;shape(ellPts(x+Math.cos(a)*6*z,y+Math.sin(a)*3*z,6*z,3.4*z,m*7+i),'#fbf6ea',{lw:1})}dot(x,y,3*z,'#ffd23f')}
  // string lights sagging across the top of the frame
@@ -3062,7 +3102,6 @@ function drawPoolCut(){const t=pcT;ctx.setTransform(DPR,0,0,DPR,0,0);const sky=c
   for(let x=L0+20;x<L1;x+=46){const lx=x+hr(x)*16,ly=by-70-hr(x*5)*40;line(lx,by-10,lx,ly,'#3f7a34',2.4);for(let k=0;k<6;k++){const a=-Math.PI/2+(k-2.5)*.42;shape([[lx,ly],[lx+Math.cos(a-.12)*16,ly+Math.sin(a-.12)*16],[lx+Math.cos(a)*22,ly+Math.sin(a)*22],[lx+Math.cos(a+.12)*16,ly+Math.sin(a+.12)*16]],['#fbf6ea','#f3b6c8','#ffd23f','#e8455a'][((x/46)|0)%4],{lw:1})}dot(lx,ly,3,'#f0a830')}
   {const cx=port?300:250,cy=by-74;shape([[cx-58,cy],[cx+58,cy],[cx+50,cy+44],[cx-50,cy+44]],'#a8743f',{lw:2.4,sh:1});for(let k=1;k<3;k++)line(cx-55+k*2,cy+k*14,cx+55-k*2,cy+k*14,'rgba(90,56,30,.6)',1.6);for(let k=0;k<9;k++){const tx=cx-44+(k%5)*22+(k>4?11:0),ty=cy-6-(k>4?12:0);dot(tx,ty,11,'#d9342a');shape([[tx-5,ty-10],[tx,ty-15],[tx+5,ty-10]],'#3f7a34',{lw:1})}}
   {const tx=port?600:690,ty=by-84;shape(ellPts(tx,ty,52,12,961),'#fbf6ea',{lw:2,sh:1});line(tx,ty+10,tx,by,'#6a4a2a',4);[[tx-22,'#f0a830'],[tx+18,'#e8455a']].forEach(([gx,c],k)=>{shape([[gx-11,ty-46],[gx+11,ty-46],[gx+4,ty-10],[gx-4,ty-10]],'rgba(234,248,255,.85)',{lw:1.6});shape([[gx-9,ty-40],[gx+9,ty-40],[gx+4,ty-14],[gx-4,ty-14]],c,{lw:0});line(gx+4,ty-46,gx+12,ty-64,'#e8455a',2);ctx.save();ctx.beginPath();ctx.ellipse(gx+12,ty-64,12,5,-.3,Math.PI,0);ctx.fillStyle=k?'#ffd23f':'#9fd8ee';ctx.fill();ctx.restore();dot(gx+8,ty-46,4,'#fbf6ea')})}}
- if(t>4.5){const ty=28;shape(rectPts(300,ty-24,300,46,93,.4),'#1b1328',{lw:2});ctx.globalAlpha=.75+.25*Math.sin(T*3);paperText('Tap to take your bow',450,ty,26,'#fbf3dc',0);ctx.globalAlpha=1}
  if(t<.8){ctx.fillStyle='rgba(18,12,30,'+(1-t/.8).toFixed(3)+')';ctx.fillRect(X0,-200,X1-X0,Y1+400)}
  ctx.setTransform(DPR,0,0,DPR,0,0);if(grain){ctx.fillStyle=grain;ctx.fillRect(0,0,W,H)}}
 function drawVacation(){const t=vacT;ctx.setTransform(DPR,0,0,DPR,0,0);const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#4a9be0');g.addColorStop(.55,'#cdeef6');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
