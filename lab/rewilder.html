@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.16</title>
+<title>Rewilder v1.17</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.16 | LAB | 2026-11-26
+<!-- TSP build: Rewilder v1.17 | LAB | 2026-11-26
+     v1.17 (founder: "There is a crackling sound in the game that might be construction or tractors breaking but it's not a nice sound and I want to cut. Also, reverse decision on the maze for the final tower. Remove maze."): the weld crackle (tractor repair, rebuild crew) and the crackle bursts in the construction cue are cut; the electric maze is gone and the tower is back to 40 floors, the 16 floors added for it removed.
      v1.16 (founder: "C. And approved for the next"): level 2 steel legs and blocks are real cross-bracing in worn mustard with bolted plates; chimney, stack and steam smoke are curling paper ribbons; dust is grit chips. No ovals standing in.
      v1.15 (founder: "Keep 93 south signs. Forget air bar and go back to the dots we had. Remove the ovals at the bottom of the waterfall. Ovals are poor abstract subs. For anything."): 93 SOUTH back, five air dots back, falls foam removed, locust leaflet ovals removed.
      v1.14 (founder: "Fix 1 2 4 5", from the art-pass weak-spot list): the level 1 and 2 dam is one poured concrete mass with board-form lines, tie holes, rust weep, lit treads, an overflow sheet down each riser and a crest rail; the reservoir behind it has depth, a lit surface band, silt banked at the dam and slivers of current instead of white lines. The air meter is a breath tube, swimmer bubbles are faint aqua rings, foam at the falls is torn paper scraps. The salmon redd is a dish of gravel under the eggs, not a cream disc. The 93 SOUTH sign is gone (TOLL stays). The tram avenue grows three kinds of street tree in five greens.
@@ -817,7 +818,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.16</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.17</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -1230,7 +1231,7 @@ const SFX={
  zap(){const k=.9+Math.random()*.2;tone(60*k,.5,'sawtooth',.22);tone(1900*k,.45,'square',.05,-1500*k);nz(.3+Math.random()*.25,.18,'highpass',2500,.7)},
  beeps(){for(let i=0;i<3;i++)tone(1050,.16,'square',.07,0,i*.36)},
  hammer(){nz(.02,.3,'bandpass',2200,3);tone(520,.08,'triangle',.12,-200)},
- construct(){for(let i=0;i<3;i++)tone(1050,.16,'square',.07,0,i*.36);for(let i=0;i<14;i++)nz(.035,.22,'bandpass',600+Math.random()*300,1.5,1.1+i*.06);for(let i=0;i<3;i++){nz(.02,.3,'bandpass',2200,3,2.1+i*.28);tone(520,.08,'triangle',.12,-200,2.1+i*.28)}},
+ construct(){for(let i=0;i<3;i++)tone(1050,.16,'square',.07,0,i*.36);for(let i=0;i<3;i++){nz(.02,.3,'bandpass',2200,3,2.1+i*.28);tone(520,.08,'triangle',.12,-200,2.1+i*.28)}},
  blimp(){tone(70,2.2,'sawtooth',.08);tone(105,2.2,'sawtooth',.05)},
  pfft(){nz(.9,.3,'bandpass',500,2);tone(300,.9,'sawtooth',.06,-240)},
  splat(){nz(.12,.3,'lowpass',500,.7);tone(120,.12,'sine',.2,-60)},
@@ -1255,7 +1256,7 @@ const SFX={
  eat(){const k=.92+Math.random()*.16;tone(660*k,.08,'sine',.14);tone(990*k,.1,'sine',.12,0,.07)},
  setback(){tone(300,.25,'triangle',.12,-140)},
  bump(){const k=.85+Math.random()*.3;tone(140*k,.15,'square',.08,-60*k)},
- weld(){noise(.2,.1,4000);tone(1500,.1,'square',.03)},
+ weld(){},/* v1.17: the repair crackle is cut (founder 2026-11-26) */
  honk(){},
  hiss(){noise(.4,.05,5000)},
  creak(){tone(95,.9,'sawtooth',.1,45);tone(61,.9,'square',.05,20)},
@@ -1564,7 +1565,7 @@ function bridgeUp(){return !!(isle&&isle.fin&&isle.ft>=1)}
 function xClamp(v,from,pad){return bridgeUp()?clamp(v,ISX0+40,EAST()-pad):from<0?clamp(v,ISX0+40,ISX1-16):clamp(v,40,EAST()-pad)}
 function salmonGen(){return clamp(level-1,0,2)+(isle&&isle.fin?1:0)}
 /* after level 3 the Baron runs to an island at the far left of the sea */
-function openIsland(){setTimeout(()=>{if(!isle||sites.some(q=>q.isle))return;const L=isle.lair,tw=buildSite({id:'spire',x:L.x-180,cols:5,cw:72,floors:56,fh:46,name:"the Baron's tower",col:'#e6dac4',cell:(c,f)=>'c',fix:'treat'},6);tw.was='standing';tw.isle=true;sites.push(tw);fortInit(tw)},0);isle={t:0,gr:0,bl:null,lt:0,fin:0,ft:0,rant:3,lair:{x:-3900,hp:6,max:6,state:'up',t:0,g:0,jolt:0,lit:1,lt:3,gap:0},mast:{x:-3050,hp:4,max:4,state:'gone',t:0,jolt:0}};docks.push(ISDOCK);
+function openIsland(){setTimeout(()=>{if(!isle||sites.some(q=>q.isle))return;const L=isle.lair,tw=buildSite({id:'spire',x:L.x-180,cols:5,cw:72,floors:40,fh:46,name:"the Baron's tower",col:'#e6dac4',cell:(c,f)=>'c',fix:'treat'},6);tw.was='standing';tw.isle=true;sites.push(tw);fortInit(tw)},0);isle={t:0,gr:0,bl:null,lt:0,fin:0,ft:0,rant:3,lair:{x:-3900,hp:6,max:6,state:'up',t:0,g:0,jolt:0,lit:1,lt:3,gap:0},mast:{x:-3050,hp:4,max:4,state:'gone',t:0,jolt:0}};docks.push(ISDOCK);
  hudKey='';SFX.blimp();baron=null;baronT=1e9;word('TO MY ISLAND',P.x,GY-260,'#ffd23f');setTimeout(()=>toast('The Baron ran for his island. Dive and swim left across the sea.',8),80)}
 function openPlots(){plotsOpen=true;const n=sites.length-5,add=PLOTS.slice(n,n+2);if(!add.length)return false;
  add.forEach(d=>{const q=buildSite(d,sites.length);q.was='standing';sites.push(q);dust(q.cx,GY,10,q.w);word('NEW GROUND',q.cx,GY-120,'#7cc35a')});hudKey='';SFX.grow();
@@ -2534,13 +2535,13 @@ function liftArt(s){const fh=s.fh,lo=cam.y-260,hi=cam.y+960,lamp=(x,y,st)=>{cons
 /* v1.11 (founder 2026-11-25: "Make the building taller before the drones attack the building lights up in a maze with electric borders player has
    almost enough time to escape first maze when it turns to a second different maze. That takes the first 15-20 floors, then the drones come."):
    the tower grows by 16 floors and everything above moves up with it; floors 1-16 are the electric maze, the drones start above it. */
-const MZ=16,QL=[8+MZ,16+MZ,24+MZ,32+MZ],QDC=[28+MZ,31+MZ],QV=24+MZ,QP=32+MZ;
+const MZ=0,QL=[8+MZ,16+MZ,24+MZ,32+MZ],QDC=[28+MZ,31+MZ],QV=24+MZ,QP=32+MZ;
 function qD(s,f){return GY-f*s.fh}
 function qGeo(s){const R=s.x+s.w;return{pipeX:R+24,pipeTop:qD(s,QP)-40,valveY:qD(s,QV)-46,drainY:qD(s,QP)+30,bx0:R+6,bx1:R+124,post:{x:R-26},roofY:GY-s.rows.length*s.fh,
  pool:{x0:s.cx-10,x1:R-8},plateDeck:QV}}
 function questInit(s){const q=isleSpec(s,Math.random,null);fort.band=q.band;fort.spec=q.spec.map(()=>null);fort.lifts=[];fort.ck=null;tdr=[];
  fort.decks=QL.map(f=>({deck:1,x:s.cx,w:s.w+44,y:qD(s,f),k:f}));
- const dr=[];for(let i=0;i<8;i++)dr.push({i,x:s.cx+(i-3.5)*48,y:GY-(MZ+9)*s.fh,st:'form',t:0,path:null});fort.mz=mzMake(s);
+ const dr=[];for(let i=0;i<8;i++)dr.push({i,x:s.cx+(i-3.5)*48,y:GY-(MZ+9)*s.fh,st:'form',t:0,path:null});fort.mz=null;/* v1.17: maze removed (founder 2026-11-26) */
  fort.tq={water:0,fill:0,drain:0,pool:1,hand:0,door:0,weight:0,dr,gt:1.2,fy:qD(s,MZ+9),pat:0,hitT:0,ren:[],rs:[],fish:{x:s.x+s.w+70,y:GY+14,on:false,face:-1,back:0},
   roof:{ph:'wait',t:0,post:2,bt:-1},end:0}}
 /* v1.12 (founder 2026-11-25: "The maze is hard to identify as such. Don't have red lights in the background in a pattern that confounds the maze.
