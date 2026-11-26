@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.18</title>
+<title>Rewilder v1.19</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.18 | LAB | 2026-11-26
+<!-- TSP build: Rewilder v1.19 | LAB | 2026-11-26
+     v1.19 (founder: "124", from the low-hanging-fruit list): (1) swatting drones in a row climbs in pitch, SWAT x2, x3...; (2) when the last site of a level grows, the camera drifts across the whole restored city for about five seconds before the notes open, tap to skip; (4) a grown site answers its need once: water sites pull the next storm in and runoff visibly slides off the houses into them, power sites send lightning chevrons to the houses, getting-around sites draw green arrows from the houses.
      v1.18 (founder: "The final tower has random red lights in windows which is hard for tracking drones. Be consistent. Review art on final tower"): every tower window is the same dark glass with one glint; the spine is iron grey with no blinking lamps; gargoyle eyes are dark. Red light on the tower now means a drone.
      v1.17 (founder: "There is a crackling sound in the game that might be construction or tractors breaking but it's not a nice sound and I want to cut. Also, reverse decision on the maze for the final tower. Remove maze."): the weld crackle (tractor repair, rebuild crew) and the crackle bursts in the construction cue are cut; the electric maze is gone and the tower is back to 40 floors, the 16 floors added for it removed.
      v1.16 (founder: "C. And approved for the next"): level 2 steel legs and blocks are real cross-bracing in worn mustard with bolted plates; chimney, stack and steam smoke are curling paper ribbons; dust is grit chips. No ovals standing in.
@@ -819,7 +820,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.18</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.19</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -1202,7 +1203,7 @@ const P={x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,
 const stats={hits:0,crews:0,paved:0,start:0,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0};
 let lift93=0,F={hard:4,soak:0,tn:0,tm:0,pn:0,pm:0,unmet:0,links:0,haze:true};
 // v0.67 needs as people: each block's need runs a neglect clock; crews and the Baron come from neglect, not from a timer
-const DECKS=[1545,2512];let needs=null,needCrewT=20,badFix=[];
+const DECKS=[1545,2512];let dCombo=0,dComboT=-9,cityPan=null,cbk=[];let needs=null,needCrewT=20,badFix=[];
 function needsReset(){P.flip=0;needs={go:{kind:'go',t:0,vis:0,ax:DECKS[0]},power:{kind:'power',t:0,vis:0,ax:DECKS[1]},dry:{kind:'dry',t:0,vis:0,ax:DECKS[0]}};needCrewT=20;badFix=[]}needsReset();
 const FLD=7,BRT=80,honks=[];let pulse=null,hl=0,roamT=3,rivRec=0,rivFl=-1,lightV=.5,level=1,vacT=0,life=[],lifeT=14,lifeI=0,done=false,hitstop=0,statue=null,baron=null,baronT=40,baronHp=3,barrels=[],tar=[],crates=[],pits=[],folk=[],who='beaver',rest={energy:100},crewT=14,stormT=26,rain=0,flood=0,rainbow=0,sed=null,beach=0,toastT=0,lensT=0,gardeners=0,crewSeen=0,swim=null,bills=[],drones=[],fort=null,tdr=[],riverOn=false,via=null,plotsOpen=false,tireJam=null,restX=FRX,restY=GY,plug={x:1000,hp:0,max:1,seen:false},lungeOn=false,downed=null,restartT=0,isle=null,fishSave=null,run=null,REDX=3500,docks=[],junk=[],grate={x:0,hp:0,max:1},eels=[],walls=[],vb=null,vacEnd=0,DY=0;
 
@@ -1213,7 +1214,7 @@ function resetWorld(){level=1;crit=[];critNext={};foundNow.clear();riverOn=false
  Object.assign(P,{x:120,y:GY,vx:0,vy:0,face:1,support:'ground',climb:null,punch:0,cool:0,energy:100,nap:0,bump:0,charge:0,spin:0,squash:0,dizzy:0,cheer:0,tumble:0,idle:0,zap:0,singe:0,stuck:0,slide:null,dive:false,cmb:0,cmbT:0,sup:0});level=1;vacT=0;life=[];lifeT=14;lifeI=0;done=false;baron=null;baronT=40;baronHp=3;barrels=[];tar=[];who='beaver';rest={energy:100};
  folk=[0,1,2,3,4,5].map(i=>({x:560+i*290+hr(i)*120,dir:i%2?1:-1,v:i%2?70+hr(i)*30:24+hr(i)*14,bike:i%2===1,c:['#c8342b','#3b6ea8','#e8c25a','#7a1a12','#2f8f8a','#b06ad0'][i],hop:0,seed:i}));
  Object.assign(stats,{hits:0,crews:0,paved:0,start:T,floods:0,boosts:0,lifts:0,floors:0,cars:0,baron:0,topples:0,junk:0});
- crewT=14;stormT=26;rain=0;flood=0;rainbow=0;sed=null;beach=0;gardeners=0;crewSeen=0}
+ crewT=14;stormT=26;cbk=[];cityPan=null;dCombo=0;rain=0;flood=0;rainbow=0;sed=null;beach=0;gardeners=0;crewSeen=0}
 resetWorld();
 
 /* ---------- sound ---------- */
@@ -1845,10 +1846,11 @@ function update(raw){if(state==='vacation'){vacT+=raw;T+=raw;vacStep(raw);return
  sites.forEach(s=>{
   if(s.state==='growing'&&!s.paving){const near=P.x>=s.x-30&&P.x<=s.x+s.w+30&&P.y>GY-140;s.tend=near;if(s.reopt&&!trucks.some(t=>t.target===s&&t.state==='drive'))s.reopt=false;const m=rate(s);
    s.g+=dt/66.7*m*(near?1.5:1)*(s.crew?1.6:1)*(s.reopt?0:1)*(s.id==='tar'?1.3:1);if(near&&Math.random()<dt*3)leaves(P.x+(Math.random()-.5)*60,GY-10,1);
-   if(s.g>=1){s.g=1;s.state='grown';s.pop=T;pulse={x:s.cx,t:T};built++;notes.add(s.id);SFX.grow(s.choice);leaves(s.cx,GY-60,26);P.cheer=1.6;hudKey='';word('GROWN',s.cx,GY-170,'#7cc35a');folk.forEach(f=>f.cheer=3.5);
-    if(levelClear()){if(done)toast('Everything is grown again.',5);else setTimeout(finish,2600)}else if(!plotsOpen||sites.length-5<1||s.plot!==undefined||!sites.slice(0,5).every(q=>q.state==='grown'))toast('The '+CH[s.choice].short+' is grown.'+(s.plot===undefined?' A field note waits in the menu.':''),5)}}
+   if(s.g>=1){s.g=1;s.state='grown';s.pop=T;pulse={x:s.cx,t:T};built++;notes.add(s.id);SFX.grow(s.choice);leaves(s.cx,GY-60,26);P.cheer=1.6;hudKey='';word('GROWN',s.cx,GY-170,'#7cc35a');folk.forEach(f=>f.cheer=3.5);{const c=CH[s.choice],kd=c?(c.power?'power':c.travel?'go':c.soak>=1?'rain':null):null;if(kd&&s.x<WORLD){cbk.push({s,kind:kd,t:0,seen:0});if(kd==='rain'&&rain<=0)stormT=Math.min(stormT,7)}}
+    if(levelClear()){if(done)toast('Everything is grown again.',5);else setTimeout(()=>{if(state==='play'&&!done)cityPan={t:0,x0:cam.x,dur:5.5}},2200)}else if(!plotsOpen||sites.length-5<1||s.plot!==undefined||!sites.slice(0,5).every(q=>q.state==='grown'))toast('The '+CH[s.choice].short+' is grown.'+(s.plot===undefined?' A field note waits in the menu.':''),5)}}
   if(s.state==='grown'){s.sprigT-=dt;if(s.sprigT<=0&&sprigs.length<4){s.sprigT=10+Math.random()*6;sprigs.push({x:s.x+20+Math.random()*(s.w-40),y:GY-24})}}});
  if(sites.some(s=>s.state==='growing'||s.state==='grown')){
+  cbk.forEach(c=>{c.t+=dt;if(c.kind==='rain'&&rain>0)c.seen=1});cbk=cbk.filter(c=>c.kind==='rain'?!(c.seen&&rain<=0)&&c.t<60:c.t<6);
   if(rain>0){rain-=dt;if(rain<=0){rain=0;stormT=30;resolveRain()}}
   else{stormT-=dt;if(stormT<=0){rain=5;SFX.rain();toast('Rain is coming.',2.5)}}}
  if(flood>0){flood-=dt;if(state==='play'&&!swim&&P.support==='ground'&&!RM)P.x-=26*floodEnv()*dt}hl+=clamp(sites.slice(0,5).filter(q=>q.state==='grown').length/5-hl,-dt*.25,dt*.25);if(rainbow>0)rainbow-=dt;
@@ -2037,7 +2039,13 @@ function qFish(){return fort&&fort.tq&&fort.tq.fish.on&&fort.s&&fort.s.isle?fort
 /* player-clear hooks (studio rule 2026-11-10): the character's on-screen box in CSS px, and a toast the gate can fire */window.__tspPlayer=()=>{if(state!=='play')return null;const f=swim||P,hw=swim?50:46,hh=swim?50:118,x=(f.x-hw-cam.x)*S,y=OY+(f.y-(swim?hh/2:hh)-cam.y)*S;return {x,y,w:hw*2*S,h:hh*S}};window.__tspToast=t=>toast(t,3);
 /* v0.89 (founder: "when I tap up and hop, the whole camera goes up even if I'm not climbing and it's shaky"): the camera holds its mode in the air */let camHigh=false;function camHi(){if(swim||P.support==='ground')camHigh=false;else if(P.climb||P.pole||(P.support&&P.y<GY-40))camHigh=true;return camHigh}
 let feetK=-1,feetV=0;function climbFeet(){const k=(T*4)|0;if(k===feetK&&feetV)return feetV;feetK=k;let f=H*.8;if(document.body.classList.contains('touch')){const d=$('dpad'),r=d&&d.getBoundingClientRect();if(r&&r.width>0&&W<H)f=Math.min(f,r.top-14)}feetV=Math.max(H*.55,Math.min(f,H-reserve-16));return feetV}
-function camFollow(dt){if(finOn()){cam.x+=(finFocus.x-viewW*.5-cam.x)*Math.min(1,dt*3);cam.y+=(Math.min(0,finFocus.y-(H*.48-OY)/S)-cam.y)*Math.min(1,dt*3);return}let target=clamp((qFish()?qFish().x:swim?swim.x:P.x)-viewW*.45,(swim||P.x<0)?(isle?ISX0-60:OC0-70):0,Math.max(0,(swim&&swim.fish?regs()[3].x1+470:EAST())-viewW));if(look){look.t+=dt;if(look.t<3.4)target=clamp(TARDEF.x+252-viewW*.5,0,EAST()-viewW);if(!look.said&&look.t>1.4){look.said=1;toast(tarUp()?'The tar factory, up past the salmon lake. The pave crews come from here.':'Clean water runs where the tar factory stood.',8)}if(look.t>4.4)look=null}if(!swim&&!qFish()&&!look){const sf=padSafe(),sx=(P.x-target)*S;if(sf.l&&sx<sf.l)target=P.x-sf.l/S;else if(sf.r&&sx>W-sf.r)target=P.x-(W-sf.r)/S}cam.x+=(target-cam.x)*Math.min(1,dt*(look?2.6:5));if(WORLD<viewW&&!(padSafe().l&&(P.x-cam.x)*S<padSafe().l))cam.x=(WORLD-viewW)/2;
+/* v1.19 (founder 2026-11-26, low-hanging fruit 2): when the last site grows, the camera drifts across the whole restored city
+   for about five seconds, no words, then the level-end notes open. A tap skips it. */
+function panStep(dt){const c=cityPan;c.t+=dt;const e=ease(clamp(c.t/c.dur,0,1)),x1=Math.max(0,EAST()-viewW),x0=0;
+ cam.x=c.t<.8?c.x0+(x0-c.x0)*ease(c.t/.8):x0+(x1-x0)*ease(clamp((c.t-.8)/(c.dur-.8),0,1));cam.y+=(0-cam.y)*Math.min(1,dt*3);
+ if(c.t>=c.dur+.6){cityPan=null;finish()}}
+addEventListener('pointerdown',()=>{if(cityPan&&cityPan.t>.4)cityPan.t=cityPan.dur+.6},true);addEventListener('keydown',()=>{if(cityPan&&cityPan.t>.4)cityPan.t=cityPan.dur+.6},true);
+function camFollow(dt){if(cityPan){panStep(dt);return}if(finOn()){cam.x+=(finFocus.x-viewW*.5-cam.x)*Math.min(1,dt*3);cam.y+=(Math.min(0,finFocus.y-(H*.48-OY)/S)-cam.y)*Math.min(1,dt*3);return}let target=clamp((qFish()?qFish().x:swim?swim.x:P.x)-viewW*.45,(swim||P.x<0)?(isle?ISX0-60:OC0-70):0,Math.max(0,(swim&&swim.fish?regs()[3].x1+470:EAST())-viewW));if(look){look.t+=dt;if(look.t<3.4)target=clamp(TARDEF.x+252-viewW*.5,0,EAST()-viewW);if(!look.said&&look.t>1.4){look.said=1;toast(tarUp()?'The tar factory, up past the salmon lake. The pave crews come from here.':'Clean water runs where the tar factory stood.',8)}if(look.t>4.4)look=null}if(!swim&&!qFish()&&!look){const sf=padSafe(),sx=(P.x-target)*S;if(sf.l&&sx<sf.l)target=P.x-sf.l/S;else if(sf.r&&sx>W-sf.r)target=P.x-(W-sf.r)/S}cam.x+=(target-cam.x)*Math.min(1,dt*(look?2.6:5));if(WORLD<viewW&&!(padSafe().l&&(P.x-cam.x)*S<padSafe().l))cam.x=(WORLD-viewW)/2;
  /* v0.87 (founder 2026-11-22: "Sometimes I'm climbing and I'm so close to the top I can't see barriers" ... "The climb camera applies game wide"): once the character leaves the ground (climbing, or standing on anything up high), the camera drops it to the lower part of the screen so the floors above, with their wires, drones and blocks, stay in view. On the ground nothing changes. */ const up=!!(fort&&fort.lifts&&!fort.down&&P.x<0&&P.y<GY-40),high=camHi(),ty=look&&look.t<3.4?0:qFish()?Math.min(0,qFish().y-330+OY/S):swim?swim.y-GY+150:high?Math.min(0,P.y-(climbFeet()-OY)/S):Math.min(0,P.y-(up?440:270)+OY/S);cam.y+=(ty-cam.y)*Math.min(1,dt*4)}
 
 /* ---------- splash: the beaver shows the verb on beats ---------- */
@@ -2976,7 +2984,7 @@ function fortStrike(){const s=fort.s||sites[0];if(fort.down||s.state!=='standing
   if(b.kind==='water'){word('VALVE',bx,by-34,'#7cc4e0');once('valve','The water goes back to the village. His pool drains.',5)}else{word('SWITCH',bx,by-34,'#ffd23f');SFX.zap();once('switch','The power goes back to the village. His lights and wires go dead.',5)}
   return true}}
  if(fort.rep&&!fort.rep.dead&&Math.abs(fort.rep.x-(P.x+P.face*30))<80&&Math.abs(fort.rep.y-(P.y-46))<76){fort.rep.dead=.01;SFX.crunch();stars(fort.rep.x,fort.rep.y,8);word('SWAT',fort.rep.x,fort.rep.y-30,'#ffd23f');return true}
- const d=tdr.find(d=>!d.dead&&Math.abs(d.x-(P.x+P.face*30))<74&&Math.abs(d.y-(P.y-46))<70);if(d){d.dead=.01;SFX.crunch();stars(d.x,d.y,6);word('SWAT',d.x,d.y-30,'#ffd23f');return true}
+ const d=tdr.find(d=>!d.dead&&Math.abs(d.x-(P.x+P.face*30))<74&&Math.abs(d.y-(P.y-46))<70);if(d){d.dead=.01;SFX.crunch();stars(d.x,d.y,6);/* v1.19: swats in a row climb in pitch (founder 2026-11-26, low-hanging fruit 1) */dCombo=(T-dComboT<1.6)?Math.min(dCombo+1,8):1;dComboT=T;{const k=Math.pow(2,[0,2,4,5,7,9,11,12][dCombo-1]/12);tone(523*k,.09,'triangle',.16);tone(784*k,.14,'sine',.12,0,.06);if(dCombo>=3)tone(1047*k,.18,'sine',.09,0,.13)}word(dCombo>1?'SWAT x'+dCombo:'SWAT',d.x,d.y-30,'#ffd23f');if(dCombo>=3)sparks(d.x,d.y,6+dCombo*2,'#ffd23f');return true}
  if(P.support===s&&P.y<=GY-(s.rows.length-.5)*s.fh&&Math.abs(P.x-s.cx)<80){if(fort.br&&fort.br.some(b=>b.t<=0)){SFX.clang();word('LOCKED',s.cx,P.y-150,'#ff8a7a');once('breaker2','The tower still runs on the island\'s water and power. Turn the valve and the switch.',6);return true}fortDown();return true}return false}
 function fortDown(){const s=fort.s||sites[0];if(s.isle){fort.down=true;tdr.forEach(d=>{if(!d.dead)d.dead=.01});s.arm=false;s.fort=false;SFX.slam();shake=RM?0:14;word('CLUNK',s.cx,P.y-170,'#fbf3dc');topple(s,1);return}fort.down=true;tdr.forEach(d=>{if(!d.dead)d.dead=.01});walls.forEach(wl=>{if(wl.up){wl.up=false;wl.t=0}});drones.forEach(d=>{if(!d.dead)d.dead=.01});sites.forEach(q=>{q.arm=false;q.foot=null;q.fort=false});
  SFX.slam();SFX.collapse();shake=RM?0:14;word('CLUNK',s.cx,P.y-170,'#fbf3dc');topple(s,1);toast('The fortress goes dark. Every wall, drone and plate lets go.',5)}
@@ -3299,7 +3307,7 @@ function render(){if(state==='vacation'){drawVacation();return}if(state==='poolc
  if(riverOn&&state==='play'&&!(swim&&swim.fish)&&fishSave){const fry=run&&run.phase==='fry',ph=T%3.2;drawSalmon(Object.assign({},fishSave,{leap:!swim&&ph<.6&&!told.has('fish')?.6-ph:0,z:fry?.42+.58*run.age:1,dead:run&&run.phase==='dying'}))}
  {const hh=clamp((GY-P.y)/300,0,1);if(state!=='title'||P.y<=GY){ctx.globalAlpha=.3*(1-hh*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(P.x,GY-1,24*(1-hh*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1}}
  if(!swim||swim.fish)drawHero();if(swim)drawSwimmer();questPoolFront();drawTagBadge();
- parts.forEach(q=>{if(!q.bk)drawPart(q)});
+ drawCallbacks();parts.forEach(q=>{if(!q.bk)drawPart(q)});
  words.forEach(w=>{const a=clamp(w.life/.9,0,1),pop=1+.5*Math.sin(Math.min(1,(1-a)*5)*Math.PI);ctx.globalAlpha=Math.min(1,a*3);if(w.k){const z=Math.max(30,22/S)*pop,R=z*(.7+w.t.length*.3),pts=[];for(let i=0;i<16;i++){const r=i%2?R*.74:R,an=i/16*6.283+w.rot;pts.push([w.x+Math.cos(an)*r,w.y-(1-a)*40+Math.sin(an)*r*.6])}shape(pts,BURST[w.k][0],{lw:2.4,st:w.k==='baron'?'#ffd23f':INK})}paperText(w.t,w.x,w.y-(1-a)*40,Math.max(30,22/S)*pop,w.k?BURST[w.k][1]:w.c,w.rot);ctx.globalAlpha=1});
  drawFlood();drawMud();
  if(pulse){const u=(T-pulse.t)/1.7;if(u>=1)pulse=null;else{const r=80+u*620,gr=ctx.createRadialGradient(pulse.x,GY-90,r*.1,pulse.x,GY-90,r);gr.addColorStop(0,'rgba(255,226,150,0)');gr.addColorStop(.55,'rgba(255,226,150,'+(.26*(1-u)).toFixed(3)+')');gr.addColorStop(1,'rgba(255,226,150,0)');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=gr;ctx.fillRect(pulse.x-r,GY-90-r,2*r,2*r);ctx.restore()}}
@@ -3945,6 +3953,14 @@ function needIcon(x,y,kind){ctx.save();ctx.translate(x,y+13);ctx.scale(1.5,1.5);
  else{shape([[x-7,y+4],[x,y-8],[x+7,y+4],[x,y+7]],'#5fae50',{lw:1.4});line(x,y+6,x,y-5,'#3f8443',1.4)}ctx.restore()}
 function drawFlyers(){const dt=Math.min(.05,Math.max(0,T-(drawFlyers.lt||T)));drawFlyers.lt=T;for(let i=flyers.length-1;i>=0;i--){const f=flyers[i];f.vy+=1300*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;f.r+=f.vr*dt;if(f.y>GY-8&&f.vy>0){dust(f.x,GY,6,40);debris(f.x,GY-10,8,f.c);SFX.bump();stars(f.x,GY-30,3);flyers.splice(i,1);continue}ctx.save();ctx.translate(f.x,f.y);ctx.rotate(f.r);car(-13,6,f.c,1.15);ctx.restore()}}
 function hawkArt(x,y,dir,fl){ctx.save();ctx.translate(x,y);ctx.scale(dir,1);const w=Math.sin(fl)*16;shape([[-4,-2],[-34,-10-w],[-22,2],[-36,2-w*.6],[-8,7]],'#6b4a2e',{lw:1.8});shape([[4,-2],[30,-12-w],[20,2],[32,0-w*.6],[8,7]],'#7d5a38',{lw:1.8});shape(ellPts(0,2,13,7,3),'#8a5a34',{lw:1.8});shape([[-11,2],[-26,-2],[-26,8]],'#fbf3dc',{lw:1.4});dot(12,-1,5.5,'#fbf3dc');dot(14,-2,1.6,INK);shape([[16,0],[23,2],[16,4]],'#e8a22a',{lw:1.2});line(2,8,6,15,'#e8a22a',2.4);line(-3,8,0,15,'#e8a22a',2.4);ctx.restore()}
+/* v1.19 (founder 2026-11-26, low-hanging fruit 4): a grown site visibly answers the need it was built for, once, right after it grows.
+   Water sites: the next storm comes soon, and while it rains, cut-paper runoff slips off the triple-deckers and along the street into the site.
+   Power sites: lightning chevrons run from the site to the houses. Getting-around sites: green arrows run from the houses to the site. */
+function drawCallbacks(){if(state!=='play')return;cbk.forEach(c=>{const s=c.s,hx=DECKS.reduce((a,b)=>Math.abs(b-s.cx)<Math.abs(a-s.cx)?b:a,DECKS[0]),sx=s.cx,dir=Math.sign(sx-hx)||1,L=Math.abs(sx-hx),gy=GY-8;
+ if(c.kind==='rain'){if(rain<=0)return;for(let i=0;i<22;i++){const u=((T*.4+i/22)%1),px=u<.25?hx+dir*20*(i%3-1):hx+dir*(u-.25)/.75*L,py=u<.25?GY-118+u/.25*110:gy-2,a=Math.min(1,u*6,(1-u)*6);ctx.globalAlpha=a*.9;
+   if(u<.25)shape([[px-3,py-12],[px+3,py-12],[px+2,py+9],[px-2,py+9]],'#4fa4d0',{lw:.8});else shape([[px-dir*24,py-3],[px+dir*14,py-5],[px+dir*24,py],[px+dir*14,py+4],[px-dir*20,py+2.4]],i%2?'#4fa4d0':'#7cc4e0',{lw:1})}ctx.globalAlpha=1;return}
+ const a=Math.min(1,c.t*2,(6-c.t)*1.2);if(a<=0)return;ctx.globalAlpha=a;const pw=c.kind==='power',from=pw?sx:hx,to=pw?hx:sx,dd=Math.sign(to-from)||1,y=gy-34;
+ for(let i=0;i<6;i++){const u=((c.t*.45+i/6)%1),x=from+(to-from)*u,k=2.4;if(pw)shape([[x-dd*6*k,y-8*k],[x+dd*2*k,y-2*k],[x-dd*2*k,y-1*k],[x+dd*6*k,y+8*k],[x-dd*1*k,y+1*k],[x+dd*3*k,y]],'#ffd23f',{lw:1.8,sh:1});else shape([[x-dd*9*k,y-5*k],[x+dd*1*k,y-5*k],[x+dd*1*k,y-9*k],[x+dd*10*k,y],[x+dd*1*k,y+9*k],[x+dd*1*k,y+5*k],[x-dd*9*k,y+5*k]],'#7cc35a',{lw:1.8,sh:1})}ctx.globalAlpha=1})}
 function drawHawks(){const dt=Math.min(.05,Math.max(0,T-(drawHawks.lt||T)));drawHawks.lt=T;const win=state==='play'&&sites.slice(0,5).every(q=>q.state==='grown'),live=drones.filter(d=>!d.dead).concat(tdr.filter(d=>!d.dead));
  if(win&&live.length&&!hawks.some(h=>h.d)){drawHawks.wait=(drawHawks.wait||0)+dt;if(drawHawks.wait>.9){drawHawks.wait=0;const d=live.sort((p,q)=>Math.abs(p.x-(swim?swim.x:P.x))-Math.abs(q.x-(swim?swim.x:P.x)))[0],side=Math.random()<.5?-1:1;hawks.push({x:d.x+side*420,y:d.y-380,d,dir:-side})}}
  for(let i=hawks.length-1;i>=0;i--){const h=hawks[i];if(h.d){const dx=h.d.x-h.x,dy=h.d.y-h.y,m=Math.hypot(dx,dy)||1;h.dir=dx>0?1:-1;h.x+=dx/m*640*dt;h.y+=dy/m*640*dt;if(m<26||h.d.dead){if(!h.d.dead){h.d.dead=.01;SFX.clang();sparks(h.d.x,h.d.y,12,'#ffd23f');word('SCREE',h.d.x,h.d.y-40,'#fbf3dc');shake=RM?0:4}h.d=null;h.vy=-260}}
