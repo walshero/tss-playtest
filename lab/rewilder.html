@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.20</title>
+<title>Rewilder v1.21</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.20 | LAB | 2026-11-27
+<!-- TSP build: Rewilder v1.21 | LAB | 2026-11-27
+     v1.21 (founder: "Revert the bluriness."): far-layer focus blur and the blurred foreground grass strip are off; deep shadows and the cardboard hill edge stay.
      v1.20 (founder: "1 then 5. Show me samples before implementing" then "Make the sun still read. 5 yes"): the lens layer. Far layers soft, the sun kept sharp, a blurred grass and cattail strip at the bottom edge; big shapes throw deeper, softer shadows (one per building outline); hills carry a corrugated cardboard edge.
      v1.19 (founder: "124", from the low-hanging-fruit list): (1) swatting drones in a row climbs in pitch, SWAT x2, x3...; (2) when the last site of a level grows, the camera drifts across the whole restored city for about five seconds before the notes open, tap to skip; (4) a grown site answers its need once: water sites pull the next storm in and runoff visibly slides off the houses into them, power sites send lightning chevrons to the houses, getting-around sites draw green arrows from the houses.
      v1.18 (founder: "The final tower has random red lights in windows which is hard for tracking drones. Be consistent. Review art on final tower"): every tower window is the same dark glass with one glint; the spine is iron grey with no blinking lamps; gargoyle eyes are dark. Red light on the tower now means a drone.
@@ -821,7 +822,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.20</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.21</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -3247,13 +3248,11 @@ function render(){if(state==='vacation'){drawVacation();return}if(state==='poolc
    if(hr(i+4)<.4&&Math.sin(T*3+i)>0)dot(bx+bw/2,top-4,3.2,'#ff5a4a');
    if(sv>=2&&hr(i+7)<.16&&!RM){const a=-1.57+Math.sin(T*.5+i)*.7,ox=bx+bw/2;ctx.fillStyle='rgba(255,240,170,.13)';ctx.beginPath();ctx.moveTo(ox,top);ctx.lineTo(ox+Math.cos(a-.08)*560,top+Math.sin(a-.08)*560);ctx.lineTo(ox+Math.cos(a+.08)*560,top+Math.sin(a+.08)*560);ctx.closePath();ctx.fill()}}
   ctx.globalAlpha=1}
- {const ks=[(sx-cam.x*.1)*S+shX,(sy-cam.y*.1)*S+OY+shY,72*S+10];if(!RM)lensBlur(.24,ks);render.ks0=ks}
  // hills: two paper layers
  [[.25,330,'#4c5d48','#6b5d48',3],[.5,390,'#3d5a3b','#5e5040',7]].forEach(L=>{setWorld(L[0]);const x0=cam.x*L[0]-40,x1=x0+viewW+80,pts=[],yo=cam.y*L[0]*.4;
   for(let x=Math.floor(x0/40)*40;x<=x1+40;x+=40)pts.push([x,yo+L[1]-Math.sin(x*.004+L[4])*34-Math.sin(x*.011+L[4]*2)*14-hr(Math.floor(x/40)+L[4]*100)*6]);
   pts.push([x1+40,1400],[x0-40,1400]);shape(pts,mix(L[3],L[2],clear),{lw:2,sh:1});{const nn=pts.length-2;ctx.save();for(let j=0;j<nn-1;j++){const [ax,ay]=pts[j],[bx2,by2]=pts[j+1];for(let t=0;t<1;t+=.125){const x=ax+(bx2-ax)*t,y=ay+(by2-ay)*t;ctx.fillStyle='rgba(30,22,16,.45)';ctx.beginPath();ctx.arc(x,y+6,3,0,Math.PI);ctx.fill();ctx.strokeStyle='rgba(240,220,180,.4)';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y+5,3.4,Math.PI,0);ctx.stroke()}}for(let x=Math.floor(x0/9)*9;x<x1;x+=9){ctx.fillStyle='rgba(20,14,10,.05)';ctx.fillRect(x,yo+L[1]+20,3,600)}ctx.restore()}
   if(clear>.3)for(let x=Math.floor(x0/170)*170;x<x1;x+=170){const n=Math.floor(x/170),px=x+hr(n+L[4])*100;if(hr(n*3+L[4])<.28)continue;pine(px,yo+L[1]-Math.sin(px*.004+L[4])*34-Math.sin(px*.011+L[4]*2)*14+6,(.35+L[0])*(.7+hr(n*7+L[4])*.9),n,(clear-.3)/.7)}});
- if(!RM)lensBlur(.5,render.ks0);
  setWorld(1);
  const dam=sites[4],damUp=dam.state==='standing'&&!dam.paved;
  // reservoir drops as the dam does
@@ -3311,7 +3310,7 @@ function render(){if(state==='vacation'){drawVacation();return}if(state==='poolc
  if(riverOn&&state==='play'&&!(swim&&swim.fish)&&fishSave){const fry=run&&run.phase==='fry',ph=T%3.2;drawSalmon(Object.assign({},fishSave,{leap:!swim&&ph<.6&&!told.has('fish')?.6-ph:0,z:fry?.42+.58*run.age:1,dead:run&&run.phase==='dying'}))}
  {const hh=clamp((GY-P.y)/300,0,1);if(state!=='title'||P.y<=GY){ctx.globalAlpha=.3*(1-hh*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(P.x,GY-1,24*(1-hh*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1}}
  if(!swim||swim.fish)drawHero();if(swim)drawSwimmer();questPoolFront();drawTagBadge();
- drawCallbacks();parts.forEach(q=>{if(!q.bk)drawPart(q)});lensFore();
+ drawCallbacks();parts.forEach(q=>{if(!q.bk)drawPart(q)});/* v1.21: focus blur and the blurred grass strip reverted (founder 2026-11-27) */
  words.forEach(w=>{const a=clamp(w.life/.9,0,1),pop=1+.5*Math.sin(Math.min(1,(1-a)*5)*Math.PI);ctx.globalAlpha=Math.min(1,a*3);if(w.k){const z=Math.max(30,22/S)*pop,R=z*(.7+w.t.length*.3),pts=[];for(let i=0;i<16;i++){const r=i%2?R*.74:R,an=i/16*6.283+w.rot;pts.push([w.x+Math.cos(an)*r,w.y-(1-a)*40+Math.sin(an)*r*.6])}shape(pts,BURST[w.k][0],{lw:2.4,st:w.k==='baron'?'#ffd23f':INK})}paperText(w.t,w.x,w.y-(1-a)*40,Math.max(30,22/S)*pop,w.k?BURST[w.k][1]:w.c,w.rot);ctx.globalAlpha=1});
  drawFlood();drawMud();
  if(pulse){const u=(T-pulse.t)/1.7;if(u>=1)pulse=null;else{const r=80+u*620,gr=ctx.createRadialGradient(pulse.x,GY-90,r*.1,pulse.x,GY-90,r);gr.addColorStop(0,'rgba(255,226,150,0)');gr.addColorStop(.55,'rgba(255,226,150,'+(.26*(1-u)).toFixed(3)+')');gr.addColorStop(1,'rgba(255,226,150,0)');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=gr;ctx.fillRect(pulse.x-r,GY-90-r,2*r,2*r);ctx.restore()}}
