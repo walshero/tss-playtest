@@ -3,10 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Rewilder v1.19</title>
+<title>Rewilder v1.20</title>
 <meta name="spec-source" content="claude/REWILDER-PANEL-AND-PLAN-2026-11-12.md">
 <meta name="audience" content="Founder playtest first; phone-first players, teens and college students. Lab build.">
-<!-- TSP build: Rewilder v1.19 | LAB | 2026-11-26
+<!-- TSP build: Rewilder v1.20 | LAB | 2026-11-27
+     v1.20 (founder: "1 then 5. Show me samples before implementing" then "Make the sun still read. 5 yes"): the lens layer. Far layers soft, the sun kept sharp, a blurred grass and cattail strip at the bottom edge; big shapes throw deeper, softer shadows (one per building outline); hills carry a corrugated cardboard edge.
      v1.19 (founder: "124", from the low-hanging-fruit list): (1) swatting drones in a row climbs in pitch, SWAT x2, x3...; (2) when the last site of a level grows, the camera drifts across the whole restored city for about five seconds before the notes open, tap to skip; (4) a grown site answers its need once: water sites pull the next storm in and runoff visibly slides off the houses into them, power sites send lightning chevrons to the houses, getting-around sites draw green arrows from the houses.
      v1.18 (founder: "The final tower has random red lights in windows which is hard for tracking drones. Be consistent. Review art on final tower"): every tower window is the same dark glass with one glint; the spine is iron grey with no blinking lamps; gargoyle eyes are dark. Red light on the tower now means a drone.
      v1.17 (founder: "There is a crackling sound in the game that might be construction or tractors breaking but it's not a nice sound and I want to cut. Also, reverse decision on the maze for the final tower. Remove maze."): the weld crackle (tractor repair, rebuild crew) and the crackle bursts in the construction cue are cut; the electric maze is gone and the tower is back to 40 floors, the 16 floors added for it removed.
@@ -820,7 +821,7 @@ body.cut #corner,body.cut #pad,body.cut #toast,body.cut #lens{display:none!impor
 
 <header class="se-chrome" id="topbar">
   <a class="nav" href="../arcade.html">Cabinet</a>
-  <h1>Rewilder <span class="ver">v1.19</span> <span class="tsp-labchip">LAB</span></h1>
+  <h1>Rewilder <span class="ver">v1.20</span> <span class="tsp-labchip">LAB</span></h1>
   <button id="modeBtn" class="icon" type="button" aria-label="Mode: Dark. Switch to Light."><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="8"/><path d="M14 6a8 8 0 0 0 0 16z" style="fill:var(--glyph)"/></svg></button>
   <button id="notesBtn" type="button">Field guide</button>
   <button id="landBtn" class="lvBtn" type="button" hidden>Leave the river</button><span id="ptLab">Playtest: start at</span><button class="lvBtn" type="button" data-l="1">Level 1</button><button class="lvBtn" type="button" data-l="2">Level 2</button><button class="lvBtn" type="button" data-l="3">Level 3</button><button class="lvBtn" type="button" id="isleBtn">Island</button>
@@ -1106,6 +1107,7 @@ function paperOn(p){if(NOPAPER||p.length<3)return;const pt=paperPat();if(!pt)ret
  ctx.save();pathPts(p);ctx.clip();ctx.setTransform(DPR,0,0,DPR,0,0);const ox=-(cam.x*S)%pt._z,oy=(OY-cam.y*S)%pt._z;ctx.translate(ox,oy);ctx.fillStyle=pt;ctx.fillRect(sx0-ox,sy0-oy,sx1-sx0,sy1-sy0);ctx.restore()}
 function shape(p,fill,o){o=o||{};const lw=o.lw||2.2,card=o.ln!==false&&!o.st&&typeof fill==='string'&&fill.length===7&&fill[0]==='#'&&ctx.globalAlpha>.94;
  if(card){const edge=tone3(fill),big=o.sh||lw>=1.9,mid=lw>=1.3;
+  if(o.sh&&lw>=2&&!noDeep&&state!=='poolcut'){DEEP.forEach(q=>{ctx.save();ctx.translate(q[0],q[1]);pathPts(p);ctx.fillStyle='rgba(18,8,24,'+q[2]+')';ctx.fill();ctx.restore()})}
   if(mid){ctx.save();ctx.translate(big?2.6:1.5,big?3.8:2.2);pathPts(p);ctx.fillStyle=big?'rgba(18,8,24,.34)':'rgba(18,8,24,.24)';ctx.fill();ctx.restore();   // cast shadow
    ctx.save();ctx.translate(.5,big?1.7:1.1);pathPts(p);ctx.fillStyle=LIP.get(fill);ctx.fill();ctx.restore();                                              // the cut edge of the card
    ctx.save();ctx.translate(-.5,-.7);pathPts(p);ctx.fillStyle=RIM.get(fill);ctx.fill();ctx.restore()}                                                       // light on the upper rim
@@ -3245,11 +3247,13 @@ function render(){if(state==='vacation'){drawVacation();return}if(state==='poolc
    if(hr(i+4)<.4&&Math.sin(T*3+i)>0)dot(bx+bw/2,top-4,3.2,'#ff5a4a');
    if(sv>=2&&hr(i+7)<.16&&!RM){const a=-1.57+Math.sin(T*.5+i)*.7,ox=bx+bw/2;ctx.fillStyle='rgba(255,240,170,.13)';ctx.beginPath();ctx.moveTo(ox,top);ctx.lineTo(ox+Math.cos(a-.08)*560,top+Math.sin(a-.08)*560);ctx.lineTo(ox+Math.cos(a+.08)*560,top+Math.sin(a+.08)*560);ctx.closePath();ctx.fill()}}
   ctx.globalAlpha=1}
+ {const ks=[(sx-cam.x*.1)*S+shX,(sy-cam.y*.1)*S+OY+shY,72*S+10];if(!RM)lensBlur(.24,ks);render.ks0=ks}
  // hills: two paper layers
  [[.25,330,'#4c5d48','#6b5d48',3],[.5,390,'#3d5a3b','#5e5040',7]].forEach(L=>{setWorld(L[0]);const x0=cam.x*L[0]-40,x1=x0+viewW+80,pts=[],yo=cam.y*L[0]*.4;
   for(let x=Math.floor(x0/40)*40;x<=x1+40;x+=40)pts.push([x,yo+L[1]-Math.sin(x*.004+L[4])*34-Math.sin(x*.011+L[4]*2)*14-hr(Math.floor(x/40)+L[4]*100)*6]);
-  pts.push([x1+40,1400],[x0-40,1400]);shape(pts,mix(L[3],L[2],clear),{lw:2,sh:1});
+  pts.push([x1+40,1400],[x0-40,1400]);shape(pts,mix(L[3],L[2],clear),{lw:2,sh:1});{const nn=pts.length-2;ctx.save();for(let j=0;j<nn-1;j++){const [ax,ay]=pts[j],[bx2,by2]=pts[j+1];for(let t=0;t<1;t+=.125){const x=ax+(bx2-ax)*t,y=ay+(by2-ay)*t;ctx.fillStyle='rgba(30,22,16,.45)';ctx.beginPath();ctx.arc(x,y+6,3,0,Math.PI);ctx.fill();ctx.strokeStyle='rgba(240,220,180,.4)';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(x,y+5,3.4,Math.PI,0);ctx.stroke()}}for(let x=Math.floor(x0/9)*9;x<x1;x+=9){ctx.fillStyle='rgba(20,14,10,.05)';ctx.fillRect(x,yo+L[1]+20,3,600)}ctx.restore()}
   if(clear>.3)for(let x=Math.floor(x0/170)*170;x<x1;x+=170){const n=Math.floor(x/170),px=x+hr(n+L[4])*100;if(hr(n*3+L[4])<.28)continue;pine(px,yo+L[1]-Math.sin(px*.004+L[4])*34-Math.sin(px*.011+L[4]*2)*14+6,(.35+L[0])*(.7+hr(n*7+L[4])*.9),n,(clear-.3)/.7)}});
+ if(!RM)lensBlur(.5,render.ks0);
  setWorld(1);
  const dam=sites[4],damUp=dam.state==='standing'&&!dam.paved;
  // reservoir drops as the dam does
@@ -3307,7 +3311,7 @@ function render(){if(state==='vacation'){drawVacation();return}if(state==='poolc
  if(riverOn&&state==='play'&&!(swim&&swim.fish)&&fishSave){const fry=run&&run.phase==='fry',ph=T%3.2;drawSalmon(Object.assign({},fishSave,{leap:!swim&&ph<.6&&!told.has('fish')?.6-ph:0,z:fry?.42+.58*run.age:1,dead:run&&run.phase==='dying'}))}
  {const hh=clamp((GY-P.y)/300,0,1);if(state!=='title'||P.y<=GY){ctx.globalAlpha=.3*(1-hh*.7);ctx.fillStyle='#120c1e';ctx.beginPath();ctx.ellipse(P.x,GY-1,24*(1-hh*.5),5,0,0,7);ctx.fill();ctx.globalAlpha=1}}
  if(!swim||swim.fish)drawHero();if(swim)drawSwimmer();questPoolFront();drawTagBadge();
- drawCallbacks();parts.forEach(q=>{if(!q.bk)drawPart(q)});
+ drawCallbacks();parts.forEach(q=>{if(!q.bk)drawPart(q)});lensFore();
  words.forEach(w=>{const a=clamp(w.life/.9,0,1),pop=1+.5*Math.sin(Math.min(1,(1-a)*5)*Math.PI);ctx.globalAlpha=Math.min(1,a*3);if(w.k){const z=Math.max(30,22/S)*pop,R=z*(.7+w.t.length*.3),pts=[];for(let i=0;i<16;i++){const r=i%2?R*.74:R,an=i/16*6.283+w.rot;pts.push([w.x+Math.cos(an)*r,w.y-(1-a)*40+Math.sin(an)*r*.6])}shape(pts,BURST[w.k][0],{lw:2.4,st:w.k==='baron'?'#ffd23f':INK})}paperText(w.t,w.x,w.y-(1-a)*40,Math.max(30,22/S)*pop,w.k?BURST[w.k][1]:w.c,w.rot);ctx.globalAlpha=1});
  drawFlood();drawMud();
  if(pulse){const u=(T-pulse.t)/1.7;if(u>=1)pulse=null;else{const r=80+u*620,gr=ctx.createRadialGradient(pulse.x,GY-90,r*.1,pulse.x,GY-90,r);gr.addColorStop(0,'rgba(255,226,150,0)');gr.addColorStop(.55,'rgba(255,226,150,'+(.26*(1-u)).toFixed(3)+')');gr.addColorStop(1,'rgba(255,226,150,0)');ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle=gr;ctx.fillRect(pulse.x-r,GY-90-r,2*r,2*r);ctx.restore()}}
@@ -3485,6 +3489,23 @@ function legC(fx,y,fw,fh,sd){shape(rectPts(fx,y,fw,fh,sd,.3),'#2a2830',{lw:1.8})
  [[fx+7,y+6],[fx+fw-7,y+6],[fx+7,y+fh-6],[fx+fw-7,y+fh-6],[fx+fw/2,y+fh/2]].forEach((p,i)=>{shape(rectPts(p[0]-5.5,p[1]-5.5,11,11,sd+i,.3),'#55505e',{lw:1});dot(p[0],p[1],1.5,'#d8cfb8')});
  if(hr(sd)<.5){const g=ctx.createLinearGradient(0,y+fh/2+5,0,y+fh);g.addColorStop(0,'rgba(150,80,40,.5)');g.addColorStop(1,'rgba(150,80,40,0)');ctx.fillStyle=g;ctx.fillRect(fx+fw/2-1.5,y+fh/2+5,3,fh*.45)}}
 function smokeCurl(x,y,h,w,c,ph,al){/* a tapered paper ribbon that curls as it rises */const n=10,L=[],R=[];for(let m=0;m<=n;m++){const t=m/n,cx=x+Math.sin(t*4.2+ph)*w*(.3+t),cy=y-t*h,hw=(1-t)*w*.32+1;const dx=Math.cos(t*4.2+ph)*w*(.3+t)*4.2/h,nx=1/Math.hypot(1,dx);L.push([cx-hw*nx,cy-hw*dx*nx]);R.push([cx+hw*nx,cy+hw*dx*nx])}ctx.globalAlpha=al;shape(L.concat(R.reverse()),c,{lw:1});ctx.globalAlpha=1}
+/* v1.20 (founder 2026-11-27: "1 then 5", "Make the sun still read. 5 yes"): the lens layer.
+   Focus: far layers are pulled soft by shrinking and stretching the frame (the glow's own trick, no canvas filter, so phones keep up);
+   the sun is kept sharp so its face still reads. A blurred strip of grass and cattails slides along the bottom edge, nearer than the
+   world; it steps aside around the TAG badge and is off while swimming. Depth: big shapes throw a wider, softer shadow onto what is
+   behind them, a building throws one shadow for its whole outline, and the hills show a corrugated cardboard cut edge. */
+function lensBlur(k,keep){const W2=cv.width,H2=cv.height;if(!render.lb){render.lb=document.createElement('canvas');render.lx=render.lb.getContext('2d');render.ks=document.createElement('canvas');render.kx=render.ks.getContext('2d')}
+ const bw=Math.max(8,Math.round(W2*k)),bh=Math.max(8,Math.round(H2*k));if(render.lb.width!==bw||render.lb.height!==bh){render.lb.width=bw;render.lb.height=bh}
+ let kr=null;if(keep){const r=Math.ceil(keep[2]*DPR),x0=Math.round(keep[0]*DPR-r),y0=Math.round(keep[1]*DPR-r);if(x0+2*r>0&&y0+2*r>0&&x0<W2&&y0<H2){kr=[x0,y0,2*r];if(render.ks.width!==2*r){render.ks.width=render.ks.height=2*r}const q=render.kx;q.globalCompositeOperation='copy';q.drawImage(cv,x0,y0,2*r,2*r,0,0,2*r,2*r);q.globalCompositeOperation='destination-in';const g=q.createRadialGradient(r,r,r*.62,r,r,r);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(1,'rgba(0,0,0,0)');q.fillStyle=g;q.fillRect(0,0,2*r,2*r)}}
+ const x=render.lx;x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.globalCompositeOperation='copy';x.drawImage(cv,0,0,bw,bh);ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.globalCompositeOperation='copy';ctx.drawImage(render.lb,0,0,W2,H2);ctx.globalCompositeOperation='source-over';if(kr)ctx.drawImage(render.ks,kr[0],kr[1]);ctx.restore()}
+function lensFore(){if(state!=='play'||swim||RM)return;if(!render.fb){render.fb=document.createElement('canvas');render.fx=render.fb.getContext('2d')}const k=.16,bw=Math.round(cv.width*k),bh=Math.round(cv.height*k);if(render.fb.width!==bw||render.fb.height!==bh){render.fb.width=bw;render.fb.height=bh}
+ const f=render.fx;f.setTransform(1,0,0,1,0,0);f.clearRect(0,0,bw,bh);const sc=k*DPR,par=1.5,ox=-cam.x*par*S,tb=tagBadge(),tx=tb?(tb.x-cam.x)*S+shX:-999;f.setTransform(sc,0,0,sc,0,0);
+ for(let i=Math.floor((cam.x*par*S-200)/90);i<(cam.x*par*S+W+200)/90;i++){if(hr(i*7)<.45)continue;const bx=i*90+ox+hr(i)*60;if(Math.abs(bx-tx)<90)continue;const hgt=34+hr(i+3)*70,lean=(hr(i+5)-.5)*40;
+  f.fillStyle=hr(i+9)<.5?'#1c2a1a':'#2a3a22';for(let b=0;b<4;b++){const x0=bx+b*9;f.beginPath();f.moveTo(x0-4,H+10);f.quadraticCurveTo(x0+lean*.3,H-hgt*.6,x0+lean,H-hgt-b*10);f.quadraticCurveTo(x0+lean*.3+3,H-hgt*.6,x0+4,H+10);f.fill()}
+  if(hr(i+11)<.35){f.fillStyle='#4a3020';f.beginPath();f.ellipse(bx+lean+14,H-hgt-6,4,13,lean*.01,0,7);f.fill()}}
+ ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.globalAlpha=.9;ctx.drawImage(render.fb,0,0,cv.width,cv.height);ctx.restore()}
+const DEEP=[[26,32,.06],[17,21,.07],[9,12,.09]];let noDeep=0;
+function deepSil(s){const n=s.rows.length,cw=s.cw,fh=s.fh;DEEP.forEach(q=>{ctx.beginPath();for(let f=0;f<n;f++){const row=s.rows[f];for(let c=0;c<row.length;c++){const k=row[c];if(!k||k.hp<=0)continue;ctx.rect(s.x+c*cw+q[0],GY-(f+1)*fh+q[1],cw,fh)}}ctx.fillStyle='rgba(18,8,24,'+q[2]+')';ctx.fill()})}
 function puffDraw(x,y){for(let k=0;k<2;k++){const u=(T*.35+k/2)%1;smokeCurl(x,y-u*18,30+u*10,10,'#ece6dc',T*.8+k*2,(1-u)*.75)}}
 function strip(x0,y0,x1,y1,w,c,o){const dx=x1-x0,dy=y1-y0,d=Math.hypot(dx,dy)||1,nx=-dy/d*w/2,ny=dx/d*w/2;shape([[x0+nx,y0+ny],[x1+nx,y1+ny],[x1-nx,y1-ny],[x0-nx,y0-ny]],c,o||{lw:1.2})}
 function cutLine(x0,y0,x1,y1,c,w){if(w>=3&&ctx.globalAlpha>.9&&c&&c[0]==='#')strip(x0,y0,x1,y1,w,c,{lw:w>=5?1.6:1.1,sh:w>=8});else line(x0,y0,x1,y1,c,w)}
@@ -4197,7 +4218,8 @@ function drawIsleFront(){const line=cutLine,dot=cutDot;const a=cam.x-260,b=cam.x
  else{shape(blobPts(M.x+70,GY-8,84,10,172,10),'#8a8a90',{lw:1.8});if(isle.gr>.5)shape(blobPts(M.x+70,GY-14,50,9,173,9),'#5fae50',{lw:1.4})}
  if(isle.bl&&isle.bl.t<4){const q=blimpAt(isle.bl.t);blimpArt(q[0],q[1],q[2],q[3],true)}}
 function keyArt(x,y,cw,fh,k){shape(rectPts(x+2,y+2,cw-4,fh-4,5,.5),'#2f3a4a',{lw:2.6,sh:1});shape([[x+cw*.26,y+fh*.2],[x+cw*.74,y+fh*.2],[x+cw*.63,y+fh*.8],[x+cw*.37,y+fh*.8]],'#d9c27a',{lw:2});line(x+cw*.5,y+fh*.32,x+cw*.5,y+fh*.68,'#2f3a4a',3);[[7,7],[cw-7,7],[7,fh-7],[cw-7,fh-7]].forEach(r=>dot(x+r[0],y+r[1],2.4,'#c9d2de'));if(k.hp<k.max)cracks(x+4,y+4,cw-8,fh-8,3,k.seed)}
-function drawStanding(s){const n=s.rows.length,top=GY-n*s.fh;
+function drawStanding(s){const n=s.rows.length,top=GY-n*s.fh;deepSil(s);noDeep++;try{drawStandingIn(s,n,top)}finally{noDeep--}}
+function drawStandingIn(s,n,top){
  if(s.plot!==undefined&&!s.paved){drawCells(s);for(let x=s.x+4;x<=s.x+s.w-4;x+=(s.w-8)/Math.round(s.w/40)){line(x,GY-26,x,GY-62,'#6d7684',3)}line(s.x+4,GY-60,s.x+s.w-4,GY-60,'#6d7684',2.4);line(s.x+4,GY-44,s.x+s.w-4,GY-44,'#6d7684',1.6);line(s.cx,GY-62,s.cx,GY-84,'#5b3a24',4);shape(rectPts(s.cx-58,GY-116,116,34,s.seed+6,.7),'#fbf3dc',{lw:2.2,sh:1});paperText(s.l2?'KEEP OUT':'EMPTY LOT',s.cx,GY-98,18,'#b3261e',0);return}
  if(s.paved||s.id==='lot'){drawCells(s);line(s.x+s.w-12,GY-18,s.x+s.w-12,GY-74,'#5a5a60',4);shape(rectPts(s.x+s.w-28,GY-80,24,8,s.seed+2,.5),'#5a5a60',{lw:1.6});return}
  for(let i=0;i<6;i++){ctx.fillStyle=i%2?'#1b1328':'#ffd23f';ctx.fillRect(s.x-52+i*8.5,GY-7,8.5,7)}ctx.strokeStyle=INK;ctx.lineWidth=1.6;ctx.strokeRect(s.x-52,GY-7,51,7);
